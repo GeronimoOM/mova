@@ -9,7 +9,7 @@ export function useQuery<T>(
   queryThunk: () => Promise<T>,
   options: UseQueryOptions<T> = {},
 ) {
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<T | null>(options.initialData ?? null);
 

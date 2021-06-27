@@ -10,7 +10,7 @@ interface PropetyDialogProps {
   onClose: () => void;
 }
 
-const AddPropetyDialog: FC<PropetyDialogProps> = ({
+const AddPropertyDialog: FC<PropetyDialogProps> = ({
   selectedLang,
   onClose,
 }) => {
@@ -26,11 +26,10 @@ const AddPropetyDialog: FC<PropetyDialogProps> = ({
       langId: selectedLang.id,
       partOfSpeech: pos,
       options:
-        type === PropertyType['Single Option'] ||
-        type === PropertyType['Multi Option']
-          ? inputList
+        type === PropertyType['SingleOption'] ||
+        type === PropertyType['MultiOption']
+          ? inputList.slice(0, inputList.length - 1)
           : undefined,
-      table: type === PropertyType.Table ? inputList : undefined,
     }),
   );
 
@@ -166,4 +165,4 @@ const AddPropetyDialog: FC<PropetyDialogProps> = ({
   );
 };
 
-export default AddPropetyDialog;
+export default AddPropertyDialog;

@@ -3,7 +3,14 @@ export interface Entry {
   original: string;
   translation: string;
   partOfSpeech: PartOfSpeech;
+}
+
+export interface EntryFull extends Entry {
   customValues: Record<string, PropertyValue>;
+}
+
+export function isEntryFull(entry: Entry | EntryFull): entry is EntryFull {
+  return 'customValues' in entry;
 }
 
 export interface Property {
@@ -22,16 +29,17 @@ export interface Language {
 
 export enum PropertyType {
   Text = 'text',
-  'Single Option' = 'single',
-  'Multi Option' = 'multi',
+  SingleOption = 'single',
+  MultiOption = 'multi',
   Table = 'table',
 }
 
-export function propertyTypeLabel(type: PropertyType): string {
-  return Object.entries(PropertyType).find(
-    ([, typeValue]) => type === typeValue,
-  )![0];
-}
+export const propertyTypeLabels: Record<PropertyType, string> = {
+  [PropertyType.Text]: 'Text',
+  [PropertyType.SingleOption]: 'Single Option',
+  [PropertyType.MultiOption]: 'Multiple Option',
+  [PropertyType.Table]: 'Table',
+};
 
 export enum PartOfSpeech {
   Noun = 'noun',
@@ -42,11 +50,14 @@ export enum PartOfSpeech {
   Misc = 'misc',
 }
 
-export function partOfSpeechLabel(pos: PartOfSpeech): string {
-  return Object.entries(PartOfSpeech).find(
-    ([, posValue]) => pos === posValue,
-  )![0];
-}
+export const partOfSpeechLabels: Record<PartOfSpeech, string> = {
+  [PartOfSpeech.Noun]: 'Noun',
+  [PartOfSpeech.Verb]: 'Verb',
+  [PartOfSpeech.Adjective]: 'Adjective',
+  [PartOfSpeech.Adverb]: 'Adverb',
+  [PartOfSpeech.Pronoun]: 'Pronoun',
+  [PartOfSpeech.Misc]: 'Misc',
+};
 
 export interface Option {
   id: string;
@@ -64,7 +75,13 @@ export interface PropertyValue {
   options?: string[];
   table: Record<string, string>;
 }
+
 export interface Page<T> {
   items: T[];
   hasMore: boolean;
 }
+
+export const EMPTY_PAGE: Page<any> = {
+  items: [],
+  hasMore: false,
+};

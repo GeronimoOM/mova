@@ -1,13 +1,11 @@
 import React, { useState, FC } from 'react';
 
 import {
-  PropertyType,
-  PartOfSpeech,
-  partOfSpeechLabel,
+  partOfSpeechLabels,
   Property,
-  propertyTypeLabel,
+  propertyTypeLabels,
 } from '../../api/types';
-import { updateEntry, updateProperty } from '../../api/client';
+import { updateProperty } from '../../api/client';
 import '../App.css';
 import { useMutation } from '../../api/useMutation';
 
@@ -17,11 +15,7 @@ interface PropetyDialogProps {
   onClose: () => void;
 }
 
-const EditPropetyDialog: FC<PropetyDialogProps> = ({
-  property,
-  langId,
-  onClose,
-}) => {
+const EditPropetyDialog: FC<PropetyDialogProps> = ({ property, onClose }) => {
   const [inputList, setInputList] = useState<string[]>(['']);
   const [name, setName] = useState<string>(property.name);
 
@@ -30,19 +24,15 @@ const EditPropetyDialog: FC<PropetyDialogProps> = ({
     onClose();
   };
 
-  const [editProperty, { loading }] = useMutation(() =>
+  const [editProperty] = useMutation(() =>
     updateProperty(
       {
         name,
-        type: property.type,
-        langId,
-        partOfSpeech: property.partOfSpeech,
-        options:
+        /*options:
           property.type === PropertyType['Single Option'] ||
           property.type === PropertyType['Multi Option']
             ? inputList
-            : undefined,
-        //table:  property.type === CustomType.Table ? inputList : undefined,
+            : undefined,*/
       },
       property.id,
     ),
@@ -80,24 +70,13 @@ const EditPropetyDialog: FC<PropetyDialogProps> = ({
           />
         </p>
         <p>
-          <label>PROPERTY TYPE: {propertyTypeLabel(property.type)}</label>
+          <label>PROPERTY TYPE: {propertyTypeLabels[property.type]}</label>
         </p>
         <p>
           <label>
-            PART OF SPEECH: {partOfSpeechLabel(property.partOfSpeech)}
+            PART OF SPEECH: {partOfSpeechLabels[property.partOfSpeech]}
           </label>
           <br />
-          {/* <select
-            className='basic-slide'
-            onChange={(event) => setPos(event.target.value)}
-            value={pos}
-          >
-            {Object.entries(PartOfSpeech).map(([posName, posValue]) => (
-              <option className='option' key={posValue} value={posValue}>
-                {posName}
-              </option>
-            ))}
-          </select> */}
         </p>
         {property.type === 'text' && <div />}
         {(property.type === 'single' || property.type === 'multi') && (

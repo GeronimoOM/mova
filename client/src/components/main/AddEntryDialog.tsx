@@ -1,154 +1,57 @@
 import React, { useState, FC } from 'react';
+import { useDispatch } from 'react-redux';
 import {
-  createEntry,
-  CreateEntryPropertyValue,
-  CreateEntryPropertyValues,
+  createEntry as createEntryCall,
+  SaveEntryPropertyValue,
+  SaveEntryPropertyValues,
   getLanguageProperties,
 } from '../../api/client';
-
-import {
-  PropertyType,
-  Entry,
-  Language,
-  PartOfSpeech,
-  Property,
-} from '../../api/types';
+import { PartOfSpeech, Property, partOfSpeechLabels } from '../../api/types';
 import { useMutation } from '../../api/useMutation';
 import { useQuery } from '../../api/useQuery';
+import { useLangSelector } from '../../store';
+import { createOne } from '../../store/entries';
 import '../App.css';
+import Select from '../utils/Select';
+import EntryPropertiesForm from './EntryPropertiesForm';
 
 interface AddEntryDialogProps {
-  selectedLang: Language;
-  onAddEntry: (entry: Entry) => void;
   onClose: () => void;
 }
 
-interface PropertiesFormProps {
-  pos: PartOfSpeech;
-  selectedLang: Language;
-  propValues: CreateEntryPropertyValues;
-  onPropValueChange: (
-    propId: string,
-    propValue: CreateEntryPropertyValue,
-  ) => void;
-}
+const AddEntryDialog: FC<AddEntryDialogProps> = ({ onClose }) => {
+  const selectedLang = useLangSelector()!;
+  const dispatch = useDispatch();
 
-interface PropertyRowProps {
-  prop: Property;
-  propValue: CreateEntryPropertyValue;
-  onPropValueChange: (propValue: CreateEntryPropertyValue) => void;
-}
-
-const PropertyRow: FC<PropertyRowProps> = ({
-  prop,
-  propValue,
-  onPropValueChange,
-}) => {
-  return (
-    <p key={prop.id}>
-      <label className='label'>{prop.name.toUpperCase()}</label> <br />
-      {prop.type === 'single' && prop.options && (
-        <select
-          className='basic-slide'
-          onChange={(event) => {
-            onPropValueChange({ option: event.target.value });
-          }}
-          value={propValue?.option}
-          defaultValue=''
-        >
-          <option value='' disabled hidden>
-            ---
-          </option>
-          {Object.entries(prop.options).map(([key, opt]) => (
-            <option key={key} value={key}>
-              {opt}
-            </option>
-          ))}
-        </select>
-      )}
-      {prop.type === 'multi' && prop.options && (
-        <>
-          {Object.entries(prop.options).map(([key, opt]) => (
-            <>
-              <input
-                key={key}
-                value={key}
-                type='checkbox'
-                className='basic-slide'
-              />
-              <label>{opt}</label>
-            </>
-          ))}
-        </>
-      )}
-      {prop.type === PropertyType.Text && (
-        <textarea
-          className='basic-slide'
-          onChange={(event) => {
-            onPropValueChange({ text: event.target.value });
-          }}
-          value={propValue?.text}
-        />
-      )}
-    </p>
-  );
-};
-
-const PropertiesForm: FC<PropertiesFormProps> = ({
-  pos,
-  selectedLang,
-  propValues,
-  onPropValueChange,
-}) => {
-  const { data: propertiesData } = useQuery<Property[]>(() =>
-    getLanguageProperties(selectedLang.id).then((page) => page.items),
-  );
-  const properties = propertiesData ?? [];
-  const posProperties = properties.filter((prop) => prop.partOfSpeech === pos);
-
-  return (
-    <div>
-      {posProperties.map((prop) => (
-        <PropertyRow
-          key={prop.id}
-          prop={prop}
-          propValue={propValues[prop.id]}
-          onPropValueChange={(propValue) =>
-            onPropValueChange(prop.id, propValue)
-          }
-        />
-      ))}
-    </div>
-  );
-};
-
-const AddEntryDialog: FC<AddEntryDialogProps> = ({
-  selectedLang,
-  onAddEntry,
-  onClose,
-}) => {
   const [original, setOriginal] = useState('');
   const [translation, setTranslation] = useState('');
-  const [pos, setPos] = useState<PartOfSpeech>(PartOfSpeech.Noun);
-  const [
-    propertyValues,
-    setPropertyValues,
-  ] = useState<CreateEntryPropertyValues>({});
+  const [partOfSpeech, setPartOfSpeech] = useState<PartOfSpeech>(
+    PartOfSpeech.Noun,
+  );
+  const [propertyValues, setPropertyValues] = useState<SaveEntryPropertyValues>(
+    {},
+  );
 
-  const [addEntry, { loading }] = useMutation(() =>
-    createEntry({
+  const { data: properties } = useQuery<Property[]>(() =>
+    getLanguageProperties(selectedLang.id, partOfSpeech).then(
+      (page) => page.items,
+    ),
+  );
+
+  const [createEntry] = useMutation(() =>
+    createEntryCall({
       original,
       translation,
       langId: selectedLang.id,
-      partOfSpeech: pos,
+      partOfSpeech,
       customValues: propertyValues,
     }),
   );
 
   const handleSubmit = async () => {
-    const result = await addEntry();
+    const result = await createEntry();
     if (result) {
-      onAddEntry(result);
+      dispatch(createOne(result));
     }
     onClose();
   };
@@ -160,7 +63,6 @@ const AddEntryDialog: FC<AddEntryDialogProps> = ({
         className='center dialog'
         onClick={(event) => event.stopPropagation()}
       >
-        {loading && <p>Loading...</p>}
         <div className='sticky'>
           <a className='topright' onClick={onClose}>
             <i className='fas fa-window-close'></i>
@@ -189,22 +91,16 @@ const AddEntryDialog: FC<AddEntryDialogProps> = ({
         </p>
         <p>
           <label>PART OF SPEECH</label> <br />
-          <select
-            className='basic-slide wide'
-            onChange={(event) => setPos(event.target.value as PartOfSpeech)}
-            defaultValue={pos}
-          >
-            {Object.entries(PartOfSpeech).map(([posName, posValue]) => (
-              <option key={posValue} value={posValue}>
-                {posName}
-              </option>
-            ))}
-          </select>
+          <Select
+            value={partOfSpeech}
+            onSelect={setPartOfSpeech}
+            options={Object.values(PartOfSpeech)}
+            getLabel={(partOfSpeech) => partOfSpeechLabels[partOfSpeech]}
+          />
         </p>
         <div>
-          <PropertiesForm
-            pos={pos}
-            selectedLang={selectedLang}
+          <EntryPropertiesForm
+            properties={properties ?? []}
             propValues={propertyValues}
             onPropValueChange={(propId, propValue) =>
               setPropertyValues({ ...propertyValues, [propId]: propValue })

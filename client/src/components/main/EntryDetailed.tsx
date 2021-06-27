@@ -1,73 +1,75 @@
 import React, { FC } from 'react';
 
-import { Property, Entry, Language } from '../../api/types';
-import { useQuery } from '../../api/useQuery';
-import { getEntryProperties, getEntry } from '../../api/client';
+import { Entry, EntryFull, isEntryFull, PropertyType } from '../../api/types';
+import { getEntry, deleteEntry as deleteEntryCall } from '../../api/client';
 import '../App.css';
 import EditEntryDialog from './EditEntryDialog';
+import { useMutation } from '../../api/useMutation';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { deleteOne, loadOne, select } from '../../store/entries';
+import { useEffect } from 'react';
 
 interface EntryDetailedProps {
-  selectedLang: Language;
-  entry: Entry;
-  onClose: () => void;
-  openEdit: boolean;
-  setOpenEdit: (open: boolean) => void;
-  onEditEntry: (entry: Entry) => void;
+  entry: Entry | EntryFull;
 }
 
-const EntryDetailed: FC<EntryDetailedProps> = ({
-  selectedLang,
-  entry,
-  onClose,
-  openEdit,
-  setOpenEdit,
-  onEditEntry,
-}) => {
-  const { data: defs } = useQuery<Property[]>(
-    () => getEntryProperties(entry.id),
-    { deps: [entry.id] },
-  );
-  const { data: entryFull } = useQuery<Entry>(() => getEntry(entry.id), {
-    deps: [entry],
-  });
-  if (entryFull === null) return <div />;
+const EntryDetailed: FC<EntryDetailedProps> = ({ entry }) => {
+  const dispatch = useDispatch();
+
+  const [openEdit, setOpenEdit] = useState(false);
+
+  useEffect(() => {
+    if (!isEntryFull(entry)) {
+      getEntry(entry.id).then((entryFull) => dispatch(loadOne(entryFull)));
+    }
+  }, [entry]);
+
+  const [deleteEntry] = useMutation(() => deleteEntryCall(entry));
+
+  const handleDelete = async () => {
+    const result = await deleteEntry();
+    if (result) {
+      dispatch(deleteOne(result.id));
+    }
+  };
+
   return (
     <div className='container entry-detailed '>
       <a className='topright'>
         <i
-          className='fa fa-pencil-square'
+          className='far fa-edit'
           style={{ marginRight: '2px' }}
           onClick={() => setOpenEdit(true)}
         ></i>
-        <i className='fas fa-window-close' onClick={onClose}></i>
+        <i
+          className='fas fa-window-close'
+          style={{ marginRight: '2px' }}
+          onClick={() => dispatch(select(undefined))}
+        ></i>
+        <i className='fas fa-trash-alt' onClick={handleDelete}></i>
       </a>
-      <span className='word-title'>{entryFull.original}</span>
+      <span className='word-title'>{entry.original}</span>
       <div style={{ textAlign: 'left' }}>
         {/* <div className='gender-letter gender-m'>M</div> */}
         <br />
-        <i>({entryFull.partOfSpeech})</i>
+        <i>({entry.partOfSpeech})</i>
         <br />
-        <b>{entryFull.translation}</b>
-        {Object.values(entryFull.customValues).map((val) => (
-          <p key={val.definition.id}>
-            <b>{val.definition.name}: </b>
-            {val.definition.type === 'text' && val.text}
-            {val.definition.type === 'single' &&
-              val.option &&
-              val.definition.options![val.option]}
-          </p>
-        ))}
+        <b>{entry.translation}</b>
+        {isEntryFull(entry) &&
+          Object.values(entry.customValues).map((val) => (
+            <p key={val.definition.id}>
+              <b>{val.definition.name}: </b>
+              {val.definition.type === PropertyType.Text && val.text}
+              {val.definition.type === PropertyType.SingleOption &&
+                val.option &&
+                val.definition.options![val.option]}
+              {/** MultiOption */}
+            </p>
+          ))}
       </div>
-      {/* { defs && defs.map((def) => (console.log("FUCK", def))) }  */}
-      {openEdit && (
-        <EditEntryDialog
-          selectedLang={selectedLang}
-          entry={entryFull}
-          onClose={() => setOpenEdit(false)}
-          defs={defs}
-          customValues={entryFull.customValues}
-          onEditEntry={onEditEntry}
-        />
+      {isEntryFull(entry) && openEdit && (
+        <EditEntryDialog entry={entry} onClose={() => setOpenEdit(false)} />
       )}
     </div>
   );

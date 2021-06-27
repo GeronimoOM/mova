@@ -1,27 +1,15 @@
 import React, { FC } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import { Language } from '../api/types';
 
 import MainPage from './main/MainPage';
 import PropertiesPage from './properties/PropertiesPage';
 
-interface AppSwitchProps {
-  selectedLang: Language | undefined;
-}
-
-const AppSwitch: FC<AppSwitchProps> = ({ selectedLang }) => {
+const AppSwitch: FC = () => {
   return (
     <Router>
       <Switch>
-        <Route
-          exact
-          path='/'
-          render={() => <MainPage selectedLang={selectedLang} />}
-        />
-        <Route
-          path='/languages'
-          render={() => <PropertiesPage selectedLang={selectedLang} />}
-        />
+        <Route exact path='/' component={MainPage} />
+        <Route path='/languages' component={PropertiesPage} />
       </Switch>
     </Router>
   );

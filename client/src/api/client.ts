@@ -1,6 +1,14 @@
-import { Page, Language, Entry, Property, PartOfSpeech } from './types';
+import {
+  Page,
+  Language,
+  Entry,
+  Property,
+  PartOfSpeech,
+  EntryFull,
+} from './types';
 
 const API = 'http://localhost:9000/api';
+const ENTRIES_PER_PAGE = 10;
 
 export async function getLanguages(): Promise<Page<Language>> {
   const response = await fetch(`${API}/langs`);
@@ -10,7 +18,7 @@ export async function getLanguages(): Promise<Page<Language>> {
 export async function getLanguageEntries(
   langId: string,
   start = 0,
-  limit = 10,
+  limit = ENTRIES_PER_PAGE,
 ): Promise<Page<Entry>> {
   const response = await fetch(
     `${API}/entries?langId=${langId}&start=${start}&limit=${limit}`,
@@ -22,10 +30,12 @@ export async function getEntryProperties(entryId: string): Promise<Property[]> {
   const response = await fetch(`${API}/entries/${entryId}/definitions`);
   return response.json();
 }
-export async function getEntry(entryId: string): Promise<Entry> {
+
+export async function getEntry(entryId: string): Promise<EntryFull> {
   const response = await fetch(`${API}/entries/${entryId}`);
   return response.json();
 }
+
 export async function getLanguageProperties(
   langId: string,
   partOfSpeech?: PartOfSpeech,
@@ -46,24 +56,20 @@ export interface CreateEntryParams {
   translation: string;
   langId: string;
   partOfSpeech: PartOfSpeech;
-  customValues?: CreateEntryPropertyValues;
+  customValues?: SaveEntryPropertyValues;
 }
 
-export type CreateEntryPropertyValues = Record<
-  string,
-  CreateEntryPropertyValue
->;
+export type SaveEntryPropertyValues = Record<string, SaveEntryPropertyValue>;
 
-export interface CreateEntryPropertyValue {
+export interface SaveEntryPropertyValue {
   text?: string;
   option?: string;
   options?: string[];
-  table?: Record<string, string>;
 }
 
 export async function createEntry(
   createEntry: CreateEntryParams,
-): Promise<Entry> {
+): Promise<EntryFull> {
   const response = await fetch(`${API}/entries`, {
     method: 'post',
     headers: {
@@ -74,16 +80,29 @@ export async function createEntry(
   return response.json();
 }
 
+export interface UpdateEntryParams {
+  original?: string;
+  translation?: string;
+  customValues?: SaveEntryPropertyValues;
+}
+
 export async function updateEntry(
-  createEntry: CreateEntryParams,
+  updateEntry: UpdateEntryParams,
   entryId: string,
-): Promise<Entry> {
+): Promise<EntryFull> {
   const response = await fetch(`${API}/entries/${entryId}`, {
     method: 'put',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(createEntry),
+    body: JSON.stringify(updateEntry),
+  });
+  return response.json();
+}
+
+export async function deleteEntry(entry: Entry): Promise<Entry> {
+  const response = await fetch(`${API}/entries/${entry.id}`, {
+    method: 'delete',
   });
   return response.json();
 }
@@ -94,8 +113,6 @@ export interface CreatePropertyParams {
   langId: string;
   partOfSpeech: PartOfSpeech;
   options?: string[];
-  table?: string[];
-  text?: string;
 }
 
 export async function createProperty(
@@ -111,8 +128,14 @@ export async function createProperty(
   return response.json();
 }
 
+export interface UpdatePropertyParams {
+  name?: string;
+  text?: string;
+  options?: Record<string, string>;
+}
+
 export async function updateProperty(
-  createProperty: CreatePropertyParams,
+  updateProperty: UpdatePropertyParams,
   propId: string,
 ): Promise<Property> {
   const response = await fetch(`${API}/definitions/${propId}`, {
@@ -120,7 +143,7 @@ export async function updateProperty(
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(createProperty),
+    body: JSON.stringify(updateProperty),
   });
   return response.json();
 }

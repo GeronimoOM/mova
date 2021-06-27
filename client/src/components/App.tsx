@@ -1,43 +1,23 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import './App.css';
-import { Language } from '../api/types';
-import LangSelectDialog from './LangSelectDialog';
 import Menu from './Menu';
 import AppSwitch from './AppSwitch';
-import Cookies from 'cookies-js';
+import { useLangSelector } from '../store';
 
-const COOKIE_SELECTED_LANG = 'selectedLang';
-
-function App() {
-  const [selectedLang, setSelectedLang] = useState<Language | undefined>(
-    getSelectedLangFromCookie(),
-  );
-  const [open, setOpen] = useState(false);
+const App = () => {
+  const selectedLang = useLangSelector();
 
   return (
     <div>
-      <Menu setOpen={setOpen} />
-      <main>
-        <AppSwitch selectedLang={selectedLang} />
-      </main>
-      {open && (
-        <LangSelectDialog
-          selectedLang={selectedLang}
-          onSelectLang={(selectedLang) => {
-            setSelectedLang(selectedLang);
-            Cookies.set(COOKIE_SELECTED_LANG, JSON.stringify(selectedLang));
-          }}
-          onClose={() => setOpen(false)}
-        />
+      <Menu />
+      {selectedLang && (
+        <main>
+          <AppSwitch />
+        </main>
       )}
     </div>
   );
-}
-
-function getSelectedLangFromCookie(): Language | undefined {
-  const cookie = Cookies.get(COOKIE_SELECTED_LANG);
-  return cookie && JSON.parse(cookie);
-}
+};
 
 export default App;

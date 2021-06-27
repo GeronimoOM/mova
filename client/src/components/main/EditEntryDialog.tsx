@@ -1,52 +1,50 @@
 import React, { useState, FC } from 'react';
+import { useDispatch } from 'react-redux';
 import {
-  CreateEntryPropertyValue,
-  CreateEntryPropertyValues,
-  updateEntry,
+  getEntryProperties,
+  SaveEntryPropertyValue,
+  SaveEntryPropertyValues,
+  updateEntry as updateEntryCall,
 } from '../../api/client';
 
 import {
   PropertyType,
-  Entry,
-  Language,
-  partOfSpeechLabel,
+  partOfSpeechLabels,
   Property,
-  PropertyValue,
+  EntryFull,
 } from '../../api/types';
 import { useMutation } from '../../api/useMutation';
+import { useQuery } from '../../api/useQuery';
+import { useLangSelector } from '../../store';
+import { updateOne } from '../../store/entries';
 import '../App.css';
+import EntryPropertiesForm from './EntryPropertiesForm';
 
 interface EditEntryDialogProps {
-  selectedLang: Language;
-  entry: Entry;
-  onEditEntry: (entry: Entry) => void;
+  entry: EntryFull;
   onClose: () => void;
-  defs: Property[] | null;
-  customValues: Record<string, PropertyValue>;
 }
 
-const EditEntryDialog: FC<EditEntryDialogProps> = ({
-  selectedLang,
-  onEditEntry,
-  entry,
-  onClose,
-  defs,
-  customValues,
-}) => {
+const EditEntryDialog: FC<EditEntryDialogProps> = ({ entry, onClose }) => {
+  const selectedLang = useLangSelector()!;
+  const dispatch = useDispatch();
+
+  const { data: properties } = useQuery<Property[]>(
+    () => getEntryProperties(entry.id),
+    { deps: [entry.id] },
+  );
+
   const [original, setOriginal] = useState(entry.original);
   const [translation, setTranslation] = useState(entry.translation);
-  const [
-    propertyValues,
-    setPropertyValues,
-  ] = useState<CreateEntryPropertyValues>(customValues);
+  const [propertyValues, setPropertyValues] = useState<SaveEntryPropertyValues>(
+    entry.customValues,
+  );
 
-  const [editEntry, { loading }] = useMutation(() =>
-    updateEntry(
+  const [updateEntry] = useMutation(() =>
+    updateEntryCall(
       {
         original: original,
         translation,
-        langId: selectedLang.id,
-        partOfSpeech: entry.partOfSpeech,
         customValues: propertyValues,
       },
       entry.id,
@@ -54,9 +52,9 @@ const EditEntryDialog: FC<EditEntryDialogProps> = ({
   );
 
   const handleSubmit = async () => {
-    const result = await editEntry();
+    const result = await updateEntry();
     if (result) {
-      onEditEntry(result);
+      dispatch(updateOne(result));
     }
     onClose();
   };
@@ -68,7 +66,6 @@ const EditEntryDialog: FC<EditEntryDialogProps> = ({
         className='center dialog'
         onClick={(event) => event.stopPropagation()}
       >
-        {loading && <p>Loading...</p>}
         <div className='sticky'>
           <a className='topright' onClick={onClose}>
             <i className='fas fa-window-close'></i>
@@ -96,14 +93,16 @@ const EditEntryDialog: FC<EditEntryDialogProps> = ({
           />
         </p>
         <p>
-          <label>PART OF SPEECH: {partOfSpeechLabel(entry.partOfSpeech)}</label>{' '}
+          <label>
+            PART OF SPEECH: {partOfSpeechLabels[entry.partOfSpeech]}
+          </label>
           <br />
         </p>
-        {defs && (
+        {properties && (
           <div>
-            <PropertiesForm
+            <EntryPropertiesForm
+              properties={properties}
               propValues={propertyValues}
-              defs={defs}
               onPropValueChange={(propId, propValue) =>
                 setPropertyValues({ ...propertyValues, [propId]: propValue })
               }
@@ -115,93 +114,6 @@ const EditEntryDialog: FC<EditEntryDialogProps> = ({
         </button>
       </dialog>
     </div>
-  );
-};
-
-interface PropertiesFormProps {
-  propValues: CreateEntryPropertyValues;
-  onPropValueChange: (
-    propId: string,
-    propValue: CreateEntryPropertyValue,
-  ) => void;
-  defs: Property[];
-}
-
-const PropertiesForm: FC<PropertiesFormProps> = ({
-  propValues,
-  onPropValueChange,
-  defs,
-}) => {
-  return (
-    <div>
-      {defs.map((prop) => (
-        <PropertyRow
-          key={prop.id}
-          prop={prop}
-          propValue={propValues[prop.id]}
-          onPropValueChange={(propValue) =>
-            onPropValueChange(prop.id, propValue)
-          }
-        />
-      ))}
-    </div>
-  );
-};
-
-interface PropertyRowProps {
-  prop: Property;
-  propValue: CreateEntryPropertyValue;
-  onPropValueChange: (propValue: CreateEntryPropertyValue) => void;
-}
-
-const PropertyRow: FC<PropertyRowProps> = ({
-  prop,
-  propValue,
-  onPropValueChange,
-}) => {
-  return (
-    <p key={prop.id}>
-      <label className='label'>{prop.name.toUpperCase()}</label> <br />
-      {prop.type === 'single' && prop.options && (
-        <select
-          className='basic-slide'
-          onChange={(event) => {
-            onPropValueChange({ option: event.target.value });
-          }}
-          value={propValue?.option}
-        >
-          {Object.entries(prop.options).map(([key, opt]) => (
-            <option key={key} value={key}>
-              {opt}
-            </option>
-          ))}
-        </select>
-      )}
-      {prop.type === 'multi' && prop.options && (
-        <>
-          {Object.entries(prop.options).map(([key, opt]) => (
-            <>
-              <input
-                key={key}
-                value={key}
-                type='checkbox'
-                className='basic-slide'
-              />
-              <label>{opt}</label>
-            </>
-          ))}
-        </>
-      )}
-      {prop.type === PropertyType.Text && (
-        <textarea
-          className='basic-slide'
-          onChange={(event) => {
-            onPropValueChange({ text: event.target.value });
-          }}
-          value={propValue?.text}
-        />
-      )}
-    </p>
   );
 };
 
