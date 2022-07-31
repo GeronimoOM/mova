@@ -1,0 +1,141 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Language {
+  id: ID!
+  name: String!
+  properties(partOfSpeech: PartOfSpeech): [PropertyUnion!]!
+  words(start: Int = 0, limit: Int, query: String, order: WordOrder): WordPage!
+}
+
+union PropertyUnion = TextProperty | OptionProperty
+
+enum PartOfSpeech {
+  Noun
+  Verb
+  Adj
+  Adv
+  Pron
+  Misc
+}
+
+enum WordOrder {
+  Alphabetical
+  Chronological
+}
+
+type TextProperty {
+  id: ID!
+  name: String!
+  type: PropertyType!
+  partOfSpeech: PartOfSpeech!
+}
+
+enum PropertyType {
+  Text
+  Option
+}
+
+type OptionProperty {
+  id: ID!
+  name: String!
+  type: PropertyType!
+  partOfSpeech: PartOfSpeech!
+  options: [Option!]!
+}
+
+type Option {
+  id: ID!
+  value: String!
+}
+
+type Word {
+  id: String!
+  original: String!
+  translation: String!
+  partOfSpeech: PartOfSpeech!
+  properties: [PropertyValueUnion!]!
+}
+
+union PropertyValueUnion = TextPropertyValue | OptionPropertyValue
+
+type TextPropertyValue {
+  property: TextProperty!
+  text: String!
+}
+
+type OptionPropertyValue {
+  property: OptionProperty!
+  option: Option!
+}
+
+type WordPage {
+  items: [Word!]!
+  hasMore: Boolean!
+}
+
+type Query {
+  languages: [Language!]!
+  language(id: ID!): Language
+}
+
+type Mutation {
+  createLanguage(input: CreateLanguageInput!): Language!
+  updateLanguage(input: UpdateLanguageInput!): Language!
+  createProperty(input: CreatePropertyInput!): PropertyUnion!
+  updateProperty(input: UpdatePropertyInput!): PropertyUnion!
+  deleteProperty(id: ID!): PropertyUnion!
+  createWord(input: CreateWordInput!): Word!
+  updateWord(input: UpdateWordInput!): Word!
+  deleteWord(id: ID!): Word!
+}
+
+input CreateLanguageInput {
+  name: String!
+}
+
+input UpdateLanguageInput {
+  id: ID!
+  name: String!
+}
+
+input CreatePropertyInput {
+  name: String!
+  type: PropertyType!
+  languageId: ID!
+  partOfSpeech: PartOfSpeech!
+  options: [String!]
+}
+
+input UpdatePropertyInput {
+  id: ID!
+  name: String
+  options: [UpdateOptionInput!]
+}
+
+input UpdateOptionInput {
+  id: ID!
+  value: String!
+}
+
+input CreateWordInput {
+  original: String!
+  translation: String!
+  languageId: ID!
+  partOfSpeech: PartOfSpeech!
+  properties: [UpdatePropertyValueInput!]
+}
+
+input UpdatePropertyValueInput {
+  id: ID!
+  text: String
+  option: ID
+}
+
+input UpdateWordInput {
+  id: ID!
+  original: String
+  translation: String
+  properties: [UpdatePropertyValueInput!]
+}
