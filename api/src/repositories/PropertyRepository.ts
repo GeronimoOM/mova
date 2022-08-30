@@ -33,7 +33,7 @@ export class PropertyRepository {
             .orderBy('added_at', 'asc');
 
         return propertyRows.map((propertyRow) =>
-            this.mapToPropertyRow(propertyRow),
+            this.mapToProperty(propertyRow),
         );
     }
 
@@ -43,7 +43,7 @@ export class PropertyRepository {
             .where({ id })
             .first();
 
-        return propertyRow ? this.mapToPropertyRow(propertyRow) : null;
+        return propertyRow ? this.mapToProperty(propertyRow) : null;
     }
 
     async getByIds(ids: PropertyId[]): Promise<Property[]> {
@@ -52,7 +52,7 @@ export class PropertyRepository {
             .whereIn('id', ids);
 
         return propertyRows.map((propertyRow) =>
-            this.mapToPropertyRow(propertyRow),
+            this.mapToProperty(propertyRow),
         );
     }
 
@@ -100,7 +100,7 @@ export class PropertyRepository {
             .delete();
     }
 
-    private mapToPropertyRow(row: PropertyTable): Property {
+    private mapToProperty(row: PropertyTable): Property {
         const baseProperty: BaseProperty = {
             id: row.id,
             name: row.name,

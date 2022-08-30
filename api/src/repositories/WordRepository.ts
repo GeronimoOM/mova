@@ -48,7 +48,7 @@ export class WordRepository {
             .limit(limit + 1)
             .orderBy(
                 order === WordOrder.Chronological ? 'added_at' : 'original',
-                'asc',
+                order === WordOrder.Chronological ? 'desc' : 'asc',
             );
 
         const page: Page<WordTable> = {
@@ -120,16 +120,20 @@ export class WordRepository {
             : undefined;
     }
 
-    private mapToWordRowProperties(propertyValues: Word['properties']): string {
-        return JSON.stringify(
-            Object.fromEntries(
-                Array.from(propertyValues).map(
-                    ([propertyId, { property, ...propertyValue }]) => [
-                        propertyId,
-                        propertyValue,
-                    ],
-                ),
-            ),
-        );
+    private mapToWordRowProperties(
+        propertyValues: Word['properties'],
+    ): string | undefined {
+        return propertyValues
+            ? JSON.stringify(
+                  Object.fromEntries(
+                      Array.from(propertyValues).map(
+                          ([propertyId, { property, ...propertyValue }]) => [
+                              propertyId,
+                              propertyValue,
+                          ],
+                      ),
+                  ),
+              )
+            : undefined;
     }
 }

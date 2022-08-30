@@ -1,13 +1,21 @@
 import type { NextPage } from 'next';
-import { Button } from '../components/Button';
-import { WordList } from '../components/WordList';
-import { words } from '../data/words';
+import { useState } from 'react';
+import { NavBar, NavBarTab } from '../components/NavBar';
+import { WordsPage } from '../components/WordsPage';
+import { useSelectedLanguage } from '../store';
 
 const Home: NextPage = () => {
+    const [selectedTab, setSelectedTab] = useState<NavBarTab>('dictionary');
+    const selectedLanguage = useSelectedLanguage();
+
     return (
-        <div>
-            <WordList words={words} selected={null} onSelect={() => {}} isLoading={false} isError={false} />
-            <Button text='Save' onClick={() => console.log('Clicked')} />
+        <div className='flex flex-row h-full'>
+            <NavBar selectedTab={selectedTab} onSelectedTab={setSelectedTab} />
+            {selectedLanguage && (
+                <main className='w-full h-full'>
+                    {selectedTab === 'dictionary' && <WordsPage />}
+                </main>
+            )}
         </div>
     );
 };
