@@ -48,7 +48,7 @@ export const NavBar: React.FC<NavBarProps> = ({
     }
 
     return (
-        <aside className='flex-none w-[15rem] overflow-x-hidden bg-gray-700'>
+        <aside className='fixed left-0 w-[15rem] h-screen overflow-x-hidden bg-gray-700'>
             <div
                 className={classNames(
                     'flex flex-no-wrap transition-transform',
@@ -74,13 +74,13 @@ export const NavBar: React.FC<NavBarProps> = ({
                         <NavBarItem
                             leftIcon={FaThList}
                             title={'Dictionary'}
-                            isActive={selectedTab === 'dictionary'}
+                            isSelected={selectedTab === 'dictionary'}
                             onClick={() => onSelectedTab('dictionary')}
                         />
                         <NavBarItem
                             leftIcon={IoSettings}
                             title={'Settings'}
-                            isActive={selectedTab === 'settings'}
+                            isSelected={selectedTab === 'settings'}
                             onClick={() => onSelectedTab('settings')}
                         />
                     </ul>
@@ -102,8 +102,6 @@ export const NavBar: React.FC<NavBarProps> = ({
                                         : IoRadioButtonOff
                                 }
                                 rightIcon={BsFillPencilFill}
-                                isEditable={true}
-                                hideRightIcon={true}
                                 onClick={() => handleSelectLanguage(language.id)}
                             />
                         ))}
@@ -121,29 +119,29 @@ export const NavBar: React.FC<NavBarProps> = ({
 export interface NavBarItemProps {
     leftIcon?: IconType;
     rightIcon?: IconType;
-    hideRightIcon?: boolean;
     title: string;
     isEditable?: boolean;
-    isActive?: boolean;
+    isSelected?: boolean;
     onClick?: () => void;
-    children?: ReactNode;
+    onRightIconClick?: () => void;
+    onEdited?: (value: string) => void;
 }
 
 export const NavBarItem: React.FC<NavBarItemProps> = ({
     leftIcon,
     rightIcon,
-    hideRightIcon,
     title,
     isEditable,
-    isActive,
+    isSelected,
     onClick,
-    children,
 }) => {
-    const [isEditing, setIsEditing] = useState(false);
     return (
         <li>
             <div
-                className='flex flex-row items-center hover:bg-gray-600 p-2 text-white text-lg font-bold group'
+                className={classNames('flex flex-row items-center p-2 text-white text-lg font-bold group cursor-pointer', {
+                    'bg-gray-500': isSelected,
+                    'hover:bg-gray-600': !isSelected,
+                })}
                 onClick={onClick}
             >
                 {leftIcon && leftIcon({ className: 'w-6 h-6 flex-none' })}
@@ -151,27 +149,17 @@ export const NavBarItem: React.FC<NavBarItemProps> = ({
                     type='text'
                     value={title}
                     className={classNames(
-                        'flex-1 px-2 w-full bg-inherit border-none outline-none',
+                        'flex-1 px-2 w-full bg-inherit border-none outline-none pointer-events-none',
                         {
-                            // 'ml-6': !leftIcon,
-                            // 'mr-6': !rightIcon,
+                            'cursor-pointer': onClick && !isEditable,
+                            'ml-6': !leftIcon,
+                            'mr-6': !rightIcon,
                         },
                     )}
-                    disabled={!isEditing}
+                    disabled={!isEditable}
                 />
-                {rightIcon &&
-                    rightIcon({
-                        className: classNames(
-                            'w-6 h-6 flex-none group-hover:scale-100',
-                            {
-                                'scale-0 transition': hideRightIcon,
-                                'scale-100': isEditing,
-                            },
-                        ),
-                        onClick: () => isEditable && setIsEditing(!isEditing),
-                    })}
+                {rightIcon && rightIcon({ className: 'w-6 h-6 flex-none' })}
             </div>
-            {children}
         </li>
     );
 };

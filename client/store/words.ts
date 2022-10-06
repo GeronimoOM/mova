@@ -1,6 +1,7 @@
 import {
     createAsyncThunk,
     createEntityAdapter,
+    createSelector,
     createSlice,
     EntityState,
     PayloadAction,
@@ -10,20 +11,22 @@ import * as api from '../graphql';
 import { setSelectedLanguage } from './languages';
 
 export interface WordsState extends EntityState<Word> {
-    query: string | null;
     list: string[];
     hasMore: boolean;
+    query: string | null;
     selected: string | null;
+    fetching: boolean;
     creating: boolean;
 }
 
 export const wordsAdapter = createEntityAdapter<Word>();
 
 const initialState: WordsState = wordsAdapter.getInitialState({
-    query: null,
     list: [],
     hasMore: true,
+    query: null,
     selected: null,
+    fetching: false,
     creating: false,
 });
 
@@ -43,19 +46,41 @@ const wordsSlice = createSlice({
             state.selected = action.payload;
         },
 
-        setQuery: (state, action: PayloadAction<string | null>) => {
-            state.query = action.payload;
+        setWordsQuery: (state, action: PayloadAction<string | null>) => {
+            const query = action.payload;
+            if (state.query !== query) {
+                state.list = [];
+                state.hasMore = true;
+                state.query = action.payload;
+                state.selected = null;
+                state.fetching = false;
+            }
         },
     },
     extraReducers: (builder) => {
         builder.addCase(setSelectedLanguage, (state) => {
             state.entities = {};
             state.ids = [];
+            state.list = [];
+            state.hasMore = true;
+            state.query = null;
             state.selected = null;
+            state.fetching = false;
+            state.creating = false;
         });
 
+        builder.addCase(fetchWords.pending, (state) => {
+            state.fetching = true;
+        });
         builder.addCase(fetchWords.fulfilled, (state, { payload }) => {
             wordsAdapter.upsertMany(state, payload.items);
+            state.list.push(...payload.items.map(word => word.id));
+            state.hasMore = payload.hasMore;
+            state.fetching = false;
+        });
+        builder.addCase(fetchWords.rejected, (state) => {
+            state.hasMore = false;
+            state.fetching = false;
         });
 
         builder.addCase(createWord.pending, (state) => {
@@ -63,6 +88,7 @@ const wordsSlice = createSlice({
         });
         builder.addCase(createWord.fulfilled, (state, { payload }) => {
             wordsAdapter.addOne(state, payload);
+            state.list.unshift(payload.id);
             state.creating = false;
             state.selected = payload.id;
         });
@@ -85,12 +111,23 @@ const wordsSlice = createSlice({
 
 export default wordsSlice.reducer;
 
-export const { setSelectedWord } = wordsSlice.actions;
+export const { setSelectedWord, setWordsQuery } = wordsSlice.actions;
 
-export const { selectAll: selectWords } = wordsAdapter.getSelectors();
+export const selectWords: (state: WordsState) => Word[] = 
+    createSelector(
+        [(state: WordsState) => state.list, (state: WordsState) => state.entities],
+        (list, entities) => list.map((wordId) => entities[wordId]!),
+    );
+
+export const selectWordsQuery = (state: WordsState): string | null => state.query;
 
 export const selectSelectedWord = (state: WordsState): Word | null =>
     state.selected ? state.entities[state.selected]! : null;
 
-export const selectIsWordCreating = (state: WordsState): boolean =>
+export const selectHasMoreWords = (state: WordsState): boolean => state.hasMore;
+
+export const selectIsFetchingWords = (state: WordsState): boolean =>
+    state.fetching;
+
+export const selectIsCreatingWord = (state: WordsState): boolean =>
     state.creating;

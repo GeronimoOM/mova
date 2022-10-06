@@ -1,9 +1,4 @@
-import {
-    AnyAction,
-    configureStore,
-    createSelector,
-    ThunkAction,
-} from '@reduxjs/toolkit';
+import { AnyAction, configureStore, ThunkAction } from '@reduxjs/toolkit';
 import { useDispatch, useSelector } from 'react-redux';
 import type { TypedUseSelectorHook } from 'react-redux';
 import { createLogger } from 'redux-logger';
@@ -16,8 +11,15 @@ import propertiesReducer, {
     selectProperties,
     selectSelectedProperty,
 } from './properties';
-import wordsReducer, { selectIsWordCreating, selectSelectedWord, selectWords } from './words';
-import { PartOfSpeech, Word } from '../types';
+import wordsReducer, {
+    selectHasMoreWords,
+    selectIsCreatingWord,
+    selectIsFetchingWords,
+    selectSelectedWord,
+    selectWords,
+    selectWordsQuery,
+} from './words';
+import { PartOfSpeech } from '../types';
 
 export const store = configureStore({
     reducer: {
@@ -61,7 +63,13 @@ export const useSelectedProperty = () =>
 
 export const useWords = () =>
     useAppSelector((state) => selectWords(state.words));
+export const useHasMoreWords = () =>
+    useAppSelector((state) => selectHasMoreWords(state.words));
+export const useWordsQuery = () =>
+    useAppSelector((state) => selectWordsQuery(state.words));
 export const useSelectedWord = () =>
     useAppSelector((state) => selectSelectedWord(state.words));
-export const useIsWordCreating = () =>
-    useAppSelector((state) => selectIsWordCreating(state.words));
+export const useIsFetchingWords = () =>
+    useAppSelector((state) => selectIsFetchingWords(state.words));
+export const useIsCreatingWord = () =>
+    useAppSelector((state) => selectIsCreatingWord(state.words));

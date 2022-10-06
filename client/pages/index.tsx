@@ -1,4 +1,5 @@
 import type { NextPage } from 'next';
+import Head from 'next/head'
 import { useState } from 'react';
 import { NavBar, NavBarTab } from '../components/NavBar';
 import { WordsPage } from '../components/WordsPage';
@@ -9,10 +10,13 @@ const Home: NextPage = () => {
     const selectedLanguage = useSelectedLanguage();
 
     return (
-        <div className='flex flex-row h-full'>
+        <div>
+            <Head>
+                <title>Mova</title>
+            </Head>
             <NavBar selectedTab={selectedTab} onSelectedTab={setSelectedTab} />
             {selectedLanguage && (
-                <main className='w-full h-full'>
+                <main className='ml-[15rem]'>
                     {selectedTab === 'dictionary' && <WordsPage />}
                 </main>
             )}

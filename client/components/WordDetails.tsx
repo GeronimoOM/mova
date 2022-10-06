@@ -5,7 +5,7 @@ import {
     useAppDispatch,
     useSelectedLanguage,
     useProperties,
-    useIsWordCreating,
+    useIsCreatingWord,
 } from '../store';
 import { createWord, deleteWord, updateWord } from '../store/words';
 import {
@@ -35,7 +35,7 @@ export const WordDetails: React.FC<WordDetailsProps> = ({
     const dispatch = useAppDispatch();
 
     const isCreateMode = !word;
-    const isCreating = useIsWordCreating();
+    const isCreating = useIsCreatingWord();
 
     const [wordDraft, setWordDraft] = useState<Partial<Word>>(word ?? {});
     let properties = useProperties(wordDraft.partOfSpeech);
@@ -62,7 +62,7 @@ export const WordDetails: React.FC<WordDetailsProps> = ({
             setWordDraft({});
             setPartOfSpeechSelectOpen(false);
         }
-    }, [isOpen]);
+    }, [isOpen, isCreateMode]);
 
     const saveChangesTimeout = useRef<NodeJS.Timeout>();
     const handleWordChange = (word: Partial<Word>) => {
@@ -122,14 +122,14 @@ export const WordDetails: React.FC<WordDetailsProps> = ({
     };
 
     const handlePartOfSpeechChange = (partOfSpeech: PartOfSpeech) => {
-        setWordDraft({ ...wordDraft!, partOfSpeech });
+        handleWordChange({ ...wordDraft!, partOfSpeech });
         setPartOfSpeechSelectOpen(false);
     };
 
     return (
         <aside
             className={classNames(
-                'fixed right-0 z-10 w-[18rem] lg:w-[24rem] xl:w-[30rem] 2xl:w-[36em] h-full bg-gray-700 transition-all',
+                'fixed right-0 top-0 z-10 h-screen w-[18rem] lg:w-[24rem] xl:w-[30rem] 2xl:w-[36em] bg-gray-700 transition-all',
                 {
                     'translate-x-[18rem] lg:translate-x-[24rem] xl:translate-x-[30rem] 2xl:translate-x-[36em]':
                         !isOpen,
@@ -172,7 +172,7 @@ export const WordDetails: React.FC<WordDetailsProps> = ({
                             handleTranslationChange(event.target.value)
                         }
                         className={classNames(
-                            'text-xl italic w-full p-2 mb-3 text-white font-bold',
+                            'text-xl w-full p-2 mb-3 text-white font-bold',
                             'outline-none bg-gray-600 focus:bg-gray-500 rounded',
                             {
                                 'animate-pulse':
