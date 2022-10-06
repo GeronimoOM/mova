@@ -9,6 +9,8 @@ import { DbConnectionManager } from './DbConnectionManager';
 
 const TABLE_WORDS = 'words';
 
+const BATCH_SIZE = 100;
+
 export interface WordWithoutProperties extends Omit<Word, 'properties'> {
     properties?: Map<PropertyId, Omit<PropertyValue, 'property'>>;
 }
@@ -68,6 +70,33 @@ export class WordRepository {
             .whereIn('id', ids);
 
         return wordRows.map((wordRow) => this.mapToWord(wordRow));
+    }
+
+    async *getBatches(
+        languageId: LanguageId,
+        batchSize: number = BATCH_SIZE,
+    ): AsyncGenerator<WordWithoutProperties[]> {
+        let offset = 0;
+
+        do {
+            const wordRows = await this.connectionManager
+                .getConnection()(TABLE_WORDS)
+                .where({
+                    language_id: languageId,
+                })
+                .offset(offset)
+                .limit(batchSize + 1);
+
+            yield wordRows
+                .slice(0, batchSize)
+                .map((wordRow) => this.mapToWord(wordRow));
+
+            if (wordRows.length <= batchSize) {
+                break;
+            }
+
+            offset += batchSize;
+        } while (true);
     }
 
     async create(word: Word): Promise<void> {

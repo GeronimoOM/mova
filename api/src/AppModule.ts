@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { MercuriusDriver, MercuriusDriverConfig } from '@nestjs/mercurius';
+import { MaintenanceController } from './MaintenanceController';
 import { join } from 'path';
 import { AppController } from './AppController';
 import { WordIndexClient } from './clients/WordIndexClient';
@@ -42,6 +43,6 @@ import { WordService } from './services/WordService';
         WordRepository,
         DbConnectionManager,
     ],
-    controllers: [AppController],
+    controllers: [AppController, MaintenanceController],
 })
 export class AppModule {}

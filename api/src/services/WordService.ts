@@ -192,6 +192,24 @@ export class WordService {
         return word;
     }
 
+    async reindex(languageId: LanguageId): Promise<void> {
+        await this.wordIndexClient.deleteLanguage(languageId);
+
+        const properties = await this.propertyService.getByLanguageId(
+            languageId,
+        );
+
+        for await (const wordsBatch of this.wordRepository.getBatches(
+            languageId,
+        )) {
+            const words = wordsBatch.map((word) =>
+                this.withProperties(word, properties),
+            );
+
+            await this.wordIndexClient.indexMany(words);
+        }
+    }
+
     private setPropertyValues(
         word: Word,
         properties: Property[],

@@ -7,8 +7,11 @@ import {
     TextPropertyValue,
 } from 'src/models/PropertyValue';
 import { Word, WordId } from 'src/models/Word';
+import { retry } from 'src/utils/retry';
 
-export const WORDS_INDEX = 'words';
+const WORDS_INDEX = 'words';
+
+const CONNECT_RETRY = 5000; // ms
 
 export type WordDocument = Omit<Word, 'properties'> & {
     properties?: string[];
@@ -28,12 +31,15 @@ export class WordIndexClient implements OnApplicationBootstrap {
     }
 
     async connect(): Promise<void> {
-        this.client = new elastic.Client({
-            //TODO extract
-            node: 'http://mova-index:9200',
-        });
+        await retry(async () => {
+            this.client = new elastic.Client({
+                //TODO extract
+                node: 'http://mova-index:9200',
+            });
 
-        await this.createIndex();
+            await this.createIndex();
+        }, CONNECT_RETRY);
+
         Logger.log('Search index ready');
     }
 
@@ -114,9 +120,23 @@ export class WordIndexClient implements OnApplicationBootstrap {
 
     async index(word: Word): Promise<void> {
         await this.client.index<WordDocument>({
-            id: word.id,
             index: WORDS_INDEX,
+            id: word.id,
             document: this.toDocument(word),
+        });
+    }
+
+    async indexMany(words: Word[]): Promise<void> {
+        await this.client.bulk<WordDocument>({
+            operations: words.flatMap((word) => [
+                {
+                    index: {
+                        _index: WORDS_INDEX,
+                        _id: word.id,
+                    },
+                },
+                this.toDocument(word),
+            ]),
         });
     }
 
@@ -124,6 +144,17 @@ export class WordIndexClient implements OnApplicationBootstrap {
         await this.client.delete({
             id,
             index: WORDS_INDEX,
+        });
+    }
+
+    async deleteLanguage(languageId: LanguageId): Promise<void> {
+        await this.client.deleteByQuery({
+            index: WORDS_INDEX,
+            query: {
+                match: {
+                    languageId,
+                },
+            },
         });
     }
 
