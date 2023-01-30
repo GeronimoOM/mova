@@ -8,6 +8,8 @@ import languagesReducer, {
     selectSelectedLanguage,
 } from './languages';
 import propertiesReducer, {
+    selectIsCreatingProperty,
+    selectIsFetchingProperties,
     selectProperties,
     selectSelectedProperty,
 } from './properties';
@@ -57,9 +59,12 @@ export const useProperties = (partOfSpeech?: PartOfSpeech) =>
               )
             : properties;
     });
-
 export const useSelectedProperty = () =>
     useAppSelector((state) => selectSelectedProperty(state.properties));
+export const useIsFetchingProperties = () =>
+    useAppSelector((state) => selectIsFetchingProperties(state.properties));
+export const useIsCreatingProperty = () =>
+    useAppSelector((state) => selectIsCreatingProperty(state.properties));
 
 export const useWords = () =>
     useAppSelector((state) => selectWords(state.words));

@@ -1,7 +1,5 @@
 export async function sleep(ms: number): Promise<void> {
-    await new Promise((resolve) => {
-        setTimeout(resolve, ms);
-    });
+    await new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export async function retry(
@@ -15,6 +13,7 @@ export async function retry(
         } catch (err) {
             console.log('Retrying due to error', err);
             await sleep(ms);
+            console.log('Retrying now');
         }
     }
 }

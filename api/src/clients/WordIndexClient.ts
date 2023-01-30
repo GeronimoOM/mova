@@ -101,6 +101,7 @@ export class WordIndexClient implements OnApplicationBootstrap {
                                     'properties',
                                 ],
                                 fuzziness: 'AUTO',
+                                type: 'bool_prefix',
                             },
                         },
                     ],

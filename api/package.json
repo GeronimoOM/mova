@@ -2,7 +2,7 @@
   "name": "mova-api",
   "version": "0.0.1",
   "description": "",
-  "author": "",
+  "author": "GeronimoOM",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
@@ -13,6 +13,7 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug 9001 --watch",
     "start:prod": "node dist/main",
+    "start:prod:min": "node --max-old-space-size=200 dist/main",
     "lint": "eslint \"{src,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",

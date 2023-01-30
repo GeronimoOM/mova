@@ -1,0 +1,13 @@
+- create language
+- delete language
+- edit language name
+
+- list properties
+- create property
+- edit property
+- delete property
+
+- randomize words
+- hide definitions 
+
+- elastic heartbeat

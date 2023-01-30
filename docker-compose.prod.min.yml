@@ -3,21 +3,24 @@ services:
   mova-api:
     build: 
       context: ./api
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile.prod.min
     ports:
       - 9000:9000
-      - 9001:9001
     environment:
       - APP_PORT=9000
-      - NODE_ENV=development
-    volumes:
-      - ./api:/app
     depends_on:
       - mova-db
       - mova-index
+    deploy:
+      resources:
+        reservations:
+          memory: 128M
+        limits:
+          cpus: '4.0'
+          memory: 256M
 
   mova-db:
-    image: mysql:8.0
+    image: hsheth2/mysql-low-memory:8.0
     command: --default-authentication-plugin=mysql_native_password
     ports:
       - 9002:3306
@@ -26,33 +29,51 @@ services:
       MYSQL_PASSWORD: secret-to-mova-db
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: mova
-    restart: always
     volumes:
-      - mova-db:/var/lib/mysql
+      - mova-db-min:/var/lib/mysql
+    deploy:
+      resources:
+        reservations:
+          memory: 128M
+        limits:
+          cpus: '4.0'
+          memory: 256M
 
   mova-index:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.3.2
     environment:
       - "discovery.type=single-node"
       - "xpack.security.enabled=false"
+      - "ES_JAVA_OPTS=-Xms128m -Xmx128m"
     ports:
       - 9003:9200
       - 9004:9300
     volumes:
       - mova-index:/usr/share/elasticsearch/data
+    deploy:
+      resources:
+        reservations:
+          memory: 128M
+        limits:
+          cpus: '4.0'
+          memory: 256M
 
   mova-client:
     build: 
       context: ./client
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile.prod.min
     ports:
       - 9005:3000
-    environment:
-      - CHOKIDAR_USEPOLLING=true
-    volumes:
-      - ./client:/app
     depends_on:
       - mova-api
+    deploy:
+      resources:
+        reservations:
+          memory: 64M
+        limits:
+          cpus: '0.5'
+          memory: 128M
+
 volumes:
-  mova-db:
+  mova-db-min:
   mova-index:

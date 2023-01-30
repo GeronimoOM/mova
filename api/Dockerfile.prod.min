@@ -1,0 +1,12 @@
+FROM node:16-alpine
+
+EXPOSE 9000
+
+WORKDIR /app
+
+COPY . . 
+
+RUN ["npm", "install"]
+RUN ["npm", "run", "build"]
+
+CMD ["npm", "run", "start:prod:min"]

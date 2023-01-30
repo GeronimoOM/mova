@@ -1,4 +1,3 @@
-import classNames from 'classnames';
 import React, { useEffect, useRef } from 'react';
 import { PartOfSpeech } from '../types';
 import { PartOfSpechBadgeConfig, PartOfSpeechBadge, partsOfSpeechConfig } from './PartOfSpeechBadge';

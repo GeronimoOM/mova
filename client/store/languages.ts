@@ -1,9 +1,8 @@
 import { createAsyncThunk, createEntityAdapter, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
-import Cookies from 'js-cookie'
 import { Language } from '../types';
 import * as api from '../graphql';
 
-const COOKIE_SELECTED_LANGUAGE = 'selected_language';
+const LOCAL_STORAGE_KEY_SELECTED_LANGUAGE = 'selected_language';
 
 export interface LanguagesState extends EntityState<Language> {
     selected: string | null;
@@ -12,7 +11,7 @@ export interface LanguagesState extends EntityState<Language> {
 export const languagesAdapter = createEntityAdapter<Language>();
 
 const initialState: LanguagesState = languagesAdapter.getInitialState({
-    selected: Cookies.get(COOKIE_SELECTED_LANGUAGE) ?? null,
+    selected: (typeof window !== "undefined") ? window.localStorage.getItem(LOCAL_STORAGE_KEY_SELECTED_LANGUAGE): null,
 });
 
 export const fetchLanguages = createAsyncThunk(
@@ -37,7 +36,7 @@ const languagesSlice = createSlice({
         setSelectedLanguage: (state, action: PayloadAction<string>) => {
             const selectedLanguage = action.payload;
             state.selected = selectedLanguage;
-            Cookies.set(COOKIE_SELECTED_LANGUAGE, selectedLanguage);
+            window.localStorage.setItem(LOCAL_STORAGE_KEY_SELECTED_LANGUAGE, selectedLanguage);
         },
     },
     extraReducers: (builder) => {

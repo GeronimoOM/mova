@@ -11,13 +11,16 @@ import { setSelectedLanguage } from './languages';
 
 export interface PropertiesState extends EntityState<Property> {
     selected: string | null;
+    loading: boolean;
+    creating: boolean;
 }
 
 export const propertiesAdapter = createEntityAdapter<Property>();
 
 const initialState: PropertiesState = propertiesAdapter.getInitialState({
-    loading: false,
     selected: null,
+    loading: false,
+    creating: false,
 });
 
 export const fetchProperties = createAsyncThunk(
@@ -54,8 +57,15 @@ const propertiesSlice = createSlice({
             propertiesAdapter.upsertMany(state, payload);
         });
 
+        builder.addCase(createProperty.pending, (state) => {
+            state.creating = true;
+        });
         builder.addCase(createProperty.fulfilled, (state, { payload }) => {
             propertiesAdapter.addOne(state, payload);
+            state.creating = false;
+        });
+        builder.addCase(createProperty.rejected, (state) => {
+            state.creating = false;
         });
 
         builder.addCase(updateProperty.fulfilled, (state, { payload }) => {
@@ -73,3 +83,11 @@ export const { selectAll: selectProperties } = propertiesAdapter.getSelectors();
 export const selectSelectedProperty = (
     state: PropertiesState,
 ): Property | null => (state.selected ? state.entities[state.selected]! : null);
+
+export const selectIsFetchingProperties = (
+    state: PropertiesState,
+): boolean => state.loading;
+
+export const selectIsCreatingProperty = (
+    state: PropertiesState,
+): boolean => state.creating;
