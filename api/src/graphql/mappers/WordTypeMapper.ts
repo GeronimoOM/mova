@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { Word } from 'src/models/Word';
+import { Word } from 'models/Word';
 import {
     isOptionPropertyValue,
     isTextPropertyValue,
     PropertyValue,
-} from 'src/models/PropertyValue';
+} from 'models/PropertyValue';
 import { WordType } from '../types/WordType';
 import { PropertyTypeMapper } from './PropertyTypeMapper';
 import {
@@ -26,6 +26,7 @@ export class WordTypeMapper {
             properties: Array.from(word.properties?.values() ?? []).map(
                 (value) => this.mapPropertyValue(value),
             ),
+            languageId: word.languageId,
         };
     }
 

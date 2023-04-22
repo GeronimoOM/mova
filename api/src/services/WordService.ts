@@ -1,34 +1,35 @@
-import { v4 as uuid } from 'uuid';
-import { Injectable } from '@nestjs/common';
-import {
-    SearchWordsParams,
-    WordIndexClient,
-} from 'src/clients/WordIndexClient';
-import { LanguageId } from 'src/models/Language';
-import { mapPage, Page, PageArgs } from 'src/models/Page';
-import { PartOfSpeech, Word, WordId, WordOrder } from 'src/models/Word';
+import { v1 as uuid } from 'uuid';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { LanguageId } from 'models/Language';
+import { mapPage, Page, PageArgs } from 'models/Page';
+import { PartOfSpeech, Word, WordId, WordOrder } from 'models/Word';
 import {
     WordRepository,
     WordWithoutProperties,
     GetWordPageParams as RepoGetWordPageParams,
-} from 'src/repositories/WordRepository';
+} from 'repositories/WordRepository';
 import {
     isOptionProperty,
     isTextProperty,
     OptionId,
     Property,
     PropertyId,
-} from 'src/models/Property';
-import { PropertyValue } from 'src/models/PropertyValue';
+} from 'models/Property';
+import { PropertyValue } from 'models/PropertyValue';
 import { PropertyService } from './PropertyService';
 import { LanguageService } from './LanguageService';
+import { SearchClient, SearchWordsParams } from 'clients/SearchClient';
+import { TopicService } from './TopicService';
+import { TopicId } from 'models/Topic';
 
 export const DEFAULT_LIMIT = 10;
-export const MAX_LIMIT = 10;
+export const MAX_LIMIT = 100;
 export const QUERY_MIN_LENGTH = 3;
 
 export interface GetWordPageParms extends PageArgs {
     languageId: LanguageId;
+    partOfSpeech?: PartOfSpeech;
+    topic?: TopicId;
     query?: string;
     order?: WordOrder;
 }
@@ -57,10 +58,26 @@ export interface UpdatePropertyValueParams {
 export class WordService {
     constructor(
         private wordRepository: WordRepository,
-        private wordIndexClient: WordIndexClient,
+        private searchClient: SearchClient,
         private propertyService: PropertyService,
+        @Inject(forwardRef(() => TopicService))
+        private topicService: TopicService,
         private languageService: LanguageService,
     ) {}
+
+    async getById(wordId: WordId): Promise<Word | null> {
+        const repoWord = await this.wordRepository.getById(wordId);
+        if (!repoWord) {
+            return null;
+        }
+
+        const properties = await this.propertyService.getByLanguageId(
+            repoWord.languageId,
+            repoWord.partOfSpeech,
+        );
+
+        return this.withProperties(repoWord, properties);
+    }
 
     async getPage(params: GetWordPageParms): Promise<Page<Word>> {
         if (!params.start) {
@@ -78,7 +95,7 @@ export class WordService {
 
         let words: Page<WordWithoutProperties>;
         if (params.query && params.query.length >= QUERY_MIN_LENGTH) {
-            const wordIds = await this.wordIndexClient.search(
+            const wordIds = await this.searchClient.searchWords(
                 params as SearchWordsParams,
             );
             const repoWords = await this.wordRepository.getByIds(wordIds.items);
@@ -131,10 +148,9 @@ export class WordService {
             this.setPropertyValues(word, properties, params.properties);
         }
 
-        await Promise.all([
-            this.wordRepository.create(word),
-            this.wordIndexClient.index(word),
-        ]);
+        await this.wordRepository.create(word);
+
+        await this.searchClient.indexWord(word);
 
         return word;
     }
@@ -165,35 +181,36 @@ export class WordService {
             this.setPropertyValues(word, properties, params.properties);
         }
 
-        await Promise.all([
-            this.wordRepository.update(word),
-            this.wordIndexClient.index(word),
-        ]);
+        await this.wordRepository.update(word);
+
+        await this.searchClient.indexWord(word);
+
         return word;
     }
 
     async delete(id: WordId): Promise<Word> {
-        const wordWithoutProperties = await this.wordRepository.getById(id);
-        if (!wordWithoutProperties) {
-            throw new Error('Word does not exist');
-        }
+        const word = this.getById(id);
 
-        const properties = await this.propertyService.getByLanguageId(
-            wordWithoutProperties.languageId,
-            wordWithoutProperties.partOfSpeech,
-        );
-        const word = this.withProperties(wordWithoutProperties, properties);
+        await this.wordRepository.delete(id);
 
-        await Promise.all([
-            this.wordRepository.delete(id),
-            this.wordIndexClient.delete(id),
-        ]);
+        await this.searchClient.deleteWord(id);
 
         return word;
     }
 
-    async reindex(languageId: LanguageId): Promise<void> {
-        await this.wordIndexClient.deleteLanguage(languageId);
+    async index(wordId: WordId): Promise<void> {
+        const word = await this.getById(wordId);
+        if (!word) {
+            throw new Error('Word does not exist');
+        }
+
+        word.topics = await this.topicService.getForWord(word.id);
+
+        await this.searchClient.indexWord(word);
+    }
+
+    async indexLanguage(languageId: LanguageId): Promise<void> {
+        await this.searchClient.deleteLanguageWords(languageId);
 
         const properties = await this.propertyService.getByLanguageId(
             languageId,
@@ -202,12 +219,22 @@ export class WordService {
         for await (const wordsBatch of this.wordRepository.getBatches(
             languageId,
         )) {
-            const words = wordsBatch.map((word) =>
-                this.withProperties(word, properties),
+            const topicsByWords = await this.topicService.getForWords(
+                wordsBatch.map((word) => word.id),
             );
 
-            await this.wordIndexClient.indexMany(words);
+            const words = wordsBatch.map((word) => ({
+                ...this.withProperties(word, properties),
+                topics: topicsByWords.get(word.id),
+            }));
+
+            await this.searchClient.indexWords(words);
         }
+    }
+
+    async deleteForLanguage(languageId: LanguageId): Promise<void> {
+        await this.wordRepository.deleteForLanguage(languageId);
+        await this.searchClient.deleteLanguageWords(languageId);
     }
 
     private setPropertyValues(

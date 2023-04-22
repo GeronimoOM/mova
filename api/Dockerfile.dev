@@ -1,6 +1,6 @@
-FROM node:16-alpine
+FROM node:18-alpine
 
-EXPOSE 9000 9001
+EXPOSE 3000 3001
 
 WORKDIR /app
 

@@ -9,19 +9,21 @@ import {
     InputType,
     Field,
 } from '@nestjs/graphql';
-import { LanguageId } from 'src/models/Language';
-import { mapPage, Page } from 'src/models/Page';
-import { PartOfSpeech, WordOrder } from 'src/models/Word';
-import { LanguageService } from 'src/services/LanguageService';
-import { PropertyService } from 'src/services/PropertyService';
-import { WordService } from 'src/services/WordService';
-import { LanguageTypeMapper } from '../mappers/LanguageTypeMapper';
+import { LanguageId } from 'models/Language';
+import { mapPage, Page } from 'models/Page';
+import { PartOfSpeech, WordOrder } from 'models/Word';
+import { LanguageService } from 'services/LanguageService';
+import { PropertyService } from 'services/PropertyService';
+import { WordService } from 'services/WordService';
 import { PropertyTypeMapper } from '../mappers/PropertyTypeMapper';
 import { WordTypeMapper } from '../mappers/WordTypeMapper';
 import { LanguageType } from '../types/LanguageType';
 import { PageArgsType } from '../types/PageType';
 import { PropertyUnionType } from '../types/PropertyType';
 import { WordPageType, WordType } from '../types/WordType';
+import { TopicPageType, TopicType } from 'graphql/types/TopicType';
+import { TopicService } from 'services/TopicService';
+import { TopicId } from 'models/Topic';
 
 @InputType()
 export class CreateLanguageInput {
@@ -44,25 +46,21 @@ export class LanguageResolver {
         private languageService: LanguageService,
         private propertyService: PropertyService,
         private wordService: WordService,
-        private languageTypeMapper: LanguageTypeMapper,
+        private topicService: TopicService,
         private propertyTypeMapper: PropertyTypeMapper,
         private wordTypeMapper: WordTypeMapper,
     ) {}
 
     @Query((type) => [LanguageType])
     async languages(): Promise<LanguageType[]> {
-        const languages = await this.languageService.getAll();
-        return languages.map((language) =>
-            this.languageTypeMapper.map(language),
-        );
+        return await this.languageService.getAll();
     }
 
     @Query((type) => LanguageType, { nullable: true })
     async language(
         @Args('id', { type: () => ID }) id: LanguageId,
     ): Promise<LanguageType | null> {
-        const language = await this.languageService.getById(id);
-        return language ? this.languageTypeMapper.map(language) : null;
+        return await this.languageService.getById(id);
     }
 
     @Mutation((returns) => LanguageType)
@@ -96,17 +94,37 @@ export class LanguageResolver {
         );
     }
 
+    @ResolveField((type) => TopicPageType)
+    async topics(
+        @Parent() language: LanguageType,
+        @Args() pageArgs: PageArgsType,
+        @Args('query', { nullable: true }) query?: string,
+    ): Promise<Page<TopicType>> {
+        const topicPage = await this.topicService.getPage({
+            languageId: language.id,
+            query,
+            ...pageArgs,
+        });
+
+        return topicPage;
+    }
+
     @ResolveField((type) => WordPageType)
     async words(
         @Parent() language: LanguageType,
         @Args() pageArgs: PageArgsType,
         @Args('query', { nullable: true }) query?: string,
+        @Args('partOfSpeech', { type: () => PartOfSpeech, nullable: true })
+        partOfSpeech?: PartOfSpeech,
+        @Args('topic', { type: () => ID, nullable: true }) topic?: TopicId,
         @Args('order', { type: () => WordOrder, nullable: true })
         order: WordOrder = WordOrder.Chronological,
     ): Promise<Page<WordType>> {
         const wordPage = await this.wordService.getPage({
             languageId: language.id,
             query,
+            partOfSpeech,
+            topic,
             order,
             ...pageArgs,
         });

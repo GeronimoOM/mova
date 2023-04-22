@@ -5,9 +5,9 @@ services:
       context: ./api
       dockerfile: Dockerfile.prod.min
     ports:
-      - 9000:9000
+      - 9000:3000
     environment:
-      - APP_PORT=9000
+      - APP_PORT=3000
     depends_on:
       - mova-db
       - mova-index
@@ -63,7 +63,7 @@ services:
       context: ./client
       dockerfile: Dockerfile.prod.min
     ports:
-      - 9005:3000
+      - 9005:4000
     depends_on:
       - mova-api
     deploy:

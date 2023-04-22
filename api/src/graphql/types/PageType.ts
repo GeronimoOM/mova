@@ -1,6 +1,6 @@
 import { Field, ObjectType, Int, ArgsType } from '@nestjs/graphql';
 import { Type } from '@nestjs/common';
-import { Page } from 'src/models/Page';
+import { Page } from 'models/Page';
 
 export function pageType<T>(
     typeName: string,

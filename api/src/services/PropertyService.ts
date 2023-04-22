@@ -1,6 +1,6 @@
 import { v1 as uuid } from 'uuid';
 import { Injectable } from '@nestjs/common';
-import { LanguageId } from 'src/models/Language';
+import { LanguageId } from 'models/Language';
 import {
     BaseProperty,
     isOptionProperty,
@@ -10,10 +10,10 @@ import {
     PropertyId,
     PropertyType,
     TextProperty,
-} from 'src/models/Property';
-import { PropertyRepository } from 'src/repositories/PropertyRepository';
+} from 'models/Property';
+import { PropertyRepository } from 'repositories/PropertyRepository';
 import { LanguageService } from './LanguageService';
-import { PartOfSpeech } from 'src/models/Word';
+import { PartOfSpeech } from 'models/Word';
 
 export interface CreateBasePropertyParams {
     name: string;
@@ -129,5 +129,9 @@ export class PropertyService {
 
         await this.propertyRepository.delete(id);
         return property;
+    }
+
+    async deleteForLanguage(languageId: LanguageId): Promise<void> {
+        await this.propertyRepository.deleteForLanguage(languageId);
     }
 }

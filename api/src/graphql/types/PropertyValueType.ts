@@ -1,5 +1,5 @@
 import { createUnionType, Field, ObjectType } from '@nestjs/graphql';
-import { PropertyType } from 'src/models/Property';
+import { PropertyType } from 'models/Property';
 import {
     OptionPropertyType,
     OptionType,

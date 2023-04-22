@@ -4,8 +4,6 @@ import { MercuriusDriver, MercuriusDriverConfig } from '@nestjs/mercurius';
 import { MaintenanceController } from './MaintenanceController';
 import { join } from 'path';
 import { AppController } from './AppController';
-import { WordIndexClient } from './clients/WordIndexClient';
-import { LanguageTypeMapper } from './graphql/mappers/LanguageTypeMapper';
 import { PropertyTypeMapper } from './graphql/mappers/PropertyTypeMapper';
 import { WordTypeMapper } from './graphql/mappers/WordTypeMapper';
 import { LanguageResolver } from './graphql/resolvers/LanguageResolver';
@@ -18,29 +16,37 @@ import { WordRepository } from './repositories/WordRepository';
 import { LanguageService } from './services/LanguageService';
 import { PropertyService } from './services/PropertyService';
 import { WordService } from './services/WordService';
+import { TopicRepository } from './repositories/TopicRepository';
+import { TopicService } from './services/TopicService';
+import { SearchClient } from './clients/SearchClient';
+import { ElasticClientModule } from './clients/ElasticClientModule';
+import { TopicResolver } from 'graphql/resolvers/TopicResolver';
 
 @Module({
     imports: [
         GraphQLModule.forRoot<MercuriusDriverConfig>({
             driver: MercuriusDriver,
-            autoSchemaFile: join(process.cwd(), 'src/graphql/schema.gql'),
+            autoSchemaFile: join(process.cwd(), 'graphql/schema.gql'),
             graphiql: true,
         }),
+        ElasticClientModule,
     ],
     providers: [
         LanguageResolver,
         PropertyResolver,
         WordResolver,
-        LanguageTypeMapper,
+        TopicResolver,
         PropertyTypeMapper,
         WordTypeMapper,
         LanguageService,
         PropertyService,
         WordService,
-        WordIndexClient,
+        TopicService,
+        SearchClient,
         LanguageRepository,
         PropertyRepository,
         WordRepository,
+        TopicRepository,
         DbConnectionManager,
     ],
     controllers: [AppController, MaintenanceController],

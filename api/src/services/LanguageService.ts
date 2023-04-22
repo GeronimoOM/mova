@@ -1,7 +1,7 @@
 import { v1 as uuid } from 'uuid';
 import { Injectable } from '@nestjs/common';
-import { Language, LanguageId } from 'src/models/Language';
-import { LanguageRepository } from 'src/repositories/LanguageRepository';
+import { Language, LanguageId } from 'models/Language';
+import { LanguageRepository } from 'repositories/LanguageRepository';
 
 export interface CreateLanguageParams {
     name: string;
@@ -41,6 +41,16 @@ export class LanguageService {
 
         language.name = params.name;
         await this.languageRepository.update(language);
+        return language;
+    }
+
+    async delete(id: LanguageId): Promise<Language> {
+        const language = await this.getById(id);
+        if (!language) {
+            throw new Error('Language does not exist');
+        }
+
+        await this.languageRepository.delete(id);
         return language;
     }
 }

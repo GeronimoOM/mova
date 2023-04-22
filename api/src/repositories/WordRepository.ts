@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { WordTable } from 'knex/types/tables';
-import { LanguageId } from 'src/models/Language';
-import { mapPage, Page, PageArgs } from 'src/models/Page';
-import { PropertyId } from 'src/models/Property';
-import { PropertyValue } from 'src/models/PropertyValue';
-import { Word, WordId, WordOrder } from 'src/models/Word';
+import { LanguageId } from 'models/Language';
+import { mapPage, Page, PageArgs, toPage } from 'models/Page';
+import { PropertyId } from 'models/Property';
+import { PropertyValue } from 'models/PropertyValue';
+import { PartOfSpeech, Word, WordId, WordOrder } from 'models/Word';
 import { DbConnectionManager } from './DbConnectionManager';
+import { TopicId } from 'models/Topic';
+import { TABLE_TOPICS_WORDS } from './TopicRepository';
 
 const TABLE_WORDS = 'words';
 
@@ -17,6 +19,8 @@ export interface WordWithoutProperties extends Omit<Word, 'properties'> {
 
 export interface GetWordPageParams extends Required<PageArgs> {
     languageId: LanguageId;
+    partOfSpeech?: PartOfSpeech;
+    topic?: TopicId;
     order: WordOrder;
 }
 
@@ -37,14 +41,18 @@ export class WordRepository {
 
     async getPage({
         languageId,
+        partOfSpeech,
+        topic,
         start,
         limit,
         order,
     }: GetWordPageParams): Promise<Page<WordWithoutProperties>> {
-        const wordRows = await this.connectionManager
-            .getConnection()(TABLE_WORDS)
+        const connection = this.connectionManager.getConnection();
+
+        let query = connection(TABLE_WORDS)
             .where({
                 language_id: languageId,
+                ...(partOfSpeech && { part_of_speech: partOfSpeech }),
             })
             .offset(start)
             .limit(limit + 1)
@@ -53,15 +61,20 @@ export class WordRepository {
                 order === WordOrder.Chronological ? 'desc' : 'asc',
             );
 
-        const page: Page<WordTable> = {
-            items:
-                wordRows.length > limit
-                    ? wordRows.slice(0, wordRows.length - 1)
-                    : wordRows,
-            hasMore: wordRows.length > limit,
-        };
+        if (topic) {
+            query = query.whereExists((query) =>
+                query.from(TABLE_TOPICS_WORDS).where({
+                    word_id: connection.ref(`${TABLE_WORDS}.id`),
+                    topic_id: topic,
+                }),
+            );
+        }
 
-        return mapPage(page, (wordRow) => this.mapToWord(wordRow));
+        const wordRows = await query;
+
+        return mapPage(toPage(wordRows, limit), (wordRow) =>
+            this.mapToWord(wordRow),
+        );
     }
 
     async getByIds(ids: WordId[]): Promise<WordWithoutProperties[]> {
@@ -127,6 +140,13 @@ export class WordRepository {
         await this.connectionManager
             .getConnection()(TABLE_WORDS)
             .where({ id })
+            .delete();
+    }
+
+    async deleteForLanguage(languageId: LanguageId): Promise<void> {
+        await this.connectionManager
+            .getConnection()(TABLE_WORDS)
+            .where({ language_id: languageId })
             .delete();
     }
 

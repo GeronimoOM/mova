@@ -7,22 +7,9 @@ export class DbConnectionManager implements OnApplicationBootstrap {
 
     getConnection(): Knex {
         if (!this.connection) {
-            // TODO use env for production
-            this.connection = knex({
-                client: 'mysql',
-                connection: {
-                    host: 'mova-db',
-                    port: 3306,
-                    user: 'mova',
-                    password: 'secret-to-mova-db',
-                    database: 'mova',
-                },
-                migrations: {
-                    directory: 'dist/repositories/migrations',
-                    loadExtensions: ['.js'],
-                },
-            });
+            this.connection = this.initConnection();
         }
+
         return this.connection;
     }
 
@@ -30,5 +17,23 @@ export class DbConnectionManager implements OnApplicationBootstrap {
         const connection = this.getConnection();
         await connection.migrate.up();
         Logger.log('Database migrated');
+    }
+
+    private initConnection(): Knex {
+        //TODO extract
+        return knex({
+            client: 'mysql',
+            connection: {
+                host: 'mova-db',
+                port: 3306,
+                user: 'mova',
+                password: 'secret-to-mova-db',
+                database: 'mova',
+            },
+            migrations: {
+                directory: 'dist/repositories/migrations',
+                loadExtensions: ['.js'],
+            },
+        });
     }
 }

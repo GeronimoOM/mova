@@ -4,14 +4,12 @@ import {
     ID,
     InputType,
     Mutation,
-    Parent,
-    ResolveField,
     Resolver,
 } from '@nestjs/graphql';
-import { LanguageId } from 'src/models/Language';
-import { OptionId, PropertyId, PropertyType } from 'src/models/Property';
-import { PartOfSpeech } from 'src/models/Word';
-import { PropertyService } from 'src/services/PropertyService';
+import { LanguageId } from 'models/Language';
+import { OptionId, PropertyId, PropertyType } from 'models/Property';
+import { PartOfSpeech } from 'models/Word';
+import { PropertyService } from 'services/PropertyService';
 import { PropertyTypeMapper } from '../mappers/PropertyTypeMapper';
 import { PropertyUnionType } from '../types/PropertyType';
 

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PropertyTable } from 'knex/types/tables';
-import { LanguageId } from 'src/models/Language';
+import { LanguageId } from 'models/Language';
 import {
     BaseProperty,
     isOptionProperty,
@@ -10,9 +10,9 @@ import {
     PropertyId,
     PropertyType,
     TextProperty,
-} from 'src/models/Property';
+} from 'models/Property';
 import { DbConnectionManager } from './DbConnectionManager';
-import { PartOfSpeech } from 'src/models/Word';
+import { PartOfSpeech } from 'models/Word';
 
 const TABLE_PROPERTIES = 'properties';
 
@@ -97,6 +97,13 @@ export class PropertyRepository {
         await this.connectionManager
             .getConnection()(TABLE_PROPERTIES)
             .where({ id })
+            .delete();
+    }
+
+    async deleteForLanguage(languageId: LanguageId): Promise<void> {
+        await this.connectionManager
+            .getConnection()(TABLE_PROPERTIES)
+            .where({ language_id: languageId })
             .delete();
     }
 

@@ -1,7 +1,8 @@
 import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
-import { PartOfSpeech, WordOrder } from 'src/models/Word';
+import { PartOfSpeech, WordId, WordOrder } from 'models/Word';
 import { pageType } from './PageType';
 import { PropertyValueUnionType } from './PropertyValueType';
+import { LanguageId } from 'models/Language';
 
 registerEnumType(PartOfSpeech, {
     name: 'PartOfSpeech',
@@ -10,7 +11,7 @@ registerEnumType(PartOfSpeech, {
 @ObjectType('Word')
 export class WordType {
     @Field()
-    id: string;
+    id: WordId;
 
     @Field()
     original: string;
@@ -23,6 +24,8 @@ export class WordType {
 
     @Field((type) => [PropertyValueUnionType])
     properties: Array<typeof PropertyValueUnionType>;
+
+    languageId: LanguageId;
 }
 
 export const WordPageType = pageType('Word', WordType);

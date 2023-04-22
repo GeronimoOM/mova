@@ -1,9 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-    isOptionProperty,
-    isTextProperty,
-    Property,
-} from 'src/models/Property';
+import { isOptionProperty, isTextProperty, Property } from 'models/Property';
 import {
     OptionPropertyType,
     PropertyUnionType,

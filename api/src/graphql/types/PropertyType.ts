@@ -6,10 +6,11 @@ import {
     registerEnumType,
 } from '@nestjs/graphql';
 import {
+    PropertyId,
     PropertyType,
     PropertyType as PropertyTypeEnum,
-} from 'src/models/Property';
-import { PartOfSpeech } from 'src/models/Word';
+} from 'models/Property';
+import { PartOfSpeech } from 'models/Word';
 
 registerEnumType(PropertyTypeEnum, {
     name: 'PropertyType',
@@ -18,7 +19,7 @@ registerEnumType(PropertyTypeEnum, {
 @ObjectType()
 export abstract class IPropertyType {
     @Field((type) => ID)
-    id: string;
+    id: PropertyId;
 
     @Field()
     name: string;

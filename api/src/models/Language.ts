@@ -1,4 +1,4 @@
-import { Flavor } from 'src/utils/flavor';
+import { Flavor } from 'utils/flavor';
 
 export type LanguageId = Flavor<string, 'Language'>;
 

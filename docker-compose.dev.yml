@@ -5,10 +5,10 @@ services:
       context: ./api
       dockerfile: Dockerfile.dev
     ports:
-      - 9000:9000
-      - 9001:9001
+      - 9000:3000
+      - 9001:3001
     environment:
-      - APP_PORT=9000
+      - APP_PORT=3000
       - NODE_ENV=development
     volumes:
       - ./api:/app
@@ -40,13 +40,20 @@ services:
       - 9004:9300
     volumes:
       - mova-index:/usr/share/elasticsearch/data
+    deploy:
+      resources:
+        reservations:
+          memory: 2G
+        limits:
+          cpus: '4.0'
+          memory: 4G
 
   mova-client:
     build: 
       context: ./client
       dockerfile: Dockerfile.dev
     ports:
-      - 9005:3000
+      - 9005:4000
     environment:
       - CHOKIDAR_USEPOLLING=true
     volumes:

@@ -6,15 +6,12 @@ import {
     Mutation,
     Resolver,
 } from '@nestjs/graphql';
-import { LanguageId } from 'src/models/Language';
-import { PartOfSpeech, WordId } from 'src/models/Word';
+import { LanguageId } from 'models/Language';
+import { PartOfSpeech, WordId } from 'models/Word';
 import { WordType } from '../types/WordType';
-import {
-    UpdatePropertyValueParams,
-    WordService,
-} from 'src/services/WordService';
+import { UpdatePropertyValueParams, WordService } from 'services/WordService';
 import { WordTypeMapper } from '../mappers/WordTypeMapper';
-import { OptionId, PropertyId } from 'src/models/Property';
+import { OptionId, PropertyId } from 'models/Property';
 
 @InputType()
 export class CreateWordInput {

@@ -1,15 +1,161 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import { LanguageId } from 'src/models/Language';
-import { WordService } from 'src/services/WordService';
+import { LanguageId } from 'models/Language';
+import { OptionProperty, PropertyId, PropertyType } from 'models/Property';
+import { PartOfSpeech } from 'models/Word';
+import { LanguageService } from 'services/LanguageService';
+import { PropertyService } from 'services/PropertyService';
+import { TopicService } from 'services/TopicService';
+import { UpdatePropertyValueParams, WordService } from 'services/WordService';
 
 @Controller('/maintenance')
 export class MaintenanceController {
-    constructor(private wordService: WordService) {}
+    constructor(
+        private languageService: LanguageService,
+        private propertyService: PropertyService,
+        private wordService: WordService,
+        private topicService: TopicService,
+    ) {}
+
+    @Get('/generate')
+    async generateTestData(@Query('name') name: string) {
+        const language = await this.languageService.create({ name });
+        const [nounTextProp, nounOptionProp, adjTextProp] = await Promise.all([
+            this.propertyService.create({
+                name: 'Noun Text Property',
+                type: PropertyType.Text,
+                partOfSpeech: PartOfSpeech.Noun,
+                languageId: language.id,
+            }),
+            this.propertyService.create({
+                name: 'Noun Option Property',
+                type: PropertyType.Option,
+                partOfSpeech: PartOfSpeech.Noun,
+                languageId: language.id,
+                options: ['Red', 'Blue', 'Green'],
+            }),
+            this.propertyService.create({
+                name: 'Adjective Text Property',
+                type: PropertyType.Text,
+                partOfSpeech: PartOfSpeech.Adj,
+                languageId: language.id,
+            }),
+        ]);
+
+        const [animals, sports] = await Promise.all([
+            this.topicService.create({
+                name: 'Animals',
+                languageId: language.id,
+            }),
+            this.topicService.create({
+                name: 'Sports',
+                languageId: language.id,
+            }),
+        ]);
+
+        const [dog, swim, run] = await Promise.all([
+            this.wordService.create({
+                original: 'koer',
+                translation: 'dog',
+                partOfSpeech: PartOfSpeech.Noun,
+                languageId: language.id,
+                properties: new Map<PropertyId, UpdatePropertyValueParams>([
+                    [
+                        nounTextProp.id,
+                        {
+                            text: 'koera',
+                        },
+                    ],
+                    [
+                        nounOptionProp.id,
+                        {
+                            option: (nounOptionProp as OptionProperty).options
+                                .keys()
+                                .next().value,
+                        },
+                    ],
+                ]),
+            }),
+
+            this.wordService.create({
+                original: 'ujuma',
+                translation: 'to swim',
+                partOfSpeech: PartOfSpeech.Verb,
+                languageId: language.id,
+            }),
+
+            this.wordService.create({
+                original: 'jooskma',
+                translation: 'to run',
+                partOfSpeech: PartOfSpeech.Verb,
+                languageId: language.id,
+            }),
+
+            this.wordService.create({
+                original: 'väike',
+                translation: 'small',
+                partOfSpeech: PartOfSpeech.Adj,
+                languageId: language.id,
+                properties: new Map<PropertyId, UpdatePropertyValueParams>([
+                    [
+                        adjTextProp.id,
+                        {
+                            text: 'väikse',
+                        },
+                    ],
+                ]),
+            }),
+
+            this.wordService.create({
+                original: 'suur',
+                translation: 'big',
+                partOfSpeech: PartOfSpeech.Adj,
+                languageId: language.id,
+            }),
+
+            this.wordService.create({
+                original: 'isegi',
+                translation: 'even',
+                partOfSpeech: PartOfSpeech.Misc,
+                languageId: language.id,
+            }),
+        ]);
+
+        await Promise.all([
+            this.topicService.addWord(animals.id, dog.id),
+            this.topicService.addWord(sports.id, swim.id),
+            this.topicService.addWord(sports.id, run.id),
+        ]);
+
+        return `Generated language ${language.name} (${language.id}) with data`;
+    }
+
+    @Get('/clear')
+    async clearLanguage(@Query('id') languageId: LanguageId) {
+        const language = await this.languageService.getById(languageId);
+        if (!language) {
+            return 'Language does not exist';
+        }
+
+        await this.wordService.deleteForLanguage(languageId);
+        await this.topicService.deleteForLanguage(languageId);
+        await this.propertyService.deleteForLanguage(languageId);
+        await this.languageService.delete(languageId);
+
+        return `Cleared language ${language.name} (${languageId})`;
+    }
 
     @Get('/reindex')
-    async reindex(@Query('language_id') languageId: LanguageId) {
-        await this.wordService.reindex(languageId);
+    async reindexLanguage(@Query('id') languageId: LanguageId) {
+        const language = await this.languageService.getById(languageId);
+        if (!language) {
+            return 'Language does not exist';
+        }
 
-        return 'ok';
+        await Promise.all([
+            this.wordService.indexLanguage(languageId),
+            this.topicService.indexLanguage(languageId),
+        ]);
+
+        return `Reindexed language ${language.name} (${languageId})`;
     }
 }

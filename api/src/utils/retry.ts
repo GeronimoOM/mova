@@ -13,7 +13,6 @@ export async function retry(
         } catch (err) {
             console.log('Retrying due to error', err);
             await sleep(ms);
-            console.log('Retrying now');
         }
     }
 }

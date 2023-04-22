@@ -2,17 +2,17 @@ import { Knex } from 'knex';
 
 export async function up(knex: Knex) {
     await knex.schema.createTable('languages', (table) => {
-        table.string('id').notNullable().primary();
+        table.uuid('id').notNullable().primary();
         table.string('name').notNullable();
         table.timestamp('added_at').notNullable().defaultTo(knex.fn.now());
     });
 
     await knex.schema.createTable('properties', (table) => {
-        table.string('id').notNullable().primary();
+        table.uuid('id').notNullable().primary();
         table.string('name').notNullable();
         table.string('type').notNullable();
         table
-            .string('language_id')
+            .uuid('language_id')
             .notNullable()
             .references('id')
             .inTable('languages');
@@ -22,11 +22,11 @@ export async function up(knex: Knex) {
     });
 
     await knex.schema.createTable('words', (table) => {
-        table.string('id').notNullable().primary();
+        table.uuid('id').notNullable().primary();
         table.string('original').notNullable();
         table.string('translation').notNullable();
         table
-            .string('language_id')
+            .uuid('language_id')
             .notNullable()
             .references('id')
             .inTable('languages');
@@ -37,5 +37,7 @@ export async function up(knex: Knex) {
 }
 
 export async function down(knex: Knex) {
+    await knex.schema.dropTableIfExists('words');
+    await knex.schema.dropTableIfExists('properties');
     await knex.schema.dropTableIfExists('languages');
 }

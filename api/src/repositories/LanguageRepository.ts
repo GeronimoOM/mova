@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Language, LanguageId } from 'src/models/Language';
+import { Language, LanguageId } from 'models/Language';
 import { DbConnectionManager } from './DbConnectionManager';
 
 const TABLE_LANGUAGES = 'languages';
@@ -32,5 +32,12 @@ export class LanguageRepository {
             .getConnection()(TABLE_LANGUAGES)
             .update({ name: language.name })
             .where({ id: language.id });
+    }
+
+    async delete(id: LanguageId): Promise<void> {
+        await this.connectionManager
+            .getConnection()(TABLE_LANGUAGES)
+            .where({ id })
+            .delete();
     }
 }
