@@ -1,0 +1,45 @@
+fragment WordFields on Word {
+  id
+  original
+  translation
+  partOfSpeech
+  properties {
+    ... on TextPropertyValue {
+      property {
+        id
+        name
+        type
+      }
+      text
+    }
+    ... on OptionPropertyValue {
+      property {
+        id
+        name
+        type
+      }
+      option {
+        id
+        value
+      }
+    }
+  }
+}
+
+fragment TextPropertyFields on TextProperty {
+  id
+  name
+  type
+  partOfSpeech
+}
+
+fragment OptionPropertyFields on OptionProperty {
+  id
+  name
+  type
+  partOfSpeech
+  options {
+    id
+    value
+  }
+}

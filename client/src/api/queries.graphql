@@ -1,0 +1,57 @@
+query GetLanguages {
+  languages {
+    id
+    name
+  }
+}
+
+query GetWords(
+  $languageId: ID!
+  $start: Int
+  $limit: Int
+  $query: String
+  $topic: ID
+  $order: WordOrder
+) {
+  language(id: $languageId) {
+    id
+    name
+    words(
+      start: $start
+      limit: $limit
+      query: $query
+      topic: $topic
+      order: $order
+    ) {
+      items {
+        ...WordFields
+      }
+      hasMore
+    }
+  }
+}
+
+query GetProperties($languageId: ID!, $partOfSpeech: PartOfSpeech) {
+  language(id: $languageId) {
+    properties(partOfSpeech: $partOfSpeech) {
+      ... on TextProperty {
+        ...TextPropertyFields
+      }
+      ... on OptionProperty {
+        ...OptionPropertyFields
+      }
+    }
+  }
+}
+
+query GetTopics($languageId: ID!, $start: Int, $limit: Int, $query: String) {
+  language(id: $languageId) {
+    topics(start: $start, limit: $limit, query: $query) {
+      items {
+        id
+        name
+      }
+      hasMore
+    }
+  }
+}

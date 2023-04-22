@@ -1,0 +1,30 @@
+{
+  "name": "vite-template-solid",
+  "version": "0.0.0",
+  "description": "",
+  "scripts": {
+    "start": "vite",
+    "dev": "vite --host",
+    "build": "vite build",
+    "serve": "vite preview",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css,graphql}\"",
+    "graphql:codegen": "graphql-codegen -c ./src/api/codegen.ts"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@merged/solid-apollo": "^1.7.1",
+    "@solidjs/router": "^0.8.2",
+    "solid-js": "^1.6.10"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "^3.3.0",
+    "@graphql-codegen/client-preset": "^3.0.0",
+    "autoprefixer": "^10.4.14",
+    "postcss": "^8.4.23",
+    "prettier": "2.8.7",
+    "tailwindcss": "^3.3.1",
+    "typescript": "^4.9.5",
+    "vite": "^4.1.1",
+    "vite-plugin-solid": "^2.5.0"
+  }
+}

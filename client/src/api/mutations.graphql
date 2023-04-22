@@ -1,0 +1,66 @@
+mutation CreateLanguage($input: CreateLanguageInput!) {
+  createLanguage(input: $input) {
+    id
+    name
+  }
+}
+
+mutation UpdateLanguage($input: UpdateLanguageInput!) {
+  updateLanguage(input: $input) {
+    id
+    name
+  }
+}
+
+mutation CreateProperty($input: CreatePropertyInput!) {
+  createProperty(input: $input) {
+    ... on TextProperty {
+      ...TextPropertyFields
+    }
+    ... on OptionProperty {
+      ...OptionPropertyFields
+    }
+  }
+}
+
+mutation UpdateProperty($input: UpdatePropertyInput!) {
+  updateProperty(input: $input) {
+    ... on TextProperty {
+      ...TextPropertyFields
+    }
+    ... on OptionProperty {
+      ...OptionPropertyFields
+    }
+  }
+}
+
+mutation CreateWord($input: CreateWordInput!) {
+  createWord(input: $input) {
+    ...WordFields
+  }
+}
+
+mutation UpdateWord($input: UpdateWordInput!) {
+  updateWord(input: $input) {
+    ...WordFields
+  }
+}
+
+mutation DeleteWord($id: ID!) {
+  deleteWord(id: $id) {
+    id
+  }
+}
+
+mutation CreateTopic($input: CreateTopicInput!) {
+  createTopic(input: $input) {
+    id
+    name
+  }
+}
+
+mutation DeleteTopic($id: ID!) {
+  deleteTopic(id: $id) {
+    id
+  }
+}
