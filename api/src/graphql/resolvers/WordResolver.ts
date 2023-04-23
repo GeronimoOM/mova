@@ -5,6 +5,7 @@ import {
     InputType,
     Mutation,
     Resolver,
+    Query,
 } from '@nestjs/graphql';
 import { LanguageId } from 'models/Language';
 import { PartOfSpeech, WordId } from 'models/Word';
@@ -64,6 +65,14 @@ export class WordResolver {
         private wordService: WordService,
         private wordTypeMapper: WordTypeMapper,
     ) {}
+
+    @Query((type) => WordType, { nullable: true })
+    async word(
+        @Args('id', { type: () => ID }) id: WordId,
+    ): Promise<WordType | null> {
+        const word = await this.wordService.getById(id);
+        return word ? this.wordTypeMapper.map(word) : null;
+    }
 
     @Mutation((returns) => WordType)
     async createWord(@Args('input') input: CreateWordInput): Promise<WordType> {

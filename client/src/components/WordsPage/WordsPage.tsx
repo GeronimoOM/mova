@@ -1,15 +1,29 @@
-import { Component, createSignal } from 'solid-js';
-import SearchBar from './SearchBar';
+import { Component, Show, createSignal } from 'solid-js';
+import WordsSearchBar from './WordsSearchBar';
 import WordsList from './WordsList';
+import { WordProvider } from './WordContext';
+import { createStore } from 'solid-js/store';
+import {
+  WordsSearchParams,
+  defaultWordsSearchParams,
+} from './wordsSearchParams';
+import WordDetails from './WordDetails';
 
 const WordsPage: Component = () => {
-  const [searchQuery, setSearchQuery] = createSignal('');
+  const [wordsSearchParams, setSearchQuery] = createStore<WordsSearchParams>(
+    defaultWordsSearchParams(),
+  );
 
   return (
-    <div class="flex flex-col">
-      <SearchBar query={searchQuery()} onQueryChange={setSearchQuery} />
-      <WordsList />
-    </div>
+    <WordProvider>
+      <div class="flex flex-col">
+        <WordsSearchBar
+          searchParams={wordsSearchParams}
+          onSearchParamsChange={setSearchQuery}
+        />
+        <WordsList searchParams={wordsSearchParams} />
+      </div>
+    </WordProvider>
   );
 };
 

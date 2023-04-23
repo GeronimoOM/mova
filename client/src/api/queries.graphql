@@ -9,25 +9,35 @@ query GetWords(
   $languageId: ID!
   $start: Int
   $limit: Int
+  $partOfSpeech: PartOfSpeech
   $query: String
   $topic: ID
   $order: WordOrder
 ) {
   language(id: $languageId) {
     id
-    name
     words(
       start: $start
       limit: $limit
+      partOfSpeech: $partOfSpeech
       query: $query
       topic: $topic
       order: $order
     ) {
       items {
-        ...WordFields
+        id
+        original
+        translation
+        partOfSpeech
       }
       hasMore
     }
+  }
+}
+
+query GetWord($id: ID!) {
+  word(id: $id) {
+    ...WordFields
   }
 }
 

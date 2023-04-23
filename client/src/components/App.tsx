@@ -4,12 +4,12 @@ import NavBar from './NavBar/NavBar';
 import WordsPage from './WordsPage/WordsPage';
 import PropertiesPage from './PropertiesPage/PropertiesPage';
 import { AppRoute } from '../routes';
-import { LanguageProvider } from '../store/LanguageContext';
+import { LanguageProvider } from './LanguageContext';
 
 const App: Component = () => {
   return (
     <LanguageProvider>
-      <div class="flex flex-row w-full justify-center bg-yellow-500">
+      <div class="flex flex-row w-full h-screen justify-center bg-yellow-500">
         <div class="min-w-60 w-60 shrink-0 grow-0 bg-cyan-500">
           <NavBar />
         </div>

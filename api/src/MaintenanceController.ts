@@ -21,20 +21,20 @@ export class MaintenanceController {
         const language = await this.languageService.create({ name });
         const [nounTextProp, nounOptionProp, adjTextProp] = await Promise.all([
             this.propertyService.create({
-                name: 'Noun Text Property',
+                name: `Noun Text Property (${name})`,
                 type: PropertyType.Text,
                 partOfSpeech: PartOfSpeech.Noun,
                 languageId: language.id,
             }),
             this.propertyService.create({
-                name: 'Noun Option Property',
+                name: `Noun Option Property (${name})`,
                 type: PropertyType.Option,
                 partOfSpeech: PartOfSpeech.Noun,
                 languageId: language.id,
                 options: ['Red', 'Blue', 'Green'],
             }),
             this.propertyService.create({
-                name: 'Adjective Text Property',
+                name: `Adjective Text Property (${name})`,
                 type: PropertyType.Text,
                 partOfSpeech: PartOfSpeech.Adj,
                 languageId: language.id,
@@ -54,7 +54,7 @@ export class MaintenanceController {
 
         const [dog, swim, run] = await Promise.all([
             this.wordService.create({
-                original: 'koer',
+                original: `koer (${name})`,
                 translation: 'dog',
                 partOfSpeech: PartOfSpeech.Noun,
                 languageId: language.id,
@@ -77,21 +77,21 @@ export class MaintenanceController {
             }),
 
             this.wordService.create({
-                original: 'ujuma',
+                original: `ujuma (${name})`,
                 translation: 'to swim',
                 partOfSpeech: PartOfSpeech.Verb,
                 languageId: language.id,
             }),
 
             this.wordService.create({
-                original: 'jooskma',
+                original: `jooskma (${name})`,
                 translation: 'to run',
                 partOfSpeech: PartOfSpeech.Verb,
                 languageId: language.id,
             }),
 
             this.wordService.create({
-                original: 'väike',
+                original: `väike (${name})`,
                 translation: 'small',
                 partOfSpeech: PartOfSpeech.Adj,
                 languageId: language.id,
@@ -106,14 +106,14 @@ export class MaintenanceController {
             }),
 
             this.wordService.create({
-                original: 'suur',
+                original: `suur (${name})`,
                 translation: 'big',
                 partOfSpeech: PartOfSpeech.Adj,
                 languageId: language.id,
             }),
 
             this.wordService.create({
-                original: 'isegi',
+                original: `isegi (${name})`,
                 translation: 'even',
                 partOfSpeech: PartOfSpeech.Misc,
                 languageId: language.id,

@@ -8,14 +8,14 @@ import {
   useContext,
 } from 'solid-js';
 
-export type LanguageContextProps = [Accessor<string | null>, Setter<string>];
+export type LanguageContextReturn = [Accessor<string | null>, Setter<string>];
 
-export const LanguageContext = createContext<LanguageContextProps>();
+export const LanguageContext = createContext<LanguageContextReturn>();
 
 export const LanguageProvider: Component<ParentProps> = (props) => {
   const [language, setLanguage] = createSignal<string | null>(null);
 
-  const contextValue: LanguageContextProps = [language, setLanguage];
+  const contextValue: LanguageContextReturn = [language, setLanguage];
 
   return (
     <LanguageContext.Provider value={contextValue}>

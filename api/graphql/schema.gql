@@ -90,6 +90,7 @@ type TopicPage {
 type Query {
   languages: [Language!]!
   language(id: ID!): Language
+  word(id: ID!): Word
 }
 
 type Mutation {
