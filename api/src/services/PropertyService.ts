@@ -58,6 +58,10 @@ export class PropertyService {
         );
     }
 
+    async getById(id: PropertyId): Promise<Property | null> {
+        return await this.propertyRepository.getById(id);
+    }
+
     async getByIds(ids: PropertyId[]): Promise<Property[]> {
         return await this.propertyRepository.getByIds(ids);
     }

@@ -120,6 +120,17 @@ export class MaintenanceController {
             }),
         ]);
 
+        await Promise.all(
+            Array.from(Array(30).keys()).map((i) =>
+                this.wordService.create({
+                    original: `word ${i + 1}`,
+                    translation: `translation ${i + 1}`,
+                    partOfSpeech: PartOfSpeech.Noun,
+                    languageId: language.id,
+                }),
+            ),
+        );
+
         await Promise.all([
             this.topicService.addWord(animals.id, dog.id),
             this.topicService.addWord(sports.id, swim.id),

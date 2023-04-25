@@ -12,7 +12,6 @@ query GetWords(
   $partOfSpeech: PartOfSpeech
   $query: String
   $topic: ID
-  $order: WordOrder
 ) {
   language(id: $languageId) {
     id
@@ -22,7 +21,6 @@ query GetWords(
       partOfSpeech: $partOfSpeech
       query: $query
       topic: $topic
-      order: $order
     ) {
       items {
         id
@@ -43,6 +41,7 @@ query GetWord($id: ID!) {
 
 query GetProperties($languageId: ID!, $partOfSpeech: PartOfSpeech) {
   language(id: $languageId) {
+    id
     properties(partOfSpeech: $partOfSpeech) {
       ... on TextProperty {
         ...TextPropertyFields
@@ -50,6 +49,17 @@ query GetProperties($languageId: ID!, $partOfSpeech: PartOfSpeech) {
       ... on OptionProperty {
         ...OptionPropertyFields
       }
+    }
+  }
+}
+
+query GetProperty($id: ID!) {
+  property(id: $id) {
+    ... on TextProperty {
+      ...TextPropertyFields
+    }
+    ... on OptionProperty {
+      ...OptionPropertyFields
     }
   }
 }

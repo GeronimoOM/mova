@@ -1,3 +1,23 @@
+fragment LanguageWords on Language {
+  words {
+    items {
+      id
+    }
+    hasMore
+  }
+}
+
+fragment LanguageProperties on Language {
+  properties(partOfSpeech: $partOfSpeech) {
+    ... on TextProperty {
+      id
+    }
+    ... on OptionProperty {
+      id
+    }
+  }
+}
+
 fragment WordFields on Word {
   id
   original

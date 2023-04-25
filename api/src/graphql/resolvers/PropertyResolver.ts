@@ -5,6 +5,7 @@ import {
     InputType,
     Mutation,
     Resolver,
+    Query,
 } from '@nestjs/graphql';
 import { LanguageId } from 'models/Language';
 import { OptionId, PropertyId, PropertyType } from 'models/Property';
@@ -58,6 +59,14 @@ export class PropertyResolver {
         private propertyService: PropertyService,
         private propertyTypeMapper: PropertyTypeMapper,
     ) {}
+
+    @Query((type) => PropertyUnionType, { nullable: true })
+    async property(
+        @Args('id', { type: () => ID }) id: PropertyId,
+    ): Promise<typeof PropertyUnionType | null> {
+        const property = await this.propertyService.getById(id);
+        return property ? this.propertyTypeMapper.map(property) : null;
+    }
 
     @Mutation((returns) => PropertyUnionType)
     async createProperty(

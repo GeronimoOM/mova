@@ -1,14 +1,18 @@
 import { ApolloClient, InMemoryCache } from '@merged/solid-apollo';
-import { WordPage } from './types/graphql';
+import { LanguageWordsArgs, WordPage } from './types/graphql';
 
 export const GRAPHQL_URI = 'http://localhost:9000/graphql';
 
-const cache = new InMemoryCache({
+export const cache = new InMemoryCache({
   typePolicies: {
     Language: {
       fields: {
         words: {
-          keyArgs: ['partOfSpeech', 'query', 'topic'],
+          keyArgs: (args: LanguageWordsArgs | null) => {
+            return args?.query || args?.partOfSpeech || args?.topic
+              ? 'search'
+              : false;
+          },
           merge(existing: WordPage | undefined, incoming: WordPage) {
             return {
               items: [...(existing?.items ?? []), ...incoming.items],

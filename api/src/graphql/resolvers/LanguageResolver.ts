@@ -117,15 +117,12 @@ export class LanguageResolver {
         @Args('partOfSpeech', { type: () => PartOfSpeech, nullable: true })
         partOfSpeech?: PartOfSpeech,
         @Args('topic', { type: () => ID, nullable: true }) topic?: TopicId,
-        @Args('order', { type: () => WordOrder, nullable: true })
-        order: WordOrder = WordOrder.Chronological,
     ): Promise<Page<WordType>> {
         const wordPage = await this.wordService.getPage({
             languageId: language.id,
             query,
             partOfSpeech,
             topic,
-            order,
             ...pageArgs,
         });
 

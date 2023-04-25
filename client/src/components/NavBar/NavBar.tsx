@@ -24,7 +24,7 @@ const NavBar: Component = () => {
     <nav class="flex flex-col h-full">
       <ul>
         <li>
-          <div class='bg-pink-400'>
+          <div class="bg-pink-400">
             <ul>
               <For each={languages()} fallback={'Loading languages...'}>
                 {(language) => (
@@ -37,8 +37,8 @@ const NavBar: Component = () => {
             </ul>
           </div>
         </li>
-        <NavBarItem href={AppRoute.Words} text='Words' />  
-        <NavBarItem href={AppRoute.Properties} text='Properties' />  
+        <NavBarItem href={AppRoute.Words} text="Words" />
+        <NavBarItem href={AppRoute.Properties} text="Properties" />
       </ul>
     </nav>
   );
@@ -47,7 +47,7 @@ const NavBar: Component = () => {
 type NavBarItemProps = {
   href: string;
   text: string;
-}
+};
 
 const NavBarItem: Component<NavBarItemProps> = (props) => {
   return (
@@ -58,7 +58,7 @@ const NavBarItem: Component<NavBarItemProps> = (props) => {
         </A>
       </div>
     </li>
-  )
-}
+  );
+};
 
 export default NavBar;

@@ -9,7 +9,7 @@ import { LanguageProvider } from './LanguageContext';
 const App: Component = () => {
   return (
     <LanguageProvider>
-      <div class="flex flex-row w-full h-screen justify-center bg-yellow-500">
+      <div class="flex flex-row w-full h-full justify-center bg-yellow-500">
         <div class="min-w-60 w-60 shrink-0 grow-0 bg-cyan-500">
           <NavBar />
         </div>

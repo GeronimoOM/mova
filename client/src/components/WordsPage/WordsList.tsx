@@ -1,48 +1,71 @@
-import { Component, For, Show, createEffect, createMemo } from 'solid-js';
+import {
+  Component,
+  For,
+  Show,
+  createEffect,
+  createMemo,
+  untrack,
+} from 'solid-js';
 import { createLazyQuery } from '@merged/solid-apollo';
-import { GetWordsDocument } from '../../api/types/graphql';
+import {
+  GetWordsDocument,
+  GetWordsQueryVariables,
+} from '../../api/types/graphql';
 import { useLanguageContext } from '../LanguageContext';
-import { useWordContext } from './WordContext';
 import { WordsSearchParams } from './wordsSearchParams';
-import WordDetails from './WordDetails';
+import { cache } from '../../api/client';
 
 export type WordsListProps = {
   searchParams: WordsSearchParams;
+  selectedWord: string | null;
+  setSelectedWord: (selectedWord: string | null) => void;
 };
 
 const WordsList: Component<WordsListProps> = (props) => {
   const [language] = useLanguageContext();
-  const [selectedWord, setSelectedWord] = useWordContext();
 
   const [fetchWordsPage, wordsPageQuery] = createLazyQuery(GetWordsDocument);
+
   const words = () => wordsPageQuery()?.language!.words.items;
   const hasMore = () => wordsPageQuery()?.language!.words.hasMore;
-  const searchQuery = createMemo(() =>
-    props.searchParams.query.length >= 3 ? props.searchParams.query : null,
-  );
+  const searchQuery = () =>
+    props.searchParams.query.length >= 3 ? props.searchParams.query : null;
+  const fetchWordsPageArgs = (): GetWordsQueryVariables => ({
+    languageId: language()!,
+    query: searchQuery(),
+    partOfSpeech: props.searchParams.partOfSpeech,
+    topic: props.searchParams.topic,
+  });
 
   createEffect(() => {
     if (language()) {
       fetchWordsPage({
         variables: {
-          languageId: language()!,
-          query: searchQuery(),
-          partOfSpeech: props.searchParams.partOfSpeech,
+          ...fetchWordsPageArgs(),
           start: 0,
-          limit: 2, // testing pagination
         },
       });
     }
   });
 
-  const handleLoadMore = () => {
+  createEffect(() => {
+    if (
+      searchQuery() ||
+      props.searchParams.partOfSpeech ||
+      props.searchParams.topic
+    ) {
+      cache.evict({
+        id: `Language:${untrack(language)!}`,
+        fieldName: 'words:search',
+      });
+    }
+  });
+
+  const handleFetchMore = () => {
     fetchWordsPage({
       variables: {
-        languageId: language()!,
-        query: searchQuery(),
-        partOfSpeech: props.searchParams.partOfSpeech,
+        ...fetchWordsPageArgs(),
         start: words()?.length ?? 0,
-        limit: 2,
       },
       fetchPolicy: 'network-only',
     });
@@ -52,17 +75,14 @@ const WordsList: Component<WordsListProps> = (props) => {
     <>
       <For each={words()} fallback={'loading...'}>
         {(word) => (
-          <span onClick={() => setSelectedWord(word.id)}>
+          <span onClick={() => props.setSelectedWord(word.id)}>
             {word.original} - {word.translation}
-            {selectedWord() === word.id ? '!' : ''}
+            {props.selectedWord === word.id ? '!' : ''}
           </span>
         )}
       </For>
       <Show when={hasMore()}>
-        <button onClick={handleLoadMore}>Load more</button>
-      </Show>
-      <Show when={selectedWord()}>
-        <WordDetails />
+        <button onClick={handleFetchMore}>Load more</button>
       </Show>
     </>
   );

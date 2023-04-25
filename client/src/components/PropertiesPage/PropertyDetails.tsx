@@ -1,0 +1,118 @@
+import { Component, For, createEffect } from 'solid-js';
+import { createLazyQuery, createMutation } from '@merged/solid-apollo';
+import {
+  CreatePropertyDocument,
+  GetPropertyDocument,
+  LanguagePropertiesFragmentDoc,
+  OptionProperty,
+  PartOfSpeech,
+  TextProperty,
+} from '../../api/types/graphql';
+import { PropertyType } from '../../api/types/graphql';
+import { createStore, produce } from 'solid-js/store';
+import { useLanguageContext } from '../LanguageContext';
+
+export type PropertyDetailsProps = {
+  selectedProperty: string | null;
+  setSelectedProperty: (property: string | null) => void;
+};
+
+enum PropertyDetailsMode {
+  Update,
+  Create,
+}
+
+const PropertyDetails: Component<PropertyDetailsProps> = (props) => {
+  const [language] = useLanguageContext();
+
+  const [property, setProperty] = createStore<
+    Partial<TextProperty | OptionProperty>
+  >({});
+
+  const [fetchSelectedProperty, selectedPropertyQuery] =
+    createLazyQuery(GetPropertyDocument);
+  const [createProperty, createdPropertyMutation] = createMutation(
+    CreatePropertyDocument,
+  );
+
+  const selectedProperty = () => selectedPropertyQuery()?.property;
+  const mode = () =>
+    props.selectedProperty
+      ? PropertyDetailsMode.Update
+      : PropertyDetailsMode.Create;
+  const createdProperty = () => createdPropertyMutation()?.createProperty;
+
+  const handleCreateProperty = () => {
+    createProperty({
+      variables: {
+        input: {
+          languageId: language()!,
+          name: property.name!,
+          type: PropertyType.Text, // TODO
+          partOfSpeech: PartOfSpeech.Noun,
+        },
+      },
+      update: (cache, { data }) => {
+        cache.updateFragment(
+          {
+            id: `Language:${language()!}`,
+            fragment: LanguagePropertiesFragmentDoc,
+            variables: { partOfSpeech: PartOfSpeech.Noun },
+            overwrite: true,
+          },
+          (properties) => ({
+            properties: [
+              ...(properties?.properties ?? []),
+              data!.createProperty,
+            ],
+          }),
+        );
+      },
+    });
+  };
+
+  createEffect(() => {
+    if (props.selectedProperty) {
+      fetchSelectedProperty({
+        variables: {
+          id: props.selectedProperty,
+        },
+      });
+    } else {
+      setProperty(
+        produce((property) => {
+          property = {};
+        }),
+      );
+    }
+  });
+
+  createEffect(() => {
+    if (selectedProperty()) {
+      const { name, type } = selectedProperty()!;
+      setProperty({ name, type });
+    }
+  });
+
+  createEffect(() => {
+    if (createdProperty()) {
+      props.setSelectedProperty(createdProperty()!.id);
+    }
+  });
+
+  return (
+    <div class="bg-lime-400">
+      <input
+        type="text"
+        value={property.name ?? ''}
+        onInput={(e) => setProperty({ name: e.currentTarget.value })}
+      />
+      <p>{property.type ?? ''}</p>
+      <button onClick={handleCreateProperty}>
+        {mode() === PropertyDetailsMode.Create ? 'Add' : 'Edit'}
+      </button>
+    </div>
+  );
+};
+
+export default PropertyDetails;
