@@ -1,13 +1,25 @@
-import { A, useLocation, useNavigate } from '@solidjs/router';
-import { Component, For, createEffect, createMemo } from 'solid-js';
+import {
+  Component,
+  Show,
+  createEffect,
+  createMemo,
+  createSignal,
+} from 'solid-js';
+import { useLocation, useNavigate } from '@solidjs/router';
+import { BsTranslate } from 'solid-icons/bs';
+import { FaSolidCircleNodes } from 'solid-icons/fa';
 import { AppRoute, getAppRouteMatch } from '../../routes';
-import { createQuery } from '@merged/solid-apollo';
-import { GetLanguagesDocument } from '../../api/types/graphql';
-import { useLanguageContext } from '../LanguageContext';
+import NavBarLanguageControl from './NavBarLanguageControl';
+import NavBarLink from './NavBarLink';
+import { createMediaQuery } from '@solid-primitives/media';
 
 const NavBar: Component = () => {
   const appRoute = createMemo(() => getAppRouteMatch(useLocation().pathname));
   const navigate = useNavigate();
+  const isSmallScreen = createMediaQuery('(max-width: 768px)');
+
+  const [isLanguageControlActive, setIsLanguageControlActive] =
+    createSignal(false);
 
   createEffect(() => {
     if (!appRoute()) {
@@ -15,49 +27,27 @@ const NavBar: Component = () => {
     }
   });
 
-  const languagesQuery = createQuery(GetLanguagesDocument);
-  const languages = () => languagesQuery()?.languages;
-
-  const [selectedLanguage, setSelectedLanguage] = useLanguageContext();
-
   return (
-    <nav class="flex flex-col h-full">
-      <ul>
-        <li>
-          <div class="bg-pink-400">
-            <ul>
-              <For each={languages()} fallback={'Loading languages...'}>
-                {(language) => (
-                  <li onClick={() => setSelectedLanguage(language.id)}>
-                    {language.name}{' '}
-                    {selectedLanguage() === language.id ? '!' : ''}
-                  </li>
-                )}
-              </For>
-            </ul>
-          </div>
-        </li>
-        <NavBarItem href={AppRoute.Words} text="Words" />
-        <NavBarItem href={AppRoute.Properties} text="Properties" />
-      </ul>
+    <nav
+      class="flex flex-row items-center fixed bottom-0 w-full 
+      md:static md:flex-col md:items-stretch md:min-w-[16rem] md:max-w-[16rem] sm md:h-full md:overflow-x-hidden
+      bg-charcoal text-gray-200 font-bold
+    "
+    >
+      <Show when={!isSmallScreen() || !isLanguageControlActive()}>
+        <NavBarLink href={AppRoute.Words} icon={BsTranslate} text="Words" />
+        <NavBarLink
+          href={AppRoute.Properties}
+          icon={FaSolidCircleNodes}
+          text="Properties"
+        />
+      </Show>
+
+      <NavBarLanguageControl
+        isActive={isLanguageControlActive()}
+        setIsActive={setIsLanguageControlActive}
+      />
     </nav>
-  );
-};
-
-type NavBarItemProps = {
-  href: string;
-  text: string;
-};
-
-const NavBarItem: Component<NavBarItemProps> = (props) => {
-  return (
-    <li>
-      <div>
-        <A href={props.href} end={true}>
-          {props.text}
-        </A>
-      </div>
-    </li>
   );
 };
 

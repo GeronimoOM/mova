@@ -11,6 +11,7 @@ import {
 import { PropertyType } from '../../api/types/graphql';
 import { createStore, produce } from 'solid-js/store';
 import { useLanguageContext } from '../LanguageContext';
+import { updateCacheOnCreateProperty } from '../../api/mutations';
 
 export type PropertyDetailsProps = {
   selectedProperty: string | null;
@@ -23,7 +24,7 @@ enum PropertyDetailsMode {
 }
 
 const PropertyDetails: Component<PropertyDetailsProps> = (props) => {
-  const [language] = useLanguageContext();
+  const [selectedLanguageId] = useLanguageContext();
 
   const [property, setProperty] = createStore<
     Partial<TextProperty | OptionProperty>
@@ -46,28 +47,13 @@ const PropertyDetails: Component<PropertyDetailsProps> = (props) => {
     createProperty({
       variables: {
         input: {
-          languageId: language()!,
+          languageId: selectedLanguageId()!,
           name: property.name!,
           type: PropertyType.Text, // TODO
-          partOfSpeech: PartOfSpeech.Noun,
+          partOfSpeech: PartOfSpeech.Noun, // TODO
         },
       },
-      update: (cache, { data }) => {
-        cache.updateFragment(
-          {
-            id: `Language:${language()!}`,
-            fragment: LanguagePropertiesFragmentDoc,
-            variables: { partOfSpeech: PartOfSpeech.Noun },
-            overwrite: true,
-          },
-          (properties) => ({
-            properties: [
-              ...(properties?.properties ?? []),
-              data!.createProperty,
-            ],
-          }),
-        );
-      },
+      update: updateCacheOnCreateProperty,
     });
   };
 

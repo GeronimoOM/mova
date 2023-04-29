@@ -62,6 +62,7 @@ export class WordService {
         private propertyService: PropertyService,
         @Inject(forwardRef(() => TopicService))
         private topicService: TopicService,
+        @Inject(forwardRef(() => LanguageService))
         private languageService: LanguageService,
     ) {}
 

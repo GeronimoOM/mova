@@ -10,7 +10,7 @@ export type PropertiesListProps = {
 };
 
 const PropertiesList: Component<PropertiesListProps> = (props) => {
-  const [language] = useLanguageContext();
+  const [selectedLanguageId] = useLanguageContext();
 
   const [fetchProperies, propertiesQuery] = createLazyQuery(
     GetPropertiesDocument,
@@ -18,10 +18,10 @@ const PropertiesList: Component<PropertiesListProps> = (props) => {
   const properties = () => propertiesQuery()?.language?.properties;
 
   createEffect(() => {
-    if (language()) {
+    if (selectedLanguageId()) {
       fetchProperies({
         variables: {
-          languageId: language()!,
+          languageId: selectedLanguageId()!,
           partOfSpeech: props.partOfSpeech,
         },
       });

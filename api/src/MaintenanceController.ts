@@ -147,9 +147,6 @@ export class MaintenanceController {
             return 'Language does not exist';
         }
 
-        await this.wordService.deleteForLanguage(languageId);
-        await this.topicService.deleteForLanguage(languageId);
-        await this.propertyService.deleteForLanguage(languageId);
         await this.languageService.delete(languageId);
 
         return `Cleared language ${language.name} (${languageId})`;

@@ -1,7 +1,10 @@
 import { v1 as uuid } from 'uuid';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { Language, LanguageId } from 'models/Language';
 import { LanguageRepository } from 'repositories/LanguageRepository';
+import { PropertyService } from './PropertyService';
+import { TopicService } from './TopicService';
+import { WordService } from './WordService';
 
 export interface CreateLanguageParams {
     name: string;
@@ -14,7 +17,15 @@ export interface UpdateLanguageParams {
 
 @Injectable()
 export class LanguageService {
-    constructor(private languageRepository: LanguageRepository) {}
+    constructor(
+        private languageRepository: LanguageRepository,
+        @Inject(forwardRef(() => PropertyService))
+        private propertyService: PropertyService,
+        @Inject(forwardRef(() => TopicService))
+        private topicService: TopicService,
+        @Inject(forwardRef(() => WordService))
+        private wordService: WordService,
+    ) {}
 
     async getAll(): Promise<Language[]> {
         return await this.languageRepository.getAll();
@@ -50,6 +61,9 @@ export class LanguageService {
             throw new Error('Language does not exist');
         }
 
+        await this.wordService.deleteForLanguage(id);
+        await this.topicService.deleteForLanguage(id);
+        await this.propertyService.deleteForLanguage(id);
         await this.languageRepository.delete(id);
         return language;
     }

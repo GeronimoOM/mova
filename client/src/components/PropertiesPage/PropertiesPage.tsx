@@ -6,7 +6,7 @@ import PropertiesPosSelect from './PropertiesPosSelect';
 import PropertyDetails from './PropertyDetails';
 
 const PropertiesPage: Component = () => {
-  const [language] = useLanguageContext();
+  const [selectedLanguageId] = useLanguageContext();
 
   const [selectedPos, setSelectedPos] = createSignal(PartOfSpeech.Noun);
   const [selectedProperty, setSelectedProperty] = createSignal<string | null>(
@@ -20,7 +20,7 @@ const PropertiesPage: Component = () => {
   };
 
   createEffect(
-    on(language, () => {
+    on(selectedLanguageId, () => {
       setSelectedProperty(null);
     }),
   );

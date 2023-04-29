@@ -13,8 +13,13 @@
   "license": "MIT",
   "dependencies": {
     "@merged/solid-apollo": "^1.7.1",
+    "@solid-primitives/media": "^2.1.6",
     "@solidjs/router": "^0.8.2",
+    "solid-icons": "^1.0.4",
     "solid-js": "^1.6.10"
+  },
+  "peerDependencies": {
+    "@apollo/client": "3.7.13"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^3.3.0",

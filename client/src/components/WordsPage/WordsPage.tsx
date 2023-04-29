@@ -10,7 +10,7 @@ import WordDetails from './WordDetails';
 import { useLanguageContext } from '../LanguageContext';
 
 const WordsPage: Component = () => {
-  const [language] = useLanguageContext();
+  const [selectedLanguageId] = useLanguageContext();
 
   const [wordsSearchParams, setSearchQuery] = createStore<WordsSearchParams>(
     defaultWordsSearchParams(),
@@ -24,7 +24,7 @@ const WordsPage: Component = () => {
   };
 
   createEffect(
-    on(language, () => {
+    on(selectedLanguageId, () => {
       setSelectedWord(null);
     }),
   );

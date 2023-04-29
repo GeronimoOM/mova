@@ -22,7 +22,7 @@ export type WordsListProps = {
 };
 
 const WordsList: Component<WordsListProps> = (props) => {
-  const [language] = useLanguageContext();
+  const [selectedLanguageId] = useLanguageContext();
 
   const [fetchWordsPage, wordsPageQuery] = createLazyQuery(GetWordsDocument);
 
@@ -31,14 +31,14 @@ const WordsList: Component<WordsListProps> = (props) => {
   const searchQuery = () =>
     props.searchParams.query.length >= 3 ? props.searchParams.query : null;
   const fetchWordsPageArgs = (): GetWordsQueryVariables => ({
-    languageId: language()!,
+    languageId: selectedLanguageId()!,
     query: searchQuery(),
     partOfSpeech: props.searchParams.partOfSpeech,
     topic: props.searchParams.topic,
   });
 
   createEffect(() => {
-    if (language()) {
+    if (selectedLanguageId()) {
       fetchWordsPage({
         variables: {
           ...fetchWordsPageArgs(),
@@ -55,7 +55,7 @@ const WordsList: Component<WordsListProps> = (props) => {
       props.searchParams.topic
     ) {
       cache.evict({
-        id: `Language:${untrack(language)!}`,
+        id: `Language:${untrack(selectedLanguageId)!}`,
         fieldName: 'words:search',
       });
     }

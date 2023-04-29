@@ -79,6 +79,14 @@ export class LanguageResolver {
         return updatedLanguage;
     }
 
+    @Mutation((returns) => LanguageType)
+    async deleteLanguage(
+        @Args('id', { type: () => ID }) id: LanguageId,
+    ): Promise<LanguageType> {
+        const deletedLanguage = await this.languageService.delete(id);
+        return deletedLanguage;
+    }
+
     @ResolveField((type) => [PropertyUnionType])
     async properties(
         @Parent() language: LanguageType,

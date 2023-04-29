@@ -8,7 +8,10 @@ import {
   useContext,
 } from 'solid-js';
 
-export type LanguageContextReturn = [Accessor<string | null>, Setter<string>];
+export type LanguageContextReturn = [
+  Accessor<string | null>,
+  Setter<string | null>,
+];
 
 export const LanguageContext = createContext<LanguageContextReturn>();
 

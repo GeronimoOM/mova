@@ -97,6 +97,7 @@ type Query {
 type Mutation {
   createLanguage(input: CreateLanguageInput!): Language!
   updateLanguage(input: UpdateLanguageInput!): Language!
+  deleteLanguage(id: ID!): Language!
   createProperty(input: CreatePropertyInput!): PropertyUnion!
   updateProperty(input: UpdatePropertyInput!): PropertyUnion!
   deleteProperty(id: ID!): PropertyUnion!

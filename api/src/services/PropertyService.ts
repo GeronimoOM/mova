@@ -1,5 +1,5 @@
 import { v1 as uuid } from 'uuid';
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { LanguageId } from 'models/Language';
 import {
     BaseProperty,
@@ -45,6 +45,7 @@ export interface UpdatePropertyParams {
 export class PropertyService {
     constructor(
         private propertyRepository: PropertyRepository,
+        @Inject(forwardRef(() => LanguageService))
         private languageService: LanguageService,
     ) {}
 

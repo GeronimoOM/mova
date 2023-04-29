@@ -12,6 +12,12 @@ mutation UpdateLanguage($input: UpdateLanguageInput!) {
   }
 }
 
+mutation DeleteLanguage($id: ID!) {
+  deleteLanguage(id: $id) {
+    id
+  }
+}
+
 mutation CreateProperty($input: CreatePropertyInput!) {
   createProperty(input: $input) {
     ... on TextProperty {

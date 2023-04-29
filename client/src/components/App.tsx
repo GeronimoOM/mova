@@ -9,11 +9,9 @@ import { LanguageProvider } from './LanguageContext';
 const App: Component = () => {
   return (
     <LanguageProvider>
-      <div class="flex flex-row w-full h-full justify-center bg-yellow-500">
-        <div class="min-w-60 w-60 shrink-0 grow-0 bg-cyan-500">
-          <NavBar />
-        </div>
-        <main class="w-[900px] bg-purple-400">
+      <div class="flex flex-row w-screen h-screen justify-center">
+        <NavBar />
+        <main class="min-w-[32rem] w-[72rem] p-2">
           <Routes>
             <Route path={AppRoute.Words} component={WordsPage} />
             <Route path={AppRoute.Properties} component={PropertiesPage} />

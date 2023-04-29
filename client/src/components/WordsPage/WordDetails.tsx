@@ -14,6 +14,7 @@ import { TextPropertyValue } from '../../api/types/graphql';
 import { OptionPropertyValue } from '../../api/types/graphql';
 import { createStore, produce } from 'solid-js/store';
 import { useLanguageContext } from '../LanguageContext';
+import { updateCacheOnCreateWord } from '../../api/mutations';
 
 export type WordDetailsProps = {
   selectedWord: string | null;
@@ -26,7 +27,7 @@ enum WordDetailsMode {
 }
 
 const WordDetails: Component<WordDetailsProps> = (props) => {
-  const [language] = useLanguageContext();
+  const [selectedLanguageId] = useLanguageContext();
 
   const [word, setWord] = createStore<Partial<Word>>({});
 
@@ -43,27 +44,13 @@ const WordDetails: Component<WordDetailsProps> = (props) => {
     createWord({
       variables: {
         input: {
-          languageId: language()!,
+          languageId: selectedLanguageId()!,
           original: word.original!,
           translation: word.translation!,
           partOfSpeech: PartOfSpeech.Noun, // TODO
         },
       },
-      update: (cache, { data }) => {
-        cache.updateFragment(
-          {
-            id: `Language:${language()!}`,
-            fragment: LanguageWordsFragmentDoc,
-            overwrite: true,
-          },
-          (wordsPage) => ({
-            words: {
-              items: [data!.createWord, ...(wordsPage?.words.items ?? [])],
-              hasMore: wordsPage?.words.hasMore ?? false,
-            },
-          }),
-        );
-      },
+      update: updateCacheOnCreateWord,
     });
   };
 
