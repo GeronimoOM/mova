@@ -22,8 +22,8 @@ export type WordDetailsProps = {
 };
 
 enum WordDetailsMode {
-  Update,
-  Create,
+  Update = 'update',
+  Create = 'create',
 }
 
 const WordDetails: Component<WordDetailsProps> = (props) => {

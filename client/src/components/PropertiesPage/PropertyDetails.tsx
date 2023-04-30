@@ -19,8 +19,8 @@ export type PropertyDetailsProps = {
 };
 
 enum PropertyDetailsMode {
-  Update,
-  Create,
+  Update = 'update',
+  Create = 'create',
 }
 
 const PropertyDetails: Component<PropertyDetailsProps> = (props) => {
