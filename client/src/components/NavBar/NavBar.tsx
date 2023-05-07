@@ -9,7 +9,7 @@ import { useLocation, useNavigate } from '@solidjs/router';
 import { BsTranslate } from 'solid-icons/bs';
 import { FaSolidCircleNodes } from 'solid-icons/fa';
 import { AppRoute, getAppRouteMatch } from '../../routes';
-import NavBarLanguages from './NavBarLanguages/NavBarLanguages';
+import Languages from './NavBarLanguages/Languages';
 import NavBarLink from './NavBarLink';
 import { createMediaQuery } from '@solid-primitives/media';
 
@@ -28,9 +28,9 @@ const NavBar: Component = () => {
 
   return (
     <nav
-      class="flex flex-row items-center fixed bottom-0 w-full
-      md:static md:flex-col md:items-stretch md:min-w-[16rem] md:max-w-[16rem] md:h-full md:overflow-x-hidden
-      bg-charcoal text-gray-200 font-bold
+      class="flex flex-row items-center fixed bottom-0 w-full min-h-0 overflow-hidden
+      md:static md:flex-col md:items-stretch md:min-w-[14rem] md:max-w-[14rem] md:h-full
+      bg-charcoal-300 text-gray-200 font-bold
     "
     >
       <Show when={!isLanguagesActive() || isVertical()}>
@@ -42,7 +42,7 @@ const NavBar: Component = () => {
         />
       </Show>
 
-      <NavBarLanguages
+      <Languages
         isActive={isLanguagesActive()}
         setIsActive={setIsLanguagesActive}
         isVertical={isVertical()}

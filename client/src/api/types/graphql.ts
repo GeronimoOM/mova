@@ -84,6 +84,7 @@ export type Mutation = {
   deleteTopic: Topic;
   deleteWord: Word;
   removeTopicWord: Topic;
+  reorderProperties: Array<PropertyUnion>;
   updateLanguage: Language;
   updateProperty: PropertyUnion;
   updateWord: Word;
@@ -129,6 +130,10 @@ export type MutationDeleteWordArgs = {
 export type MutationRemoveTopicWordArgs = {
   topicId: Scalars['ID'];
   wordId: Scalars['ID'];
+};
+
+export type MutationReorderPropertiesArgs = {
+  input: ReorderPropertiesInput;
 };
 
 export type MutationUpdateLanguageArgs = {
@@ -200,6 +205,12 @@ export type QueryPropertyArgs = {
 
 export type QueryWordArgs = {
   id: Scalars['ID'];
+};
+
+export type ReorderPropertiesInput = {
+  languageId: Scalars['ID'];
+  partOfSpeech: PartOfSpeech;
+  propertyIds: Array<Scalars['ID']>;
 };
 
 export type TextProperty = {
@@ -284,6 +295,12 @@ export type WordPage = {
   __typename?: 'WordPage';
   hasMore: Scalars['Boolean'];
   items: Array<Word>;
+};
+
+export type LanguageFieldsFragment = {
+  __typename?: 'Language';
+  id: string;
+  name: string;
 };
 
 export type LanguageWordsFragment = {
@@ -423,6 +440,18 @@ export type UpdatePropertyMutation = {
         type: PropertyType;
         partOfSpeech: PartOfSpeech;
       };
+};
+
+export type ReorderPropertiesMutationVariables = Exact<{
+  input: ReorderPropertiesInput;
+}>;
+
+export type ReorderPropertiesMutation = {
+  __typename?: 'Mutation';
+  reorderProperties: Array<
+    | { __typename?: 'OptionProperty'; id: string }
+    | { __typename?: 'TextProperty'; id: string }
+  >;
 };
 
 export type CreateWordMutationVariables = Exact<{
@@ -672,6 +701,26 @@ export type GetTopicsQuery = {
   } | null;
 };
 
+export const LanguageFieldsFragmentDoc = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'LanguageFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'Language' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<LanguageFieldsFragment, unknown>;
 export const LanguageWordsFragmentDoc = {
   kind: 'Document',
   definitions: [
@@ -1361,6 +1410,85 @@ export const UpdatePropertyDocument = {
   UpdatePropertyMutation,
   UpdatePropertyMutationVariables
 >;
+export const ReorderPropertiesDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'ReorderProperties' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'input' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'ReorderPropertiesInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'reorderProperties' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'input' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'input' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'InlineFragment',
+                  typeCondition: {
+                    kind: 'NamedType',
+                    name: { kind: 'Name', value: 'TextProperty' },
+                  },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                    ],
+                  },
+                },
+                {
+                  kind: 'InlineFragment',
+                  typeCondition: {
+                    kind: 'NamedType',
+                    name: { kind: 'Name', value: 'OptionProperty' },
+                  },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  ReorderPropertiesMutation,
+  ReorderPropertiesMutationVariables
+>;
 export const CreateWordDocument = {
   kind: 'Document',
   definitions: [
@@ -1847,11 +1975,28 @@ export const GetLanguagesDocument = {
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'LanguageFields' },
+                },
               ],
             },
           },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'LanguageFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'Language' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
         ],
       },
     },

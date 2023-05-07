@@ -16,6 +16,7 @@ import { updateCacheOnCreateProperty } from '../../api/mutations';
 export type PropertyDetailsProps = {
   selectedProperty: string | null;
   setSelectedProperty: (property: string | null) => void;
+  partOfSpeech: PartOfSpeech;
 };
 
 enum PropertyDetailsMode {
@@ -43,14 +44,14 @@ const PropertyDetails: Component<PropertyDetailsProps> = (props) => {
       : PropertyDetailsMode.Create;
   const createdProperty = () => createdPropertyMutation()?.createProperty;
 
-  const handleCreateProperty = () => {
+  const onCreateProperty = () => {
     createProperty({
       variables: {
         input: {
           languageId: selectedLanguageId()!,
           name: property.name!,
           type: PropertyType.Text, // TODO
-          partOfSpeech: PartOfSpeech.Noun, // TODO
+          partOfSpeech: props.partOfSpeech,
         },
       },
       update: updateCacheOnCreateProperty,
@@ -87,14 +88,14 @@ const PropertyDetails: Component<PropertyDetailsProps> = (props) => {
   });
 
   return (
-    <div class="bg-lime-400">
+    <div class="flex flex-col">
       <input
         type="text"
         value={property.name ?? ''}
         onInput={(e) => setProperty({ name: e.currentTarget.value })}
       />
       <p>{property.type ?? ''}</p>
-      <button onClick={handleCreateProperty}>
+      <button onClick={onCreateProperty}>
         {mode() === PropertyDetailsMode.Create ? 'Add' : 'Edit'}
       </button>
     </div>

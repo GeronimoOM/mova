@@ -12,6 +12,7 @@ import {
   GetLanguagesDocument,
   LanguagePropertiesFragmentDoc,
   LanguageWordsFragmentDoc,
+  ReorderPropertiesDocument,
 } from './types/graphql';
 
 type MutationUpdaterFunction<MDocument> = MDocument extends TypedDocumentNode<
@@ -70,6 +71,18 @@ export const updateCacheOnCreateProperty: MutationUpdaterFunction<
       properties: [...(properties?.properties ?? []), data!.createProperty],
     }),
   );
+};
+
+export const updateCacheOnReorderProperties: MutationUpdaterFunction<
+  typeof ReorderPropertiesDocument
+> = (cache, { data }, { variables }) => {
+  cache.writeFragment({
+    id: `Language:${variables!.input.languageId}`,
+    fragment: LanguagePropertiesFragmentDoc,
+    variables: { partOfSpeech: variables!.input.partOfSpeech },
+    overwrite: true,
+    data: { properties: data!.reorderProperties },
+  });
 };
 
 export const updateCacheOnCreateWord: MutationUpdaterFunction<

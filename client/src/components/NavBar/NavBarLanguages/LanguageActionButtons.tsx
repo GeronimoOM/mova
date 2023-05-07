@@ -4,9 +4,10 @@ import {
   FaSolidCircleXmark,
   FaSolidCircleMinus,
 } from 'solid-icons/fa';
+import { IoArrowRedo } from 'solid-icons/io';
 import { Component, For } from 'solid-js';
 import { NavBarIcon } from '../NavBarIcon';
-import { LanguageAction } from './NavBarLanguages';
+import { LanguageAction } from './Languages';
 
 export type LanguageActionButtonsProps = {
   onAction: (action: LanguageAction | null) => void;
@@ -18,7 +19,7 @@ export type LanguageActionButtonsAction = Omit<
   'onAction'
 >;
 
-export const LanguageActionButtons: Component<LanguageActionButtonsProps> = (
+const LanguageActionButtons: Component<LanguageActionButtonsProps> = (
   props,
 ) => {
   return (
@@ -35,16 +36,14 @@ export const LanguageActionButtons: Component<LanguageActionButtonsProps> = (
   );
 };
 
-export type LanguageActionButtonProps = {
+type LanguageActionButtonProps = {
   action: LanguageAction | null;
   isDisabled?: boolean;
   isConfirm?: boolean;
   onAction: (action: LanguageAction | null) => void;
 };
 
-export const LanguageActionButton: Component<LanguageActionButtonProps> = (
-  props,
-) => {
+const LanguageActionButton: Component<LanguageActionButtonProps> = (props) => {
   const icon = () => {
     switch (props.action) {
       case LanguageAction.Create:
@@ -54,7 +53,7 @@ export const LanguageActionButton: Component<LanguageActionButtonProps> = (
       case LanguageAction.Delete:
         return FaSolidCircleXmark;
       default:
-        return FaSolidCircleMinus;
+        return IoArrowRedo;
     }
   };
 
@@ -70,7 +69,7 @@ export const LanguageActionButton: Component<LanguageActionButtonProps> = (
     }
   };
 
-  const handleAction = (action: LanguageAction | null) => () =>
+  const onAction = (action: LanguageAction | null) => () =>
     props.onAction(action);
 
   return (
@@ -78,12 +77,13 @@ export const LanguageActionButton: Component<LanguageActionButtonProps> = (
       icon={icon()}
       class="cursor-pointer transition-colors"
       classList={{
-        'hover:backdrop-brightness-150 hover:text-spacecadet':
-          !props.isDisabled,
+        'hover:bg-charcoal-100 hover:text-spacecadet': !props.isDisabled,
         'brightness-75': props.isDisabled,
         [confirmClasses()]: props.isConfirm && !props.isDisabled,
       }}
-      onClick={handleAction(props.action)}
+      onClick={onAction(props.action)}
     />
   );
 };
+
+export default LanguageActionButtons;

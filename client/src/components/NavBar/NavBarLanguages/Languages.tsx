@@ -2,7 +2,6 @@ import {
   Component,
   createSignal,
   Show,
-  For,
   Setter,
   createEffect,
   batch,
@@ -17,7 +16,6 @@ import {
   CreateLanguageDocument,
   DeleteLanguageDocument,
   GetLanguagesDocument,
-  GetLanguagesQuery,
   UpdateLanguageDocument,
 } from '../../../api/types/graphql';
 import { useLanguageContext } from '../../LanguageContext';
@@ -26,11 +24,11 @@ import {
   updateCacheOnDeleteLanguage,
 } from '../../../api/mutations';
 import { NavBarIcon, NavBarToggleIcon } from '../NavBarIcon';
-import {
+import LanguageActionButtons, {
   LanguageActionButtonsAction,
-  LanguageActionButtons,
 } from './LanguageActionButtons';
-import { LanguageInput, LanguageList } from './LanguageList';
+import LanguageList from './LanguageList';
+import LanguageInput from './LanguageInput';
 
 const MIN_LANGUAGE_NAME_LENGTH = 3;
 
@@ -46,7 +44,7 @@ export enum LanguageAction {
   Delete = 'delete',
 }
 
-const NavBarLanguages: Component<NavBarLanguagesProps> = (props) => {
+const Languages: Component<NavBarLanguagesProps> = (props) => {
   const [selectedLanguageId, setSelectedLanguageId] = useLanguageContext();
 
   const [action, setAction] = createSignal<LanguageAction | null>(null);
@@ -147,11 +145,11 @@ const NavBarLanguages: Component<NavBarLanguagesProps> = (props) => {
       : []),
   ];
 
-  const handleLanguageSelect = (languageId: string) => {
+  const onLanguageSelect = (languageId: string) => {
     setSelectedLanguageId(languageId);
   };
 
-  const handleAction = (
+  const onAction = (
     newAction: LanguageAction | null,
     newActionLanguageId: string | null = null,
   ) => {
@@ -242,10 +240,11 @@ const NavBarLanguages: Component<NavBarLanguagesProps> = (props) => {
     }
   };
 
+  // TODO fix langauges collapsing in horizontal mode
   return (
-    <div class="flex-auto max-w-full flex flex-row items-center md:flex-col md:items-stretch">
+    <div class="flex-auto max-w-full flex flex-row items-center md:max-h-full md:flex-col md:items-stretch">
       <div
-        class="flex-none flex flex-row items-stretch hover:backdrop-brightness-150 hover:text-spacecadet cursor-pointer transition-colors"
+        class="flex-none flex flex-row items-stretch hover:bg-charcoal-100 hover:text-spacecadet cursor-pointer transition-colors"
         onClick={() => props.setIsActive((isActive) => !isActive)}
       >
         <NavBarIcon icon={FaSolidEarthEurope} />
@@ -262,40 +261,46 @@ const NavBarLanguages: Component<NavBarLanguagesProps> = (props) => {
       </div>
 
       <Show when={props.isActive}>
-        <div class="min-w-0 flex-auto flex flex-row items-stretch md:flex-col md:items-stretch">
-          <Show when={!action() || props.isVertical}>
+        <Show when={!action() || props.isVertical}>
+          <div class="min-w-0 min-h-0 flex-1 flex flex-row items-stretch md:flex-col">
             <LanguageList
               languages={languages()}
               selectedLanguageId={selectedLanguageId()}
-              onLanguageSelect={handleLanguageSelect}
+              onLanguageSelect={onLanguageSelect}
               action={action()}
               actionLanguageId={actionLanguageId()}
-              onAction={handleAction}
+              onAction={onAction}
               isVertical={props.isVertical}
               languageInput={languageInput()}
               onLanguageInput={setLanguageInput}
               isLanguageInputValid={isLanguageInputValid()}
               setLanguagesContainer={setLanguagesContainer}
             />
-          </Show>
+          </div>
+        </Show>
 
+        <div
+          class="flex-none flex flex-row md:justify-center"
+          classList={{
+            'flex-1': Boolean(action() && !props.isVertical),
+          }}
+        >
           <Show
             when={
               props.isVertical ? action() === LanguageAction.Create : action()
             }
           >
-            <LanguageInput
-              languageInput={languageInput()}
-              onLanguageInput={setLanguageInput}
-              isDisabled={action() === LanguageAction.Delete}
-            />
+            <div class="flex-1">
+              <LanguageInput
+                languageInput={languageInput()}
+                onLanguageInput={setLanguageInput}
+                isDisabled={action() === LanguageAction.Delete}
+              />
+            </div>
           </Show>
 
-          <div class="flex md:justify-center">
-            <LanguageActionButtons
-              actions={actions()}
-              onAction={handleAction}
-            />
+          <div class="flex-none">
+            <LanguageActionButtons actions={actions()} onAction={onAction} />
           </div>
         </div>
       </Show>
@@ -303,4 +308,4 @@ const NavBarLanguages: Component<NavBarLanguagesProps> = (props) => {
   );
 };
 
-export default NavBarLanguages;
+export default Languages;

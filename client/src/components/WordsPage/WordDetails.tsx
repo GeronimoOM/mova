@@ -40,7 +40,7 @@ const WordDetails: Component<WordDetailsProps> = (props) => {
     props.selectedWord ? WordDetailsMode.Update : WordDetailsMode.Create;
   const createdWord = () => createdWordMutation()?.createWord;
 
-  const handleCreateWord = () => {
+  const onCreateWord = () => {
     createWord({
       variables: {
         input: {
@@ -106,7 +106,7 @@ const WordDetails: Component<WordDetailsProps> = (props) => {
           </p>
         )}
       </For>
-      <button onClick={handleCreateWord}>
+      <button onClick={onCreateWord}>
         {mode() === WordDetailsMode.Create ? 'Add' : 'Edit'}
       </button>
     </div>

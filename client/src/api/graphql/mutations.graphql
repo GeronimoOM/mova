@@ -40,6 +40,17 @@ mutation UpdateProperty($input: UpdatePropertyInput!) {
   }
 }
 
+mutation ReorderProperties($input: ReorderPropertiesInput!) {
+  reorderProperties(input: $input) {
+    ... on TextProperty {
+      id
+    }
+    ... on OptionProperty {
+      id
+    }
+  }
+}
+
 mutation CreateWord($input: CreateWordInput!) {
   createWord(input: $input) {
     ...WordFields

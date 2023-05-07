@@ -1,7 +1,6 @@
 query GetLanguages {
   languages {
-    id
-    name
+    ...LanguageFields
   }
 }
 

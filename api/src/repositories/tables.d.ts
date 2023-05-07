@@ -5,49 +5,50 @@ import { TopicId } from 'models/Topic';
 import { WordId, PartOfSpeech } from 'models/Word';
 
 declare module 'knex/types/tables' {
-    interface LanguageTable {
-        id: LanguageId;
-        name: string;
-        added_at: number;
-    }
+  interface LanguageTable {
+    id: LanguageId;
+    name: string;
+    added_at: number;
+  }
 
-    interface PropertyTable {
-        id: PropertyId;
-        name: string;
-        type: PropertyType;
-        language_id: LanguageId;
-        part_of_speech: PartOfSpeech;
-        added_at: number;
-        data?: string;
-    }
+  interface PropertyTable {
+    id: PropertyId;
+    name: string;
+    type: PropertyType;
+    language_id: LanguageId;
+    part_of_speech: PartOfSpeech;
+    order: number;
+    added_at: number;
+    data?: string;
+  }
 
-    interface WordTable {
-        id: WordId;
-        original: string;
-        translation: string;
-        language_id: LanguageId;
-        part_of_speech: PartOfSpeech;
-        added_at: number;
-        properties?: string;
-    }
+  interface WordTable {
+    id: WordId;
+    original: string;
+    translation: string;
+    language_id: LanguageId;
+    part_of_speech: PartOfSpeech;
+    added_at: number;
+    properties?: string;
+  }
 
-    interface TopicTable {
-        id: TopicId;
-        name: string;
-        language_id: LanguageId;
-        added_at: number;
-    }
+  interface TopicTable {
+    id: TopicId;
+    name: string;
+    language_id: LanguageId;
+    added_at: number;
+  }
 
-    interface TopicWordTable {
-        topic_id: TopicId;
-        word_id: WordId;
-    }
+  interface TopicWordTable {
+    topic_id: TopicId;
+    word_id: WordId;
+  }
 
-    interface Tables {
-        languages: LanguageTable;
-        properties: PropertyTable;
-        words: WordTable;
-        topics: TopicTable;
-        topics_words: TopicWordTable;
-    }
+  interface Tables {
+    languages: LanguageTable;
+    properties: PropertyTable;
+    words: WordTable;
+    topics: TopicTable;
+    topics_words: TopicWordTable;
+  }
 }

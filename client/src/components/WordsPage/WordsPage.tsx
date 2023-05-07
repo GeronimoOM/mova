@@ -18,7 +18,7 @@ const WordsPage: Component = () => {
   const [selectedWord, setSelectedWord] = createSignal<string | null>(null);
   const [showWordDetails, setShowWordDetails] = createSignal(false);
 
-  const handleCreateWordDetails = () => {
+  const onCreateWordDetails = () => {
     setSelectedWord(null);
     setShowWordDetails(true);
   };
@@ -48,7 +48,7 @@ const WordsPage: Component = () => {
         selectedWord={selectedWord()}
         setSelectedWord={setSelectedWord}
       />
-      <button onClick={handleCreateWordDetails}>New</button>
+      <button onClick={onCreateWordDetails}>New</button>
       <Show when={showWordDetails()}>
         <WordDetails
           selectedWord={selectedWord()}

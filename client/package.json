@@ -15,6 +15,7 @@
     "@merged/solid-apollo": "^1.7.1",
     "@solid-primitives/media": "^2.1.6",
     "@solidjs/router": "^0.8.2",
+    "@thisbeyond/solid-dnd": "^0.7.4",
     "solid-icons": "^1.0.4",
     "solid-js": "^1.6.10"
   },

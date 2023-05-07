@@ -2,141 +2,159 @@ import { v1 as uuid } from 'uuid';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { LanguageId } from 'models/Language';
 import {
-    BaseProperty,
-    isOptionProperty,
-    OptionId,
-    OptionProperty,
-    Property,
-    PropertyId,
-    PropertyType,
-    TextProperty,
+  BaseProperty,
+  isOptionProperty,
+  OptionId,
+  OptionProperty,
+  Property,
+  PropertyId,
+  PropertyType,
+  TextProperty,
 } from 'models/Property';
 import { PropertyRepository } from 'repositories/PropertyRepository';
 import { LanguageService } from './LanguageService';
 import { PartOfSpeech } from 'models/Word';
+import * as arrays from 'utils/arrays';
 
 export interface CreateBasePropertyParams {
-    name: string;
-    type: PropertyType;
-    languageId: LanguageId;
-    partOfSpeech: PartOfSpeech;
+  name: string;
+  type: PropertyType;
+  languageId: LanguageId;
+  partOfSpeech: PartOfSpeech;
 }
 
 export interface CreateTextPropertyParams extends CreateBasePropertyParams {
-    type: PropertyType.Text;
+  type: PropertyType.Text;
 }
 
 export interface CreateOptionPropertyParams extends CreateBasePropertyParams {
-    type: PropertyType.Option;
-    options: string[];
+  type: PropertyType.Option;
+  options: string[];
 }
 
 export type CreatePropertyParams =
-    | CreateTextPropertyParams
-    | CreateOptionPropertyParams;
+  | CreateTextPropertyParams
+  | CreateOptionPropertyParams;
 
 export interface UpdatePropertyParams {
-    id: PropertyId;
-    name?: string;
-    options?: Map<OptionId, string>;
+  id: PropertyId;
+  name?: string;
+  options?: Map<OptionId, string>;
 }
 
 @Injectable()
 export class PropertyService {
-    constructor(
-        private propertyRepository: PropertyRepository,
-        @Inject(forwardRef(() => LanguageService))
-        private languageService: LanguageService,
-    ) {}
+  constructor(
+    private propertyRepository: PropertyRepository,
+    @Inject(forwardRef(() => LanguageService))
+    private languageService: LanguageService,
+  ) { }
 
-    async getByLanguageId(
-        languageId: LanguageId,
-        partOfSpeech?: PartOfSpeech,
-    ): Promise<Property[]> {
-        return await this.propertyRepository.getByLanguageId(
-            languageId,
-            partOfSpeech,
-        );
+  async getByLanguageId(
+    languageId: LanguageId,
+    partOfSpeech?: PartOfSpeech,
+  ): Promise<Property[]> {
+    return await this.propertyRepository.getByLanguageId(
+      languageId,
+      partOfSpeech,
+    );
+  }
+
+  async getById(id: PropertyId): Promise<Property | null> {
+    return await this.propertyRepository.getById(id);
+  }
+
+  async getByIds(ids: PropertyId[]): Promise<Property[]> {
+    return await this.propertyRepository.getByIds(ids);
+  }
+
+  async create(params: CreatePropertyParams): Promise<Property> {
+    if (!(await this.languageService.getById(params.languageId))) {
+      throw new Error('Language does not exist');
     }
 
-    async getById(id: PropertyId): Promise<Property | null> {
-        return await this.propertyRepository.getById(id);
-    }
+    const order = await this.propertyRepository.getCount(params.languageId, params.partOfSpeech) + 1;
 
-    async getByIds(ids: PropertyId[]): Promise<Property[]> {
-        return await this.propertyRepository.getByIds(ids);
-    }
+    const baseProperty: BaseProperty = {
+      id: uuid(),
+      name: params.name,
+      type: params.type,
+      languageId: params.languageId,
+      partOfSpeech: params.partOfSpeech,
+      order,
+    };
 
-    async create(params: CreatePropertyParams): Promise<Property> {
-        if (!(await this.languageService.getById(params.languageId))) {
-            throw new Error('Language does not exist');
+    let property: Property;
+    switch (baseProperty.type) {
+      case PropertyType.Text:
+        property = baseProperty as TextProperty;
+        break;
+      case PropertyType.Option:
+        const options = (params as CreateOptionPropertyParams).options;
+        if (!options || options.length < 2) {
+          throw new Error('Options are required');
         }
-
-        const baseProperty: BaseProperty = {
-            id: uuid(),
-            name: params.name,
-            type: params.type,
-            languageId: params.languageId,
-            partOfSpeech: params.partOfSpeech,
-        };
-
-        let property: Property;
-        switch (baseProperty.type) {
-            case PropertyType.Text:
-                property = baseProperty as TextProperty;
-                break;
-            case PropertyType.Option:
-                const options = (params as CreateOptionPropertyParams).options;
-                if (!options || options.length < 2) {
-                    throw new Error('Options are required');
-                }
-                property = {
-                    ...baseProperty,
-                    options: new Map(options.map((option) => [uuid(), option])),
-                } as OptionProperty;
-                break;
-        }
-
-        await this.propertyRepository.create(property);
-        return property;
+        property = {
+          ...baseProperty,
+          options: new Map(options.map((option) => [uuid(), option])),
+        } as OptionProperty;
+        break;
     }
 
-    async update(params: UpdatePropertyParams): Promise<Property> {
-        const property = await this.propertyRepository.getById(params.id);
-        if (!property) {
-            throw new Error('Property does not exist');
-        }
+    await this.propertyRepository.create(property);
+    return property;
+  }
 
-        if (params.name) {
-            property.name = params.name;
-        }
-
-        if (isOptionProperty(property)) {
-            if (params.options) {
-                for (const [optionId, optionValue] of params.options) {
-                    if (!property.options.has(optionId)) {
-                        throw new Error('Option does not exist');
-                    }
-                    property.options.set(optionId, optionValue);
-                }
-            }
-        }
-
-        await this.propertyRepository.update(property);
-        return property;
+  async update(params: UpdatePropertyParams): Promise<Property> {
+    const property = await this.propertyRepository.getById(params.id);
+    if (!property) {
+      throw new Error('Property does not exist');
     }
 
-    async delete(id: PropertyId): Promise<Property> {
-        const property = await this.propertyRepository.getById(id);
-        if (!property) {
-            throw new Error('Property does not exist');
+    if (params.name) {
+      property.name = params.name;
+    }
+
+    if (isOptionProperty(property)) {
+      if (params.options) {
+        for (const [optionId, optionValue] of params.options) {
+          if (!property.options.has(optionId)) {
+            throw new Error('Option does not exist');
+          }
+          property.options.set(optionId, optionValue);
         }
-
-        await this.propertyRepository.delete(id);
-        return property;
+      }
     }
 
-    async deleteForLanguage(languageId: LanguageId): Promise<void> {
-        await this.propertyRepository.deleteForLanguage(languageId);
+    await this.propertyRepository.update(property);
+    return property;
+  }
+
+  async reorder(languageId: LanguageId, partOfSpeech: PartOfSpeech, orderedIds: PropertyId[]): Promise<void> {
+    if (!(await this.languageService.getById(languageId))) {
+      throw new Error('Language does not exist');
     }
+
+    const properties = await this.propertyRepository.getByLanguageId(languageId, partOfSpeech);
+    const currentOrderedIds = properties.map((property) => property.id);
+    if (arrays.diff(orderedIds, currentOrderedIds).length) {
+      throw new Error('Reordered properties are not same as current');
+    }
+
+    await this.propertyRepository.updateOrder(orderedIds);
+  }
+
+  async delete(id: PropertyId): Promise<Property> {
+    const property = await this.propertyRepository.getById(id);
+    if (!property) {
+      throw new Error('Property does not exist');
+    }
+
+    await this.propertyRepository.delete(id);
+    return property;
+  }
+
+  async deleteForLanguage(languageId: LanguageId): Promise<void> {
+    await this.propertyRepository.deleteForLanguage(languageId);
+  }
 }

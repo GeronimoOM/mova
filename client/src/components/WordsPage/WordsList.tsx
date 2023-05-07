@@ -61,7 +61,7 @@ const WordsList: Component<WordsListProps> = (props) => {
     }
   });
 
-  const handleFetchMore = () => {
+  const onFetchMore = () => {
     fetchWordsPage({
       variables: {
         ...fetchWordsPageArgs(),
@@ -82,7 +82,7 @@ const WordsList: Component<WordsListProps> = (props) => {
         )}
       </For>
       <Show when={hasMore()}>
-        <button onClick={handleFetchMore}>Load more</button>
+        <button onClick={onFetchMore}>Load more</button>
       </Show>
     </>
   );
