@@ -1,9 +1,8 @@
-import { Component, Show, createEffect, createSignal, on } from 'solid-js';
+import { Component, createEffect, createSignal, on } from 'solid-js';
 import { useLanguageContext } from '../LanguageContext';
 import PropertiesList from './PropertiesList';
 import { PartOfSpeech } from '../../api/types/graphql';
 import PropertiesPosSelect from './PropertiesPosSelect';
-import PropertyDetails from './PropertyDetails';
 
 const PropertiesPage: Component = () => {
   const [selectedLanguageId] = useLanguageContext();
@@ -12,12 +11,6 @@ const PropertiesPage: Component = () => {
   const [selectedProperty, setSelectedProperty] = createSignal<string | null>(
     null,
   );
-  const [showPropertyDetails, setShowPropertyDetails] = createSignal(false);
-
-  const onCreatePropertyDetails = () => {
-    setSelectedProperty(null);
-    setShowPropertyDetails(true);
-  };
 
   createEffect(
     on(selectedLanguageId, () => {
@@ -25,40 +18,20 @@ const PropertiesPage: Component = () => {
     }),
   );
 
-  createEffect(() => {
-    if (selectedProperty()) {
-      setShowPropertyDetails(true);
-    } else {
-      setShowPropertyDetails(false);
-    }
-  });
-
   return (
-    <div class="pb-12 md:pb-0 flex flex-col h-full items-center justify-items-stretch">
-      <div class="flex flex-col items-center outline outline-yellow-300">
+    <div class="flex flex-col h-full items-center justify-items-stretch">
+      <div class="w-full flex flex-col items-center">
         <PropertiesPosSelect
           selectedPos={selectedPos()}
           setSelectedPos={setSelectedPos}
         />
       </div>
-      <div class="w-full p-2 flex-auto flex flex-col xl:flex-row outline outline-purple-300">
-        <div class="flex-1 outline outline-green-300">
-          <PropertiesList
-            partOfSpeech={selectedPos()}
-            selectedProperty={selectedProperty()}
-            onPropertySelect={setSelectedProperty}
-          />
-          <button onClick={onCreatePropertyDetails}>New</button>
-        </div>
-        <Show when={showPropertyDetails()}>
-          <div class="flex-1 outline outline-orange-300">
-            <PropertyDetails
-              selectedProperty={selectedProperty()}
-              setSelectedProperty={setSelectedProperty}
-              partOfSpeech={selectedPos()}
-            />
-          </div>
-        </Show>
+      <div class="w-full overflow-y-scroll">
+        <PropertiesList
+          partOfSpeech={selectedPos()}
+          selectedProperty={selectedProperty()}
+          onPropertySelect={setSelectedProperty}
+        />
       </div>
     </div>
   );

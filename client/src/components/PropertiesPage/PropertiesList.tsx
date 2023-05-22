@@ -1,12 +1,11 @@
 import { Component, For, createEffect, createSignal } from 'solid-js';
+import { FaSolidGripLines } from 'solid-icons/fa';
 import { createLazyQuery, createMutation } from '@merged/solid-apollo';
 import {
   DragDropProvider,
   DragDropSensors,
   SortableProvider,
   closestCenter,
-  createSortable,
-  useDragDropContext,
   DragEvent,
   DragOverlay,
 } from '@thisbeyond/solid-dnd';
@@ -19,14 +18,7 @@ import {
 import { TextPropertyFieldsFragment } from '../../api/types/graphql';
 import { OptionPropertyFieldsFragment } from '../../api/types/graphql';
 import { updateCacheOnReorderProperties } from '../../api/mutations';
-
-declare module 'solid-js' {
-  namespace JSX {
-    interface Directives {
-      sortable: any;
-    }
-  }
-}
+import PropertyListItem from './PropertiesListItem';
 
 export type PropertiesListProps = {
   partOfSpeech: PartOfSpeech;
@@ -104,7 +96,7 @@ const PropertiesList: Component<PropertiesListProps> = (props) => {
       collisionDetector={closestCenter}
     >
       <DragDropSensors>
-        <div class="relative flex flex-col font-mono font-bold">
+        <div class="w-full p-2 gap-y-2 flex flex-col items-center">
           <SortableProvider ids={propertyIds()}>
             <For each={properties()} fallback={'loading...'}>
               {(property) => (
@@ -125,32 +117,6 @@ const PropertiesList: Component<PropertiesListProps> = (props) => {
   );
 };
 
-type PropertyListItemProps = {
-  property: TextPropertyFieldsFragment | OptionPropertyFieldsFragment;
-  selectedProperty: string | null;
-  onPropertySelect: (selectedProperty: string | null) => void;
-};
-
-const PropertyListItem: Component<PropertyListItemProps> = (props) => {
-  const sortable = createSortable(props.property.id);
-
-  const [state] = useDragDropContext()!;
-
-  return (
-    <div
-      use:sortable
-      class="p-1 bg-blue-300 border border-black hover:underline cursor-move"
-      onClick={() => props.onPropertySelect(props.property.id)}
-      classList={{
-        'opacity-25': sortable.isActiveDraggable,
-        'transition-transform': !!state.active.draggable,
-      }}
-    >
-      {props.property.name}
-    </div>
-  );
-};
-
 type PropertyListItemOverlayProps = {
   property?: TextPropertyFieldsFragment | OptionPropertyFieldsFragment;
 };
@@ -159,8 +125,13 @@ const PropertyListItemOverlay: Component<PropertyListItemOverlayProps> = (
   props,
 ) => {
   return (
-    <div class="p-1 bg-blue-300 border border-black">
-      {props.property?.name ?? ''}
+    <div class="flex flex-row">
+      <div class="flex-1 p-2 bg-coolgray-300 font-bold">
+        {props.property?.name ?? ''}
+      </div>
+      <div class="bg-spacecadet text-coolgray-300 cursor-move">
+        <FaSolidGripLines size="2rem" class="m-2" />
+      </div>
     </div>
   );
 };

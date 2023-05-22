@@ -2,7 +2,6 @@ import {
   FaSolidCirclePlus,
   FaSolidFeatherPointed,
   FaSolidCircleXmark,
-  FaSolidCircleMinus,
 } from 'solid-icons/fa';
 import { IoArrowRedo } from 'solid-icons/io';
 import { Component, For } from 'solid-js';

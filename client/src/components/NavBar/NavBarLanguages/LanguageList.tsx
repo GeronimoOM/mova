@@ -25,8 +25,8 @@ export type LanguageListProps = {
 const LanguageList: Component<LanguageListProps> = (props) => {
   return (
     <div
-      class="flex-auto flex flex-row items-stretch scrollbar-hide overflow-x-scroll
-      md:grow-0 md:flex-col md:items-stretch md:overflow-x-clip overflow-y-scroll
+      class="flex-1 flex flex-row items-stretch scrollbar-hide overflow-x-scroll
+      md:flex-col md:items-stretch md:overflow-x-clip md:min-h-0 md:overflow-y-scroll
       bg-charcoal-200"
       ref={props.setLanguagesContainer}
     >

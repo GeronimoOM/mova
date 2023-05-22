@@ -5,6 +5,7 @@ import {
   createEffect,
   createMemo,
   untrack,
+  createSignal,
 } from 'solid-js';
 import { createLazyQuery } from '@merged/solid-apollo';
 import {
@@ -14,6 +15,7 @@ import {
 import { useLanguageContext } from '../LanguageContext';
 import { WordsSearchParams } from './wordsSearchParams';
 import { cache } from '../../api/client';
+import WordsListItem from './WordsListItem';
 
 export type WordsListProps = {
   searchParams: WordsSearchParams;
@@ -23,6 +25,8 @@ export type WordsListProps = {
 
 const WordsList: Component<WordsListProps> = (props) => {
   const [selectedLanguageId] = useLanguageContext();
+
+  const [wordsContainer, setWordsContainer] = createSignal<HTMLDivElement | undefined>();
 
   const [fetchWordsPage, wordsPageQuery] = createLazyQuery(GetWordsDocument);
 
@@ -61,6 +65,10 @@ const WordsList: Component<WordsListProps> = (props) => {
     }
   });
 
+  createEffect(() => {
+    console.log(wordsContainer()?.offsetTop);
+  })
+
   const onFetchMore = () => {
     fetchWordsPage({
       variables: {
@@ -72,19 +80,22 @@ const WordsList: Component<WordsListProps> = (props) => {
   };
 
   return (
-    <>
+    <div class="p-2 gap-y-2 flex flex-col items-center"
+      ref={setWordsContainer}
+    >
       <For each={words()} fallback={'loading...'}>
         {(word) => (
-          <span onClick={() => props.setSelectedWord(word.id)}>
-            {word.original} - {word.translation}
-            {props.selectedWord === word.id ? '!' : ''}
-          </span>
+          <WordsListItem
+            word={word}
+            selectedWord={props.selectedWord}
+            setSelectedWord={props.setSelectedWord}
+          />
         )}
       </For>
       <Show when={hasMore()}>
         <button onClick={onFetchMore}>Load more</button>
       </Show>
-    </>
+    </div>
   );
 };
 

@@ -84,7 +84,7 @@ const WordDetails: Component<WordDetailsProps> = (props) => {
   });
 
   return (
-    <div class="bg-lime-400">
+    <div class="m-2">
       <input
         type="text"
         value={word.original ?? ''}

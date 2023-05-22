@@ -11,7 +11,7 @@ const App: Component = () => {
     <LanguageProvider>
       <div class="flex flex-row w-full h-full justify-center">
         <NavBar />
-        <main class="w-full max-w-[72rem]">
+        <main class="w-full max-w-[72rem] pb-12 md:pb-0 overflow-hidden bg-alabaster">
           <Routes>
             <Route path={AppRoute.Words} component={WordsPage} />
             <Route path={AppRoute.Properties} component={PropertiesPage} />

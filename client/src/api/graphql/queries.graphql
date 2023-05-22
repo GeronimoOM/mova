@@ -22,10 +22,7 @@ query GetWords(
       topic: $topic
     ) {
       items {
-        id
-        original
-        translation
-        partOfSpeech
+        ...WordFields
       }
       hasMore
     }
@@ -34,7 +31,7 @@ query GetWords(
 
 query GetWord($id: ID!) {
   word(id: $id) {
-    ...WordFields
+    ...WordFieldsFull
   }
 }
 

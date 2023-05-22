@@ -28,7 +28,7 @@ const NavBar: Component = () => {
 
   return (
     <nav
-      class="flex flex-row items-center fixed bottom-0 w-full min-h-0 overflow-hidden
+      class="flex flex-row items-center fixed bottom-0 w-full overflow-hidden
       md:static md:flex-col md:items-stretch md:min-w-[14rem] md:max-w-[14rem] md:h-full
       bg-charcoal-300 text-gray-200 font-bold
     "

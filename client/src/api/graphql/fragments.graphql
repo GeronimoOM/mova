@@ -28,6 +28,13 @@ fragment WordFields on Word {
   original
   translation
   partOfSpeech
+}
+
+fragment WordFieldsFull on Word {
+  id
+  original
+  translation
+  partOfSpeech
   properties {
     ... on TextPropertyValue {
       property {

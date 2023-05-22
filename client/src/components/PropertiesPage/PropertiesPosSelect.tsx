@@ -48,12 +48,12 @@ export const partOfSpeechParams: Record<PartOfSpeech, PartOfSpeechButtonProps> =
 
 const PropertiesPosSelect: Component<PropertiesPosSelectProps> = (props) => {
   return (
-    <div class="my-2 flex flex-row justify-center bg-lavender text-spacecadet font-bold cursor-pointer">
+    <div class="my-2 flex flex-row justify-center text-spacecadet font-bold cursor-pointer">
       {Object.entries(partOfSpeechParams).map(([partOfSpeech, posProps]) => (
         <div
-          class="p-2 items-center flex flex-row hover:bg-spacecadet hover:text-lavender"
+          class="p-2 items-center flex flex-row hover:bg-spacecadet hover:text-white"
           classList={{
-            'bg-spacecadet text-lavender': partOfSpeech === props.selectedPos,
+            'bg-spacecadet text-white': partOfSpeech === props.selectedPos,
           }}
           onClick={() => props.setSelectedPos(partOfSpeech as PartOfSpeech)}
         >

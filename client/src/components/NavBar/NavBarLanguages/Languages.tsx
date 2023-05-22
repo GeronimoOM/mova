@@ -119,29 +119,29 @@ const Languages: Component<NavBarLanguagesProps> = (props) => {
     { action: LanguageAction.Create },
     ...(!props.isVertical && selectedLanguageId()
       ? [
-          {
-            action: LanguageAction.Update,
-          },
-          {
-            action: LanguageAction.Delete,
-          },
-        ]
+        {
+          action: LanguageAction.Update,
+        },
+        {
+          action: LanguageAction.Delete,
+        },
+      ]
       : []),
   ];
 
   const confirmActions = (): LanguageActionButtonsAction[] => [
     ...(action() === LanguageAction.Create || !props.isVertical
       ? [
-          {
-            action: action(),
-            isConfirm: true,
-            isDisabled:
-              (action() === LanguageAction.Create ||
-                action() === LanguageAction.Update) &&
-              !isLanguageInputValid(),
-          },
-          { action: null },
-        ]
+        {
+          action: action(),
+          isConfirm: true,
+          isDisabled:
+            (action() === LanguageAction.Create ||
+              action() === LanguageAction.Update) &&
+            !isLanguageInputValid(),
+        },
+        { action: null },
+      ]
       : []),
   ];
 
@@ -234,15 +234,14 @@ const Languages: Component<NavBarLanguagesProps> = (props) => {
       languagesContainer()!.scrollLeft = Math.min(
         selectedLanguageDiv.offsetLeft,
         selectedLanguageDiv.offsetLeft -
-          languagesContainer()!.clientWidth / 2 +
-          selectedLanguageDiv.clientWidth / 2,
+        languagesContainer()!.clientWidth / 2 +
+        selectedLanguageDiv.clientWidth / 2,
       );
     }
   };
 
-  // TODO fix langauges collapsing in horizontal mode
   return (
-    <div class="flex-auto max-w-full flex flex-row items-center md:max-h-full md:flex-col md:items-stretch">
+    <div class="flex-auto max-w-full flex flex-row items-center md:flex-col md:items-stretch">
       <div
         class="flex-none flex flex-row items-stretch hover:bg-charcoal-100 hover:text-spacecadet cursor-pointer transition-colors"
         onClick={() => props.setIsActive((isActive) => !isActive)}
@@ -280,7 +279,7 @@ const Languages: Component<NavBarLanguagesProps> = (props) => {
         </Show>
 
         <div
-          class="flex-none flex flex-row md:justify-center"
+          class="flex flex-row md:justify-center"
           classList={{
             'flex-1': Boolean(action() && !props.isVertical),
           }}
