@@ -39,14 +39,15 @@ const WordsPage: Component = () => {
 
   return (
     <div class="flex flex-col w-full h-full items-stretch">
-      <div class='flex-none'>
+      <div class="flex-none">
         <WordsSearchBar
           searchParams={wordsSearchParams}
           onSearchParamsChange={setSearchQuery}
         />
       </div>
       <div class="flex-1 min-h-0 flex flex-col xl:flex-row">
-        <div class="flex-none w-full min-h-0 overflow-y-scroll"
+        <div
+          class="flex-none w-full min-h-0 overflow-y-scroll"
           classList={{
             'basis-full': !showWordDetails(),
             'basis-1/2': showWordDetails(),

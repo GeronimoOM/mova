@@ -49,7 +49,7 @@ export class LanguageResolver {
     private topicService: TopicService,
     private propertyTypeMapper: PropertyTypeMapper,
     private wordTypeMapper: WordTypeMapper,
-  ) { }
+  ) {}
 
   @Query((type) => [LanguageType])
   async languages(): Promise<LanguageType[]> {
@@ -98,9 +98,7 @@ export class LanguageResolver {
       partOfSpeech,
     );
 
-    return properties.map((property) =>
-      this.propertyTypeMapper.map(property),
-    );
+    return properties.map((property) => this.propertyTypeMapper.map(property));
   }
 
   @ResolveField((type) => TopicPageType)

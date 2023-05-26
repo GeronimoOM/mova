@@ -1,34 +1,34 @@
 import {
-    createUnionType,
-    Field,
-    ID,
-    ObjectType,
-    registerEnumType,
+  createUnionType,
+  Field,
+  ID,
+  ObjectType,
+  registerEnumType,
 } from '@nestjs/graphql';
 import {
-    PropertyId,
-    PropertyType,
-    PropertyType as PropertyTypeEnum,
+  PropertyId,
+  PropertyType,
+  PropertyType as PropertyTypeEnum,
 } from 'models/Property';
 import { PartOfSpeech } from 'models/Word';
 
 registerEnumType(PropertyTypeEnum, {
-    name: 'PropertyType',
+  name: 'PropertyType',
 });
 
 @ObjectType()
 export abstract class IPropertyType {
-    @Field((type) => ID)
-    id: PropertyId;
+  @Field((type) => ID)
+  id: PropertyId;
 
-    @Field()
-    name: string;
+  @Field()
+  name: string;
 
-    @Field((type) => PropertyTypeEnum)
-    type: PropertyTypeEnum;
+  @Field((type) => PropertyTypeEnum)
+  type: PropertyTypeEnum;
 
-    @Field((type) => PartOfSpeech)
-    partOfSpeech: PartOfSpeech;
+  @Field((type) => PartOfSpeech)
+  partOfSpeech: PartOfSpeech;
 }
 
 @ObjectType('TextProperty')
@@ -36,28 +36,28 @@ export class TextPropertyType extends IPropertyType {}
 
 @ObjectType('OptionProperty')
 export class OptionPropertyType extends IPropertyType {
-    @Field(() => [OptionType])
-    options: OptionType[];
+  @Field(() => [OptionType])
+  options: OptionType[];
 }
 
 @ObjectType('Option')
 export class OptionType {
-    @Field(() => ID)
-    id: string;
+  @Field(() => ID)
+  id: string;
 
-    @Field()
-    value: string;
+  @Field()
+  value: string;
 }
 
 export const PropertyUnionType = createUnionType({
-    name: 'PropertyUnion',
-    types: () => [TextPropertyType, OptionPropertyType] as const,
-    resolveType: (value) => {
-        switch (value.type) {
-            case PropertyType.Text:
-                return TextPropertyType;
-            case PropertyType.Option:
-                return OptionPropertyType;
-        }
-    },
+  name: 'PropertyUnion',
+  types: () => [TextPropertyType, OptionPropertyType] as const,
+  resolveType: (value) => {
+    switch (value.type) {
+      case PropertyType.Text:
+        return TextPropertyType;
+      case PropertyType.Option:
+        return OptionPropertyType;
+    }
+  },
 });

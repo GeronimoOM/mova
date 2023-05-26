@@ -119,29 +119,29 @@ const Languages: Component<NavBarLanguagesProps> = (props) => {
     { action: LanguageAction.Create },
     ...(!props.isVertical && selectedLanguageId()
       ? [
-        {
-          action: LanguageAction.Update,
-        },
-        {
-          action: LanguageAction.Delete,
-        },
-      ]
+          {
+            action: LanguageAction.Update,
+          },
+          {
+            action: LanguageAction.Delete,
+          },
+        ]
       : []),
   ];
 
   const confirmActions = (): LanguageActionButtonsAction[] => [
     ...(action() === LanguageAction.Create || !props.isVertical
       ? [
-        {
-          action: action(),
-          isConfirm: true,
-          isDisabled:
-            (action() === LanguageAction.Create ||
-              action() === LanguageAction.Update) &&
-            !isLanguageInputValid(),
-        },
-        { action: null },
-      ]
+          {
+            action: action(),
+            isConfirm: true,
+            isDisabled:
+              (action() === LanguageAction.Create ||
+                action() === LanguageAction.Update) &&
+              !isLanguageInputValid(),
+          },
+          { action: null },
+        ]
       : []),
   ];
 
@@ -234,8 +234,8 @@ const Languages: Component<NavBarLanguagesProps> = (props) => {
       languagesContainer()!.scrollLeft = Math.min(
         selectedLanguageDiv.offsetLeft,
         selectedLanguageDiv.offsetLeft -
-        languagesContainer()!.clientWidth / 2 +
-        selectedLanguageDiv.clientWidth / 2,
+          languagesContainer()!.clientWidth / 2 +
+          selectedLanguageDiv.clientWidth / 2,
       );
     }
   };

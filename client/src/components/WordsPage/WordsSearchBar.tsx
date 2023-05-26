@@ -11,12 +11,15 @@ export type WordsSearchBarProps = {
 };
 
 const KEY_FOCUS_SEARCHBAR = 's';
-const CHAR_OPEN_DROPDOWN = ':'
+const CHAR_OPEN_DROPDOWN = ':';
 
 const WordsSearchBar: Component<WordsSearchBarProps> = (props) => {
   const [isDropdownOpen, setIsDropdownOpen] = createSignal(false);
-  const [inputElement, setInputElement] = createSignal<HTMLInputElement | undefined>();
-  const [isInputElementAnimated, setIsInputElementAnimated] = createSignal(false);
+  const [inputElement, setInputElement] = createSignal<
+    HTMLInputElement | undefined
+  >();
+  const [isInputElementAnimated, setIsInputElementAnimated] =
+    createSignal(false);
 
   const keyEvent = useKeyDownEvent();
 
@@ -27,7 +30,7 @@ const WordsSearchBar: Component<WordsSearchBarProps> = (props) => {
       inputElement()!.focus();
       //setIsInputElementAnimated(true);
     }
-  })
+  });
 
   const onSearchParamsChange = (text: string) => {
     if (text[text.length - 1] === CHAR_OPEN_DROPDOWN) {
@@ -37,7 +40,7 @@ const WordsSearchBar: Component<WordsSearchBarProps> = (props) => {
     }
 
     props.onSearchParamsChange({ query: text });
-  }
+  };
 
   return (
     <div class="relative w-full p-2 flex flex-row bg-coolgray-300 outline outline-charcoal-300 font-bold">
@@ -87,7 +90,8 @@ const WordSearchBarDropdown: Component = () => {
           <FaSolidShapes size="1rem" class="m-2" />
         </div>
         <div class="p-1">
-          <span class="px-1 mx-0.5 bg-spacecadet text-coolgray-100">p</span>art of speech
+          <span class="px-1 mx-0.5 bg-spacecadet text-coolgray-100">p</span>art
+          of speech
         </div>
       </div>
       <div class="flex flex-row items-center">
@@ -100,6 +104,6 @@ const WordSearchBarDropdown: Component = () => {
       </div>
     </div>
   );
-}
+};
 
 export default WordsSearchBar;

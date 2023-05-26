@@ -14,7 +14,7 @@ export class MaintenanceController {
     private propertyService: PropertyService,
     private wordService: WordService,
     private topicService: TopicService,
-  ) { }
+  ) {}
 
   @Get('/generate')
   async generateTestData(@Query('name') name: string) {
@@ -42,13 +42,15 @@ export class MaintenanceController {
     ]);
 
     await Promise.all(
-      Object.values(PartOfSpeech).flatMap((pos) => Array.from(Array(5).keys()).map((i) =>
-        this.propertyService.create({
-          name: `${pos} property ${i + 1}`,
-          type: PropertyType.Text,
-          partOfSpeech: pos,
-          languageId: language.id,
-        })),
+      Object.values(PartOfSpeech).flatMap((pos) =>
+        Array.from(Array(5).keys()).map((i) =>
+          this.propertyService.create({
+            name: `${pos} property ${i + 1}`,
+            type: PropertyType.Text,
+            partOfSpeech: pos,
+            languageId: language.id,
+          }),
+        ),
       ),
     );
 
@@ -79,9 +81,8 @@ export class MaintenanceController {
           [
             nounOptionProp.id,
             {
-              option: (nounOptionProp as OptionProperty).options
-                .keys()
-                .next().value,
+              option: (nounOptionProp as OptionProperty).options.keys().next()
+                .value,
             },
           ],
         ]),

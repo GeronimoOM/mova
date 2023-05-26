@@ -23,32 +23,32 @@ import { ElasticClientModule } from './clients/ElasticClientModule';
 import { TopicResolver } from 'graphql/resolvers/TopicResolver';
 
 @Module({
-    imports: [
-        GraphQLModule.forRoot<MercuriusDriverConfig>({
-            driver: MercuriusDriver,
-            autoSchemaFile: join(process.cwd(), 'graphql/schema.gql'),
-            graphiql: true,
-        }),
-        ElasticClientModule,
-    ],
-    providers: [
-        LanguageResolver,
-        PropertyResolver,
-        WordResolver,
-        TopicResolver,
-        PropertyTypeMapper,
-        WordTypeMapper,
-        LanguageService,
-        PropertyService,
-        WordService,
-        TopicService,
-        SearchClient,
-        LanguageRepository,
-        PropertyRepository,
-        WordRepository,
-        TopicRepository,
-        DbConnectionManager,
-    ],
-    controllers: [AppController, MaintenanceController],
+  imports: [
+    GraphQLModule.forRoot<MercuriusDriverConfig>({
+      driver: MercuriusDriver,
+      autoSchemaFile: join(process.cwd(), 'graphql/schema.gql'),
+      graphiql: true,
+    }),
+    ElasticClientModule,
+  ],
+  providers: [
+    LanguageResolver,
+    PropertyResolver,
+    WordResolver,
+    TopicResolver,
+    PropertyTypeMapper,
+    WordTypeMapper,
+    LanguageService,
+    PropertyService,
+    WordService,
+    TopicService,
+    SearchClient,
+    LanguageRepository,
+    PropertyRepository,
+    WordRepository,
+    TopicRepository,
+    DbConnectionManager,
+  ],
+  controllers: [AppController, MaintenanceController],
 })
 export class AppModule {}

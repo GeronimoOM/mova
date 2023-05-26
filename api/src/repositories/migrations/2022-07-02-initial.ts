@@ -12,7 +12,8 @@ export async function up(knex: Knex) {
     table.string('name').notNullable();
     table.string('type').notNullable();
     table
-      .uuid('language_id').notNullable()
+      .uuid('language_id')
+      .notNullable()
       .references('id')
       .inTable('languages');
     table.string('part_of_speech').notNullable();

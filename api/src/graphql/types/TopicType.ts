@@ -5,13 +5,13 @@ import { LanguageId } from 'models/Language';
 
 @ObjectType('Topic')
 export class TopicType {
-    @Field((type) => ID)
-    id: TopicId;
+  @Field((type) => ID)
+  id: TopicId;
 
-    @Field()
-    name: string;
+  @Field()
+  name: string;
 
-    languageId: LanguageId;
+  languageId: LanguageId;
 }
 
 export const TopicPageType = pageType('Topic', TopicType);

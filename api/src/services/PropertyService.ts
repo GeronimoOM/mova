@@ -48,7 +48,7 @@ export class PropertyService {
     private propertyRepository: PropertyRepository,
     @Inject(forwardRef(() => LanguageService))
     private languageService: LanguageService,
-  ) { }
+  ) {}
 
   async getByLanguageId(
     languageId: LanguageId,
@@ -73,7 +73,11 @@ export class PropertyService {
       throw new Error('Language does not exist');
     }
 
-    const order = await this.propertyRepository.getCount(params.languageId, params.partOfSpeech) + 1;
+    const order =
+      (await this.propertyRepository.getCount(
+        params.languageId,
+        params.partOfSpeech,
+      )) + 1;
 
     const baseProperty: BaseProperty = {
       id: uuid(),
@@ -130,12 +134,19 @@ export class PropertyService {
     return property;
   }
 
-  async reorder(languageId: LanguageId, partOfSpeech: PartOfSpeech, orderedIds: PropertyId[]): Promise<void> {
+  async reorder(
+    languageId: LanguageId,
+    partOfSpeech: PartOfSpeech,
+    orderedIds: PropertyId[],
+  ): Promise<void> {
     if (!(await this.languageService.getById(languageId))) {
       throw new Error('Language does not exist');
     }
 
-    const properties = await this.propertyRepository.getByLanguageId(languageId, partOfSpeech);
+    const properties = await this.propertyRepository.getByLanguageId(
+      languageId,
+      partOfSpeech,
+    );
     const currentOrderedIds = properties.map((property) => property.id);
     if (arrays.diff(orderedIds, currentOrderedIds).length) {
       throw new Error('Reordered properties are not same as current');

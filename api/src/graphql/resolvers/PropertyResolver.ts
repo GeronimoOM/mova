@@ -70,7 +70,7 @@ export class PropertyResolver {
   constructor(
     private propertyService: PropertyService,
     private propertyTypeMapper: PropertyTypeMapper,
-  ) { }
+  ) {}
 
   @Query((type) => PropertyUnionType, { nullable: true })
   async property(
@@ -95,9 +95,7 @@ export class PropertyResolver {
     const updatedProperty = await this.propertyService.update({
       ...input,
       ...(input.options && {
-        options: new Map(
-          input.options.map(({ id, value }) => [id, value]),
-        ),
+        options: new Map(input.options.map(({ id, value }) => [id, value])),
       }),
     });
     return this.propertyTypeMapper.map(updatedProperty);

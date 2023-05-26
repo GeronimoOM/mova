@@ -6,38 +6,38 @@ const TABLE_LANGUAGES = 'languages';
 
 @Injectable()
 export class LanguageRepository {
-    constructor(private connectionManager: DbConnectionManager) {}
+  constructor(private connectionManager: DbConnectionManager) {}
 
-    async getAll(): Promise<Language[]> {
-        return await this.connectionManager
-            .getConnection()(TABLE_LANGUAGES)
-            .orderBy('added_at', 'asc');
-    }
+  async getAll(): Promise<Language[]> {
+    return await this.connectionManager
+      .getConnection()(TABLE_LANGUAGES)
+      .orderBy('added_at', 'asc');
+  }
 
-    async getById(id: LanguageId): Promise<Language | null> {
-        return await this.connectionManager
-            .getConnection()(TABLE_LANGUAGES)
-            .where({ id })
-            .first();
-    }
+  async getById(id: LanguageId): Promise<Language | null> {
+    return await this.connectionManager
+      .getConnection()(TABLE_LANGUAGES)
+      .where({ id })
+      .first();
+  }
 
-    async create(language: Language): Promise<void> {
-        await this.connectionManager
-            .getConnection()(TABLE_LANGUAGES)
-            .insert(language);
-    }
+  async create(language: Language): Promise<void> {
+    await this.connectionManager
+      .getConnection()(TABLE_LANGUAGES)
+      .insert(language);
+  }
 
-    async update(language: Language): Promise<void> {
-        await this.connectionManager
-            .getConnection()(TABLE_LANGUAGES)
-            .update({ name: language.name })
-            .where({ id: language.id });
-    }
+  async update(language: Language): Promise<void> {
+    await this.connectionManager
+      .getConnection()(TABLE_LANGUAGES)
+      .update({ name: language.name })
+      .where({ id: language.id });
+  }
 
-    async delete(id: LanguageId): Promise<void> {
-        await this.connectionManager
-            .getConnection()(TABLE_LANGUAGES)
-            .where({ id })
-            .delete();
-    }
+  async delete(id: LanguageId): Promise<void> {
+    await this.connectionManager
+      .getConnection()(TABLE_LANGUAGES)
+      .where({ id })
+      .delete();
+  }
 }

@@ -26,7 +26,9 @@ export type WordsListProps = {
 const WordsList: Component<WordsListProps> = (props) => {
   const [selectedLanguageId] = useLanguageContext();
 
-  const [wordsContainer, setWordsContainer] = createSignal<HTMLDivElement | undefined>();
+  const [wordsContainer, setWordsContainer] = createSignal<
+    HTMLDivElement | undefined
+  >();
 
   const [fetchWordsPage, wordsPageQuery] = createLazyQuery(GetWordsDocument);
 
@@ -67,7 +69,7 @@ const WordsList: Component<WordsListProps> = (props) => {
 
   createEffect(() => {
     console.log(wordsContainer()?.offsetTop);
-  })
+  });
 
   const onFetchMore = () => {
     fetchWordsPage({
@@ -80,9 +82,7 @@ const WordsList: Component<WordsListProps> = (props) => {
   };
 
   return (
-    <div class="p-2 gap-y-2 flex flex-col items-center"
-      ref={setWordsContainer}
-    >
+    <div class="p-2 gap-y-2 flex flex-col items-center" ref={setWordsContainer}>
       <For each={words()} fallback={'loading...'}>
         {(word) => (
           <WordsListItem

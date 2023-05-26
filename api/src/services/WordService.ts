@@ -64,7 +64,7 @@ export class WordService {
     private topicService: TopicService,
     @Inject(forwardRef(() => LanguageService))
     private languageService: LanguageService,
-  ) { }
+  ) {}
 
   async getById(wordId: WordId): Promise<Word | null> {
     const repoWord = await this.wordRepository.getById(wordId);
@@ -157,9 +157,7 @@ export class WordService {
   }
 
   async update(params: UpdateWordParams): Promise<Word> {
-    const wordWithoutProperties = await this.wordRepository.getById(
-      params.id,
-    );
+    const wordWithoutProperties = await this.wordRepository.getById(params.id);
     if (!wordWithoutProperties) {
       throw new Error('Word does not exist');
     }
@@ -213,13 +211,9 @@ export class WordService {
   async indexLanguage(languageId: LanguageId): Promise<void> {
     await this.searchClient.deleteLanguageWords(languageId);
 
-    const properties = await this.propertyService.getByLanguageId(
-      languageId,
-    );
+    const properties = await this.propertyService.getByLanguageId(languageId);
 
-    for await (const wordsBatch of this.wordRepository.getBatches(
-      languageId,
-    )) {
+    for await (const wordsBatch of this.wordRepository.getBatches(languageId)) {
       const topicsByWords = await this.topicService.getForWords(
         wordsBatch.map((word) => word.id),
       );

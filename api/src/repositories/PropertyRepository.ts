@@ -18,7 +18,7 @@ const TABLE_PROPERTIES = 'properties';
 
 @Injectable()
 export class PropertyRepository {
-  constructor(private connectionManager: DbConnectionManager) { }
+  constructor(private connectionManager: DbConnectionManager) {}
 
   async getByLanguageId(
     languageId: LanguageId,
@@ -32,9 +32,7 @@ export class PropertyRepository {
       })
       .orderBy('order', 'asc');
 
-    return propertyRows.map((propertyRow) =>
-      this.mapToProperty(propertyRow),
-    );
+    return propertyRows.map((propertyRow) => this.mapToProperty(propertyRow));
   }
 
   async getById(id: PropertyId): Promise<Property | null> {
@@ -51,17 +49,18 @@ export class PropertyRepository {
       .getConnection()(TABLE_PROPERTIES)
       .whereIn('id', ids);
 
-    return propertyRows.map((propertyRow) =>
-      this.mapToProperty(propertyRow),
-    );
+    return propertyRows.map((propertyRow) => this.mapToProperty(propertyRow));
   }
 
-  async getCount(languageId: LanguageId, partOfSpeech: PartOfSpeech): Promise<number> {
-    const { count } = await this.connectionManager
+  async getCount(
+    languageId: LanguageId,
+    partOfSpeech: PartOfSpeech,
+  ): Promise<number> {
+    const { count } = (await this.connectionManager
       .getConnection()(TABLE_PROPERTIES)
       .where({ language_id: languageId, part_of_speech: partOfSpeech })
       .count('id as count')
-      .first()! as any;
+      .first()!) as any;
 
     return Number(count);
   }
@@ -105,13 +104,15 @@ export class PropertyRepository {
   }
 
   async updateOrder(propertyIds: PropertyId[]): Promise<void> {
-    await this.connectionManager
-      .getConnection()
-      .transaction(async (trx) => {
-        await Promise.all(propertyIds.map((propertyId, i) =>
-          trx(TABLE_PROPERTIES).update({ order: i + 1 }).where({ id: propertyId })
-        ));
-      });
+    await this.connectionManager.getConnection().transaction(async (trx) => {
+      await Promise.all(
+        propertyIds.map((propertyId, i) =>
+          trx(TABLE_PROPERTIES)
+            .update({ order: i + 1 })
+            .where({ id: propertyId }),
+        ),
+      );
+    });
   }
 
   async delete(id: PropertyId): Promise<void> {
@@ -142,9 +143,7 @@ export class PropertyRepository {
       case PropertyType.Text:
         return baseProperty as TextProperty;
       case PropertyType.Option:
-        const options: Record<OptionId, string> = JSON.parse(
-          row.data,
-        ).options;
+        const options: Record<OptionId, string> = JSON.parse(row.data).options;
         return {
           ...baseProperty,
           options: new Map(Object.entries(options)),
