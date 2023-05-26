@@ -1,8 +1,5 @@
 import { Module } from '@nestjs/common';
-import { GraphQLModule } from '@nestjs/graphql';
-import { MercuriusDriver, MercuriusDriverConfig } from '@nestjs/mercurius';
 import { MaintenanceController } from './MaintenanceController';
-import { join } from 'path';
 import { AppController } from './AppController';
 import { PropertyTypeMapper } from './graphql/mappers/PropertyTypeMapper';
 import { WordTypeMapper } from './graphql/mappers/WordTypeMapper';
@@ -21,14 +18,11 @@ import { TopicService } from './services/TopicService';
 import { SearchClient } from './clients/SearchClient';
 import { ElasticClientModule } from './clients/ElasticClientModule';
 import { TopicResolver } from 'graphql/resolvers/TopicResolver';
+import { GraphQLModule } from 'graphql/GraphQLModule';
 
 @Module({
   imports: [
-    GraphQLModule.forRoot<MercuriusDriverConfig>({
-      driver: MercuriusDriver,
-      autoSchemaFile: join(process.cwd(), 'graphql/schema.gql'),
-      graphiql: true,
-    }),
+    GraphQLModule,
     ElasticClientModule,
   ],
   providers: [
@@ -51,4 +45,4 @@ import { TopicResolver } from 'graphql/resolvers/TopicResolver';
   ],
   controllers: [AppController, MaintenanceController],
 })
-export class AppModule {}
+export class AppModule { }
