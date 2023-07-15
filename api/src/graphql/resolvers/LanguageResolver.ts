@@ -121,15 +121,15 @@ export class LanguageResolver {
     @Parent() language: LanguageType,
     @Args() pageArgs: PageArgsType,
     @Args('query', { nullable: true }) query?: string,
-    @Args('partOfSpeech', { type: () => PartOfSpeech, nullable: true })
-    partOfSpeech?: PartOfSpeech,
-    @Args('topic', { type: () => ID, nullable: true }) topic?: TopicId,
+    @Args('partsOfSpeech', { type: () => [PartOfSpeech], nullable: true })
+    partsOfSpeech?: PartOfSpeech[],
+    @Args('topics', { type: () => [ID], nullable: true }) topics?: TopicId[],
   ): Promise<Page<WordType>> {
     const wordPage = await this.wordService.getPage({
       languageId: language.id,
       query,
-      partOfSpeech,
-      topic,
+      partsOfSpeech,
+      topics,
       ...pageArgs,
     });
 

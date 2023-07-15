@@ -14,6 +14,7 @@ const LanguageInput: Component<LanguageInputProps> = (props) => (
     onInput={(e) => props.onLanguageInput(e.currentTarget.value)}
     disabled={props.isDisabled}
     spellcheck={false}
+    onKeyDown={(e) => e.stopPropagation()}
   />
 );
 

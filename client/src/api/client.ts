@@ -8,7 +8,7 @@ const languageTypePolicy: TypePolicy = {
   fields: {
     words: {
       keyArgs: (args: LanguageWordsArgs | null) => {
-        return args?.query || args?.partOfSpeech || args?.topic
+        return args?.query || args?.partsOfSpeech || args?.topics
           ? 'search'
           : false;
       },

@@ -15,5 +15,12 @@
 			"remoteRoot": "/app",
 			"skipFiles": ["<node_internals>/**/*.js"],
 		},
+		{
+			"name": "Launch Chrome",
+			"request": "launch",
+			"type": "chrome",
+			"url": "http://localhost:9005",
+			"webRoot": "${workspaceFolder}/client"
+		},
 	]
 }

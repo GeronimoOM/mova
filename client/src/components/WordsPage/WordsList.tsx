@@ -3,7 +3,6 @@ import {
   For,
   Show,
   createEffect,
-  createMemo,
   untrack,
   createSignal,
 } from 'solid-js';
@@ -13,7 +12,7 @@ import {
   GetWordsQueryVariables,
 } from '../../api/types/graphql';
 import { useLanguageContext } from '../LanguageContext';
-import { WordsSearchParams } from './wordsSearchParams';
+import { WordsSearchParams } from './WordsSearchBar/wordsSearchParams';
 import { cache } from '../../api/client';
 import WordsListItem from './WordsListItem';
 
@@ -39,8 +38,8 @@ const WordsList: Component<WordsListProps> = (props) => {
   const fetchWordsPageArgs = (): GetWordsQueryVariables => ({
     languageId: selectedLanguageId()!,
     query: searchQuery(),
-    partOfSpeech: props.searchParams.partOfSpeech,
-    topic: props.searchParams.topic,
+    partsOfSpeech: props.searchParams.partsOfSpeech,
+    topics: props.searchParams.topics,
   });
 
   createEffect(() => {
@@ -57,18 +56,14 @@ const WordsList: Component<WordsListProps> = (props) => {
   createEffect(() => {
     if (
       searchQuery() ||
-      props.searchParams.partOfSpeech ||
-      props.searchParams.topic
+      props.searchParams.partsOfSpeech ||
+      props.searchParams.topics
     ) {
       cache.evict({
         id: `Language:${untrack(selectedLanguageId)!}`,
         fieldName: 'words:search',
       });
     }
-  });
-
-  createEffect(() => {
-    console.log(wordsContainer()?.offsetTop);
   });
 
   const onFetchMore = () => {

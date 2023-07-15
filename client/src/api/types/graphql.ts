@@ -66,10 +66,10 @@ export type LanguageTopicsArgs = {
 
 export type LanguageWordsArgs = {
   limit?: InputMaybe<Scalars['Int']>;
-  partOfSpeech?: InputMaybe<PartOfSpeech>;
+  partsOfSpeech?: InputMaybe<Array<PartOfSpeech>>;
   query?: InputMaybe<Scalars['String']>;
   start?: Scalars['Int'];
-  topic?: InputMaybe<Scalars['ID']>;
+  topics?: InputMaybe<Array<Scalars['ID']>>;
 };
 
 export type Mutation = {
@@ -157,6 +157,7 @@ export type Option = {
 export type OptionProperty = {
   __typename?: 'OptionProperty';
   id: Scalars['ID'];
+  languageId: Scalars['ID'];
   name: Scalars['String'];
   options: Array<Option>;
   partOfSpeech: PartOfSpeech;
@@ -216,6 +217,7 @@ export type ReorderPropertiesInput = {
 export type TextProperty = {
   __typename?: 'TextProperty';
   id: Scalars['ID'];
+  languageId: Scalars['ID'];
   name: Scalars['String'];
   partOfSpeech: PartOfSpeech;
   type: PropertyType;
@@ -237,7 +239,7 @@ export type Topic = {
 export type TopicWordsArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   order?: InputMaybe<WordOrder>;
-  partOfSpeech?: InputMaybe<PartOfSpeech>;
+  partOfSpeech?: InputMaybe<Array<PartOfSpeech>>;
   query?: InputMaybe<Scalars['String']>;
   start?: Scalars['Int'];
 };
@@ -280,6 +282,7 @@ export type UpdateWordInput = {
 export type Word = {
   __typename?: 'Word';
   id: Scalars['String'];
+  languageId: Scalars['ID'];
   original: Scalars['String'];
   partOfSpeech: PartOfSpeech;
   properties: Array<PropertyValueUnion>;
@@ -450,6 +453,27 @@ export type UpdatePropertyMutation = {
       };
 };
 
+export type DeletePropertyMutationVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type DeletePropertyMutation = {
+  __typename?: 'Mutation';
+  deleteProperty:
+    | {
+        __typename?: 'OptionProperty';
+        id: string;
+        languageId: string;
+        partOfSpeech: PartOfSpeech;
+      }
+    | {
+        __typename?: 'TextProperty';
+        id: string;
+        languageId: string;
+        partOfSpeech: PartOfSpeech;
+      };
+};
+
 export type ReorderPropertiesMutationVariables = Exact<{
   input: ReorderPropertiesInput;
 }>;
@@ -530,9 +554,9 @@ export type GetWordsQueryVariables = Exact<{
   languageId: Scalars['ID'];
   start?: InputMaybe<Scalars['Int']>;
   limit?: InputMaybe<Scalars['Int']>;
-  partOfSpeech?: InputMaybe<PartOfSpeech>;
+  partsOfSpeech?: InputMaybe<Array<PartOfSpeech> | PartOfSpeech>;
   query?: InputMaybe<Scalars['String']>;
-  topic?: InputMaybe<Scalars['ID']>;
+  topics?: InputMaybe<Array<Scalars['ID']> | Scalars['ID']>;
 }>;
 
 export type GetWordsQuery = {
@@ -1396,6 +1420,95 @@ export const UpdatePropertyDocument = {
   UpdatePropertyMutation,
   UpdatePropertyMutationVariables
 >;
+export const DeletePropertyDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'DeleteProperty' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'deleteProperty' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'InlineFragment',
+                  typeCondition: {
+                    kind: 'NamedType',
+                    name: { kind: 'Name', value: 'TextProperty' },
+                  },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'languageId' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'partOfSpeech' },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: 'InlineFragment',
+                  typeCondition: {
+                    kind: 'NamedType',
+                    name: { kind: 'Name', value: 'OptionProperty' },
+                  },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'languageId' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'partOfSpeech' },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  DeletePropertyMutation,
+  DeletePropertyMutationVariables
+>;
 export const ReorderPropertiesDocument = {
   kind: 'Document',
   definitions: [
@@ -1841,11 +1954,17 @@ export const GetWordsDocument = {
           kind: 'VariableDefinition',
           variable: {
             kind: 'Variable',
-            name: { kind: 'Name', value: 'partOfSpeech' },
+            name: { kind: 'Name', value: 'partsOfSpeech' },
           },
           type: {
-            kind: 'NamedType',
-            name: { kind: 'Name', value: 'PartOfSpeech' },
+            kind: 'ListType',
+            type: {
+              kind: 'NonNullType',
+              type: {
+                kind: 'NamedType',
+                name: { kind: 'Name', value: 'PartOfSpeech' },
+              },
+            },
           },
         },
         {
@@ -1860,9 +1979,15 @@ export const GetWordsDocument = {
           kind: 'VariableDefinition',
           variable: {
             kind: 'Variable',
-            name: { kind: 'Name', value: 'topic' },
+            name: { kind: 'Name', value: 'topics' },
           },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          type: {
+            kind: 'ListType',
+            type: {
+              kind: 'NonNullType',
+              type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+            },
+          },
         },
       ],
       selectionSet: {
@@ -1907,10 +2032,10 @@ export const GetWordsDocument = {
                     },
                     {
                       kind: 'Argument',
-                      name: { kind: 'Name', value: 'partOfSpeech' },
+                      name: { kind: 'Name', value: 'partsOfSpeech' },
                       value: {
                         kind: 'Variable',
-                        name: { kind: 'Name', value: 'partOfSpeech' },
+                        name: { kind: 'Name', value: 'partsOfSpeech' },
                       },
                     },
                     {
@@ -1923,10 +2048,10 @@ export const GetWordsDocument = {
                     },
                     {
                       kind: 'Argument',
-                      name: { kind: 'Name', value: 'topic' },
+                      name: { kind: 'Name', value: 'topics' },
                       value: {
                         kind: 'Variable',
-                        name: { kind: 'Name', value: 'topic' },
+                        name: { kind: 'Name', value: 'topics' },
                       },
                     },
                   ],

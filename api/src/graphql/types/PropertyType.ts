@@ -5,6 +5,7 @@ import {
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
+import { LanguageId } from 'models/Language';
 import {
   PropertyId,
   PropertyType,
@@ -29,6 +30,9 @@ export abstract class IPropertyType {
 
   @Field((type) => PartOfSpeech)
   partOfSpeech: PartOfSpeech;
+
+  @Field((type) => ID)
+  languageId: LanguageId;
 }
 
 @ObjectType('TextProperty')

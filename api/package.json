@@ -29,6 +29,7 @@
     "@nestjs/graphql": "^11.0.5",
     "@nestjs/mercurius": "^11.0.5",
     "@nestjs/platform-fastify": "^9.4.0",
+    "@types/uuid": "^9.0.1",
     "graphql": "^16.6.0",
     "knex": "^2.4.2",
     "mercurius": "^12.2.0",

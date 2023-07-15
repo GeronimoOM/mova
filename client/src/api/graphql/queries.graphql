@@ -8,18 +8,18 @@ query GetWords(
   $languageId: ID!
   $start: Int
   $limit: Int
-  $partOfSpeech: PartOfSpeech
+  $partsOfSpeech: [PartOfSpeech!]
   $query: String
-  $topic: ID
+  $topics: [ID!]
 ) {
   language(id: $languageId) {
     id
     words(
       start: $start
       limit: $limit
-      partOfSpeech: $partOfSpeech
+      partsOfSpeech: $partsOfSpeech
       query: $query
-      topic: $topic
+      topics: $topics
     ) {
       items {
         ...WordFields

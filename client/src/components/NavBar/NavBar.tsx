@@ -10,7 +10,7 @@ import { BsTranslate } from 'solid-icons/bs';
 import { FaSolidCircleNodes } from 'solid-icons/fa';
 import { AppRoute, getAppRouteMatch } from '../../routes';
 import Languages from './NavBarLanguages/Languages';
-import NavBarLink from './NavBarLink';
+import NavBarItem from './NavBarItem';
 import { createMediaQuery } from '@solid-primitives/media';
 
 const NavBar: Component = () => {
@@ -34,8 +34,8 @@ const NavBar: Component = () => {
     "
     >
       <Show when={!isLanguagesActive() || isVertical()}>
-        <NavBarLink href={AppRoute.Words} icon={BsTranslate} text="Words" />
-        <NavBarLink
+        <NavBarItem href={AppRoute.Words} icon={BsTranslate} text="Words" />
+        <NavBarItem
           href={AppRoute.Properties}
           icon={FaSolidCircleNodes}
           text="Properties"

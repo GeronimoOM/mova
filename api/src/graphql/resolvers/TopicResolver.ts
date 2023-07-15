@@ -41,16 +41,16 @@ export class TopicResolver {
     @Parent() topic: TopicType,
     @Args() pageArgs: PageArgsType,
     @Args('query', { nullable: true }) query?: string,
-    @Args('partOfSpeech', { type: () => PartOfSpeech, nullable: true })
-    partOfSpeech?: PartOfSpeech,
+    @Args('partOfSpeech', { type: () => [PartOfSpeech], nullable: true })
+    partsOfSpeech?: PartOfSpeech[],
     @Args('order', { type: () => WordOrder, nullable: true })
     order: WordOrder = WordOrder.Chronological,
   ): Promise<Page<WordType>> {
     const wordPage = await this.wordService.getPage({
       languageId: topic.languageId,
       query,
-      partOfSpeech,
-      topic: topic.id,
+      partsOfSpeech,
+      topics: [topic.id],
       order,
       ...pageArgs,
     });

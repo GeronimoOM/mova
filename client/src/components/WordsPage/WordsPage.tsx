@@ -1,11 +1,11 @@
 import { Component, Show, createEffect, createSignal, on } from 'solid-js';
-import WordsSearchBar from './WordsSearchBar';
+import WordsSearchBar from './WordsSearchBar/WordsSearchBar';
 import WordsList from './WordsList';
 import { createStore } from 'solid-js/store';
 import {
   WordsSearchParams,
   defaultWordsSearchParams,
-} from './wordsSearchParams';
+} from './WordsSearchBar/wordsSearchParams';
 import WordDetails from './WordDetails';
 import { useLanguageContext } from '../LanguageContext';
 

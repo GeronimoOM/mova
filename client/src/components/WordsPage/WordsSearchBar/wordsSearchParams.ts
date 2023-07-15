@@ -2,12 +2,12 @@ import { PartOfSpeech } from '../../api/types/graphql';
 
 export type WordsSearchParams = {
   query: string;
-  topic: string | null;
-  partOfSpeech: PartOfSpeech | null;
+  topics: string[];
+  partsOfSpeech: PartOfSpeech[];
 };
 
 export const defaultWordsSearchParams = (): WordsSearchParams => ({
   query: '',
-  topic: null,
-  partOfSpeech: null,
+  topics: [],
+  partsOfSpeech: [],
 });

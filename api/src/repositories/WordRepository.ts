@@ -19,8 +19,8 @@ export interface WordWithoutProperties extends Omit<Word, 'properties'> {
 
 export interface GetWordPageParams extends Required<PageArgs> {
   languageId: LanguageId;
-  partOfSpeech?: PartOfSpeech;
-  topic?: TopicId;
+  partsOfSpeech?: PartOfSpeech[];
+  topics?: TopicId[];
   order: WordOrder;
 }
 
@@ -41,8 +41,8 @@ export class WordRepository {
 
   async getPage({
     languageId,
-    partOfSpeech,
-    topic,
+    partsOfSpeech,
+    topics,
     start,
     limit,
     order,
@@ -52,7 +52,6 @@ export class WordRepository {
     let query = connection(TABLE_WORDS)
       .where({
         language_id: languageId,
-        ...(partOfSpeech && { part_of_speech: partOfSpeech }),
       })
       .offset(start)
       .limit(limit + 1)
@@ -61,12 +60,15 @@ export class WordRepository {
         order === WordOrder.Chronological ? 'desc' : 'asc',
       );
 
-    if (topic) {
-      query = query.whereExists((query) =>
-        query.from(TABLE_TOPICS_WORDS).where({
-          word_id: connection.ref(`${TABLE_WORDS}.id`),
-          topic_id: topic,
-        }),
+    if (partsOfSpeech?.length) {
+      query.whereIn('part_of_speech', partsOfSpeech);
+    }
+
+    if (topics?.length) {
+      query = query.whereExists((query) => query
+        .from(TABLE_TOPICS_WORDS)
+        .where({ word_id: connection.ref(`${TABLE_WORDS}.id`) })
+        .whereIn('topic_id', topics),
       );
     }
 

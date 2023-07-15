@@ -1,5 +1,11 @@
-import { Component, For, createEffect, createSignal } from 'solid-js';
-import { FaSolidGripLines } from 'solid-icons/fa';
+import {
+  Component,
+  For,
+  Show,
+  batch,
+  createEffect,
+  createSignal,
+} from 'solid-js';
 import { createLazyQuery, createMutation } from '@merged/solid-apollo';
 import {
   DragDropProvider,
@@ -15,25 +21,31 @@ import {
   PartOfSpeech,
   ReorderPropertiesDocument,
 } from '../../api/types/graphql';
-import { TextPropertyFieldsFragment } from '../../api/types/graphql';
-import { OptionPropertyFieldsFragment } from '../../api/types/graphql';
 import { updateCacheOnReorderProperties } from '../../api/mutations';
-import PropertyListItem from './PropertiesListItem';
+import PropertyListItem, {
+  PropertyListItemOverlay,
+} from './PropertiesListItem';
+import PropertyActionBar from './PropertyActionBar';
+import { PropertyAction } from './propertyActions';
 
 export type PropertiesListProps = {
   partOfSpeech: PartOfSpeech;
-  selectedProperty: string | null;
-  onPropertySelect: (selectedProperty: string | null) => void;
 };
 
 const PropertiesList: Component<PropertiesListProps> = (props) => {
   const [selectedLanguageId] = useLanguageContext();
+  const [selectedAction, setSelectedAction] =
+    createSignal<PropertyAction | null>(null);
+  const [selectedPropertyId, setSelectedPropertyId] = createSignal<
+    string | null
+  >(null);
+  const isCreateOpen = () => selectedAction() === PropertyAction.Create;
 
   const [fetchProperies, propertiesQuery] = createLazyQuery(
     GetPropertiesDocument,
   );
   const properties = () => propertiesQuery()?.language?.properties;
-  const propertyIds = () => properties()?.map((property) => property.id) || [];
+  const propertyIds = () => properties()?.map((property) => property.id) ?? [];
 
   const [draggedPropertyId, setDraggedPropertyId] = createSignal<string | null>(
     null,
@@ -51,8 +63,31 @@ const PropertiesList: Component<PropertiesListProps> = (props) => {
           partOfSpeech: props.partOfSpeech,
         },
       });
+
+      setSelectedAction(null);
+      setSelectedPropertyId(null);
     }
   });
+
+  const onAction = (
+    newAction: PropertyAction | null,
+    newActionPropertyId: string | null = null,
+  ) => {
+    if (
+      newActionPropertyId === selectedPropertyId() &&
+      newAction === selectedAction()
+    ) {
+      batch(() => {
+        setSelectedAction(null);
+        setSelectedPropertyId(null);
+      });
+    } else {
+      batch(() => {
+        setSelectedAction(newAction);
+        setSelectedPropertyId(newActionPropertyId);
+      });
+    }
+  };
 
   const onDragStart = ({ draggable }: DragEvent) =>
     setDraggedPropertyId(draggable.id as string);
@@ -90,48 +125,52 @@ const PropertiesList: Component<PropertiesListProps> = (props) => {
   };
 
   return (
-    <DragDropProvider
-      onDragStart={onDragStart}
-      onDragEnd={onDragEnd}
-      collisionDetector={closestCenter}
-    >
-      <DragDropSensors>
-        <div class="w-full p-2 gap-y-2 flex flex-col items-center">
-          <SortableProvider ids={propertyIds()}>
-            <For each={properties()} fallback={'loading...'}>
-              {(property) => (
-                <PropertyListItem
-                  property={property}
-                  selectedProperty={props.selectedProperty}
-                  onPropertySelect={props.onPropertySelect}
-                />
-              )}
-            </For>
-          </SortableProvider>
-        </div>
-      </DragDropSensors>
-      <DragOverlay>
-        <PropertyListItemOverlay property={draggedProperty()} />
-      </DragOverlay>
-    </DragDropProvider>
-  );
-};
-
-type PropertyListItemOverlayProps = {
-  property?: TextPropertyFieldsFragment | OptionPropertyFieldsFragment;
-};
-
-const PropertyListItemOverlay: Component<PropertyListItemOverlayProps> = (
-  props,
-) => {
-  return (
-    <div class="flex flex-row">
-      <div class="flex-1 p-2 bg-coolgray-300 font-bold">
-        {props.property?.name ?? ''}
-      </div>
-      <div class="bg-spacecadet text-coolgray-300 cursor-move">
-        <FaSolidGripLines size="2rem" class="m-2" />
-      </div>
+    <div class="w-full p-2 gap-y-2 flex flex-col items-center">
+      <DragDropProvider
+        onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
+        collisionDetector={closestCenter}
+      >
+        <DragDropSensors />
+        <SortableProvider ids={propertyIds()}>
+          <For each={properties()} fallback={'loading...'}>
+            {(property) => (
+              <PropertyListItem
+                property={property}
+                partOfSpeech={props.partOfSpeech}
+                selectedAction={
+                  property.id === selectedPropertyId() ? selectedAction() : null
+                }
+                onSelectAction={(action) => onAction(action, property.id)}
+                isSortable={true}
+              />
+            )}
+          </For>
+        </SortableProvider>
+        <DragOverlay>
+          <PropertyListItemOverlay property={draggedProperty()} />
+        </DragOverlay>
+      </DragDropProvider>
+      <Show
+        when={isCreateOpen()}
+        fallback={
+          <div class="sticky bottom-0 flex flex-row justify-center w-full max-w-[60rem] bg-coolgray-300 outline outline-8 outline-alabaster">
+            <PropertyActionBar
+              actions={[PropertyAction.Create]}
+              selectedAction={null}
+              onSelectAction={onAction}
+            />
+          </div>
+        }
+      >
+        <PropertyListItem
+          property={null}
+          partOfSpeech={props.partOfSpeech}
+          selectedAction={PropertyAction.Create}
+          onSelectAction={onAction}
+          isSortable={false}
+        />
+      </Show>
     </div>
   );
 };

@@ -5,8 +5,8 @@ import {
 } from 'solid-icons/fa';
 import { IoArrowRedo } from 'solid-icons/io';
 import { Component, For } from 'solid-js';
-import { NavBarIcon } from '../NavBarIcon';
 import { LanguageAction } from './Languages';
+import { Icon } from '../../utils/Icon';
 
 export type LanguageActionButtonsProps = {
   onAction: (action: LanguageAction | null) => void;
@@ -60,27 +60,28 @@ const LanguageActionButton: Component<LanguageActionButtonProps> = (props) => {
     switch (props.action) {
       case LanguageAction.Create:
       case LanguageAction.Update:
-        return 'text-mint hover:bg-mint';
+        return 'text-mint bg-spacecadet hover:bg-mint';
       case LanguageAction.Delete:
-        return 'text-chilired hover:bg-chilired';
+        return 'text-chilired bg-spacecadet hover:bg-chilired';
       default:
         return '';
     }
   };
 
-  const onAction = (action: LanguageAction | null) => () =>
-    props.onAction(action);
-
   return (
-    <NavBarIcon
+    <Icon
       icon={icon()}
-      class="cursor-pointer transition-colors"
+      class="transition-colors"
       classList={{
+        'cursor-pointer': !props.isDisabled,
+        'text-white': !props.isConfirm,
         'hover:bg-charcoal-100 hover:text-spacecadet': !props.isDisabled,
-        'brightness-75': props.isDisabled,
         [confirmClasses()]: props.isConfirm && !props.isDisabled,
+        'brightness-75': props.isDisabled,
       }}
-      onClick={onAction(props.action)}
+      onClick={
+        !props.isDisabled ? () => props.onAction(props.action) : undefined
+      }
     />
   );
 };

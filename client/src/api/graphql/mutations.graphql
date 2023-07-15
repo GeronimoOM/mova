@@ -40,6 +40,21 @@ mutation UpdateProperty($input: UpdatePropertyInput!) {
   }
 }
 
+mutation DeleteProperty($id: ID!) {
+  deleteProperty(id: $id) {
+    ... on TextProperty {
+      id
+      languageId
+      partOfSpeech
+    }
+    ... on OptionProperty {
+      id
+      languageId
+      partOfSpeech
+    }
+  }
+}
+
 mutation ReorderProperties($input: ReorderPropertiesInput!) {
   reorderProperties(input: $input) {
     ... on TextProperty {

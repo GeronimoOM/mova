@@ -1,22 +1,11 @@
-import { Component, createEffect, createSignal, on } from 'solid-js';
+import { Component, createSignal, on } from 'solid-js';
 import { useLanguageContext } from '../LanguageContext';
 import PropertiesList from './PropertiesList';
 import { PartOfSpeech } from '../../api/types/graphql';
 import PropertiesPosSelect from './PropertiesPosSelect';
 
 const PropertiesPage: Component = () => {
-  const [selectedLanguageId] = useLanguageContext();
-
   const [selectedPos, setSelectedPos] = createSignal(PartOfSpeech.Noun);
-  const [selectedProperty, setSelectedProperty] = createSignal<string | null>(
-    null,
-  );
-
-  createEffect(
-    on(selectedLanguageId, () => {
-      setSelectedProperty(null);
-    }),
-  );
 
   return (
     <div class="flex flex-col h-full items-center justify-items-stretch">
@@ -27,11 +16,7 @@ const PropertiesPage: Component = () => {
         />
       </div>
       <div class="w-full overflow-y-scroll">
-        <PropertiesList
-          partOfSpeech={selectedPos()}
-          selectedProperty={selectedProperty()}
-          onPropertySelect={setSelectedProperty}
-        />
+        <PropertiesList partOfSpeech={selectedPos()} />
       </div>
     </div>
   );

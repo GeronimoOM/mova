@@ -24,8 +24,8 @@ export type TopicDocument = Topic;
 export interface SearchWordsParams extends Required<PageArgs> {
   languageId: LanguageId;
   query: string;
-  partOfSpeech?: PartOfSpeech;
-  topic?: TopicId;
+  partsOfSpeech?: PartOfSpeech[];
+  topics?: TopicId[];
 }
 
 export interface SearchTopicsParams extends Required<PageArgs> {
@@ -35,13 +35,13 @@ export interface SearchTopicsParams extends Required<PageArgs> {
 
 @Injectable()
 export class SearchClient implements OnApplicationBootstrap {
-  constructor(private elasticClientManager: ElasticClientManager) {}
+  constructor(private elasticClientManager: ElasticClientManager) { }
 
   async searchWords({
     languageId,
     query,
-    partOfSpeech,
-    topic,
+    partsOfSpeech,
+    topics,
     start,
     limit,
   }: SearchWordsParams): Promise<Page<WordId>> {
@@ -52,8 +52,12 @@ export class SearchClient implements OnApplicationBootstrap {
 
     const mustMatch: QueryDslQueryContainer[] = [
       { match: { languageId } },
-      ...(partOfSpeech ? [{ match: { partOfSpeech } }] : []),
-      ...(topic ? [{ match: { topics: topic } }] : []),
+      ...partsOfSpeech?.length 
+        ? [{ bool: { should: partsOfSpeech.map((partOfSpeech) => ({ match: { partOfSpeech } })) } }] 
+        : [],
+      ...topics?.length 
+        ? [{ bool: { should: topics.map((topic) => ({ match: { topics: topic } })) } }] 
+        : [],
       {
         multi_match: {
           query,
@@ -244,10 +248,10 @@ export class SearchClient implements OnApplicationBootstrap {
       partOfSpeech: word.partOfSpeech,
       properties: word.properties
         ? [...word.properties.values()]
-            .filter((value): value is TextPropertyValue =>
-              isTextPropertyValue(value),
-            )
-            .map((value) => value.text)
+          .filter((value): value is TextPropertyValue =>
+            isTextPropertyValue(value),
+          )
+          .map((value) => value.text)
         : undefined,
       ...(word.topics && {
         topics: word.topics.map((topic) => topic.id),

@@ -1,15 +1,15 @@
 import { useMatch, A } from '@solidjs/router';
 import { IconTypes } from 'solid-icons';
 import { Component } from 'solid-js';
-import { NavBarIcon } from './NavBarIcon';
+import { Icon } from '../utils/Icon';
 
-type NavBarLinkProps = {
+type NavBarItemProps = {
   href: string;
   icon: IconTypes;
   text: string;
 };
 
-const NavBarLink: Component<NavBarLinkProps> = (props) => {
+const NavBarItem: Component<NavBarItemProps> = (props) => {
   const match = useMatch(() => props.href);
 
   return (
@@ -21,11 +21,11 @@ const NavBarLink: Component<NavBarLinkProps> = (props) => {
           'hover:bg-charcoal-100 hover:text-spacecadet': !match(),
         }}
       >
-        {<NavBarIcon icon={props.icon} />}
+        <Icon icon={props.icon} />
         <div class="p-3 hidden md:inline-block">{props.text}</div>
       </div>
     </A>
   );
 };
 
-export default NavBarLink;
+export default NavBarItem;

@@ -26,10 +26,10 @@ export const DEFAULT_LIMIT = 10;
 export const MAX_LIMIT = 100;
 export const QUERY_MIN_LENGTH = 3;
 
-export interface GetWordPageParms extends PageArgs {
+export interface GetWordPageParams extends PageArgs {
   languageId: LanguageId;
-  partOfSpeech?: PartOfSpeech;
-  topic?: TopicId;
+  partsOfSpeech?: PartOfSpeech[];
+  topics?: TopicId[];
   query?: string;
   order?: WordOrder;
 }
@@ -64,7 +64,7 @@ export class WordService {
     private topicService: TopicService,
     @Inject(forwardRef(() => LanguageService))
     private languageService: LanguageService,
-  ) {}
+  ) { }
 
   async getById(wordId: WordId): Promise<Word | null> {
     const repoWord = await this.wordRepository.getById(wordId);
@@ -80,7 +80,7 @@ export class WordService {
     return this.withProperties(repoWord, properties);
   }
 
-  async getPage(params: GetWordPageParms): Promise<Page<Word>> {
+  async getPage(params: GetWordPageParams): Promise<Page<Word>> {
     if (!params.start) {
       params.start = 0;
     }

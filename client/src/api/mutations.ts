@@ -9,6 +9,7 @@ import {
   CreatePropertyDocument,
   CreateWordDocument,
   DeleteLanguageDocument,
+  DeletePropertyDocument,
   GetLanguagesDocument,
   LanguagePropertiesFragmentDoc,
   LanguageWordsFragmentDoc,
@@ -69,6 +70,24 @@ export const updateCacheOnCreateProperty: MutationUpdaterFunction<
     },
     (properties) => ({
       properties: [...(properties?.properties ?? []), data!.createProperty],
+    }),
+  );
+};
+
+export const updateCacheOnDeleteProperty: MutationUpdaterFunction<
+  typeof DeletePropertyDocument
+> = (cache, { data }) => {
+  cache.updateFragment(
+    {
+      id: `Language:${data!.deleteProperty.languageId}`,
+      fragment: LanguagePropertiesFragmentDoc,
+      variables: { partOfSpeech: data!.deleteProperty.partOfSpeech },
+      overwrite: true,
+    },
+    (properties) => ({
+      properties: (properties?.properties ?? []).filter(
+        ({ id }) => id !== data!.deleteProperty.id,
+      ),
     }),
   );
 };

@@ -9,8 +9,8 @@ import {
 import { createMutation, createQuery } from '@merged/solid-apollo';
 import { FaSolidEarthEurope } from 'solid-icons/fa';
 import {
-  RiSystemArrowDropDownLine,
-  RiSystemArrowDropUpLine,
+  RiArrowsArrowDropDownLine,
+  RiArrowsArrowDropUpLine,
 } from 'solid-icons/ri';
 import {
   CreateLanguageDocument,
@@ -23,12 +23,12 @@ import {
   updateCacheOnCreateLanguage,
   updateCacheOnDeleteLanguage,
 } from '../../../api/mutations';
-import { NavBarIcon, NavBarToggleIcon } from '../NavBarIcon';
 import LanguageActionButtons, {
   LanguageActionButtonsAction,
 } from './LanguageActionButtons';
 import LanguageList from './LanguageList';
 import LanguageInput from './LanguageInput';
+import { Icon, ToggleIcon } from '../../utils/Icon';
 
 const MIN_LANGUAGE_NAME_LENGTH = 3;
 
@@ -130,6 +130,13 @@ const Languages: Component<NavBarLanguagesProps> = (props) => {
   ];
 
   const confirmActions = (): LanguageActionButtonsAction[] => [
+    ...(action() !== LanguageAction.Create && props.isVertical
+      ? [
+          {
+            action: LanguageAction.Create,
+          },
+        ]
+      : []),
     ...(action() === LanguageAction.Create || !props.isVertical
       ? [
           {
@@ -246,14 +253,14 @@ const Languages: Component<NavBarLanguagesProps> = (props) => {
         class="flex-none flex flex-row items-stretch hover:bg-charcoal-100 hover:text-spacecadet cursor-pointer transition-colors"
         onClick={() => props.setIsActive((isActive) => !isActive)}
       >
-        <NavBarIcon icon={FaSolidEarthEurope} />
+        <Icon icon={FaSolidEarthEurope} />
         <div class="flex-auto p-3 hidden md:block truncate">
           {selectedLanguage()?.name ?? 'Language'}
         </div>
         <div class="hidden md:block">
-          <NavBarToggleIcon
-            offIcon={RiSystemArrowDropDownLine}
-            onIcon={RiSystemArrowDropUpLine}
+          <ToggleIcon
+            offIcon={RiArrowsArrowDropDownLine}
+            onIcon={RiArrowsArrowDropUpLine}
             isOn={props.isActive}
           />
         </div>
