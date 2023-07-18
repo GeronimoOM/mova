@@ -68,19 +68,20 @@ mutation ReorderProperties($input: ReorderPropertiesInput!) {
 
 mutation CreateWord($input: CreateWordInput!) {
   createWord(input: $input) {
-    ...WordFields
+    ...WordFieldsFull
   }
 }
 
 mutation UpdateWord($input: UpdateWordInput!) {
   updateWord(input: $input) {
-    ...WordFields
+    ...WordFieldsFull
   }
 }
 
 mutation DeleteWord($id: ID!) {
   deleteWord(id: $id) {
     id
+    languageId
   }
 }
 

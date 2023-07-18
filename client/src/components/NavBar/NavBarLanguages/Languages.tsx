@@ -23,12 +23,10 @@ import {
   updateCacheOnCreateLanguage,
   updateCacheOnDeleteLanguage,
 } from '../../../api/mutations';
-import LanguageActionButtons, {
-  LanguageActionButtonsAction,
-} from './LanguageActionButtons';
 import LanguageList from './LanguageList';
 import LanguageInput from './LanguageInput';
 import { Icon, ToggleIcon } from '../../utils/Icon';
+import ActionBar, { Action } from '../../utils/ActionBar';
 
 const MIN_LANGUAGE_NAME_LENGTH = 3;
 
@@ -38,16 +36,10 @@ export type NavBarLanguagesProps = {
   isVertical: boolean;
 };
 
-export enum LanguageAction {
-  Create = 'create',
-  Update = 'update',
-  Delete = 'delete',
-}
-
 const Languages: Component<NavBarLanguagesProps> = (props) => {
   const [selectedLanguageId, setSelectedLanguageId] = useLanguageContext();
 
-  const [action, setAction] = createSignal<LanguageAction | null>(null);
+  const [action, setAction] = createSignal<Action | null>(null);
   const [languagesContainer, setLanguagesContainer] = createSignal<
     HTMLDivElement | undefined
   >();
@@ -76,7 +68,7 @@ const Languages: Component<NavBarLanguagesProps> = (props) => {
   });
 
   createEffect(() => {
-    if (!action() || action() === LanguageAction.Create) {
+    if (!action() || action() === Action.Create) {
       setActionLanguageId(null);
     }
   });
@@ -91,10 +83,10 @@ const Languages: Component<NavBarLanguagesProps> = (props) => {
 
   createEffect(() => {
     switch (action()) {
-      case LanguageAction.Create:
+      case Action.Create:
         return setLanguageInput('');
-      case LanguageAction.Update:
-      case LanguageAction.Delete:
+      case Action.Update:
+      case Action.Delete:
         if (actionLanguage()) {
           return setLanguageInput(actionLanguage()!.name);
         }
@@ -112,43 +104,10 @@ const Languages: Component<NavBarLanguagesProps> = (props) => {
     }
   });
 
-  const actions = (): LanguageActionButtonsAction[] =>
-    !action() ? selectActions() : confirmActions();
-
-  const selectActions = (): LanguageActionButtonsAction[] => [
-    { action: LanguageAction.Create },
+  const actions = () => [
+    Action.Create,
     ...(!props.isVertical && selectedLanguageId()
-      ? [
-          {
-            action: LanguageAction.Update,
-          },
-          {
-            action: LanguageAction.Delete,
-          },
-        ]
-      : []),
-  ];
-
-  const confirmActions = (): LanguageActionButtonsAction[] => [
-    ...(action() !== LanguageAction.Create && props.isVertical
-      ? [
-          {
-            action: LanguageAction.Create,
-          },
-        ]
-      : []),
-    ...(action() === LanguageAction.Create || !props.isVertical
-      ? [
-          {
-            action: action(),
-            isConfirm: true,
-            isDisabled:
-              (action() === LanguageAction.Create ||
-                action() === LanguageAction.Update) &&
-              !isLanguageInputValid(),
-          },
-          { action: null },
-        ]
+      ? [Action.Update, Action.Delete]
       : []),
   ];
 
@@ -156,14 +115,11 @@ const Languages: Component<NavBarLanguagesProps> = (props) => {
     setSelectedLanguageId(languageId);
   };
 
-  const onAction = (
-    newAction: LanguageAction | null,
+  const onActionSelect = (
+    newAction: Action | null,
     newActionLanguageId: string | null = null,
   ) => {
-    if (
-      newAction === LanguageAction.Update ||
-      newAction === LanguageAction.Delete
-    ) {
+    if (newAction === Action.Update || newAction === Action.Delete) {
       newActionLanguageId = newActionLanguageId ?? selectedLanguageId();
     }
 
@@ -177,13 +133,13 @@ const Languages: Component<NavBarLanguagesProps> = (props) => {
     }
   };
 
-  const executeAction = (action: LanguageAction) => {
+  const executeAction = (action: Action) => {
     switch (action) {
-      case LanguageAction.Create:
+      case Action.Create:
         return executeCreate();
-      case LanguageAction.Update:
+      case Action.Update:
         return executeUpdate();
-      case LanguageAction.Delete:
+      case Action.Delete:
         return executeDelete();
     }
   };
@@ -250,7 +206,7 @@ const Languages: Component<NavBarLanguagesProps> = (props) => {
   return (
     <div class="flex-auto max-w-full flex flex-row items-center md:flex-col md:items-stretch">
       <div
-        class="flex-none flex flex-row items-stretch hover:bg-charcoal-100 hover:text-spacecadet cursor-pointer transition-colors"
+        class="flex-none flex flex-row items-stretch hover:bg-charcoal-100 hover:text-spacecadet-300 cursor-pointer transition-colors"
         onClick={() => props.setIsActive((isActive) => !isActive)}
       >
         <Icon icon={FaSolidEarthEurope} />
@@ -273,9 +229,9 @@ const Languages: Component<NavBarLanguagesProps> = (props) => {
               languages={languages()}
               selectedLanguageId={selectedLanguageId()}
               onLanguageSelect={onLanguageSelect}
-              action={action()}
+              selectedAction={action()}
               actionLanguageId={actionLanguageId()}
-              onAction={onAction}
+              onActionSelect={onActionSelect}
               isVertical={props.isVertical}
               languageInput={languageInput()}
               onLanguageInput={setLanguageInput}
@@ -291,22 +247,31 @@ const Languages: Component<NavBarLanguagesProps> = (props) => {
             'flex-1': Boolean(action() && !props.isVertical),
           }}
         >
-          <Show
-            when={
-              props.isVertical ? action() === LanguageAction.Create : action()
-            }
-          >
+          <Show when={props.isVertical ? action() === Action.Create : action()}>
             <div class="flex-1">
               <LanguageInput
                 languageInput={languageInput()}
                 onLanguageInput={setLanguageInput}
-                isDisabled={action() === LanguageAction.Delete}
+                isDisabled={action() === Action.Delete}
               />
             </div>
           </Show>
 
           <div class="flex-none">
-            <LanguageActionButtons actions={actions()} onAction={onAction} />
+            <ActionBar
+              actions={actions()}
+              selectedAction={
+                props.isVertical
+                  ? action() === Action.Create
+                    ? Action.Create
+                    : null
+                  : action()
+              }
+              onActionSelect={onActionSelect}
+              isSaveDisabled={
+                action() === Action.Create && !isLanguageInputValid()
+              }
+            />
           </div>
         </div>
       </Show>

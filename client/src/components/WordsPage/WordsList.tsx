@@ -19,12 +19,14 @@ import WordsListItem from './WordsListItem';
 export type WordsListProps = {
   searchParams: WordsSearchParams;
   selectedWord: string | null;
-  setSelectedWord: (selectedWord: string | null) => void;
+  onSelectWord: (selectedWord: string | null) => void;
+  onOpenDetails: () => void;
 };
 
 const WordsList: Component<WordsListProps> = (props) => {
   const [selectedLanguageId] = useLanguageContext();
 
+  const [isCreateOpen, setIsCreateOpen] = createSignal(false);
   const [wordsContainer, setWordsContainer] = createSignal<
     HTMLDivElement | undefined
   >();
@@ -77,13 +79,36 @@ const WordsList: Component<WordsListProps> = (props) => {
   };
 
   return (
-    <div class="p-2 gap-y-2 flex flex-col items-center" ref={setWordsContainer}>
+    <div
+      class="w-full max-w-[60rem] mx-auto p-2 gap-y-2 flex flex-col items-center"
+      ref={setWordsContainer}
+    >
+      {/* <Show
+        when={isCreateOpen()}
+        fallback={
+          <div class="sticky bottom-0 w-full flex flex-row justify-center bg-coolgray-300 outline outline-8 outline-alabaster">
+            <PropertyActionBar
+              actions={[PropertyAction.Create]}
+              selectedAction={null}
+              onActionSelect={onAction}
+            />
+          </div>
+        }
+      >
+        <PropertyListItem
+          property={null}
+          partOfSpeech={props.partOfSpeech}
+          selectedAction={PropertyAction.Create}
+          onActionSelect={onAction}
+          isSortable={false}
+        />
+      </Show> */}
       <For each={words()} fallback={'loading...'}>
         {(word) => (
           <WordsListItem
             word={word}
             selectedWord={props.selectedWord}
-            setSelectedWord={props.setSelectedWord}
+            setSelectedWord={props.onSelectWord}
           />
         )}
       </For>

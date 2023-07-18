@@ -11,44 +11,53 @@ export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
   [SubKey in K]: Maybe<T[SubKey]>;
 };
+export type MakeEmpty<
+  T extends { [key: string]: unknown },
+  K extends keyof T,
+> = { [_ in K]?: never };
+export type Incremental<T> =
+  | T
+  | {
+      [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never;
+    };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: string;
-  String: string;
-  Boolean: boolean;
-  Int: number;
-  Float: number;
+  ID: { input: string; output: string };
+  String: { input: string; output: string };
+  Boolean: { input: boolean; output: boolean };
+  Int: { input: number; output: number };
+  Float: { input: number; output: number };
 };
 
 export type CreateLanguageInput = {
-  name: Scalars['String'];
+  name: Scalars['String']['input'];
 };
 
 export type CreatePropertyInput = {
-  languageId: Scalars['ID'];
-  name: Scalars['String'];
-  options?: InputMaybe<Array<Scalars['String']>>;
+  languageId: Scalars['ID']['input'];
+  name: Scalars['String']['input'];
+  options?: InputMaybe<Array<Scalars['String']['input']>>;
   partOfSpeech: PartOfSpeech;
   type: PropertyType;
 };
 
 export type CreateTopicInput = {
-  languageId: Scalars['ID'];
-  name: Scalars['String'];
+  languageId: Scalars['ID']['input'];
+  name: Scalars['String']['input'];
 };
 
 export type CreateWordInput = {
-  languageId: Scalars['ID'];
-  original: Scalars['String'];
+  languageId: Scalars['ID']['input'];
+  original: Scalars['String']['input'];
   partOfSpeech: PartOfSpeech;
   properties?: InputMaybe<Array<UpdatePropertyValueInput>>;
-  translation: Scalars['String'];
+  translation: Scalars['String']['input'];
 };
 
 export type Language = {
   __typename?: 'Language';
-  id: Scalars['ID'];
-  name: Scalars['String'];
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
   properties: Array<PropertyUnion>;
   topics: TopicPage;
   words: WordPage;
@@ -59,17 +68,17 @@ export type LanguagePropertiesArgs = {
 };
 
 export type LanguageTopicsArgs = {
-  limit?: InputMaybe<Scalars['Int']>;
-  query?: InputMaybe<Scalars['String']>;
-  start?: Scalars['Int'];
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  query?: InputMaybe<Scalars['String']['input']>;
+  start?: Scalars['Int']['input'];
 };
 
 export type LanguageWordsArgs = {
-  limit?: InputMaybe<Scalars['Int']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
   partsOfSpeech?: InputMaybe<Array<PartOfSpeech>>;
-  query?: InputMaybe<Scalars['String']>;
-  start?: Scalars['Int'];
-  topics?: InputMaybe<Array<Scalars['ID']>>;
+  query?: InputMaybe<Scalars['String']['input']>;
+  start?: Scalars['Int']['input'];
+  topics?: InputMaybe<Array<Scalars['ID']['input']>>;
 };
 
 export type Mutation = {
@@ -91,8 +100,8 @@ export type Mutation = {
 };
 
 export type MutationAddTopicWordArgs = {
-  topicId: Scalars['ID'];
-  wordId: Scalars['ID'];
+  topicId: Scalars['ID']['input'];
+  wordId: Scalars['ID']['input'];
 };
 
 export type MutationCreateLanguageArgs = {
@@ -112,24 +121,24 @@ export type MutationCreateWordArgs = {
 };
 
 export type MutationDeleteLanguageArgs = {
-  id: Scalars['ID'];
+  id: Scalars['ID']['input'];
 };
 
 export type MutationDeletePropertyArgs = {
-  id: Scalars['ID'];
+  id: Scalars['ID']['input'];
 };
 
 export type MutationDeleteTopicArgs = {
-  id: Scalars['ID'];
+  id: Scalars['ID']['input'];
 };
 
 export type MutationDeleteWordArgs = {
-  id: Scalars['ID'];
+  id: Scalars['ID']['input'];
 };
 
 export type MutationRemoveTopicWordArgs = {
-  topicId: Scalars['ID'];
-  wordId: Scalars['ID'];
+  topicId: Scalars['ID']['input'];
+  wordId: Scalars['ID']['input'];
 };
 
 export type MutationReorderPropertiesArgs = {
@@ -150,15 +159,15 @@ export type MutationUpdateWordArgs = {
 
 export type Option = {
   __typename?: 'Option';
-  id: Scalars['ID'];
-  value: Scalars['String'];
+  id: Scalars['ID']['output'];
+  value: Scalars['String']['output'];
 };
 
 export type OptionProperty = {
   __typename?: 'OptionProperty';
-  id: Scalars['ID'];
-  languageId: Scalars['ID'];
-  name: Scalars['String'];
+  id: Scalars['ID']['output'];
+  languageId: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
   options: Array<Option>;
   partOfSpeech: PartOfSpeech;
   type: PropertyType;
@@ -197,28 +206,28 @@ export type Query = {
 };
 
 export type QueryLanguageArgs = {
-  id: Scalars['ID'];
+  id: Scalars['ID']['input'];
 };
 
 export type QueryPropertyArgs = {
-  id: Scalars['ID'];
+  id: Scalars['ID']['input'];
 };
 
 export type QueryWordArgs = {
-  id: Scalars['ID'];
+  id: Scalars['ID']['input'];
 };
 
 export type ReorderPropertiesInput = {
-  languageId: Scalars['ID'];
+  languageId: Scalars['ID']['input'];
   partOfSpeech: PartOfSpeech;
-  propertyIds: Array<Scalars['ID']>;
+  propertyIds: Array<Scalars['ID']['input']>;
 };
 
 export type TextProperty = {
   __typename?: 'TextProperty';
-  id: Scalars['ID'];
-  languageId: Scalars['ID'];
-  name: Scalars['String'];
+  id: Scalars['ID']['output'];
+  languageId: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
   partOfSpeech: PartOfSpeech;
   type: PropertyType;
 };
@@ -226,67 +235,67 @@ export type TextProperty = {
 export type TextPropertyValue = {
   __typename?: 'TextPropertyValue';
   property: TextProperty;
-  text: Scalars['String'];
+  text: Scalars['String']['output'];
 };
 
 export type Topic = {
   __typename?: 'Topic';
-  id: Scalars['ID'];
-  name: Scalars['String'];
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
   words: WordPage;
 };
 
 export type TopicWordsArgs = {
-  limit?: InputMaybe<Scalars['Int']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
   order?: InputMaybe<WordOrder>;
   partOfSpeech?: InputMaybe<Array<PartOfSpeech>>;
-  query?: InputMaybe<Scalars['String']>;
-  start?: Scalars['Int'];
+  query?: InputMaybe<Scalars['String']['input']>;
+  start?: Scalars['Int']['input'];
 };
 
 export type TopicPage = {
   __typename?: 'TopicPage';
-  hasMore: Scalars['Boolean'];
+  hasMore: Scalars['Boolean']['output'];
   items: Array<Topic>;
 };
 
 export type UpdateLanguageInput = {
-  id: Scalars['ID'];
-  name: Scalars['String'];
+  id: Scalars['ID']['input'];
+  name: Scalars['String']['input'];
 };
 
 export type UpdateOptionInput = {
-  id: Scalars['ID'];
-  value: Scalars['String'];
+  id: Scalars['ID']['input'];
+  value: Scalars['String']['input'];
 };
 
 export type UpdatePropertyInput = {
-  id: Scalars['ID'];
-  name?: InputMaybe<Scalars['String']>;
+  id: Scalars['ID']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
   options?: InputMaybe<Array<UpdateOptionInput>>;
 };
 
 export type UpdatePropertyValueInput = {
-  id: Scalars['ID'];
-  option?: InputMaybe<Scalars['ID']>;
-  text?: InputMaybe<Scalars['String']>;
+  id: Scalars['ID']['input'];
+  option?: InputMaybe<Scalars['ID']['input']>;
+  text?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UpdateWordInput = {
-  id: Scalars['ID'];
-  original?: InputMaybe<Scalars['String']>;
+  id: Scalars['ID']['input'];
+  original?: InputMaybe<Scalars['String']['input']>;
   properties?: InputMaybe<Array<UpdatePropertyValueInput>>;
-  translation?: InputMaybe<Scalars['String']>;
+  translation?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Word = {
   __typename?: 'Word';
-  id: Scalars['String'];
-  languageId: Scalars['ID'];
-  original: Scalars['String'];
+  id: Scalars['String']['output'];
+  languageId: Scalars['ID']['output'];
+  original: Scalars['String']['output'];
   partOfSpeech: PartOfSpeech;
   properties: Array<PropertyValueUnion>;
-  translation: Scalars['String'];
+  translation: Scalars['String']['output'];
 };
 
 export enum WordOrder {
@@ -296,7 +305,7 @@ export enum WordOrder {
 
 export type WordPage = {
   __typename?: 'WordPage';
-  hasMore: Scalars['Boolean'];
+  hasMore: Scalars['Boolean']['output'];
   items: Array<Word>;
 };
 
@@ -340,25 +349,27 @@ export type WordFieldsFullFragment = {
   properties: Array<
     | {
         __typename?: 'OptionPropertyValue';
-        property: {
-          __typename?: 'OptionProperty';
-          id: string;
-          name: string;
-          type: PropertyType;
-        };
+        property: { __typename?: 'OptionProperty'; id: string };
         option: { __typename?: 'Option'; id: string; value: string };
       }
     | {
         __typename?: 'TextPropertyValue';
         text: string;
-        property: {
-          __typename?: 'TextProperty';
-          id: string;
-          name: string;
-          type: PropertyType;
-        };
+        property: { __typename?: 'TextProperty'; id: string };
       }
   >;
+};
+
+export type TextPropertyValueFieldsFragment = {
+  __typename?: 'TextPropertyValue';
+  text: string;
+  property: { __typename?: 'TextProperty'; id: string };
+};
+
+export type OptionPropertyValueFieldsFragment = {
+  __typename?: 'OptionPropertyValue';
+  property: { __typename?: 'OptionProperty'; id: string };
+  option: { __typename?: 'Option'; id: string; value: string };
 };
 
 export type TextPropertyFieldsFragment = {
@@ -397,7 +408,7 @@ export type UpdateLanguageMutation = {
 };
 
 export type DeleteLanguageMutationVariables = Exact<{
-  id: Scalars['ID'];
+  id: Scalars['ID']['input'];
 }>;
 
 export type DeleteLanguageMutation = {
@@ -454,7 +465,7 @@ export type UpdatePropertyMutation = {
 };
 
 export type DeletePropertyMutationVariables = Exact<{
-  id: Scalars['ID'];
+  id: Scalars['ID']['input'];
 }>;
 
 export type DeletePropertyMutation = {
@@ -498,6 +509,18 @@ export type CreateWordMutation = {
     original: string;
     translation: string;
     partOfSpeech: PartOfSpeech;
+    properties: Array<
+      | {
+          __typename?: 'OptionPropertyValue';
+          property: { __typename?: 'OptionProperty'; id: string };
+          option: { __typename?: 'Option'; id: string; value: string };
+        }
+      | {
+          __typename?: 'TextPropertyValue';
+          text: string;
+          property: { __typename?: 'TextProperty'; id: string };
+        }
+    >;
   };
 };
 
@@ -513,16 +536,28 @@ export type UpdateWordMutation = {
     original: string;
     translation: string;
     partOfSpeech: PartOfSpeech;
+    properties: Array<
+      | {
+          __typename?: 'OptionPropertyValue';
+          property: { __typename?: 'OptionProperty'; id: string };
+          option: { __typename?: 'Option'; id: string; value: string };
+        }
+      | {
+          __typename?: 'TextPropertyValue';
+          text: string;
+          property: { __typename?: 'TextProperty'; id: string };
+        }
+    >;
   };
 };
 
 export type DeleteWordMutationVariables = Exact<{
-  id: Scalars['ID'];
+  id: Scalars['ID']['input'];
 }>;
 
 export type DeleteWordMutation = {
   __typename?: 'Mutation';
-  deleteWord: { __typename?: 'Word'; id: string };
+  deleteWord: { __typename?: 'Word'; id: string; languageId: string };
 };
 
 export type CreateTopicMutationVariables = Exact<{
@@ -535,7 +570,7 @@ export type CreateTopicMutation = {
 };
 
 export type DeleteTopicMutationVariables = Exact<{
-  id: Scalars['ID'];
+  id: Scalars['ID']['input'];
 }>;
 
 export type DeleteTopicMutation = {
@@ -551,12 +586,12 @@ export type GetLanguagesQuery = {
 };
 
 export type GetWordsQueryVariables = Exact<{
-  languageId: Scalars['ID'];
-  start?: InputMaybe<Scalars['Int']>;
-  limit?: InputMaybe<Scalars['Int']>;
+  languageId: Scalars['ID']['input'];
+  start?: InputMaybe<Scalars['Int']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
   partsOfSpeech?: InputMaybe<Array<PartOfSpeech> | PartOfSpeech>;
-  query?: InputMaybe<Scalars['String']>;
-  topics?: InputMaybe<Array<Scalars['ID']> | Scalars['ID']>;
+  query?: InputMaybe<Scalars['String']['input']>;
+  topics?: InputMaybe<Array<Scalars['ID']['input']> | Scalars['ID']['input']>;
 }>;
 
 export type GetWordsQuery = {
@@ -579,7 +614,7 @@ export type GetWordsQuery = {
 };
 
 export type GetWordQueryVariables = Exact<{
-  id: Scalars['ID'];
+  id: Scalars['ID']['input'];
 }>;
 
 export type GetWordQuery = {
@@ -593,30 +628,20 @@ export type GetWordQuery = {
     properties: Array<
       | {
           __typename?: 'OptionPropertyValue';
-          property: {
-            __typename?: 'OptionProperty';
-            id: string;
-            name: string;
-            type: PropertyType;
-          };
+          property: { __typename?: 'OptionProperty'; id: string };
           option: { __typename?: 'Option'; id: string; value: string };
         }
       | {
           __typename?: 'TextPropertyValue';
           text: string;
-          property: {
-            __typename?: 'TextProperty';
-            id: string;
-            name: string;
-            type: PropertyType;
-          };
+          property: { __typename?: 'TextProperty'; id: string };
         }
     >;
   } | null;
 };
 
 export type GetPropertiesQueryVariables = Exact<{
-  languageId: Scalars['ID'];
+  languageId: Scalars['ID']['input'];
   partOfSpeech?: InputMaybe<PartOfSpeech>;
 }>;
 
@@ -646,7 +671,7 @@ export type GetPropertiesQuery = {
 };
 
 export type GetPropertyQueryVariables = Exact<{
-  id: Scalars['ID'];
+  id: Scalars['ID']['input'];
 }>;
 
 export type GetPropertyQuery = {
@@ -671,10 +696,10 @@ export type GetPropertyQuery = {
 };
 
 export type GetTopicsQueryVariables = Exact<{
-  languageId: Scalars['ID'];
-  start?: InputMaybe<Scalars['Int']>;
-  limit?: InputMaybe<Scalars['Int']>;
-  query?: InputMaybe<Scalars['String']>;
+  languageId: Scalars['ID']['input'];
+  start?: InputMaybe<Scalars['Int']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  query?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 export type GetTopicsQuery = {
@@ -832,6 +857,74 @@ export const WordFieldsFragmentDoc = {
     },
   ],
 } as unknown as DocumentNode<WordFieldsFragment, unknown>;
+export const TextPropertyValueFieldsFragmentDoc = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'TextPropertyValueFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'TextPropertyValue' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'property' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+              ],
+            },
+          },
+          { kind: 'Field', name: { kind: 'Name', value: 'text' } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<TextPropertyValueFieldsFragment, unknown>;
+export const OptionPropertyValueFieldsFragmentDoc = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'OptionPropertyValueFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'OptionPropertyValue' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'property' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+              ],
+            },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'option' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'value' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<OptionPropertyValueFieldsFragment, unknown>;
 export const WordFieldsFullFragmentDoc = {
   kind: 'Document',
   definitions: [
@@ -865,27 +958,12 @@ export const WordFieldsFullFragmentDoc = {
                     kind: 'SelectionSet',
                     selections: [
                       {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'property' },
-                        selectionSet: {
-                          kind: 'SelectionSet',
-                          selections: [
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: 'id' },
-                            },
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: 'name' },
-                            },
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: 'type' },
-                            },
-                          ],
+                        kind: 'FragmentSpread',
+                        name: {
+                          kind: 'Name',
+                          value: 'TextPropertyValueFields',
                         },
                       },
-                      { kind: 'Field', name: { kind: 'Name', value: 'text' } },
                     ],
                   },
                 },
@@ -899,46 +977,73 @@ export const WordFieldsFullFragmentDoc = {
                     kind: 'SelectionSet',
                     selections: [
                       {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'property' },
-                        selectionSet: {
-                          kind: 'SelectionSet',
-                          selections: [
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: 'id' },
-                            },
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: 'name' },
-                            },
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: 'type' },
-                            },
-                          ],
-                        },
-                      },
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'option' },
-                        selectionSet: {
-                          kind: 'SelectionSet',
-                          selections: [
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: 'id' },
-                            },
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: 'value' },
-                            },
-                          ],
+                        kind: 'FragmentSpread',
+                        name: {
+                          kind: 'Name',
+                          value: 'OptionPropertyValueFields',
                         },
                       },
                     ],
                   },
                 },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'TextPropertyValueFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'TextPropertyValue' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'property' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+              ],
+            },
+          },
+          { kind: 'Field', name: { kind: 'Name', value: 'text' } },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'OptionPropertyValueFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'OptionPropertyValue' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'property' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+              ],
+            },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'option' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'value' } },
               ],
             },
           },
@@ -1632,7 +1737,7 @@ export const CreateWordDocument = {
               selections: [
                 {
                   kind: 'FragmentSpread',
-                  name: { kind: 'Name', value: 'WordFields' },
+                  name: { kind: 'Name', value: 'WordFieldsFull' },
                 },
               ],
             },
@@ -1642,7 +1747,65 @@ export const CreateWordDocument = {
     },
     {
       kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'WordFields' },
+      name: { kind: 'Name', value: 'TextPropertyValueFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'TextPropertyValue' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'property' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+              ],
+            },
+          },
+          { kind: 'Field', name: { kind: 'Name', value: 'text' } },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'OptionPropertyValueFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'OptionPropertyValue' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'property' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+              ],
+            },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'option' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'value' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'WordFieldsFull' },
       typeCondition: {
         kind: 'NamedType',
         name: { kind: 'Name', value: 'Word' },
@@ -1654,6 +1817,53 @@ export const CreateWordDocument = {
           { kind: 'Field', name: { kind: 'Name', value: 'original' } },
           { kind: 'Field', name: { kind: 'Name', value: 'translation' } },
           { kind: 'Field', name: { kind: 'Name', value: 'partOfSpeech' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'properties' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'InlineFragment',
+                  typeCondition: {
+                    kind: 'NamedType',
+                    name: { kind: 'Name', value: 'TextPropertyValue' },
+                  },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      {
+                        kind: 'FragmentSpread',
+                        name: {
+                          kind: 'Name',
+                          value: 'TextPropertyValueFields',
+                        },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: 'InlineFragment',
+                  typeCondition: {
+                    kind: 'NamedType',
+                    name: { kind: 'Name', value: 'OptionPropertyValue' },
+                  },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      {
+                        kind: 'FragmentSpread',
+                        name: {
+                          kind: 'Name',
+                          value: 'OptionPropertyValueFields',
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
         ],
       },
     },
@@ -1703,7 +1913,7 @@ export const UpdateWordDocument = {
               selections: [
                 {
                   kind: 'FragmentSpread',
-                  name: { kind: 'Name', value: 'WordFields' },
+                  name: { kind: 'Name', value: 'WordFieldsFull' },
                 },
               ],
             },
@@ -1713,7 +1923,65 @@ export const UpdateWordDocument = {
     },
     {
       kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'WordFields' },
+      name: { kind: 'Name', value: 'TextPropertyValueFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'TextPropertyValue' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'property' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+              ],
+            },
+          },
+          { kind: 'Field', name: { kind: 'Name', value: 'text' } },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'OptionPropertyValueFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'OptionPropertyValue' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'property' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+              ],
+            },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'option' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'value' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'WordFieldsFull' },
       typeCondition: {
         kind: 'NamedType',
         name: { kind: 'Name', value: 'Word' },
@@ -1725,6 +1993,53 @@ export const UpdateWordDocument = {
           { kind: 'Field', name: { kind: 'Name', value: 'original' } },
           { kind: 'Field', name: { kind: 'Name', value: 'translation' } },
           { kind: 'Field', name: { kind: 'Name', value: 'partOfSpeech' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'properties' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'InlineFragment',
+                  typeCondition: {
+                    kind: 'NamedType',
+                    name: { kind: 'Name', value: 'TextPropertyValue' },
+                  },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      {
+                        kind: 'FragmentSpread',
+                        name: {
+                          kind: 'Name',
+                          value: 'TextPropertyValueFields',
+                        },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: 'InlineFragment',
+                  typeCondition: {
+                    kind: 'NamedType',
+                    name: { kind: 'Name', value: 'OptionPropertyValue' },
+                  },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      {
+                        kind: 'FragmentSpread',
+                        name: {
+                          kind: 'Name',
+                          value: 'OptionPropertyValueFields',
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
         ],
       },
     },
@@ -1767,6 +2082,7 @@ export const DeleteWordDocument = {
               kind: 'SelectionSet',
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'languageId' } },
               ],
             },
           },
@@ -2151,6 +2467,64 @@ export const GetWordDocument = {
     },
     {
       kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'TextPropertyValueFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'TextPropertyValue' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'property' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+              ],
+            },
+          },
+          { kind: 'Field', name: { kind: 'Name', value: 'text' } },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'OptionPropertyValueFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'OptionPropertyValue' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'property' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+              ],
+            },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'option' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'value' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
       name: { kind: 'Name', value: 'WordFieldsFull' },
       typeCondition: {
         kind: 'NamedType',
@@ -2179,27 +2553,12 @@ export const GetWordDocument = {
                     kind: 'SelectionSet',
                     selections: [
                       {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'property' },
-                        selectionSet: {
-                          kind: 'SelectionSet',
-                          selections: [
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: 'id' },
-                            },
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: 'name' },
-                            },
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: 'type' },
-                            },
-                          ],
+                        kind: 'FragmentSpread',
+                        name: {
+                          kind: 'Name',
+                          value: 'TextPropertyValueFields',
                         },
                       },
-                      { kind: 'Field', name: { kind: 'Name', value: 'text' } },
                     ],
                   },
                 },
@@ -2213,41 +2572,10 @@ export const GetWordDocument = {
                     kind: 'SelectionSet',
                     selections: [
                       {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'property' },
-                        selectionSet: {
-                          kind: 'SelectionSet',
-                          selections: [
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: 'id' },
-                            },
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: 'name' },
-                            },
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: 'type' },
-                            },
-                          ],
-                        },
-                      },
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'option' },
-                        selectionSet: {
-                          kind: 'SelectionSet',
-                          selections: [
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: 'id' },
-                            },
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: 'value' },
-                            },
-                          ],
+                        kind: 'FragmentSpread',
+                        name: {
+                          kind: 'Name',
+                          value: 'OptionPropertyValueFields',
                         },
                       },
                     ],

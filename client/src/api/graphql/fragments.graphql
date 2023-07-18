@@ -37,24 +37,28 @@ fragment WordFieldsFull on Word {
   partOfSpeech
   properties {
     ... on TextPropertyValue {
-      property {
-        id
-        name
-        type
-      }
-      text
+      ...TextPropertyValueFields
     }
     ... on OptionPropertyValue {
-      property {
-        id
-        name
-        type
-      }
-      option {
-        id
-        value
-      }
+      ...OptionPropertyValueFields
     }
+  }
+}
+
+fragment TextPropertyValueFields on TextPropertyValue {
+  property {
+    id
+  }
+  text
+}
+
+fragment OptionPropertyValueFields on OptionPropertyValue {
+  property {
+    id
+  }
+  option {
+    id
+    value
   }
 }
 

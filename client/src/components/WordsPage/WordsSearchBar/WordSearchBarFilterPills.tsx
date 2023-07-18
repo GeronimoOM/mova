@@ -6,6 +6,7 @@ import { PartOfSpeech } from '../../../api/types/graphql';
 import { partsOfSpeechParams } from '../../utils/partsOfSpeech';
 import { DropdownMode } from './WordsSearchBar';
 import { WordsSearchParams } from './wordsSearchParams';
+import { Icon } from '../../utils/Icon';
 
 type WordSearchBarFilterPillsProps = {
   dropdownMode: DropdownMode | null;
@@ -59,7 +60,7 @@ const WordSearchBarPosFilterPill: Component<WordSearchBarPosFilterPillProps> = (
   };
   const label = (): string | null => {
     if (props.partsOfSpeech.length === 1) {
-      return partsOfSpeechParams[props.partsOfSpeech[0]].label;
+      return partsOfSpeechParams[props.partsOfSpeech[0]].labelShort;
     } else if (props.partsOfSpeech.length < 4) {
       return null;
     } else {
@@ -69,17 +70,16 @@ const WordSearchBarPosFilterPill: Component<WordSearchBarPosFilterPillProps> = (
 
   return (
     <div
-      class="flex flex-row items-center text-spacecadet outline outline-2 outline-spacecadet cursor-pointer"
+      class="flex flex-row items-center text-spacecadet-300 outline outline-2 outline-spacecadet-300 cursor-pointer"
       classList={{
         'bg-coolgray-100': props.dropdownMode === DropdownMode.PartsOfSpeech,
       }}
       onClick={props.onClick}
     >
       {icons().map((icon) => {
-        return <Dynamic component={icon} size="1.5rem" class="m-2" />;
+        return <Icon icon={icon} size="sm" />;
       })}
       <Show when={label()}>
-        {' '}
         <div class="p-2">{label()}</div>
       </Show>
     </div>

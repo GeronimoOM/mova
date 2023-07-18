@@ -15,22 +15,22 @@ const WordsPage: Component = () => {
   const [wordsSearchParams, setSearchQuery] = createStore<WordsSearchParams>(
     defaultWordsSearchParams(),
   );
-  const [selectedWord, setSelectedWord] = createSignal<string | null>(null);
+  const [selectedWordId, setSelectedWordId] = createSignal<string | null>(null);
   const [showWordDetails, setShowWordDetails] = createSignal(false);
 
-  const onCreateWordDetails = () => {
-    setSelectedWord(null);
+  const onOpenCreateWord = () => {
+    setSelectedWordId(null);
     setShowWordDetails(true);
   };
 
   createEffect(
     on(selectedLanguageId, () => {
-      setSelectedWord(null);
+      setSelectedWordId(null);
     }),
   );
 
   createEffect(() => {
-    if (selectedWord()) {
+    if (selectedWordId()) {
       setShowWordDetails(true);
     } else {
       setShowWordDetails(false);
@@ -55,15 +55,16 @@ const WordsPage: Component = () => {
         >
           <WordsList
             searchParams={wordsSearchParams}
-            selectedWord={selectedWord()}
-            setSelectedWord={setSelectedWord}
+            selectedWord={selectedWordId()}
+            onSelectWord={setSelectedWordId}
+            onOpenDetails={() => setShowWordDetails(true)}
           />
         </div>
         <Show when={showWordDetails()}>
           <div class="flex-none basis-1/2 min-h-0 overflow-y-scroll">
             <WordDetails
-              selectedWord={selectedWord()}
-              setSelectedWord={setSelectedWord}
+              selectedWordId={selectedWordId()}
+              onWordSelect={setSelectedWordId}
             />
           </div>
         </Show>

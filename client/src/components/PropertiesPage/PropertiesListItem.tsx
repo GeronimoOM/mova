@@ -20,18 +20,18 @@ import {
   updateCacheOnCreateProperty,
   updateCacheOnDeleteProperty,
 } from '../../api/mutations';
-import { PropertyAction } from './propertyActions';
 import { Icon } from '../utils/Icon';
-import PropertyActionBar from './PropertyActionBar';
-import PropertyTypeSelect from './PropertyTypeSelect';
+import PropertyTypeSelect, { PropertyTypeIcon } from './PropertyTypeSelect';
+import ActionBar, { Action } from '../utils/ActionBar';
+import { asClasses, useColorContext } from '../utils/ColorContext';
 
 const MIN_PROPERTY_NAME_LENGTH = 3;
 
 type PropertyListItemProps = {
   property: TextPropertyFieldsFragment | OptionPropertyFieldsFragment | null;
   partOfSpeech: PartOfSpeech;
-  selectedAction: PropertyAction | null;
-  onSelectAction: (action: PropertyAction | null) => void;
+  selectedAction: Action | null;
+  onActionSelect: (action: Action | null) => void;
   isSortable: boolean;
 };
 
@@ -55,23 +55,21 @@ const PropertyListItem: Component<PropertyListItemProps> = (props) => {
   const [updateProperty] = createMutation(UpdatePropertyDocument);
   const [deleteProperty] = createMutation(DeletePropertyDocument);
 
-  const onAction =
-    (selectedAction: PropertyAction | null) =>
-    (newAction: PropertyAction | null) => {
-      if (newAction && newAction === selectedAction) {
-        executeAction(newAction);
-      }
+  const onActionSelect = (newAction: Action | null) => {
+    if (newAction && newAction === props.selectedAction) {
+      executeAction(newAction);
+    }
 
-      props.onSelectAction(newAction);
-    };
+    props.onActionSelect(newAction);
+  };
 
-  const executeAction = (action: PropertyAction) => {
+  const executeAction = (action: Action) => {
     switch (action) {
-      case PropertyAction.Create:
+      case Action.Create:
         return executeCreate();
-      case PropertyAction.Update:
+      case Action.Update:
         return executeUpdate();
-      case PropertyAction.Delete:
+      case Action.Delete:
         return executeDelete();
     }
   };
@@ -82,8 +80,7 @@ const PropertyListItem: Component<PropertyListItemProps> = (props) => {
         input: {
           languageId: selectedLanguageId()!,
           partOfSpeech: props.partOfSpeech,
-          // TODO
-          type: PropertyType.Text,
+          type: propertyType(),
           name: propertyName(),
         },
       },
@@ -117,12 +114,15 @@ const PropertyListItem: Component<PropertyListItemProps> = (props) => {
     }
   });
 
+  const { base: baseColors } = useColorContext()!;
+
   return (
     <div
       ref={sortableRef}
-      class="group w-full max-w-[60rem] min-h-[6rem] flex flex-row text-spacecadet bg-coolgray-300 transition-colors"
+      class={`group w-full max-w-[60rem] min-h-[6rem] p-2 flex flex-row 
+      ${baseColors?.textColor} ${baseColors?.backgroundColor} transition-colors`}
       classList={{
-        'opacity-50': sortable?.isActiveDraggable,
+        'opacity-75': sortable?.isActiveDraggable,
         'transition-transform': !!dragDropState?.active.draggable,
       }}
       style={sortable ? transformStyle(sortable.transform) : undefined}
@@ -137,8 +137,8 @@ const PropertyListItem: Component<PropertyListItemProps> = (props) => {
           propertyName={propertyName()}
           onPropertyName={setPropertyName}
           isDisabled={
-            props.selectedAction !== PropertyAction.Create &&
-            props.selectedAction !== PropertyAction.Update
+            props.selectedAction !== Action.Create &&
+            props.selectedAction !== Action.Update
           }
         />
       </div>
@@ -149,19 +149,17 @@ const PropertyListItem: Component<PropertyListItemProps> = (props) => {
             'opacity-0 group-hover:opacity-100': !props.selectedAction,
           }}
         >
-          <PropertyActionBar
+          <ActionBar
             actions={
-              props.property
-                ? [PropertyAction.Update, PropertyAction.Delete]
-                : [PropertyAction.Create]
+              props.property ? [Action.Update, Action.Delete] : [Action.Create]
             }
             selectedAction={props.selectedAction}
-            onSelectAction={onAction(props.selectedAction)}
+            onActionSelect={onActionSelect}
             isSaveDisabled={!isPropertyNameValid()}
           />
           <Show when={props.isSortable}>
             <div
-              class="hover:bg-coolgray-200 cursor-move"
+              class={`${baseColors?.hoverBackgroundColor} cursor-move`}
               {...sortable?.dragActivators}
             >
               <Icon icon={FaSolidGripLines} />
@@ -174,20 +172,24 @@ const PropertyListItem: Component<PropertyListItemProps> = (props) => {
 };
 
 type PropertyListItemOverlayProps = {
-  property?: TextPropertyFieldsFragment | OptionPropertyFieldsFragment;
+  property: TextPropertyFieldsFragment | OptionPropertyFieldsFragment;
 };
 
 export const PropertyListItemOverlay: Component<
   PropertyListItemOverlayProps
 > = (props) => {
+  const { base: baseColors, selected: selectedColors } = useColorContext()!;
+
   return (
-    <div class="flex flex-row text-spacecadet">
-      <div class="flex-1 p-2 bg-coolgray-300 font-bold">
-        {props.property?.name ?? ''}
-      </div>
-      <div class="bg-coolgray-200 cursor-move">
-        <FaSolidGripLines size="2rem" class="m-2" />
-      </div>
+    <div
+      class={`flex flex-row p-2 ${baseColors?.textColor} ${baseColors?.backgroundColor}`}
+    >
+      <PropertyTypeIcon type={props.property.type} />
+      <div class="flex-1 p-3 font-bold">{props.property.name}</div>
+      <Icon
+        icon={FaSolidGripLines}
+        class={`${selectedColors?.textColor} ${selectedColors?.backgroundColor} cursor-move`}
+      />
     </div>
   );
 };
@@ -199,12 +201,22 @@ type PropertyNameInputProps = {
 };
 
 const PropertyNameInput: Component<PropertyNameInputProps> = (props) => {
+  const { base: baseColors, active: activeColors } = useColorContext()!;
+  const disabledClasses = asClasses(
+    baseColors?.textColor,
+    baseColors?.backgroundColor,
+  );
+  const enabledClasses = asClasses(
+    activeColors?.textColor,
+    activeColors?.backgroundColor,
+  );
+
   return (
     <input
       class="p-3 w-full outline-none"
       classList={{
-        'bg-coolgray-300': props.isDisabled,
-        'bg-coolgray-200': !props.isDisabled,
+        [disabledClasses]: props.isDisabled,
+        [enabledClasses]: !props.isDisabled,
       }}
       value={props.propertyName}
       onInput={(e) => props.onPropertyName(e.currentTarget.value)}

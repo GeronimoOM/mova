@@ -10,6 +10,7 @@ import {
   CreateWordDocument,
   DeleteLanguageDocument,
   DeletePropertyDocument,
+  DeleteWordDocument,
   GetLanguagesDocument,
   LanguagePropertiesFragmentDoc,
   LanguageWordsFragmentDoc,
@@ -116,6 +117,26 @@ export const updateCacheOnCreateWord: MutationUpdaterFunction<
     (wordsPage) => ({
       words: {
         items: [data!.createWord, ...(wordsPage?.words.items ?? [])],
+        hasMore: wordsPage?.words.hasMore ?? false,
+      },
+    }),
+  );
+};
+
+export const updateCacheOnDeleteWord: MutationUpdaterFunction<
+  typeof DeleteWordDocument
+> = (cache, { data }) => {
+  cache.updateFragment(
+    {
+      id: `Language:${data!.deleteWord.languageId}`,
+      fragment: LanguageWordsFragmentDoc,
+      overwrite: true,
+    },
+    (wordsPage) => ({
+      words: {
+        items: (wordsPage?.words.items ?? []).filter(
+          ({ id }) => id !== data!.deleteWord.id,
+        ),
         hasMore: wordsPage?.words.hasMore ?? false,
       },
     }),

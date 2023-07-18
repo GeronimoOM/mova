@@ -10,17 +10,17 @@ export type PropertiesPosSelectProps = {
 
 const PropertiesPosSelect: Component<PropertiesPosSelectProps> = (props) => {
   return (
-    <div class="my-2 flex flex-row justify-center text-spacecadet font-bold cursor-pointer">
+    <div class="my-2 flex flex-row justify-center text-spacecadet-300 font-bold cursor-pointer">
       {Object.entries(partsOfSpeechParams).map(([partOfSpeech, posProps]) => (
         <div
-          class="p-2 items-center flex flex-row hover:bg-spacecadet hover:text-white"
+          class="p-2 items-center flex flex-row hover:bg-spacecadet-300 hover:text-white"
           classList={{
-            'bg-spacecadet text-white': partOfSpeech === props.selectedPos,
+            'bg-spacecadet-300 text-white': partOfSpeech === props.selectedPos,
           }}
           onClick={() => props.setSelectedPos(partOfSpeech as PartOfSpeech)}
         >
           <Icon icon={posProps.icon} size="sm" />
-          <div class="hidden md:block">{posProps.label}</div>
+          <div class="hidden md:block">{posProps.labelShort}</div>
         </div>
       ))}
     </div>

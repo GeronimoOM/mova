@@ -1,5 +1,4 @@
 /** @type {import('tailwindcss').Config} */
-const defaultTheme = require('tailwindcss/defaultTheme');
 
 module.exports = {
   content: [
@@ -8,7 +7,9 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        spacecadet: '#2e294e',
+        'spacecadet-300': '#2e294e',
+        'spacecadet-200': '#453d75',
+        'spacecadet-100': '#5c529c',
         'coolgray-300': '#8789c0',
         'coolgray-200': '#a9abf0',
         'coolgray-100': '#cacdff',

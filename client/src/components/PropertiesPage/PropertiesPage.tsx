@@ -8,8 +8,8 @@ const PropertiesPage: Component = () => {
   const [selectedPos, setSelectedPos] = createSignal(PartOfSpeech.Noun);
 
   return (
-    <div class="flex flex-col h-full items-center justify-items-stretch">
-      <div class="w-full flex flex-col items-center">
+    <div class="h-full flex flex-col items-center justify-items-stretch">
+      <div class="w-full">
         <PropertiesPosSelect
           selectedPos={selectedPos()}
           setSelectedPos={setSelectedPos}

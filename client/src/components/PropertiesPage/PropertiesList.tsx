@@ -25,8 +25,8 @@ import { updateCacheOnReorderProperties } from '../../api/mutations';
 import PropertyListItem, {
   PropertyListItemOverlay,
 } from './PropertiesListItem';
-import PropertyActionBar from './PropertyActionBar';
-import { PropertyAction } from './propertyActions';
+import ActionBar, { Action } from '../utils/ActionBar';
+import { ColorContextType, ColorProvider } from '../utils/ColorContext';
 
 export type PropertiesListProps = {
   partOfSpeech: PartOfSpeech;
@@ -34,12 +34,11 @@ export type PropertiesListProps = {
 
 const PropertiesList: Component<PropertiesListProps> = (props) => {
   const [selectedLanguageId] = useLanguageContext();
-  const [selectedAction, setSelectedAction] =
-    createSignal<PropertyAction | null>(null);
+  const [selectedAction, setSelectedAction] = createSignal<Action | null>(null);
   const [selectedPropertyId, setSelectedPropertyId] = createSignal<
     string | null
   >(null);
-  const isCreateOpen = () => selectedAction() === PropertyAction.Create;
+  const isCreateOpen = () => selectedAction() === Action.Create;
 
   const [fetchProperies, propertiesQuery] = createLazyQuery(
     GetPropertiesDocument,
@@ -69,8 +68,8 @@ const PropertiesList: Component<PropertiesListProps> = (props) => {
     }
   });
 
-  const onAction = (
-    newAction: PropertyAction | null,
+  const onActionSelect = (
+    newAction: Action | null,
     newActionPropertyId: string | null = null,
   ) => {
     if (
@@ -124,54 +123,86 @@ const PropertiesList: Component<PropertiesListProps> = (props) => {
     }
   };
 
+  const colorContext: ColorContextType = {
+    base: {
+      textColor: 'text-spacecadet-300',
+      backgroundColor: 'bg-coolgray-300',
+      hoverBackgroundColor: 'hover:bg-coolgray-200',
+    },
+    active: {
+      textColor: 'text-spacecadet-300',
+      backgroundColor: 'bg-coolgray-200',
+    },
+    selected: {
+      textColor: 'text-coolgray-200',
+      backgroundColor: 'bg-spacecadet-300',
+      hoverTextColor: 'hover:text-spacecadet-300',
+    },
+    disabled: {
+      textColor: 'text-spacecadet-100',
+    },
+  };
+
   return (
-    <div class="w-full p-2 gap-y-2 flex flex-col items-center">
-      <DragDropProvider
-        onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
-        collisionDetector={closestCenter}
-      >
-        <DragDropSensors />
-        <SortableProvider ids={propertyIds()}>
-          <For each={properties()} fallback={'loading...'}>
-            {(property) => (
-              <PropertyListItem
-                property={property}
-                partOfSpeech={props.partOfSpeech}
-                selectedAction={
-                  property.id === selectedPropertyId() ? selectedAction() : null
-                }
-                onSelectAction={(action) => onAction(action, property.id)}
-                isSortable={true}
+    <ColorProvider colorContext={colorContext}>
+      <div class="w-full max-w-[60rem] mx-auto p-2 gap-y-2 flex flex-col items-center">
+        <DragDropProvider
+          onDragStart={onDragStart}
+          onDragEnd={onDragEnd}
+          collisionDetector={closestCenter}
+        >
+          <DragDropSensors />
+          <SortableProvider ids={propertyIds()}>
+            <For each={properties()} fallback={'loading...'}>
+              {(property) => (
+                <PropertyListItem
+                  property={property}
+                  partOfSpeech={props.partOfSpeech}
+                  selectedAction={
+                    property.id === selectedPropertyId()
+                      ? selectedAction()
+                      : null
+                  }
+                  onActionSelect={(action) =>
+                    onActionSelect(action, property.id)
+                  }
+                  isSortable={true}
+                />
+              )}
+            </For>
+          </SortableProvider>
+          <DragOverlay>
+            <Show when={draggedProperty()}>
+              <PropertyListItemOverlay property={draggedProperty()!} />
+            </Show>
+          </DragOverlay>
+        </DragDropProvider>
+        <Show
+          when={isCreateOpen()}
+          fallback={
+            <div
+              class={`sticky bottom-0 w-full p-2 flex flex-row justify-center 
+            outline outline-8 outline-alabaster ${colorContext.base!
+              .backgroundColor!}`}
+            >
+              <ActionBar
+                actions={[Action.Create]}
+                selectedAction={null}
+                onActionSelect={onActionSelect}
               />
-            )}
-          </For>
-        </SortableProvider>
-        <DragOverlay>
-          <PropertyListItemOverlay property={draggedProperty()} />
-        </DragOverlay>
-      </DragDropProvider>
-      <Show
-        when={isCreateOpen()}
-        fallback={
-          <div class="sticky bottom-0 flex flex-row justify-center w-full max-w-[60rem] bg-coolgray-300 outline outline-8 outline-alabaster">
-            <PropertyActionBar
-              actions={[PropertyAction.Create]}
-              selectedAction={null}
-              onSelectAction={onAction}
-            />
-          </div>
-        }
-      >
-        <PropertyListItem
-          property={null}
-          partOfSpeech={props.partOfSpeech}
-          selectedAction={PropertyAction.Create}
-          onSelectAction={onAction}
-          isSortable={false}
-        />
-      </Show>
-    </div>
+            </div>
+          }
+        >
+          <PropertyListItem
+            property={null}
+            partOfSpeech={props.partOfSpeech}
+            selectedAction={Action.Create}
+            onActionSelect={onActionSelect}
+            isSortable={false}
+          />
+        </Show>
+      </div>
+    </ColorProvider>
   );
 };
 

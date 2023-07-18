@@ -1,18 +1,15 @@
-import { Component, createSignal, Show } from 'solid-js';
+import { Component, createEffect, createSignal, Show } from 'solid-js';
 import { LanguageFieldsFragment } from '../../../api/types/graphql';
-import LanguageActionButtons, {
-  LanguageActionButtonsAction,
-} from './LanguageActionButtons';
 import LanguageInput from './LanguageInput';
 import LanguageName from './LanguageName';
-import { LanguageAction } from './Languages';
+import ActionBar, { Action } from '../../utils/ActionBar';
 
 export type LanguageListItemProps = {
   language: LanguageFieldsFragment;
   selectedLanguageId: string | null;
   onLanguageSelect: (languageId: string) => void;
-  action: LanguageAction | null;
-  onActionSelect: (action: LanguageAction | null) => void;
+  selectedAction: Action | null;
+  onActionSelect: (action: Action | null) => void;
   isVertical: boolean;
   languageInput: string;
   onLanguageInput: (languageInput: string) => void;
@@ -21,23 +18,10 @@ export type LanguageListItemProps = {
 
 const LanguageListItem: Component<LanguageListItemProps> = (props) => {
   const [isHovered, setIsHovered] = createSignal(false);
-  const itemActions = (): LanguageActionButtonsAction[] =>
-    !props.action ? selectActions() : confirmActions();
-  const selectActions = (): LanguageActionButtonsAction[] => [
-    { action: LanguageAction.Update },
-    {
-      action: LanguageAction.Delete,
-    },
-  ];
-  const confirmActions = (): LanguageActionButtonsAction[] => [
-    {
-      action: props.action,
-      isConfirm: true,
-      isDisabled:
-        props.action === LanguageAction.Update && !props.isLanguageInputValid,
-    },
-    { action: null },
-  ];
+  const isSelectedSaveAction = () =>
+    props.selectedAction === Action.Create ||
+    props.selectedAction === Action.Update;
+
   return (
     <div
       class="flex flex-row items-stretch"
@@ -46,8 +30,8 @@ const LanguageListItem: Component<LanguageListItemProps> = (props) => {
     >
       <Show
         when={
-          props.action === LanguageAction.Create ||
-          props.action === LanguageAction.Update
+          props.selectedAction === Action.Create ||
+          props.selectedAction === Action.Update
         }
         fallback={
           <LanguageName
@@ -63,10 +47,12 @@ const LanguageListItem: Component<LanguageListItemProps> = (props) => {
         />
       </Show>
 
-      <Show when={props.isVertical && (isHovered() || props.action)}>
-        <LanguageActionButtons
-          actions={itemActions()}
-          onAction={props.onActionSelect}
+      <Show when={props.isVertical && (isHovered() || props.selectedAction)}>
+        <ActionBar
+          actions={[Action.Update, Action.Delete]}
+          selectedAction={props.selectedAction}
+          onActionSelect={props.onActionSelect}
+          isSaveDisabled={isSelectedSaveAction() && !props.isLanguageInputValid}
         />
       </Show>
     </div>

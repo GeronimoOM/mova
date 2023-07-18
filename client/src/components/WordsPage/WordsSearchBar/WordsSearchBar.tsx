@@ -46,13 +46,13 @@ const WordsSearchBar: Component<WordsSearchBarProps> = (props) => {
   const keyEvent = useKeyDownEvent();
 
   // TODO extract keyboard logic
-  createEffect(() => {
-    const event = keyEvent();
-    if (event?.key === KEY_FOCUS_SEARCHBAR) {
-      event.preventDefault();
-      inputElement()!.focus();
-    }
-  });
+  // createEffect(() => {
+  //   const event = keyEvent();
+  //   if (event?.key === KEY_FOCUS_SEARCHBAR) {
+  //     event.preventDefault();
+  //     inputElement()!.focus();
+  //   }
+  // });
 
   const onPartOfSpeechSelect = (pos: PartOfSpeech) => {
     if (props.searchParams.partsOfSpeech.includes(pos)) {
@@ -140,15 +140,15 @@ const WordsSearchBar: Component<WordsSearchBarProps> = (props) => {
   return (
     <div class="relative w-full mx-auto max-w-2xl p-2 flex flex-row font-bold">
       <div class="relative w-full flex flex-row items-center bg-coolgray-300 focus-within:bg-coolgray-200">
-        <Icon icon={FaSolidMagnifyingGlass} class="text-spacecadet" />
+        <Icon icon={FaSolidMagnifyingGlass} class="text-spacecadet-300" />
         <WordSearchBarFilterPills
           dropdownMode={dropdownMode()}
           searchParams={props.searchParams}
           onFilterSelect={onFilterSelect}
         />
         <input
-          class="relative w-full p-3 outline-none bg-inherit text-spacecadet 
-        placeholder:text-spacecadet placeholder:text-opacity-50"
+          class="relative w-full p-3 outline-none bg-inherit text-spacecadet-300 
+        placeholder:text-spacecadet-300 placeholder:text-opacity-50"
           type="text"
           value={props.searchParams.query}
           ref={setInputElement}

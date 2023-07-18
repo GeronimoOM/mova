@@ -1,8 +1,7 @@
-import { Component } from 'solid-js';
+import { Component, JSX, splitProps } from 'solid-js';
 import { PropertyType } from '../../api/types/graphql';
 import { IconTypes } from 'solid-icons';
 import { BiRegularText } from 'solid-icons/bi';
-import { BsUiRadiosGrid } from 'solid-icons/bs';
 import { ImRadioChecked } from 'solid-icons/im';
 import { Icon } from '../utils/Icon';
 
@@ -18,15 +17,25 @@ type PropertyTypeSelectProps = {
 };
 
 const PropertyTypeSelect: Component<PropertyTypeSelectProps> = (props) => {
-  const icon = propertyTypeToIcon[props.selectedType];
   return (
-    <Icon
-      icon={icon}
+    <PropertyTypeIcon
+      type={props.selectedType}
       classList={{
         'cursor-pointer': !props.isDisabled,
       }}
     />
   );
+};
+
+type PropertyTypeIconProps = JSX.HTMLAttributes<HTMLDivElement> & {
+  type: PropertyType;
+};
+
+export const PropertyTypeIcon: Component<PropertyTypeIconProps> = (props) => {
+  const [, otherProps] = splitProps(props, ['type']);
+  const icon = propertyTypeToIcon[props.type];
+
+  return <Icon icon={icon} {...otherProps} />;
 };
 
 export default PropertyTypeSelect;

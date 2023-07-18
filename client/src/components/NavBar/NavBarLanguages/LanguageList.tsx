@@ -1,7 +1,8 @@
 import { Component, For } from 'solid-js';
 import { LanguageFieldsFragment } from '../../../api/types/graphql';
 import LanguageListItem from './LanguageListItem';
-import { LanguageAction } from './Languages';
+import { Action } from '../../utils/ActionBar';
+import { ColorContextType, ColorProvider } from '../../utils/ColorContext';
 
 export type Languages = LanguageFieldsFragment[];
 
@@ -9,10 +10,10 @@ export type LanguageListProps = {
   languages: Languages | undefined;
   selectedLanguageId: string | null;
   onLanguageSelect: (languageId: string) => void;
-  action: LanguageAction | null;
+  selectedAction: Action | null;
   actionLanguageId: string | null;
-  onAction: (
-    action: LanguageAction | null,
+  onActionSelect: (
+    action: Action | null,
     actionLanguageId: string | null,
   ) => void;
   isVertical: boolean;
@@ -23,31 +24,44 @@ export type LanguageListProps = {
 };
 
 const LanguageList: Component<LanguageListProps> = (props) => {
+  const colorContext: ColorContextType = {
+    base: {
+      backgroundColor: 'bg-charcoal-200',
+      hoverBackgroundColor: 'hover:bg-charcoal-100',
+    },
+  };
+
   return (
-    <div
-      class="flex-1 flex flex-row items-stretch scrollbar-hide overflow-x-scroll
-      md:flex-col md:items-stretch md:overflow-x-clip md:min-h-0 md:overflow-y-scroll
-      bg-charcoal-200"
-      ref={props.setLanguagesContainer}
-    >
-      <For each={props.languages} fallback={'Loading languages...'}>
-        {(language) => (
-          <LanguageListItem
-            language={language}
-            selectedLanguageId={props.selectedLanguageId}
-            onLanguageSelect={props.onLanguageSelect}
-            action={
-              language.id === props.actionLanguageId ? props.action : null
-            }
-            onActionSelect={(action) => props.onAction(action, language.id)}
-            isVertical={props.isVertical}
-            languageInput={props.languageInput}
-            onLanguageInput={props.onLanguageInput}
-            isLanguageInputValid={props.isLanguageInputValid}
-          />
-        )}
-      </For>
-    </div>
+    <ColorProvider colorContext={colorContext}>
+      <div
+        class="flex-1 flex flex-row items-stretch scrollbar-hide overflow-x-scroll
+        md:flex-col md:items-stretch md:overflow-x-clip md:min-h-0 md:overflow-y-scroll
+        bg-charcoal-200"
+        ref={props.setLanguagesContainer}
+      >
+        <For each={props.languages} fallback={'Loading languages...'}>
+          {(language) => (
+            <LanguageListItem
+              language={language}
+              selectedLanguageId={props.selectedLanguageId}
+              onLanguageSelect={props.onLanguageSelect}
+              selectedAction={
+                language.id === props.actionLanguageId
+                  ? props.selectedAction
+                  : null
+              }
+              onActionSelect={(action) =>
+                props.onActionSelect(action, language.id)
+              }
+              isVertical={props.isVertical}
+              languageInput={props.languageInput}
+              onLanguageInput={props.onLanguageInput}
+              isLanguageInputValid={props.isLanguageInputValid}
+            />
+          )}
+        </For>
+      </div>
+    </ColorProvider>
   );
 };
 

@@ -7,6 +7,7 @@ import { PartOfSpeech, GetTopicsDocument } from '../../../api/types/graphql';
 import { partsOfSpeech, partsOfSpeechParams } from '../../utils/partsOfSpeech';
 import { DropdownMode } from './WordsSearchBar';
 import { WordsSearchParams } from './wordsSearchParams';
+import { Icon } from '../../utils/Icon';
 
 type WordSearchBarDropdownProps = {
   searchParams: WordsSearchParams;
@@ -23,7 +24,7 @@ const WordSearchBarDropdown: Component<WordSearchBarDropdownProps> = (
   const [fetchTopics, topicsQuery] = createLazyQuery(GetTopicsDocument);
 
   return (
-    <div class="absolute flex flex-col top-full w-full bg-coolgray-200 text-spacecadet border-t-2 border-charcoal-300">
+    <div class="absolute flex flex-col top-full w-full bg-coolgray-200 text-spacecadet-300 border-t-2 border-charcoal-300">
       <Switch>
         <Match when={props.mode === DropdownMode.Filters}>
           <WordSearchBarDropdownFilterItems
@@ -77,9 +78,7 @@ const WordSearchBarDropdownFilterItem: Component<
 > = (props) => {
   return (
     <div class="flex flex-row items-center" onClick={props.onClick}>
-      <div class="text-spacecadet">
-        <props.icon size="1.5rem" class="m-3" />
-      </div>
+      <Icon icon={props.icon} size="sm" />
       <div>{props.label}</div>
     </div>
   );
@@ -119,14 +118,12 @@ const WordSearchBarDropdownPosItem: Component<
 
   return (
     <div
-      class="flex flex-row items-center"
+      class="flex flex-row items-center p-2"
       classList={{ 'bg-coolgray-100': props.isSelected }}
       onClick={props.onClick}
     >
-      <div class="text-spacecadet">
-        <partOfSpeechParams.icon size="1.5rem" class="m-3" />
-      </div>
-      <div>{partOfSpeechParams.label}</div>
+      <Icon icon={partOfSpeechParams.icon} size="sm" />
+      <div class="p-1">{partOfSpeechParams.label}</div>
     </div>
   );
 };
@@ -171,7 +168,7 @@ const WordSearchBarDropdownPosItem: Component<
  
   return (
     <div class="flex flex-row items-center" onClick={props.onClick}>
-      <div class="text-spacecadet">
+      <div class="text-spacecadet-300">
         <partOfSpeechParams.icon size="1.5rem" class="m-3" />
       </div>
       <div>{partOfSpeechParams.label}</div>
