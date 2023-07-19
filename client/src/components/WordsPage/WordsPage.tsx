@@ -1,26 +1,32 @@
 import { Component, Show, createEffect, createSignal, on } from 'solid-js';
-import WordsSearchBar from './WordsSearchBar/WordsSearchBar';
-import WordsList from './WordsList';
+import { WordsList } from './WordsList';
 import { createStore } from 'solid-js/store';
 import {
   WordsSearchParams,
   defaultWordsSearchParams,
 } from './WordsSearchBar/wordsSearchParams';
-import WordDetails from './WordDetails';
+import { WordDetails } from './WordDetails';
 import { useLanguageContext } from '../LanguageContext';
+import { WordsPageHeader } from './WordsPageHeader';
 
-const WordsPage: Component = () => {
+export const WordsPage: Component = () => {
   const [selectedLanguageId] = useLanguageContext();
 
   const [wordsSearchParams, setSearchQuery] = createStore<WordsSearchParams>(
     defaultWordsSearchParams(),
   );
   const [selectedWordId, setSelectedWordId] = createSignal<string | null>(null);
-  const [showWordDetails, setShowWordDetails] = createSignal(false);
+  const [isWordDetailsOpen, setIsWordDetailsOpen] = createSignal(false);
+  const isOpenCreateWord = () => isWordDetailsOpen() && !selectedWordId();
 
-  const onOpenCreateWord = () => {
+  const onOpenCreateWord = (isOpen: boolean) => {
     setSelectedWordId(null);
-    setShowWordDetails(true);
+    setIsWordDetailsOpen(isOpen);
+  };
+
+  const onWordSelect = (selectedWordId: string | null) => {
+    setSelectedWordId(selectedWordId);
+    setIsWordDetailsOpen(!!selectedWordId);
   };
 
   createEffect(
@@ -29,42 +35,36 @@ const WordsPage: Component = () => {
     }),
   );
 
-  createEffect(() => {
-    if (selectedWordId()) {
-      setShowWordDetails(true);
-    } else {
-      setShowWordDetails(false);
-    }
-  });
-
   return (
     <div class="flex flex-col w-full h-full items-stretch">
       <div class="flex-none">
-        <WordsSearchBar
+        <WordsPageHeader
           searchParams={wordsSearchParams}
           onSearchParamsChange={setSearchQuery}
+          onOpenCreateWord={() => onOpenCreateWord(true)}
+          isOpenCreateWord={isOpenCreateWord()}
         />
       </div>
       <div class="flex-1 min-h-0 flex flex-col xl:flex-row">
         <div
           class="flex-none w-full min-h-0 overflow-y-scroll"
           classList={{
-            'basis-full': !showWordDetails(),
-            'basis-1/2': showWordDetails(),
+            'basis-full': !isWordDetailsOpen(),
+            'basis-1/2': isWordDetailsOpen(),
           }}
         >
           <WordsList
             searchParams={wordsSearchParams}
             selectedWord={selectedWordId()}
-            onSelectWord={setSelectedWordId}
-            onOpenDetails={() => setShowWordDetails(true)}
+            onSelectWord={onWordSelect}
+            onOpenDetails={() => setIsWordDetailsOpen(true)}
           />
         </div>
-        <Show when={showWordDetails()}>
+        <Show when={isWordDetailsOpen()}>
           <div class="flex-none basis-1/2 min-h-0 overflow-y-scroll">
             <WordDetails
               selectedWordId={selectedWordId()}
-              onWordSelect={setSelectedWordId}
+              onWordSelect={onWordSelect}
             />
           </div>
         </Show>
@@ -72,5 +72,3 @@ const WordsPage: Component = () => {
     </div>
   );
 };
-
-export default WordsPage;

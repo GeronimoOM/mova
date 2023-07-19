@@ -1,6 +1,6 @@
 import { Component, For } from 'solid-js';
 import { LanguageFieldsFragment } from '../../../api/types/graphql';
-import LanguageListItem from './LanguageListItem';
+import { LanguageListItem } from './LanguageListItem';
 import { Action } from '../../utils/ActionBar';
 import { ColorContextType, ColorProvider } from '../../utils/ColorContext';
 
@@ -23,7 +23,7 @@ export type LanguageListProps = {
   setLanguagesContainer: (elem: HTMLDivElement) => void;
 };
 
-const LanguageList: Component<LanguageListProps> = (props) => {
+export const LanguageList: Component<LanguageListProps> = (props) => {
   const colorContext: ColorContextType = {
     base: {
       backgroundColor: 'bg-charcoal-200',
@@ -64,5 +64,3 @@ const LanguageList: Component<LanguageListProps> = (props) => {
     </ColorProvider>
   );
 };
-
-export default LanguageList;

@@ -1,10 +1,9 @@
-import { Component, createSignal, on } from 'solid-js';
-import { useLanguageContext } from '../LanguageContext';
-import PropertiesList from './PropertiesList';
+import { Component, createSignal } from 'solid-js';
+import { PropertiesList } from './PropertiesList';
 import { PartOfSpeech } from '../../api/types/graphql';
-import PropertiesPosSelect from './PropertiesPosSelect';
+import { PropertiesPosSelect } from './PropertiesPosSelect';
 
-const PropertiesPage: Component = () => {
+export const PropertiesPage: Component = () => {
   const [selectedPos, setSelectedPos] = createSignal(PartOfSpeech.Noun);
 
   return (
@@ -21,5 +20,3 @@ const PropertiesPage: Component = () => {
     </div>
   );
 };
-
-export default PropertiesPage;

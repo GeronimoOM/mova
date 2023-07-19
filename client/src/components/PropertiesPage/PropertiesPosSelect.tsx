@@ -1,6 +1,6 @@
 import { Component } from 'solid-js';
 import { PartOfSpeech } from '../../api/types/graphql';
-import { partsOfSpeechParams } from '../utils/partsOfSpeech';
+import { partsOfSpeechProps } from '../utils/partsOfSpeech';
 import { Icon } from '../utils/Icon';
 
 export type PropertiesPosSelectProps = {
@@ -8,10 +8,12 @@ export type PropertiesPosSelectProps = {
   setSelectedPos: (selectedProperty: PartOfSpeech) => void;
 };
 
-const PropertiesPosSelect: Component<PropertiesPosSelectProps> = (props) => {
+export const PropertiesPosSelect: Component<PropertiesPosSelectProps> = (
+  props,
+) => {
   return (
     <div class="my-2 flex flex-row justify-center text-spacecadet-300 font-bold cursor-pointer">
-      {Object.entries(partsOfSpeechParams).map(([partOfSpeech, posProps]) => (
+      {Object.entries(partsOfSpeechProps).map(([partOfSpeech, posProps]) => (
         <div
           class="p-2 items-center flex flex-row hover:bg-spacecadet-300 hover:text-white"
           classList={{
@@ -26,5 +28,3 @@ const PropertiesPosSelect: Component<PropertiesPosSelectProps> = (props) => {
     </div>
   );
 };
-
-export default PropertiesPosSelect;

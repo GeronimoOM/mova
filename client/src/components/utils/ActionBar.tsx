@@ -32,7 +32,7 @@ export type ActionBarProps = {
   isSaveDisabled?: boolean;
 };
 
-const ActionBar: Component<ActionBarProps> = (props) => {
+export const ActionBar: Component<ActionBarProps> = (props) => {
   const isSaveAction = (action: Action | null) =>
     action === Action.Create || action === Action.Update;
 
@@ -68,7 +68,7 @@ type ActionButtonProps = {
   isDisabled?: boolean;
 };
 
-const ActionButton: Component<ActionButtonProps> = (props) => {
+export const ActionButton: Component<ActionButtonProps> = (props) => {
   const icon = props.action ? actionToIcon[props.action] : cancelActionIcon;
   const {
     base: baseColors,
@@ -90,7 +90,12 @@ const ActionButton: Component<ActionButtonProps> = (props) => {
         selectedColors?.hoverTextColor,
       )
     : '';
-  const disabledClasses = asClasses(disabledColors?.textColor);
+  const disabledClasses = asClasses(
+    disabledColors?.textColor,
+    disabledColors?.backgroundColor,
+  );
+
+  const onClick = () => !props.isDisabled && runWithOwner(owner, () => props.onActionSelect(props.action))
 
   const owner = getOwner();
 
@@ -105,13 +110,7 @@ const ActionButton: Component<ActionButtonProps> = (props) => {
         [confirmClasses]: props.isConfirm && !props.isDisabled,
         [disabledClasses]: props.isDisabled,
       }}
-      onClick={
-        !props.isDisabled
-          ? () => runWithOwner(owner, () => props.onActionSelect(props.action))
-          : undefined
-      }
+      onClick={onClick}
     />
   );
 };
-
-export default ActionBar;

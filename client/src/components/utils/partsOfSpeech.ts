@@ -10,7 +10,7 @@ type PartOfSpeechProps = {
   icon: IconTypes;
 };
 
-export const partsOfSpeechParams: Record<PartOfSpeech, PartOfSpeechProps> = {
+export const partsOfSpeechProps: Record<PartOfSpeech, PartOfSpeechProps> = {
   [PartOfSpeech.Noun]: {
     labelShort: 'Noun',
     label: 'Noun',
@@ -37,12 +37,12 @@ export const partsOfSpeechParams: Record<PartOfSpeech, PartOfSpeechProps> = {
     icon: BsDiamondFill,
   },
   [PartOfSpeech.Misc]: {
-    labelShort: 'Misc',
-    label: 'Miscellaneous',
+    labelShort: 'Other',
+    label: 'Other',
     icon: FaSolidStar,
   },
 };
 
 export const partsOfSpeech: PartOfSpeech[] = Object.keys(
-  partsOfSpeechParams,
+  partsOfSpeechProps,
 ).map((pos) => pos as PartOfSpeech);

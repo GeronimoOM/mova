@@ -9,12 +9,12 @@ import { useLocation, useNavigate } from '@solidjs/router';
 import { BsTranslate } from 'solid-icons/bs';
 import { FaSolidGear } from 'solid-icons/fa';
 import { AppRoute, getAppRouteMatch } from '../../routes';
-import Languages from './NavBarLanguages/Languages';
-import NavBarItem from './NavBarItem';
+import { Languages } from './NavBarLanguages/Languages';
+import { NavBarItem } from './NavBarItem';
 import { createMediaQuery } from '@solid-primitives/media';
 import { ColorContextType, ColorProvider } from '../utils/ColorContext';
 
-const NavBar: Component = () => {
+export const NavBar: Component = () => {
   const appRoute = createMemo(() => getAppRouteMatch(useLocation().pathname));
   const navigate = useNavigate();
   const isVertical = createMediaQuery('(min-width: 768px)');
@@ -69,5 +69,3 @@ const NavBar: Component = () => {
     </ColorProvider>
   );
 };
-
-export default NavBar;

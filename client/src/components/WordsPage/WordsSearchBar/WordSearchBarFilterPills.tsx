@@ -1,9 +1,8 @@
 import { IconTypes } from 'solid-icons';
 import { IoShapes } from 'solid-icons/io';
 import { Component, Show } from 'solid-js';
-import { Dynamic } from 'solid-js/web';
 import { PartOfSpeech } from '../../../api/types/graphql';
-import { partsOfSpeechParams } from '../../utils/partsOfSpeech';
+import { partsOfSpeechProps } from '../../utils/partsOfSpeech';
 import { DropdownMode } from './WordsSearchBar';
 import { WordsSearchParams } from './wordsSearchParams';
 import { Icon } from '../../utils/Icon';
@@ -16,9 +15,9 @@ type WordSearchBarFilterPillsProps = {
   ) => void;
 };
 
-const WordSearchBarFilterPills: Component<WordSearchBarFilterPillsProps> = (
-  props,
-) => {
+export const WordSearchBarFilterPills: Component<
+  WordSearchBarFilterPillsProps
+> = (props) => {
   const hasFilters = () =>
     Boolean(
       props.searchParams.partsOfSpeech?.length ||
@@ -46,21 +45,21 @@ type WordSearchBarPosFilterPillProps = {
   onClick: () => void;
 };
 
-const WordSearchBarPosFilterPill: Component<WordSearchBarPosFilterPillProps> = (
-  props,
-) => {
+export const WordSearchBarPosFilterPill: Component<
+  WordSearchBarPosFilterPillProps
+> = (props) => {
   const icons = (): IconTypes[] => {
     if (props.partsOfSpeech.length === 1) {
-      return [partsOfSpeechParams[props.partsOfSpeech[0]].icon];
+      return [partsOfSpeechProps[props.partsOfSpeech[0]].icon];
     } else if (props.partsOfSpeech.length < 4) {
-      return props.partsOfSpeech.map((pos) => partsOfSpeechParams[pos].icon);
+      return props.partsOfSpeech.map((pos) => partsOfSpeechProps[pos].icon);
     } else {
       return [IoShapes];
     }
   };
   const label = (): string | null => {
     if (props.partsOfSpeech.length === 1) {
-      return partsOfSpeechParams[props.partsOfSpeech[0]].labelShort;
+      return partsOfSpeechProps[props.partsOfSpeech[0]].labelShort;
     } else if (props.partsOfSpeech.length < 4) {
       return null;
     } else {
@@ -85,5 +84,3 @@ const WordSearchBarPosFilterPill: Component<WordSearchBarPosFilterPillProps> = (
     </div>
   );
 };
-
-export default WordSearchBarFilterPills;

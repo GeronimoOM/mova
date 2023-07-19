@@ -8,7 +8,7 @@ export type LanguageNameProps = {
   onLanguageSelect: (languageId: string) => void;
 };
 
-const LanguageName: Component<LanguageNameProps> = (props) => {
+export const LanguageName: Component<LanguageNameProps> = (props) => {
   const isSelected = () => props.selectedLanguageId === props.language!.id;
 
   const { base: baseColors } = useColorContext()!;
@@ -30,5 +30,3 @@ const LanguageName: Component<LanguageNameProps> = (props) => {
     </div>
   );
 };
-
-export default LanguageName;

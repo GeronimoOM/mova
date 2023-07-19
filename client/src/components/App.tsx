@@ -1,12 +1,12 @@
 import { Component } from 'solid-js';
 import { Route, Routes } from '@solidjs/router';
-import NavBar from './NavBar/NavBar';
-import WordsPage from './WordsPage/WordsPage';
-import PropertiesPage from './PropertiesPage/PropertiesPage';
+import { NavBar } from './NavBar/NavBar';
+import { WordsPage } from './WordsPage/WordsPage';
+import { PropertiesPage } from './PropertiesPage/PropertiesPage';
 import { AppRoute } from '../routes';
 import { LanguageProvider } from './LanguageContext';
 
-const App: Component = () => {
+export const App: Component = () => {
   return (
     <LanguageProvider>
       <div class="flex flex-row w-full h-full justify-center">
@@ -21,5 +21,3 @@ const App: Component = () => {
     </LanguageProvider>
   );
 };
-
-export default App;

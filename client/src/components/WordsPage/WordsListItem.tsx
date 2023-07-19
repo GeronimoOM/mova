@@ -1,7 +1,7 @@
 import { Component } from 'solid-js';
 import { WordFieldsFragment } from '../../api/types/graphql';
 import { Icon } from '../utils/Icon';
-import { partsOfSpeechParams } from '../utils/partsOfSpeech';
+import { partsOfSpeechProps } from '../utils/partsOfSpeech';
 
 export type WordsListItemProps = {
   word: WordFieldsFragment;
@@ -9,7 +9,7 @@ export type WordsListItemProps = {
   setSelectedWord: (selectedWord: string | null) => void;
 };
 
-const WordsListItem: Component<WordsListItemProps> = (props) => {
+export const WordsListItem: Component<WordsListItemProps> = (props) => {
   const isSelected = () => props.selectedWord === props.word.id;
 
   return (
@@ -23,7 +23,7 @@ const WordsListItem: Component<WordsListItemProps> = (props) => {
     >
       <div class="flex-none p-1.5">
         <Icon
-          icon={partsOfSpeechParams[props.word.partOfSpeech].icon}
+          icon={partsOfSpeechProps[props.word.partOfSpeech].icon}
           size="sm"
         />
       </div>
@@ -32,5 +32,3 @@ const WordsListItem: Component<WordsListItemProps> = (props) => {
     </div>
   );
 };
-
-export default WordsListItem;

@@ -1,4 +1,4 @@
-import { Component, For, Show, createEffect, createSignal } from 'solid-js';
+import { Component, For, createEffect, createSignal } from 'solid-js';
 import { createLazyQuery, createMutation } from '@merged/solid-apollo';
 import {
   CreateWordDocument,
@@ -15,7 +15,7 @@ import {
   WordFieldsFullFragment,
 } from '../../api/types/graphql';
 import { PropertyType } from '../../api/types/graphql';
-import { createStore, produce, reconcile } from 'solid-js/store';
+import { createStore, reconcile } from 'solid-js/store';
 import { useLanguageContext } from '../LanguageContext';
 import {
   updateCacheOnCreateWord,
@@ -23,15 +23,16 @@ import {
 } from '../../api/mutations';
 import { BsTranslate } from 'solid-icons/bs';
 import { Icon } from '../utils/Icon';
-import { partsOfSpeechParams } from '../utils/partsOfSpeech';
+import { partsOfSpeechProps } from '../utils/partsOfSpeech';
 import {
   ColorContextType,
   ColorProvider,
   asClasses,
   useColorContext,
 } from '../utils/ColorContext';
-import ActionBar, { Action } from '../utils/ActionBar';
+import { ActionBar, Action } from '../utils/ActionBar';
 import { IoShapes } from 'solid-icons/io';
+import { WordDetailsPosSelect } from './WordDetailsPosSelect';
 
 const MIN_WORD_ORIGINAL_LENGTH = 1;
 const MIN_WORD_TRANSLATION_LENGTH = 1;
@@ -51,7 +52,7 @@ type OptionWordProperty = Partial<OptionPropertyValueFieldsFragment> & {
   property: OptionPropertyFieldsFragment;
 };
 
-const WordDetails: Component<WordDetailsProps> = (props) => {
+export const WordDetails: Component<WordDetailsProps> = (props) => {
   const [selectedLanguageId] = useLanguageContext();
 
   const [selectedAction, setSelectedAction] = createSignal<Action | null>(null);
@@ -100,6 +101,14 @@ const WordDetails: Component<WordDetailsProps> = (props) => {
   });
 
   createEffect(() => {
+    if (isCreateMode()) {
+      setSelectedAction(Action.Create);
+    } else {
+      setSelectedAction(null);
+    }
+  });
+
+  createEffect(() => {
     if (selectedWord()) {
       const { partOfSpeech } = selectedWord()!;
       initWord();
@@ -125,7 +134,7 @@ const WordDetails: Component<WordDetailsProps> = (props) => {
   });
 
   createEffect(() => {
-    if (selectedWord() && properties()) {
+    if ((isCreateMode() || selectedWord()) && properties()) {
       initWordProperties();
     }
   });
@@ -185,11 +194,15 @@ const WordDetails: Component<WordDetailsProps> = (props) => {
         props.onWordSelect(null);
       }
     } else {
-      setSelectedAction(newAction);
       if (!newAction) {
-        initWord();
-        initWordProperties();
+        if (selectedAction() === Action.Create) {
+          props.onWordSelect(null);
+        } else {
+          initWord();
+          initWordProperties();
+        }
       }
+      setSelectedAction(newAction);
     }
   };
 
@@ -276,21 +289,11 @@ const WordDetails: Component<WordDetailsProps> = (props) => {
         ${colorContext.base!.textColor} ${colorContext.base!.backgroundColor}`}
         >
           <div class="flex flex-row items-center justify-between">
-            <div class="flex flex-row items-center">
-              <Icon
-                icon={
-                  word.partOfSpeech
-                    ? partsOfSpeechParams[word.partOfSpeech].icon
-                    : IoShapes
-                }
-                size="sm"
-              />
-              <p>
-                {word.partOfSpeech
-                  ? partsOfSpeechParams[word.partOfSpeech].labelShort
-                  : ''}
-              </p>
-            </div>
+            <WordDetailsPosSelect
+              selectedPartOfSpeech={word.partOfSpeech ?? null}
+              onPartOfSpeechSelect={(partOfSpeech) => setWord({ partOfSpeech })}
+              isDisabled={!isCreateMode()}
+            />
             <ActionBar
               actions={
                 isCreateMode()
@@ -396,5 +399,3 @@ const WordDetailsTextInput: Component<WordDetailsTextInputProps> = (props) => {
     />
   );
 };
-
-export default WordDetails;

@@ -23,10 +23,10 @@ import {
   updateCacheOnCreateLanguage,
   updateCacheOnDeleteLanguage,
 } from '../../../api/mutations';
-import LanguageList from './LanguageList';
-import LanguageInput from './LanguageInput';
+import { LanguageList } from './LanguageList';
+import { LanguageInput } from './LanguageInput';
 import { Icon, ToggleIcon } from '../../utils/Icon';
-import ActionBar, { Action } from '../../utils/ActionBar';
+import { ActionBar, Action } from '../../utils/ActionBar';
 
 const MIN_LANGUAGE_NAME_LENGTH = 3;
 
@@ -36,7 +36,7 @@ export type NavBarLanguagesProps = {
   isVertical: boolean;
 };
 
-const Languages: Component<NavBarLanguagesProps> = (props) => {
+export const Languages: Component<NavBarLanguagesProps> = (props) => {
   const [selectedLanguageId, setSelectedLanguageId] = useLanguageContext();
 
   const [action, setAction] = createSignal<Action | null>(null);
@@ -278,5 +278,3 @@ const Languages: Component<NavBarLanguagesProps> = (props) => {
     </div>
   );
 };
-
-export default Languages;

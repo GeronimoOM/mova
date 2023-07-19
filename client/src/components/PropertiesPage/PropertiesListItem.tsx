@@ -21,8 +21,8 @@ import {
   updateCacheOnDeleteProperty,
 } from '../../api/mutations';
 import { Icon } from '../utils/Icon';
-import PropertyTypeSelect, { PropertyTypeIcon } from './PropertyTypeSelect';
-import ActionBar, { Action } from '../utils/ActionBar';
+import { PropertyTypeSelect, PropertyTypeIcon } from './PropertyTypeSelect';
+import { ActionBar, Action } from '../utils/ActionBar';
 import { asClasses, useColorContext } from '../utils/ColorContext';
 
 const MIN_PROPERTY_NAME_LENGTH = 3;
@@ -35,7 +35,7 @@ type PropertyListItemProps = {
   isSortable: boolean;
 };
 
-const PropertyListItem: Component<PropertyListItemProps> = (props) => {
+export const PropertyListItem: Component<PropertyListItemProps> = (props) => {
   const [selectedLanguageId] = useLanguageContext();
 
   const [propertyName, setPropertyName] = createSignal(
@@ -225,5 +225,3 @@ const PropertyNameInput: Component<PropertyNameInputProps> = (props) => {
     />
   );
 };
-
-export default PropertyListItem;

@@ -10,7 +10,7 @@ type NavBarItemProps = {
   text: string;
 };
 
-const NavBarItem: Component<NavBarItemProps> = (props) => {
+export const NavBarItem: Component<NavBarItemProps> = (props) => {
   const match = useMatch(() => props.href);
 
   const { base: baseColors, selected: selectedColors } = useColorContext()!;
@@ -40,5 +40,3 @@ const NavBarItem: Component<NavBarItemProps> = (props) => {
     </A>
   );
 };
-
-export default NavBarItem;

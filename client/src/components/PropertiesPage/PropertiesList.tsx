@@ -22,17 +22,18 @@ import {
   ReorderPropertiesDocument,
 } from '../../api/types/graphql';
 import { updateCacheOnReorderProperties } from '../../api/mutations';
-import PropertyListItem, {
+import {
+  PropertyListItem,
   PropertyListItemOverlay,
 } from './PropertiesListItem';
-import ActionBar, { Action } from '../utils/ActionBar';
+import { ActionBar, Action } from '../utils/ActionBar';
 import { ColorContextType, ColorProvider } from '../utils/ColorContext';
 
 export type PropertiesListProps = {
   partOfSpeech: PartOfSpeech;
 };
 
-const PropertiesList: Component<PropertiesListProps> = (props) => {
+export const PropertiesList: Component<PropertiesListProps> = (props) => {
   const [selectedLanguageId] = useLanguageContext();
   const [selectedAction, setSelectedAction] = createSignal<Action | null>(null);
   const [selectedPropertyId, setSelectedPropertyId] = createSignal<
@@ -205,5 +206,3 @@ const PropertiesList: Component<PropertiesListProps> = (props) => {
     </ColorProvider>
   );
 };
-
-export default PropertiesList;

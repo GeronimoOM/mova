@@ -1,8 +1,8 @@
-import { Component, createEffect, createSignal, Show } from 'solid-js';
+import { Component, createSignal, Show } from 'solid-js';
 import { LanguageFieldsFragment } from '../../../api/types/graphql';
-import LanguageInput from './LanguageInput';
-import LanguageName from './LanguageName';
-import ActionBar, { Action } from '../../utils/ActionBar';
+import { LanguageInput } from './LanguageInput';
+import { LanguageName } from './LanguageName';
+import { ActionBar, Action } from '../../utils/ActionBar';
 
 export type LanguageListItemProps = {
   language: LanguageFieldsFragment;
@@ -16,7 +16,7 @@ export type LanguageListItemProps = {
   isLanguageInputValid: boolean;
 };
 
-const LanguageListItem: Component<LanguageListItemProps> = (props) => {
+export const LanguageListItem: Component<LanguageListItemProps> = (props) => {
   const [isHovered, setIsHovered] = createSignal(false);
   const isSelectedSaveAction = () =>
     props.selectedAction === Action.Create ||
@@ -58,5 +58,3 @@ const LanguageListItem: Component<LanguageListItemProps> = (props) => {
     </div>
   );
 };
-
-export default LanguageListItem;

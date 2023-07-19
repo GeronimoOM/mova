@@ -2,10 +2,11 @@ import { Component, createEffect, createSignal, Show } from 'solid-js';
 import { FaSolidMagnifyingGlass } from 'solid-icons/fa';
 import { useKeyDownEvent } from '@solid-primitives/keyboard';
 import { WordsSearchParams } from './wordsSearchParams';
-import WordSearchBarFilterPills from './WordSearchBarFilterPills';
-import WordSearchBarDropdown from './WordSearchBarDropdown';
+import { WordSearchBarFilterPills } from './WordSearchBarFilterPills';
+import { WordSearchBarDropdown } from './WordSearchBarDropdown';
 import { PartOfSpeech } from '../../../api/types/graphql';
 import { Icon } from '../../utils/Icon';
+import { useColorContext } from '../../utils/ColorContext';
 
 export enum DropdownMode {
   Filters = 'filters',
@@ -35,7 +36,7 @@ export type WordsSearchBarProps = {
   onSearchParamsChange: (searchParams: Partial<WordsSearchParams>) => void;
 };
 
-const WordsSearchBar: Component<WordsSearchBarProps> = (props) => {
+export const WordsSearchBar: Component<WordsSearchBarProps> = (props) => {
   const [dropdownMode, setDropdownMode] = createSignal<DropdownMode | null>(
     null,
   );
@@ -43,7 +44,7 @@ const WordsSearchBar: Component<WordsSearchBarProps> = (props) => {
     HTMLInputElement | undefined
   >();
 
-  const keyEvent = useKeyDownEvent();
+  // const keyEvent = useKeyDownEvent();
 
   // TODO extract keyboard logic
   // createEffect(() => {
@@ -137,18 +138,21 @@ const WordsSearchBar: Component<WordsSearchBarProps> = (props) => {
     }
   };
 
+  const { base: baseColors } = useColorContext()!;
+
   return (
-    <div class="relative w-full mx-auto max-w-2xl p-2 flex flex-row font-bold">
-      <div class="relative w-full flex flex-row items-center bg-coolgray-300 focus-within:bg-coolgray-200">
-        <Icon icon={FaSolidMagnifyingGlass} class="text-spacecadet-300" />
+    <div class="w-full max-w-2xl p-2 flex flex-row font-bold">
+      <div
+        class={`relative w-full flex flex-row items-center ${baseColors?.textColor} ${baseColors?.backgroundColor}`}
+      >
+        <Icon icon={FaSolidMagnifyingGlass} />
         <WordSearchBarFilterPills
           dropdownMode={dropdownMode()}
           searchParams={props.searchParams}
           onFilterSelect={onFilterSelect}
         />
         <input
-          class="relative w-full p-3 outline-none bg-inherit text-spacecadet-300 
-        placeholder:text-spacecadet-300 placeholder:text-opacity-50"
+          class="relative w-full p-3 outline-none bg-inherit placeholder:text-opacity-50"
           type="text"
           value={props.searchParams.query}
           ref={setInputElement}
@@ -175,5 +179,3 @@ const WordsSearchBar: Component<WordsSearchBarProps> = (props) => {
     </div>
   );
 };
-
-export default WordsSearchBar;

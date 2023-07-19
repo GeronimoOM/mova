@@ -6,7 +6,7 @@ export type LanguageInputProps = {
   isDisabled?: boolean;
 };
 
-const LanguageInput: Component<LanguageInputProps> = (props) => (
+export const LanguageInput: Component<LanguageInputProps> = (props) => (
   <input
     type="text"
     class="p-3 w-full outline-none bg-charcoal-100"
@@ -17,5 +17,3 @@ const LanguageInput: Component<LanguageInputProps> = (props) => (
     onKeyDown={(e) => e.stopPropagation()}
   />
 );
-
-export default LanguageInput;

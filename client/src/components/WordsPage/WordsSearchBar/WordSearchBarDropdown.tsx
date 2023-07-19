@@ -4,7 +4,7 @@ import { BsTagFill } from 'solid-icons/bs';
 import { IoShapes } from 'solid-icons/io';
 import { Component, Switch, Match, For } from 'solid-js';
 import { PartOfSpeech, GetTopicsDocument } from '../../../api/types/graphql';
-import { partsOfSpeech, partsOfSpeechParams } from '../../utils/partsOfSpeech';
+import { partsOfSpeech, partsOfSpeechProps } from '../../utils/partsOfSpeech';
 import { DropdownMode } from './WordsSearchBar';
 import { WordsSearchParams } from './wordsSearchParams';
 import { Icon } from '../../utils/Icon';
@@ -18,7 +18,7 @@ type WordSearchBarDropdownProps = {
   onPartOfSpeechSelect: (partOfSpeech: PartOfSpeech) => void;
 };
 
-const WordSearchBarDropdown: Component<WordSearchBarDropdownProps> = (
+export const WordSearchBarDropdown: Component<WordSearchBarDropdownProps> = (
   props,
 ) => {
   const [fetchTopics, topicsQuery] = createLazyQuery(GetTopicsDocument);
@@ -114,7 +114,7 @@ type WordSearchBarDropdownPosItemProps = {
 const WordSearchBarDropdownPosItem: Component<
   WordSearchBarDropdownPosItemProps
 > = (props) => {
-  const partOfSpeechParams = partsOfSpeechParams[props.partOfSpeech];
+  const partOfSpeechParams = partsOfSpeechProps[props.partOfSpeech];
 
   return (
     <div
@@ -176,5 +176,3 @@ const WordSearchBarDropdownPosItem: Component<
   );
 };
 */
-
-export default WordSearchBarDropdown;

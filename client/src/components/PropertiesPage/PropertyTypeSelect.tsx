@@ -16,7 +16,9 @@ type PropertyTypeSelectProps = {
   isDisabled?: boolean;
 };
 
-const PropertyTypeSelect: Component<PropertyTypeSelectProps> = (props) => {
+export const PropertyTypeSelect: Component<PropertyTypeSelectProps> = (
+  props,
+) => {
   return (
     <PropertyTypeIcon
       type={props.selectedType}
@@ -37,5 +39,3 @@ export const PropertyTypeIcon: Component<PropertyTypeIconProps> = (props) => {
 
   return <Icon icon={icon} {...otherProps} />;
 };
-
-export default PropertyTypeSelect;

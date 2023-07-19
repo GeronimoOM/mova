@@ -14,7 +14,7 @@ import {
 import { useLanguageContext } from '../LanguageContext';
 import { WordsSearchParams } from './WordsSearchBar/wordsSearchParams';
 import { cache } from '../../api/client';
-import WordsListItem from './WordsListItem';
+import { WordsListItem } from './WordsListItem';
 
 export type WordsListProps = {
   searchParams: WordsSearchParams;
@@ -23,10 +23,9 @@ export type WordsListProps = {
   onOpenDetails: () => void;
 };
 
-const WordsList: Component<WordsListProps> = (props) => {
+export const WordsList: Component<WordsListProps> = (props) => {
   const [selectedLanguageId] = useLanguageContext();
 
-  const [isCreateOpen, setIsCreateOpen] = createSignal(false);
   const [wordsContainer, setWordsContainer] = createSignal<
     HTMLDivElement | undefined
   >();
@@ -118,5 +117,3 @@ const WordsList: Component<WordsListProps> = (props) => {
     </div>
   );
 };
-
-export default WordsList;
