@@ -32,8 +32,8 @@ export const WordsList: Component<WordsListProps> = (props) => {
 
   const [fetchWordsPage, wordsPageQuery] = createLazyQuery(GetWordsDocument);
 
-  const words = () => wordsPageQuery()?.language!.words.items;
-  const hasMore = () => wordsPageQuery()?.language!.words.hasMore;
+  const words = () => wordsPageQuery()?.language?.words.items;
+  const hasMore = () => wordsPageQuery()?.language?.words.hasMore;
   const searchQuery = () =>
     props.searchParams.query.length >= 3 ? props.searchParams.query : null;
   const fetchWordsPageArgs = (): GetWordsQueryVariables => ({
@@ -102,7 +102,7 @@ export const WordsList: Component<WordsListProps> = (props) => {
           isSortable={false}
         />
       </Show> */}
-      <For each={words()} fallback={'loading...'}>
+      <For each={words()}>
         {(word) => (
           <WordsListItem
             word={word}

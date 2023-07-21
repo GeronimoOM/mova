@@ -1,0 +1,14 @@
+FROM node:18-alpine
+
+RUN ["npm", "install", "-g", "pnpm"]
+
+EXPOSE 4001
+
+WORKDIR /app
+
+COPY . .
+
+RUN ["pnpm", "install"]
+RUN ["pnpm", "run", "build"]
+
+CMD ["pnpm", "run", "serve"]

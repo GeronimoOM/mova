@@ -154,7 +154,7 @@ export const PropertiesList: Component<PropertiesListProps> = (props) => {
         >
           <DragDropSensors />
           <SortableProvider ids={propertyIds()}>
-            <For each={properties()} fallback={'loading...'}>
+            <For each={properties()}>
               {(property) => (
                 <PropertyListItem
                   property={property}
@@ -182,7 +182,7 @@ export const PropertiesList: Component<PropertiesListProps> = (props) => {
           when={isCreateOpen()}
           fallback={
             <div
-              class={`sticky bottom-0 w-full p-2 flex flex-row justify-center 
+              class={`sticky bottom-0 w-full p-2 flex flex-row justify-center
             outline outline-8 outline-alabaster ${colorContext.base!
               .backgroundColor!}`}
             >
