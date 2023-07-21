@@ -64,12 +64,12 @@ export class WordService {
     private topicService: TopicService,
     @Inject(forwardRef(() => LanguageService))
     private languageService: LanguageService,
-  ) { }
+  ) {}
 
-  async getById(wordId: WordId): Promise<Word | null> {
+  async getById(wordId: WordId): Promise<Word> {
     const repoWord = await this.wordRepository.getById(wordId);
     if (!repoWord) {
-      return null;
+      throw new Error('Word does not exist');
     }
 
     const properties = await this.propertyService.getByLanguageId(
@@ -127,10 +127,7 @@ export class WordService {
   }
 
   async create(params: CreateWordParams): Promise<Word> {
-    const language = await this.languageService.getById(params.languageId);
-    if (!language) {
-      throw new Error('Language does not exist');
-    }
+    await this.languageService.getById(params.languageId);
 
     const word: Word = {
       id: uuid(),
@@ -199,9 +196,6 @@ export class WordService {
 
   async index(wordId: WordId): Promise<void> {
     const word = await this.getById(wordId);
-    if (!word) {
-      throw new Error('Word does not exist');
-    }
 
     word.topics = await this.topicService.getForWord(word.id);
 

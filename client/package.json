@@ -12,27 +12,27 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@merged/solid-apollo": "^1.7.1",
-    "@solid-primitives/active-element": "^2.0.15",
-    "@solid-primitives/keyboard": "^1.2.3",
-    "@solid-primitives/media": "^2.2.3",
-    "@solidjs/router": "^0.8.2",
-    "@thisbeyond/solid-dnd": "^0.7.4",
-    "solid-icons": "^1.0.11",
-    "solid-js": "^1.7.8"
+    "@merged/solid-apollo": "1.7.1",
+    "@solid-primitives/active-element": "2.0.15",
+    "@solid-primitives/keyboard": "1.2.3",
+    "@solid-primitives/media": "2.2.3",
+    "@solidjs/router": "0.8.2",
+    "@thisbeyond/solid-dnd": "0.7.4",
+    "solid-icons": "1.0.11",
+    "solid-js": "1.7.8"
   },
   "peerDependencies": {
     "@apollo/client": "3.7.13"
   },
   "devDependencies": {
-    "@graphql-codegen/cli": "^4.0.1",
-    "@graphql-codegen/client-preset": "^4.0.1",
-    "autoprefixer": "^10.4.14",
-    "postcss": "^8.4.26",
+    "@graphql-codegen/cli": "4.0.1",
+    "@graphql-codegen/client-preset": "4.0.1",
+    "autoprefixer": "10.4.14",
+    "postcss": "8.4.26",
     "prettier": "3.0.0",
-    "tailwindcss": "^3.3.3",
-    "typescript": "^5.1.6",
-    "vite": "^4.4.4",
-    "vite-plugin-solid": "^2.7.0"
+    "tailwindcss": "3.3.3",
+    "typescript": "5.1.6",
+    "vite": "4.4.4",
+    "vite-plugin-solid": "2.7.0"
   }
 }

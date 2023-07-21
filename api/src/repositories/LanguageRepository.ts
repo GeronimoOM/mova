@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Language, LanguageId } from 'models/Language';
 import { DbConnectionManager } from './DbConnectionManager';
+import { LanguageTable, WordTable } from 'knex/types/tables';
 
 const TABLE_LANGUAGES = 'languages';
 
@@ -39,5 +40,17 @@ export class LanguageRepository {
       .getConnection()(TABLE_LANGUAGES)
       .where({ id })
       .delete();
+  }
+
+  streamRecords(): AsyncIterable<LanguageTable> {
+    return this.connectionManager.getConnection()(TABLE_LANGUAGES).stream();
+  }
+
+  async insertBatch(batch: LanguageTable[]): Promise<void> {
+    await this.connectionManager
+      .getConnection()(TABLE_LANGUAGES)
+      .insert(batch)
+      .onConflict()
+      .merge();
   }
 }

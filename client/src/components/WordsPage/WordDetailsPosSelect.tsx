@@ -15,15 +15,15 @@ export const WordDetailsPosSelect: Component<WordDetailsPosSelectProps> = (
   props,
 ) => {
   const [isOpen, setIsOpen] = createSignal(false);
-  
+
   const onPartOfSpeechSelect = (partOfSpeech: PartOfSpeech) => {
     setIsOpen(false);
     props.onPartOfSpeechSelect(partOfSpeech);
-  }
+  };
 
   return (
     <div class="relative w-[7rem] select-none">
-      <WordDetailsPosSelectItem 
+      <WordDetailsPosSelectItem
         partOfSpeech={props.selectedPartOfSpeech}
         onSelect={() => setIsOpen(!isOpen())}
         isDisabled={props.isDisabled}
@@ -33,7 +33,7 @@ export const WordDetailsPosSelect: Component<WordDetailsPosSelectProps> = (
         <div class={`absolute flex flex-col top-full w-full`}>
           <For each={partsOfSpeech}>
             {(partOfSpeech) => (
-              <WordDetailsPosSelectItem 
+              <WordDetailsPosSelectItem
                 partOfSpeech={partOfSpeech}
                 onSelect={() => onPartOfSpeechSelect(partOfSpeech)}
                 isDisabled={props.isDisabled}
@@ -50,13 +50,19 @@ type WordDetailsPosSelectItem = {
   partOfSpeech: PartOfSpeech | null;
   onSelect: () => void;
   isDisabled?: boolean;
-}
+};
 
-const WordDetailsPosSelectItem: Component<WordDetailsPosSelectItem> = (props) => {
-  const partOfSpeechIcon = () => 
+const WordDetailsPosSelectItem: Component<WordDetailsPosSelectItem> = (
+  props,
+) => {
+  const partOfSpeechIcon = () =>
     props.partOfSpeech ? partsOfSpeechProps[props.partOfSpeech].icon : IoShapes;
   const label = () =>
-    props.partOfSpeech ? partsOfSpeechProps[props.partOfSpeech].labelShort : (props.isDisabled ? '' : 'Select');
+    props.partOfSpeech
+      ? partsOfSpeechProps[props.partOfSpeech].labelShort
+      : props.isDisabled
+      ? ''
+      : 'PoS';
 
   const { base: baseColors, active: activeColors } = useColorContext()!;
   const activeClasses = asClasses(
@@ -78,10 +84,9 @@ const WordDetailsPosSelectItem: Component<WordDetailsPosSelectItem> = (props) =>
       onClick={onClick}
     >
       <Icon icon={partOfSpeechIcon()} size="sm" />
-      <div class='flex-1 flex flex-row justify-center'>
+      <div class="flex-1 flex flex-row justify-center">
         <p class="p-1">{label()}</p>
       </div>
-      
     </div>
-  )
-}
+  );
+};

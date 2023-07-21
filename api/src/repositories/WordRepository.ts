@@ -65,10 +65,11 @@ export class WordRepository {
     }
 
     if (topics?.length) {
-      query = query.whereExists((query) => query
-        .from(TABLE_TOPICS_WORDS)
-        .where({ word_id: connection.ref(`${TABLE_WORDS}.id`) })
-        .whereIn('topic_id', topics),
+      query = query.whereExists((query) =>
+        query
+          .from(TABLE_TOPICS_WORDS)
+          .where({ word_id: connection.ref(`${TABLE_WORDS}.id`) })
+          .whereIn('topic_id', topics),
       );
     }
 
@@ -150,6 +151,18 @@ export class WordRepository {
       .getConnection()(TABLE_WORDS)
       .where({ language_id: languageId })
       .delete();
+  }
+
+  streamRecords(): AsyncIterable<WordTable> {
+    return this.connectionManager.getConnection()(TABLE_WORDS).stream();
+  }
+
+  async insertBatch(batch: WordTable[]): Promise<void> {
+    await this.connectionManager
+      .getConnection()(TABLE_WORDS)
+      .insert(batch)
+      .onConflict()
+      .merge();
   }
 
   private mapToWord(row: WordTable): WordWithoutProperties {

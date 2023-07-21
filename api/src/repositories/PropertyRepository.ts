@@ -129,6 +129,18 @@ export class PropertyRepository {
       .delete();
   }
 
+  streamRecords(): AsyncIterable<PropertyTable> {
+    return this.connectionManager.getConnection()(TABLE_PROPERTIES).stream();
+  }
+
+  async insertBatch(batch: PropertyTable[]): Promise<void> {
+    await this.connectionManager
+      .getConnection()(TABLE_PROPERTIES)
+      .insert(batch)
+      .onConflict()
+      .merge();
+  }
+
   private mapToProperty(row: PropertyTable): Property {
     const baseProperty: BaseProperty = {
       id: row.id,

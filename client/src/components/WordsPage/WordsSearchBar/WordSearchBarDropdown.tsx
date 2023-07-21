@@ -24,7 +24,7 @@ export const WordSearchBarDropdown: Component<WordSearchBarDropdownProps> = (
   const [fetchTopics, topicsQuery] = createLazyQuery(GetTopicsDocument);
 
   return (
-    <div class="absolute flex flex-col top-full w-full bg-coolgray-200 text-spacecadet-300 border-t-2 border-charcoal-300">
+    <div class="absolute flex flex-col top-full w-full z-10 bg-coolgray-200 text-spacecadet-300 border-t-2 border-charcoal-300">
       <Switch>
         <Match when={props.mode === DropdownMode.Filters}>
           <WordSearchBarDropdownFilterItems

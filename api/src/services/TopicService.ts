@@ -34,8 +34,12 @@ export class TopicService {
     private wordService: WordService,
   ) {}
 
-  async getById(id: TopicId): Promise<Topic | null> {
-    return await this.topicRepository.getById(id);
+  async getById(id: TopicId): Promise<Topic> {
+    const topic = await this.topicRepository.getById(id);
+    if (!topic) {
+      throw new Error('Topic does not exist');
+    }
+    return topic;
   }
 
   async getPage(params: GetTopicPageParms): Promise<Page<Topic>> {
@@ -95,14 +99,8 @@ export class TopicService {
   }
 
   async addWord(topicId: TopicId, wordId: WordId): Promise<Topic> {
-    const topic = await this.topicRepository.getById(topicId);
-    if (!topic) {
-      throw new Error('Topic does not exist');
-    }
-    const word = await this.wordService.getById(wordId);
-    if (!word) {
-      throw new Error('Word does not exist');
-    }
+    await this.topicRepository.getById(topicId);
+    await this.wordService.getById(wordId);
 
     await this.topicRepository.addWord(topicId, wordId);
 
@@ -112,14 +110,8 @@ export class TopicService {
   }
 
   async removeWord(topicId: TopicId, wordId: WordId): Promise<Topic> {
-    const topic = await this.topicRepository.getById(topicId);
-    if (!topic) {
-      throw new Error('Topic does not exist');
-    }
-    const word = await this.wordService.getById(wordId);
-    if (!word) {
-      throw new Error('Word does not exist');
-    }
+    await this.topicRepository.getById(topicId);
+    await this.wordService.getById(wordId);
 
     await this.topicRepository.removeWord(topicId, wordId);
 

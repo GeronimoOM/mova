@@ -14,7 +14,7 @@ export const WordsListItem: Component<WordsListItemProps> = (props) => {
 
   return (
     <div
-      class="w-full flex flex-row items-center text-spacecadet-300"
+      class="w-full flex flex-row items-center cursor-pointer select-none text-spacecadet-300"
       classList={{
         'bg-coolgray-300 hover:bg-coolgray-200': !isSelected(),
         'bg-spacecadet-300 text-white': isSelected(),

@@ -76,7 +76,7 @@ export class PropertyResolver {
   async property(
     @Args('id', { type: () => ID }) id: PropertyId,
   ): Promise<typeof PropertyUnionType | null> {
-    const property = await this.propertyService.getById(id);
+    const property = await this.propertyService.getById(id).catch(() => null);
     return property ? this.propertyTypeMapper.map(property) : null;
   }
 

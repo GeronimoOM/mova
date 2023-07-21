@@ -60,8 +60,12 @@ export class PropertyService {
     );
   }
 
-  async getById(id: PropertyId): Promise<Property | null> {
-    return await this.propertyRepository.getById(id);
+  async getById(id: PropertyId): Promise<Property> {
+    const property = await this.propertyRepository.getById(id);
+    if (!property) {
+      throw new Error('Property does not exist');
+    }
+    return property;
   }
 
   async getByIds(ids: PropertyId[]): Promise<Property[]> {
@@ -69,9 +73,7 @@ export class PropertyService {
   }
 
   async create(params: CreatePropertyParams): Promise<Property> {
-    if (!(await this.languageService.getById(params.languageId))) {
-      throw new Error('Language does not exist');
-    }
+    await this.languageService.getById(params.languageId);
 
     const order =
       (await this.propertyRepository.getCount(
@@ -139,9 +141,7 @@ export class PropertyService {
     partOfSpeech: PartOfSpeech,
     orderedIds: PropertyId[],
   ): Promise<void> {
-    if (!(await this.languageService.getById(languageId))) {
-      throw new Error('Language does not exist');
-    }
+    await this.languageService.getById(languageId);
 
     const properties = await this.propertyRepository.getByLanguageId(
       languageId,
@@ -157,9 +157,6 @@ export class PropertyService {
 
   async delete(id: PropertyId): Promise<Property> {
     const property = await this.propertyRepository.getById(id);
-    if (!property) {
-      throw new Error('Property does not exist');
-    }
 
     await this.propertyRepository.delete(id);
     return property;

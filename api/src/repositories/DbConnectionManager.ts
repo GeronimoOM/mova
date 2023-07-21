@@ -15,7 +15,7 @@ export class DbConnectionManager implements OnApplicationBootstrap {
 
   async onApplicationBootstrap() {
     const connection = this.getConnection();
-    await connection.migrate.up();
+    await connection.migrate.latest();
     Logger.log('Database migrated');
   }
 
@@ -29,6 +29,7 @@ export class DbConnectionManager implements OnApplicationBootstrap {
         user: 'mova',
         password: 'secret-to-mova-db',
         database: 'mova',
+        dateStrings: true,
       },
       migrations: {
         directory: 'dist/repositories/migrations',

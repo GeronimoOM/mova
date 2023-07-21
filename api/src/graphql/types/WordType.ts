@@ -25,7 +25,6 @@ export class WordType {
   @Field((type) => [PropertyValueUnionType])
   properties: Array<typeof PropertyValueUnionType>;
 
-  
   @Field((type) => ID)
   languageId: LanguageId;
 }

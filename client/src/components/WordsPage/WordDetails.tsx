@@ -259,6 +259,7 @@ export const WordDetails: Component<WordDetailsProps> = (props) => {
     });
 
     setSelectedAction(null);
+    props.onWordSelect(null);
   };
 
   const colorContext: ColorContextType = {
@@ -285,7 +286,7 @@ export const WordDetails: Component<WordDetailsProps> = (props) => {
     <ColorProvider colorContext={colorContext}>
       <div class="h-full w-full p-2">
         <div
-          class={`h-full flex flex-col p-5 gap-y-3 
+          class={`h-full flex flex-col p-5 gap-y-3
         ${colorContext.base!.textColor} ${colorContext.base!.backgroundColor}`}
         >
           <div class="flex flex-row items-center justify-between">

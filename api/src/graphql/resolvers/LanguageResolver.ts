@@ -60,7 +60,7 @@ export class LanguageResolver {
   async language(
     @Args('id', { type: () => ID }) id: LanguageId,
   ): Promise<LanguageType | null> {
-    return await this.languageService.getById(id);
+    return this.languageService.getById(id).catch(() => null);
   }
 
   @Mutation((returns) => LanguageType)
@@ -123,7 +123,8 @@ export class LanguageResolver {
     @Args('query', { nullable: true }) query?: string,
     @Args('partsOfSpeech', { type: () => [PartOfSpeech], nullable: true })
     partsOfSpeech?: PartOfSpeech[],
-    @Args('topics', { type: () => [ID], nullable: true }) topics?: TopicId[],
+    @Args('topics', { type: () => [ID], nullable: true })
+    topics?: TopicId[],
   ): Promise<Page<WordType>> {
     const wordPage = await this.wordService.getPage({
       languageId: language.id,

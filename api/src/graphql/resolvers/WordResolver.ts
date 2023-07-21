@@ -70,7 +70,7 @@ export class WordResolver {
   async word(
     @Args('id', { type: () => ID }) id: WordId,
   ): Promise<WordType | null> {
-    const word = await this.wordService.getById(id);
+    const word = await this.wordService.getById(id).catch(() => null);
     return word ? this.wordTypeMapper.map(word) : null;
   }
 

@@ -10,7 +10,6 @@
 			"name": "Debug (docker-compose up)",
 			"address": "localhost",
 			"port": 9001,
-			"restart": true,
 			"localRoot": "${workspaceRoot}/api",
 			"remoteRoot": "/app",
 			"skipFiles": ["<node_internals>/**/*.js"],

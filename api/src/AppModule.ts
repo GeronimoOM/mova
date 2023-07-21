@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
-import { MaintenanceController } from './MaintenanceController';
-import { AppController } from './AppController';
+import { MaintenanceController } from './controllers/MaintenanceController';
 import { PropertyTypeMapper } from './graphql/mappers/PropertyTypeMapper';
 import { WordTypeMapper } from './graphql/mappers/WordTypeMapper';
 import { LanguageResolver } from './graphql/resolvers/LanguageResolver';
@@ -17,14 +16,12 @@ import { TopicRepository } from './repositories/TopicRepository';
 import { TopicService } from './services/TopicService';
 import { SearchClient } from './clients/SearchClient';
 import { ElasticClientModule } from './clients/ElasticClientModule';
-import { TopicResolver } from 'graphql/resolvers/TopicResolver';
-import { GraphQLModule } from 'graphql/GraphQLModule';
+import { TopicResolver } from './graphql/resolvers/TopicResolver';
+import { GraphQLModule } from './graphql/GraphQLModule';
+import { MaintenanceService } from './services/MaintenanceService';
 
 @Module({
-  imports: [
-    GraphQLModule,
-    ElasticClientModule,
-  ],
+  imports: [GraphQLModule, ElasticClientModule],
   providers: [
     LanguageResolver,
     PropertyResolver,
@@ -36,6 +33,7 @@ import { GraphQLModule } from 'graphql/GraphQLModule';
     PropertyService,
     WordService,
     TopicService,
+    MaintenanceService,
     SearchClient,
     LanguageRepository,
     PropertyRepository,
@@ -43,6 +41,6 @@ import { GraphQLModule } from 'graphql/GraphQLModule';
     TopicRepository,
     DbConnectionManager,
   ],
-  controllers: [AppController, MaintenanceController],
+  controllers: [MaintenanceController],
 })
-export class AppModule { }
+export class AppModule {}

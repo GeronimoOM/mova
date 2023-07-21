@@ -95,7 +95,9 @@ export const ActionButton: Component<ActionButtonProps> = (props) => {
     disabledColors?.backgroundColor,
   );
 
-  const onClick = () => !props.isDisabled && runWithOwner(owner, () => props.onActionSelect(props.action))
+  const onClick = () =>
+    !props.isDisabled &&
+    runWithOwner(owner, () => props.onActionSelect(props.action));
 
   const owner = getOwner();
 

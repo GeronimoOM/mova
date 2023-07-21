@@ -35,7 +35,7 @@ export interface SearchTopicsParams extends Required<PageArgs> {
 
 @Injectable()
 export class SearchClient implements OnApplicationBootstrap {
-  constructor(private elasticClientManager: ElasticClientManager) { }
+  constructor(private elasticClientManager: ElasticClientManager) {}
 
   async searchWords({
     languageId,
@@ -52,12 +52,28 @@ export class SearchClient implements OnApplicationBootstrap {
 
     const mustMatch: QueryDslQueryContainer[] = [
       { match: { languageId } },
-      ...partsOfSpeech?.length 
-        ? [{ bool: { should: partsOfSpeech.map((partOfSpeech) => ({ match: { partOfSpeech } })) } }] 
-        : [],
-      ...topics?.length 
-        ? [{ bool: { should: topics.map((topic) => ({ match: { topics: topic } })) } }] 
-        : [],
+      ...(partsOfSpeech?.length
+        ? [
+            {
+              bool: {
+                should: partsOfSpeech.map((partOfSpeech) => ({
+                  match: { partOfSpeech },
+                })),
+              },
+            },
+          ]
+        : []),
+      ...(topics?.length
+        ? [
+            {
+              bool: {
+                should: topics.map((topic) => ({
+                  match: { topics: topic },
+                })),
+              },
+            },
+          ]
+        : []),
       {
         multi_match: {
           query,
@@ -136,6 +152,10 @@ export class SearchClient implements OnApplicationBootstrap {
   }
 
   async indexWords(words: Word[]): Promise<void> {
+    if (!words.length) {
+      return;
+    }
+
     await this.getClient().bulk<WordDocument>({
       operations: words.flatMap((word) => [
         {
@@ -164,9 +184,13 @@ export class SearchClient implements OnApplicationBootstrap {
     });
   }
 
-  async indexTopics(topic: Topic[]): Promise<void> {
+  async indexTopics(topics: Topic[]): Promise<void> {
+    if (!topics.length) {
+      return;
+    }
+
     await this.getClient().bulk<TopicDocument>({
-      operations: topic.flatMap((topic) => [
+      operations: topics.flatMap((topic) => [
         {
           index: {
             _index: INDEX_TOPICS,
@@ -248,10 +272,10 @@ export class SearchClient implements OnApplicationBootstrap {
       partOfSpeech: word.partOfSpeech,
       properties: word.properties
         ? [...word.properties.values()]
-          .filter((value): value is TextPropertyValue =>
-            isTextPropertyValue(value),
-          )
-          .map((value) => value.text)
+            .filter((value): value is TextPropertyValue =>
+              isTextPropertyValue(value),
+            )
+            .map((value) => value.text)
         : undefined,
       ...(word.topics && {
         topics: word.topics.map((topic) => topic.id),

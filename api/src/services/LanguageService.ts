@@ -31,8 +31,12 @@ export class LanguageService {
     return await this.languageRepository.getAll();
   }
 
-  async getById(id: LanguageId): Promise<Language | null> {
-    return await this.languageRepository.getById(id);
+  async getById(id: LanguageId): Promise<Language> {
+    const language = await this.languageRepository.getById(id);
+    if (!language) {
+      throw new Error('Language does not exist');
+    }
+    return language;
   }
 
   async create(params: CreateLanguageParams): Promise<Language> {
@@ -46,9 +50,6 @@ export class LanguageService {
 
   async update(params: UpdateLanguageParams): Promise<Language> {
     const language = await this.getById(params.id);
-    if (!language) {
-      throw new Error('Language does not exist');
-    }
 
     language.name = params.name;
     await this.languageRepository.update(language);
@@ -57,9 +58,6 @@ export class LanguageService {
 
   async delete(id: LanguageId): Promise<Language> {
     const language = await this.getById(id);
-    if (!language) {
-      throw new Error('Language does not exist');
-    }
 
     await this.wordService.deleteForLanguage(id);
     await this.topicService.deleteForLanguage(id);

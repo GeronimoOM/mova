@@ -4,6 +4,7 @@ import {
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import { AppModule } from './AppModule';
+import fastifyMultipart from '@fastify/multipart';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -14,6 +15,7 @@ async function bootstrap() {
     },
   );
   app.enableCors();
+  await app.register(fastifyMultipart);
 
   await app.listen(process.env.APP_PORT || 3000, '0.0.0.0');
 }

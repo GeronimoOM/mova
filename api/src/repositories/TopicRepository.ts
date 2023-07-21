@@ -3,7 +3,7 @@ import { DbConnectionManager } from './DbConnectionManager';
 import { WordId } from 'models/Word';
 import * as maps from 'utils/maps';
 import { Topic, TopicId } from 'models/Topic';
-import { TopicTable } from 'knex/types/tables';
+import { TopicTable, TopicWordTable } from 'knex/types/tables';
 import { Page, PageArgs, mapPage, toPage } from 'models/Page';
 import { LanguageId } from 'models/Language';
 
@@ -117,6 +117,30 @@ export class TopicRepository {
       .getConnection()(TABLE_TOPICS)
       .where({ language_id: languageId })
       .delete();
+  }
+
+  streamRecords(): AsyncIterable<TopicTable> {
+    return this.connectionManager.getConnection()(TABLE_TOPICS).stream();
+  }
+
+  streamWordRecords(): AsyncIterable<TopicWordTable> {
+    return this.connectionManager.getConnection()(TABLE_TOPICS_WORDS).stream();
+  }
+
+  async insertBatch(batch: TopicTable[]): Promise<void> {
+    await this.connectionManager
+      .getConnection()(TABLE_TOPICS)
+      .insert(batch)
+      .onConflict()
+      .merge();
+  }
+
+  async insertWordsBatch(batch: TopicWordTable[]): Promise<void> {
+    await this.connectionManager
+      .getConnection()(TABLE_TOPICS_WORDS)
+      .insert(batch)
+      .onConflict()
+      .merge();
   }
 
   private mapToTopic(row: TopicTable): Topic {
