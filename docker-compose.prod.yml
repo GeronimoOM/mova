@@ -7,7 +7,6 @@ services:
     ports:
       - 9000:3000
     environment:
-      - APP_PORT=3000
       - NODE_ENV=production
     depends_on:
       - mova-db
