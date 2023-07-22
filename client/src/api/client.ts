@@ -2,7 +2,7 @@ import { ApolloClient, InMemoryCache } from '@merged/solid-apollo';
 import { TypePolicy } from '@apollo/client';
 import { LanguageWordsArgs, WordPage } from './types/graphql';
 
-export const GRAPHQL_URI = `${import.meta.env.VITE_API_URL}/graphql`;
+export const GRAPHQL_URI = `${import.meta.env.VITE_API_URL || 'http://localhost:9000'}/graphql`;
 
 const languageTypePolicy: TypePolicy = {
   fields: {

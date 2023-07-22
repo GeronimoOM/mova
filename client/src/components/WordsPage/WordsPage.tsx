@@ -12,7 +12,7 @@ import { WordsPageHeader } from './WordsPageHeader';
 export const WordsPage: Component = () => {
   const [selectedLanguageId] = useLanguageContext();
 
-  const [wordsSearchParams, setSearchQuery] = createStore<WordsSearchParams>(
+  const [searchParams, setSearchParams] = createStore<WordsSearchParams>(
     defaultWordsSearchParams(),
   );
   const [selectedWordId, setSelectedWordId] = createSignal<string | null>(null);
@@ -39,8 +39,8 @@ export const WordsPage: Component = () => {
     <div class="flex flex-col w-full h-full items-stretch">
       <div class="flex-none">
         <WordsPageHeader
-          searchParams={wordsSearchParams}
-          onSearchParamsChange={setSearchQuery}
+          searchParams={searchParams}
+          onSearchParamsChange={setSearchParams}
           onOpenCreateWord={() => onOpenCreateWord(true)}
           isOpenCreateWord={isOpenCreateWord()}
         />
@@ -54,7 +54,7 @@ export const WordsPage: Component = () => {
           }}
         >
           <WordsList
-            searchParams={wordsSearchParams}
+            searchParams={searchParams}
             selectedWord={selectedWordId()}
             onSelectWord={onWordSelect}
             onOpenDetails={() => setIsWordDetailsOpen(true)}

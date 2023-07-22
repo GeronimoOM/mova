@@ -7,7 +7,7 @@ import {
 } from 'solid-js';
 import { useLocation, useNavigate } from '@solidjs/router';
 import { BsTranslate } from 'solid-icons/bs';
-import { FaSolidGear } from 'solid-icons/fa';
+import { FaSolidGear, FaSolidBrain } from 'solid-icons/fa';
 import { AppRoute, getAppRouteMatch } from '../../routes';
 import { Languages } from './NavBarLanguages/Languages';
 import { NavBarItem } from './NavBarItem';
@@ -57,6 +57,11 @@ export const NavBar: Component = () => {
             href={AppRoute.Properties}
             icon={FaSolidGear}
             text="Properties"
+          />
+          <NavBarItem
+            href={AppRoute.Exercises}
+            icon={FaSolidBrain}
+            text="Exercises"
           />
         </Show>
 

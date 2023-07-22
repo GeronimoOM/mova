@@ -1,6 +1,5 @@
 import { Readable } from 'stream';
-import { chain } from 'stream-chain';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import {
   MigrationRecordType,
   MigrationRecord,
@@ -24,6 +23,7 @@ import { TopicService } from './TopicService';
 import { PropertyType, PropertyId, OptionProperty } from 'models/Property';
 import { PartOfSpeech } from 'models/Word';
 import { PropertyService } from './PropertyService';
+import { SearchClient } from 'clients/SearchClient';
 
 const RECORDS_BATCH = 1000;
 
@@ -39,6 +39,8 @@ export class MaintenanceService {
     private propertyRepository: PropertyRepository,
     private topicRepository: TopicRepository,
     private wordRepository: WordRepository,
+
+    private searchClient: SearchClient,
   ) {}
 
   export(): Readable {
@@ -49,9 +51,18 @@ export class MaintenanceService {
     await this.insertRecords(recordStream);
 
     const languages = await this.languageService.getAll();
+    await this.searchClient.createIndices();
     await Promise.all(
       languages.map((language) => this.reindexLanguage(language.id)),
     );
+  }
+
+  async destroy(): Promise<void> {
+    await this.topicRepository.deleteAll();
+    await this.wordRepository.deleteAll();
+    await this.propertyRepository.deleteAll();
+    await this.languageRepository.deleteAll();
+    await this.searchClient.deleteIndices();
   }
 
   async reindexLanguage(languageId: LanguageId): Promise<Language> {

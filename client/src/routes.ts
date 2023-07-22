@@ -1,6 +1,7 @@
 export enum AppRoute {
   Words = '/',
   Properties = '/properties',
+  Exercises = '/exercises',
 }
 
 export const getAppRouteMatch = (location: string): AppRoute | null => {

@@ -50,45 +50,45 @@ export class SearchClient implements OnApplicationBootstrap {
       return emptyPage();
     }
 
-    const mustMatch: QueryDslQueryContainer[] = [
-      { match: { languageId } },
-      ...(partsOfSpeech?.length
-        ? [
-            {
-              bool: {
-                should: partsOfSpeech.map((partOfSpeech) => ({
-                  match: { partOfSpeech },
-                })),
-              },
-            },
-          ]
-        : []),
-      ...(topics?.length
-        ? [
-            {
-              bool: {
-                should: topics.map((topic) => ({
-                  match: { topics: topic },
-                })),
-              },
-            },
-          ]
-        : []),
-      {
-        multi_match: {
-          query,
-          fields: ['original', 'translation', 'properties'],
-          fuzziness: 'AUTO',
-          type: 'bool_prefix',
-        },
-      },
+    const queryFilters: QueryDslQueryContainer[] = [
+      { term: { languageId } },
     ];
+
+    if (partsOfSpeech?.length) {
+      queryFilters.push({
+        bool: {
+          should: partsOfSpeech.map((partOfSpeech) => ({
+            term: { partOfSpeech },
+          })),
+        },
+      })
+    }
+
+    if (topics?.length) {
+      queryFilters.push({
+        bool: {
+          should: topics.map((topic) => ({
+            term: { topics: topic },
+          })),
+        },
+      })
+    }
+
+    const queryMust: QueryDslQueryContainer = {
+      multi_match: {
+        query,
+        fields: ['original', 'translation', 'properties'],
+        fuzziness: 'AUTO',
+        type: 'bool_prefix',
+      },
+    };
 
     const searchResponse = await this.getClient().search<WordDocument>({
       index: INDEX_WORDS,
       query: {
         bool: {
-          must: mustMatch,
+          filter: queryFilters,
+          must: queryMust,
         },
       },
       from: start,
@@ -227,10 +227,12 @@ export class SearchClient implements OnApplicationBootstrap {
     return this.elasticClientManager.getClient();
   }
 
-  private async createIndices(): Promise<void> {
+  async createIndices(): Promise<void> {
     for (const [index, mappings] of Object.entries(INDEX_TO_MAPPING)) {
       const indexExists = await this.indexExists(index);
       if (!indexExists) {
+        Logger.log(index);
+        Logger.log(mappings);
         await this.getClient().indices.create({
           index,
           mappings,
@@ -238,6 +240,12 @@ export class SearchClient implements OnApplicationBootstrap {
         });
       }
     }
+  }
+
+  async deleteIndices(): Promise<void> {
+    await this.getClient().indices.delete({
+      index: [INDEX_WORDS, INDEX_TOPICS],
+    });
   }
 
   private async deleteLanguageInIndex(

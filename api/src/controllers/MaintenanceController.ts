@@ -12,8 +12,7 @@ import {
   Query,
   Put,
   Body,
-  Header,
-  Logger,
+  Delete,
 } from '@nestjs/common';
 import { LanguageId } from 'models/Language';
 import { MaintenanceService } from 'services/MaintenanceService';
@@ -42,6 +41,11 @@ export class MaintenanceController {
     const recordStream = chain([multipartFile.file, jsonParser()]);
 
     await this.maintenanceService.import(recordStream);
+  }
+
+  @Delete('/destroy')
+  async destroy() {
+    await this.maintenanceService.destroy();
   }
 
   @Put('/reindex')

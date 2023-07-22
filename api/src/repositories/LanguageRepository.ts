@@ -53,4 +53,10 @@ export class LanguageRepository {
       .onConflict()
       .merge();
   }
+
+  async deleteAll(): Promise<void> {
+    await this.connectionManager
+      .getConnection()(TABLE_LANGUAGES)
+      .delete();
+  }
 }

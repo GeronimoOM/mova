@@ -45,24 +45,16 @@ export const WordsList: Component<WordsListProps> = (props) => {
 
   createEffect(() => {
     if (selectedLanguageId()) {
+      cache.evict({
+        id: `Language:${untrack(selectedLanguageId)!}`,
+        fieldName: 'words:search',
+      });
+
       fetchWordsPage({
         variables: {
           ...fetchWordsPageArgs(),
           start: 0,
         },
-      });
-    }
-  });
-
-  createEffect(() => {
-    if (
-      searchQuery() ||
-      props.searchParams.partsOfSpeech ||
-      props.searchParams.topics
-    ) {
-      cache.evict({
-        id: `Language:${untrack(selectedLanguageId)!}`,
-        fieldName: 'words:search',
       });
     }
   });

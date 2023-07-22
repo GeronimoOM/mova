@@ -143,6 +143,16 @@ export class TopicRepository {
       .merge();
   }
 
+  async deleteAll(): Promise<void> {
+    await this.connectionManager
+      .getConnection()(TABLE_TOPICS_WORDS)
+      .delete();
+
+    await this.connectionManager
+      .getConnection()(TABLE_TOPICS)
+      .delete();
+  }
+
   private mapToTopic(row: TopicTable): Topic {
     return {
       id: row.id,

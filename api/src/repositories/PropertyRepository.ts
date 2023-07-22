@@ -141,6 +141,12 @@ export class PropertyRepository {
       .merge();
   }
 
+  async deleteAll(): Promise<void> {
+    await this.connectionManager
+      .getConnection()(TABLE_PROPERTIES)
+      .delete();
+  }
+
   private mapToProperty(row: PropertyTable): Property {
     const baseProperty: BaseProperty = {
       id: row.id,

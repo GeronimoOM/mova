@@ -165,6 +165,12 @@ export class WordRepository {
       .merge();
   }
 
+  async deleteAll(): Promise<void> {
+    await this.connectionManager
+      .getConnection()(TABLE_WORDS)
+      .delete();
+  }
+
   private mapToWord(row: WordTable): WordWithoutProperties {
     return {
       id: row.id,

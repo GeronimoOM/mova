@@ -5,6 +5,7 @@ import { WordsPage } from './WordsPage/WordsPage';
 import { PropertiesPage } from './PropertiesPage/PropertiesPage';
 import { AppRoute } from '../routes';
 import { LanguageProvider } from './LanguageContext';
+import { ExercisesPage } from './ExercisesPage/ExercisesPage';
 
 export const App: Component = () => {
   return (
@@ -15,6 +16,7 @@ export const App: Component = () => {
           <Routes>
             <Route path={AppRoute.Words} component={WordsPage} />
             <Route path={AppRoute.Properties} component={PropertiesPage} />
+            <Route path={AppRoute.Exercises} component={ExercisesPage} />
           </Routes>
         </main>
       </div>
