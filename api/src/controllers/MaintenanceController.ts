@@ -27,7 +27,7 @@ export class MaintenanceController {
       this.maintenanceService.export(),
       jsonStringer(),
     ]);
-    const fileName = `mova-db:${DateTime.now().toFormat('yyyy-mm-dd')}.jsonl`;
+    const fileName = `mova-db:${DateTime.now().toFormat('yyyy-LL-dd')}.jsonl`;
 
     return new StreamableFile(jsonStream, {
       type: 'application/json',
