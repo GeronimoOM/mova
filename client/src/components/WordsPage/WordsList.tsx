@@ -1,7 +1,6 @@
 import {
   Component,
   For,
-  Show,
   createEffect,
   untrack,
   createSignal,
@@ -16,6 +15,8 @@ import { WordsSearchParams } from './WordsSearchBar/wordsSearchParams';
 import { cache } from '../../api/client';
 import { WordsListItem } from './WordsListItem';
 
+const WORDS_PAGE_SIZE = 15;
+
 export type WordsListProps = {
   searchParams: WordsSearchParams;
   selectedWord: string | null;
@@ -26,9 +27,10 @@ export type WordsListProps = {
 export const WordsList: Component<WordsListProps> = (props) => {
   const [selectedLanguageId] = useLanguageContext();
 
-  const [wordsContainer, setWordsContainer] = createSignal<
+  const [listEndRef, setListEndRef] = createSignal<
     HTMLDivElement | undefined
   >();
+  const [isListEndVisible, setIsListEndVisible] = createSignal(false);
 
   const [fetchWordsPage, wordsPageQuery] = createLazyQuery(GetWordsDocument);
 
@@ -41,6 +43,7 @@ export const WordsList: Component<WordsListProps> = (props) => {
     query: searchQuery(),
     partsOfSpeech: props.searchParams.partsOfSpeech,
     topics: props.searchParams.topics,
+    limit: WORDS_PAGE_SIZE,
   });
 
   createEffect(() => {
@@ -59,6 +62,23 @@ export const WordsList: Component<WordsListProps> = (props) => {
     }
   });
 
+  const observer = new IntersectionObserver(
+    entries => setIsListEndVisible(entries[0].isIntersecting),
+    { threshold: 1 }
+  );
+
+  createEffect(() => {
+    if (listEndRef()) {
+      observer.observe(listEndRef()!);
+    }
+  });
+
+  createEffect(() => {
+    if (isListEndVisible() && hasMore() && !wordsPageQuery.loading) {
+      onFetchMore();
+    }
+  })
+
   const onFetchMore = () => {
     fetchWordsPage({
       variables: {
@@ -72,28 +92,7 @@ export const WordsList: Component<WordsListProps> = (props) => {
   return (
     <div
       class="w-full max-w-[60rem] mx-auto p-2 gap-y-2 flex flex-col items-center"
-      ref={setWordsContainer}
     >
-      {/* <Show
-        when={isCreateOpen()}
-        fallback={
-          <div class="sticky bottom-0 w-full flex flex-row justify-center bg-coolgray-300 outline outline-8 outline-alabaster">
-            <PropertyActionBar
-              actions={[PropertyAction.Create]}
-              selectedAction={null}
-              onActionSelect={onAction}
-            />
-          </div>
-        }
-      >
-        <PropertyListItem
-          property={null}
-          partOfSpeech={props.partOfSpeech}
-          selectedAction={PropertyAction.Create}
-          onActionSelect={onAction}
-          isSortable={false}
-        />
-      </Show> */}
       <For each={words()}>
         {(word) => (
           <WordsListItem
@@ -103,9 +102,7 @@ export const WordsList: Component<WordsListProps> = (props) => {
           />
         )}
       </For>
-      <Show when={hasMore()}>
-        <button onClick={onFetchMore}>Load more</button>
-      </Show>
+      <div ref={setListEndRef}></div>
     </div>
   );
 };
