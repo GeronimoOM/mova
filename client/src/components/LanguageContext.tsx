@@ -20,15 +20,14 @@ const LOCAL_STORAGE_LANGUAGE_KEY = 'selectedLanguage';
 
 export const LanguageProvider: Component<ParentProps> = (props) => {
   const [language, setLanguage] = createSignal<string | null>(
-    // TODO revert
-    null, //localStorage.getItem(LOCAL_STORAGE_LANGUAGE_KEY),
+    localStorage.getItem(LOCAL_STORAGE_LANGUAGE_KEY),
   );
 
-  // createEffect(() => {
-  //   if (language()) {
-  //     localStorage.setItem(LOCAL_STORAGE_LANGUAGE_KEY, language()!);
-  //   }
-  // });
+  createEffect(() => {
+    if (language()) {
+      localStorage.setItem(LOCAL_STORAGE_LANGUAGE_KEY, language()!);
+    }
+  });
 
   const contextValue: LanguageContextReturn = [language, setLanguage];
 
