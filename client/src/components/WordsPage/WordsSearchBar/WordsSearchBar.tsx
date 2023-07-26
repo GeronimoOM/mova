@@ -73,37 +73,37 @@ export const WordsSearchBar: Component<WordsSearchBarProps> = (props) => {
     props.onSearchParamsChange({ query: text });
   };
 
-  const onKeyDown = (code: string): boolean => {
-    if (code === KEY_DROPDOWN_FILTERS) {
-      setDropdownMode(DropdownMode.Filters);
+  // const onKeyDown = (code: string): boolean => {
+  //   if (code === KEY_DROPDOWN_FILTERS) {
+  //     setDropdownMode(DropdownMode.Filters);
 
-      return false;
-    } else {
-      switch (dropdownMode()) {
-        case null:
-          return onDefaultKeyDown(code);
-        case DropdownMode.Filters:
-          return onFiltersKeyDown(code);
-        case DropdownMode.PartsOfSpeech:
-          return onPartsOfSpeechKeyDown(code);
-      }
-    }
+  //     return false;
+  //   } else {
+  //     switch (dropdownMode()) {
+  //       case null:
+  //         return onDefaultKeyDown(code);
+  //       case DropdownMode.Filters:
+  //         return onFiltersKeyDown(code);
+  //       case DropdownMode.PartsOfSpeech:
+  //         return onPartsOfSpeechKeyDown(code);
+  //     }
+  //   }
 
-    return true;
-  };
+  //   return true;
+  // };
 
-  const onDefaultKeyDown = (code: string): boolean => {
-    if (code === KEY_BACK && inputElement()?.selectionStart === 0) {
-      if (props.searchParams.topics.length) {
-        props.onSearchParamsChange({ topics: [] });
-      } else if (props.searchParams.partsOfSpeech.length) {
-        props.onSearchParamsChange({ partsOfSpeech: [] });
-      }
-      return false;
-    }
+  // const onDefaultKeyDown = (code: string): boolean => {
+  //   if (code === KEY_BACK && inputElement()?.selectionStart === 0) {
+  //     if (props.searchParams.topics.length) {
+  //       props.onSearchParamsChange({ topics: [] });
+  //     } else if (props.searchParams.partsOfSpeech.length) {
+  //       props.onSearchParamsChange({ partsOfSpeech: [] });
+  //     }
+  //     return false;
+  //   }
 
-    return true;
-  };
+  //   return true;
+  // };
 
   const onFiltersKeyDown = (code: string): boolean => {
     const dropdownModeByKey = KEY_TO_DROPDOWN_MODE[code];
@@ -159,13 +159,13 @@ export const WordsSearchBar: Component<WordsSearchBarProps> = (props) => {
           spellcheck={false}
           placeholder={'Type : to add filter'}
           onInput={(e) => onInputChange(e.currentTarget.value)}
-          onKeyDown={(e) => {
-            const shouldChangeInput = onKeyDown(e.code);
-            if (!shouldChangeInput) {
-              e.preventDefault();
-            }
-            e.stopPropagation();
-          }}
+          // onKeyDown={(e) => {
+          //   const shouldChangeInput = onKeyDown(e.code);
+          //   if (!shouldChangeInput) {
+          //     e.preventDefault();
+          //   }
+          //   e.stopPropagation();
+          // }}
         />
         <Show when={dropdownMode()}>
           <WordSearchBarDropdown

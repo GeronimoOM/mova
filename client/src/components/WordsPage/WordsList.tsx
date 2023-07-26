@@ -2,8 +2,8 @@ import {
   Component,
   For,
   createEffect,
-  untrack,
   createSignal,
+  Show,
 } from 'solid-js';
 import { createLazyQuery } from '@merged/solid-apollo';
 import {
@@ -13,7 +13,7 @@ import {
 import { useLanguageContext } from '../LanguageContext';
 import { WordsSearchParams } from './WordsSearchBar/wordsSearchParams';
 import { cache } from '../../api/client';
-import { WordsListItem } from './WordsListItem';
+import { WordListItemLoading, WordsListItem } from './WordsListItem';
 
 const WORDS_PAGE_SIZE = 15;
 
@@ -49,7 +49,7 @@ export const WordsList: Component<WordsListProps> = (props) => {
   createEffect(() => {
     if (selectedLanguageId()) {
       cache.evict({
-        id: `Language:${untrack(selectedLanguageId)!}`,
+        id: `Language:${selectedLanguageId!}`,
         fieldName: 'words:search',
       });
 
@@ -102,6 +102,9 @@ export const WordsList: Component<WordsListProps> = (props) => {
           />
         )}
       </For>
+      {/* <Show when={wordsPageQuery.loading}>
+        {new Array(15).fill(null).map(() => <WordListItemLoading />)}
+      </Show> */}
       <div ref={setListEndRef}></div>
     </div>
   );
