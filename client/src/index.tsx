@@ -15,9 +15,9 @@ render(
   () => (
     <ApolloProvider client={client}>
       <Router>
-        <Suspense fallback={<AppLoading />}>
+        {/* <Suspense fallback={<AppLoading />}> */}
           <App />
-        </Suspense>
+        {/* </Suspense> */}
       </Router>
     </ApolloProvider>
   ),

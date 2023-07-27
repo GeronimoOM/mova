@@ -48,7 +48,7 @@ export const Languages: Component<NavBarLanguagesProps> = (props) => {
   );
   const [languageInput, setLanguageInput] = createSignal('');
   const isLanguageInputValid = () =>
-    languageInput().length >= MIN_LANGUAGE_NAME_LENGTH;
+    languageInput().trim().length >= MIN_LANGUAGE_NAME_LENGTH;
 
   const languagesQuery = createQuery(GetLanguagesDocument);
   const languages = () => languagesQuery()?.languages;
@@ -148,7 +148,7 @@ export const Languages: Component<NavBarLanguagesProps> = (props) => {
     const { createLanguage: createdLanguage } = await createLanguage({
       variables: {
         input: {
-          name: languageInput(),
+          name: languageInput().trim(),
         },
       },
       update: updateCacheOnCreateLanguage,
@@ -163,7 +163,7 @@ export const Languages: Component<NavBarLanguagesProps> = (props) => {
       variables: {
         input: {
           id: actionLanguageId()!,
-          name: languageInput(),
+          name: languageInput().trim(),
         },
       },
     });

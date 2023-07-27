@@ -42,7 +42,7 @@ export const PropertyListItem: Component<PropertyListItemProps> = (props) => {
     props.property?.name ?? '',
   );
   const isPropertyNameValid = () =>
-    propertyName().length >= MIN_PROPERTY_NAME_LENGTH;
+    propertyName().trim().length >= MIN_PROPERTY_NAME_LENGTH;
   const [propertyType, setPropertyType] = createSignal(
     props.property?.type ?? PropertyType.Text,
   );
@@ -81,7 +81,7 @@ export const PropertyListItem: Component<PropertyListItemProps> = (props) => {
           languageId: selectedLanguageId()!,
           partOfSpeech: props.partOfSpeech,
           type: propertyType(),
-          name: propertyName(),
+          name: propertyName().trim(),
         },
       },
       update: updateCacheOnCreateProperty,
@@ -93,7 +93,7 @@ export const PropertyListItem: Component<PropertyListItemProps> = (props) => {
       variables: {
         input: {
           id: props.property!.id,
-          name: propertyName(),
+          name: propertyName().trim(),
         },
       },
     });
@@ -119,7 +119,7 @@ export const PropertyListItem: Component<PropertyListItemProps> = (props) => {
   return (
     <div
       ref={sortableRef}
-      class={`group w-full max-w-[60rem] min-h-[6rem] p-2 flex flex-row 
+      class={`group w-full max-w-[60rem] min-h-[6rem] p-2 flex flex-row
       ${baseColors?.textColor} ${baseColors?.backgroundColor} transition-colors`}
       classList={{
         'opacity-75': sortable?.isActiveDraggable,
