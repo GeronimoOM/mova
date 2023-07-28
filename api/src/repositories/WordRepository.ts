@@ -166,9 +166,7 @@ export class WordRepository {
   }
 
   async deleteAll(): Promise<void> {
-    await this.connectionManager
-      .getConnection()(TABLE_WORDS)
-      .delete();
+    await this.connectionManager.getConnection()(TABLE_WORDS).delete();
   }
 
   private mapToWord(row: WordTable): WordWithoutProperties {

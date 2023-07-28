@@ -142,9 +142,7 @@ export class PropertyRepository {
   }
 
   async deleteAll(): Promise<void> {
-    await this.connectionManager
-      .getConnection()(TABLE_PROPERTIES)
-      .delete();
+    await this.connectionManager.getConnection()(TABLE_PROPERTIES).delete();
   }
 
   private mapToProperty(row: PropertyTable): Property {

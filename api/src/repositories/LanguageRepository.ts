@@ -55,8 +55,6 @@ export class LanguageRepository {
   }
 
   async deleteAll(): Promise<void> {
-    await this.connectionManager
-      .getConnection()(TABLE_LANGUAGES)
-      .delete();
+    await this.connectionManager.getConnection()(TABLE_LANGUAGES).delete();
   }
 }

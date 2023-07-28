@@ -12,6 +12,7 @@ export const INDEX_TO_MAPPING: Record<IndexType, elastic.MappingTypeMapping> = {
     properties: {
       original: {
         type: 'text',
+        boost: 1.5,
       },
       translation: {
         type: 'text',

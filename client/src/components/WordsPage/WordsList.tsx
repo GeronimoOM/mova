@@ -16,6 +16,7 @@ import { cache } from '../../api/client';
 import { WordListItemLoading, WordsListItem } from './WordsListItem';
 
 const WORDS_PAGE_SIZE = 15;
+const SEARCH_MIN_TERM = 3;
 
 export type WordsListProps = {
   searchParams: WordsSearchParams;
@@ -36,8 +37,9 @@ export const WordsList: Component<WordsListProps> = (props) => {
 
   const words = () => wordsPageQuery()?.language?.words.items;
   const hasMore = () => wordsPageQuery()?.language?.words.hasMore;
-  const searchQuery = () =>
-    props.searchParams.query.length >= 3 ? props.searchParams.query : null;
+  const isSearch = () => props.searchParams.query.length >= SEARCH_MIN_TERM;
+  const searchQuery = () => isSearch() ? props.searchParams.query : null;
+
   const fetchWordsPageArgs = (): GetWordsQueryVariables => ({
     languageId: selectedLanguageId()!,
     query: searchQuery(),
@@ -48,10 +50,12 @@ export const WordsList: Component<WordsListProps> = (props) => {
 
   createEffect(() => {
     if (selectedLanguageId()) {
-      cache.evict({
-        id: `Language:${selectedLanguageId!}`,
-        fieldName: 'words:search',
-      });
+      if (isSearch()) {
+        cache.evict({
+          id: `Language:${selectedLanguageId()!}`,
+          fieldName: 'words:search',
+        });
+      }
 
       fetchWordsPage({
         variables: {

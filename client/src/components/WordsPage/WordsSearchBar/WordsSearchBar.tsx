@@ -159,6 +159,7 @@ export const WordsSearchBar: Component<WordsSearchBarProps> = (props) => {
           placeholder={'Type : to add filter'}
           value={props.searchParams.query}
           onInput={(e) => onInputChange(e.currentTarget.value)}
+          onChange={(e) => onInputChange(e.currentTarget.value)}
           onKeyDown={(e) => {
             const shouldChangeInput = onKeyDown(e.code);
             if (!shouldChangeInput) {

@@ -50,9 +50,7 @@ export class SearchClient implements OnApplicationBootstrap {
       return emptyPage();
     }
 
-    const queryFilters: QueryDslQueryContainer[] = [
-      { term: { languageId } },
-    ];
+    const queryFilters: QueryDslQueryContainer[] = [{ term: { languageId } }];
 
     if (partsOfSpeech?.length) {
       queryFilters.push({
@@ -61,7 +59,7 @@ export class SearchClient implements OnApplicationBootstrap {
             term: { partOfSpeech },
           })),
         },
-      })
+      });
     }
 
     if (topics?.length) {
@@ -71,24 +69,25 @@ export class SearchClient implements OnApplicationBootstrap {
             term: { topics: topic },
           })),
         },
-      })
+      });
     }
 
-    const queryMust: QueryDslQueryContainer = {
-      multi_match: {
-        query,
-        fields: ['original', 'translation', 'properties'],
-        fuzziness: 'AUTO',
-        type: 'bool_prefix',
-      },
-    };
+    const queryShould: QueryDslQueryContainer[] = [
+      { fuzzy: { original: { value: query } } },
+      { prefix: { original: { value: query } } },
+      { fuzzy: { translation: { value: query } } },
+      { prefix: { translation: { value: query } } },
+      { fuzzy: { properties: { value: query } } },
+      { prefix: { properties: { value: query } } },
+    ];
 
     const searchResponse = await this.getClient().search<WordDocument>({
       index: INDEX_WORDS,
       query: {
         bool: {
           filter: queryFilters,
-          must: queryMust,
+          should: queryShould,
+          minimum_should_match: 1,
         },
       },
       from: start,
