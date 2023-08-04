@@ -72,6 +72,8 @@ export class SearchClient implements OnApplicationBootstrap {
       });
     }
 
+    query = query.toLowerCase();
+
     const queryShould: QueryDslQueryContainer[] = [
       { fuzzy: { original: { value: query } } },
       { prefix: { original: { value: query } } },
@@ -179,7 +181,11 @@ export class SearchClient implements OnApplicationBootstrap {
     await this.getClient().index<TopicDocument>({
       index: INDEX_TOPICS,
       id: topic.id,
-      document: topic,
+      document: {
+        id: topic.id,
+        name: topic.name.toLowerCase(),
+        languageId: topic.languageId,
+      },
     });
   }
 
@@ -273,8 +279,8 @@ export class SearchClient implements OnApplicationBootstrap {
   private wordToDocument(word: Word): WordDocument {
     return {
       id: word.id,
-      original: word.original,
-      translation: word.translation,
+      original: word.original.toLowerCase(),
+      translation: word.translation.toLowerCase(),
       languageId: word.languageId,
       partOfSpeech: word.partOfSpeech,
       properties: word.properties
@@ -282,7 +288,7 @@ export class SearchClient implements OnApplicationBootstrap {
             .filter((value): value is TextPropertyValue =>
               isTextPropertyValue(value),
             )
-            .map((value) => value.text)
+            .map((value) => value.text.toLowerCase())
         : undefined,
       ...(word.topics && {
         topics: word.topics.map((topic) => topic.id),

@@ -27,7 +27,7 @@ export const WordsPageHeader: Component<WordsPageHeader> = (props) => {
 
   return (
     <ColorProvider colorContext={colorContext}>
-      <div class="flex flex-row items-center justify-center">
+      <div class="p-2 gap-2 flex flex-row items-center justify-center">
         <WordsSearchBar
           searchParams={props.searchParams}
           onSearchParamsChange={props.onSearchParamsChange}

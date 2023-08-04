@@ -385,6 +385,7 @@ const WordDetailsTextInput: Component<WordDetailsTextInputProps> = (props) => {
       onInput={(e) => props.onTextChange(e.currentTarget.value)}
       disabled={props.isDisabled}
       spellcheck={false}
+      autoCapitalize='off'
     />
   );
 };

@@ -141,7 +141,7 @@ export const WordsSearchBar: Component<WordsSearchBarProps> = (props) => {
   const { base: baseColors } = useColorContext()!;
 
   return (
-    <div class="w-full max-w-2xl p-2 flex flex-row font-bold">
+    <div class="w-full max-w-2xl flex flex-row font-bold">
       <div
         class={`relative w-full flex flex-row items-center ${baseColors?.textColor} ${baseColors?.backgroundColor}`}
       >
@@ -156,6 +156,7 @@ export const WordsSearchBar: Component<WordsSearchBarProps> = (props) => {
           type="text"
           ref={setInputElement}
           spellcheck={false}
+          autoCapitalize='off'
           placeholder={'Type : to add filter'}
           value={props.searchParams.query}
           onInput={(e) => onInputChange(e.currentTarget.value)}

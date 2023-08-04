@@ -222,6 +222,7 @@ const PropertyNameInput: Component<PropertyNameInputProps> = (props) => {
       onInput={(e) => props.onPropertyName(e.currentTarget.value)}
       disabled={props.isDisabled}
       spellcheck={false}
+      autoCapitalize='off'
     />
   );
 };
