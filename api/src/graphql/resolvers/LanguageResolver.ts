@@ -11,7 +11,7 @@ import {
 } from '@nestjs/graphql';
 import { LanguageId } from 'models/Language';
 import { mapPage, Page } from 'models/Page';
-import { PartOfSpeech } from 'models/Word';
+import { PartOfSpeech, WordOrder } from 'models/Word';
 import { LanguageService } from 'services/LanguageService';
 import { PropertyService } from 'services/PropertyService';
 import { WordService } from 'services/WordService';
@@ -125,6 +125,8 @@ export class LanguageResolver {
     partsOfSpeech?: PartOfSpeech[],
     @Args('topics', { type: () => [ID], nullable: true })
     topics?: TopicId[],
+    @Args('order', { type: () => WordOrder, nullable: true })
+    order?: WordOrder,
   ): Promise<Page<WordType>> {
     const wordPage = await this.wordService.getPage({
       languageId: language.id,
@@ -132,6 +134,7 @@ export class LanguageResolver {
       partsOfSpeech,
       topics,
       ...pageArgs,
+      order,
     });
 
     return mapPage(wordPage, (word) => this.wordTypeMapper.map(word));

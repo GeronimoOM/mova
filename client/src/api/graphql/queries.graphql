@@ -11,6 +11,7 @@ query GetWords(
   $partsOfSpeech: [PartOfSpeech!]
   $query: String
   $topics: [ID!]
+  $order: WordOrder
 ) {
   language(id: $languageId) {
     id
@@ -20,6 +21,7 @@ query GetWords(
       partsOfSpeech: $partsOfSpeech
       query: $query
       topics: $topics
+      order: $order
     ) {
       items {
         ...WordFields

@@ -21,11 +21,11 @@ export const NavBar: Component = () => {
 
   const [isLanguagesActive, setIsLanguagesActive] = createSignal(false);
 
-  createEffect(() => {
-    if (!appRoute()) {
-      navigate(AppRoute.Words, { replace: true });
-    }
-  });
+  // createEffect(() => {
+  //   if (!appRoute()) {
+  //     navigate(AppRoute.Words, { replace: true });
+  //   }
+  // });
 
   const colorContext: ColorContextType = {
     base: {

@@ -1,12 +1,56 @@
-import { IoConstructSharp } from 'solid-icons/io'
-import { Icon } from '../utils/Icon'
 import { Component } from 'solid-js';
+import { ExerciseType, exercisesProps } from './exercises';
+import { IconTypes } from 'solid-icons';
+import { ColorContextType, ColorProvider, asClasses } from '../utils/ColorContext';
+import { Icon } from '../utils/Icon';
+import { A } from '@solidjs/router';
+import { AppRoute } from '../../routes';
 
 export const ExercisesPage: Component = () => {
   return (
-    <div class='p-10 flex flex-col items-center justify-center text-spacecadet-300'>
-      <Icon icon={IoConstructSharp} />
-      <p class=' text-lg'>Under construction...</p>
+    <div class='p-2 grid grid-cols-2 gap-2'>
+      {Object.entries(exercisesProps).map(([type, { title, icon, route }]) =>
+        <ExerciseBanner type={type as ExerciseType} title={title} icon={icon}
+          route={`${AppRoute.Exercises}${route}`}
+        />
+      )}
     </div>
-  )
+  );
+}
+
+type ExerciseBannerProps = {
+  type: ExerciseType;
+  title: string;
+  icon: IconTypes;
+  route: string;
+};
+
+export const ExerciseBanner: Component<ExerciseBannerProps> = (props) => {
+  const colorContext: ColorContextType = {
+    base: {
+      textColor: 'text-spacecadet-300',
+      backgroundColor: 'bg-coolgray-300',
+      hoverBackgroundColor: 'hover:bg-coolgray-200',
+    },
+  };
+
+  const baseClasses = asClasses(
+    colorContext.base?.textColor,
+    colorContext.base?.backgroundColor,
+    colorContext.base?.hoverTextColor,
+    colorContext.base?.hoverBackgroundColor,
+  );
+
+  return (
+    <ColorProvider colorContext={colorContext}>
+      <A href={props.route} end={true}>
+        <div class={`${baseClasses} min-h-[10rem] p-3 flex flex-row items-center`}>
+          <div class='p-2'>
+            <Icon icon={props.icon} />
+          </div>
+          <p class='text-lg'>{props.title}</p>
+        </div>
+      </A>
+    </ColorProvider>
+  );
 }

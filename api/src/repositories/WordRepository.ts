@@ -53,12 +53,16 @@ export class WordRepository {
       .where({
         language_id: languageId,
       })
-      .offset(start)
-      .limit(limit + 1)
-      .orderBy(
+
+
+    if (order === WordOrder.Random) {
+      query.orderByRaw('RAND()');
+    } else {
+      query.offset(start).limit(limit + 1).orderBy(
         order === WordOrder.Chronological ? 'added_at' : 'original',
         order === WordOrder.Chronological ? 'desc' : 'asc',
       );
+    }
 
     if (partsOfSpeech?.length) {
       query.whereIn('part_of_speech', partsOfSpeech);

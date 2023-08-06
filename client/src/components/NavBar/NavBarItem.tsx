@@ -26,7 +26,7 @@ export const NavBarItem: Component<NavBarItemProps> = (props) => {
   );
 
   return (
-    <A href={props.href} end={true}>
+    <A href={props.href}>
       <div
         class="flex-none flex flex-row items-center"
         classList={{

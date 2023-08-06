@@ -28,4 +28,5 @@ export enum PartOfSpeech {
 export enum WordOrder {
   Alphabetical = 'alphabetical',
   Chronological = 'chronolocial',
+  Random = 'random',
 }

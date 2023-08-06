@@ -1,12 +1,13 @@
 import { Routes, Route } from '@solidjs/router'
 import { FaSolidEarthEurope } from 'solid-icons/fa';
 import { AppRoute } from '../routes'
-import { Component, Show, lazy } from 'solid-js'
+import { Component, Show } from 'solid-js'
 import { useLanguageContext } from './LanguageContext'
 import { Icon } from './utils/Icon'
 import { WordsPage } from './WordsPage/WordsPage';
 import { PropertiesPage } from './PropertiesPage/PropertiesPage';
 import { ExercisesPage } from './ExercisesPage/ExercisesPage';
+import { CardsExercise } from './ExercisesPage/CardsExercise';
 
 export const Main: Component = () => {
   const [selectedLanguage] = useLanguageContext();
@@ -17,7 +18,10 @@ export const Main: Component = () => {
         <Routes>
           <Route path={AppRoute.Words} component={WordsPage} />
           <Route path={AppRoute.Properties} component={PropertiesPage} />
-          <Route path={AppRoute.Exercises} component={ExercisesPage} />
+          <Route path={AppRoute.Exercises}>
+            <Route path='/' component={ExercisesPage} />
+            <Route path='/cards' component={CardsExercise} />
+          </Route>
         </Routes>
       </Show>
     </main>
