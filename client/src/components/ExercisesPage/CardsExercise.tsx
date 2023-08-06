@@ -3,8 +3,8 @@ import { Component, Show, createEffect, createSignal } from 'solid-js'
 import { GetWordsDocument, WordFieldsFragment, WordOrder } from '../../api/types/graphql'
 import { useLanguageContext } from '../LanguageContext'
 import { ColorProvider, ColorContextType, asClasses, useColorContext } from '../utils/ColorContext';
-import { Icon } from '../utils/Icon';
-import { BiRegularRightArrow, BiRegularLeftArrow } from 'solid-icons/bi'
+import { BiRegularRightArrow, BiRegularLeftArrow, BiRegularReset } from 'solid-icons/bi'
+import { FaSolidBoltLightning, FaSolidLightbulb } from 'solid-icons/fa'
 import { Button } from '../utils/Button';
 
 const N_WORDS = 30;
@@ -19,7 +19,7 @@ export const CardsExercise: Component = () => {
   const hasPrevWord = () => wordIndex() > 0;
   const hasNextWord = () => wordIndex() < (words() ?? []).length - 1;
 
-  createEffect(() => {
+  const fetchWords = () => {
     if (selectedLanguageId()) {
       fetchRandomWords({
         variables: {
@@ -27,8 +27,14 @@ export const CardsExercise: Component = () => {
           limit: N_WORDS,
           order: WordOrder.Random,
         },
+        fetchPolicy: 'no-cache',
       });
+      setWordIndex(0);
     }
+  }
+
+  createEffect(() => {
+    fetchWords();
   });
 
   const toPrevWord = () => setWordIndex((idx) => idx - 1);
@@ -50,8 +56,11 @@ export const CardsExercise: Component = () => {
     <ColorProvider colorContext={colorContext}>
       <div class='flex flex-col items-center p-3'>
         <Show when={word()}>
-          <WordCard word={word()!}/>
+          <WordCard word={word()!} index={wordIndex()} total={words()?.length ?? 0} />
           <div class='p-2 gap-2 flex flex-row'>
+            <Button icon={BiRegularReset}
+              onClick={fetchWords}
+            />
             <Button icon={BiRegularLeftArrow}
               onClick={toPrevWord}
               isDisabled={!hasPrevWord()}
@@ -69,6 +78,8 @@ export const CardsExercise: Component = () => {
 
 type WordCardProps = {
   word: WordFieldsFragment;
+  index: number;
+  total: number;
 }
 
 const WordCard: Component<WordCardProps> = (props) => {
@@ -83,10 +94,12 @@ const WordCard: Component<WordCardProps> = (props) => {
   );
 
   return (
-    <div class={`${baseClasses} min-w-[20rem] min-h-[10rem] flex items-center justify-center`}
+    <div class={`relative w-[20rem] h-[10rem] p-3 flex items-center justify-center
+     cursor-pointer select-none ${baseClasses}`}
       onClick={() => setIsRevealed((isRevealed) => !isRevealed)}
     >
-      <p>{isRevealed() ? props.word.original : props.word.translation}</p>
+      <div class='absolute top-2 left-3 text-sm'>{`${props.index + 1}/${props.total}`}</div>
+      <div class='truncate text-lg'>{isRevealed() ? props.word.original : props.word.translation}</div>
     </div>
   );
 }
