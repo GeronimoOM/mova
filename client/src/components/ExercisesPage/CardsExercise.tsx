@@ -13,6 +13,7 @@ export const CardsExercise: Component = () => {
   const [selectedLanguageId] = useLanguageContext();
   const [fetchRandomWords, randomWordsQuery] = createLazyQuery(GetWordsDocument);
   const [wordIndex, setWordIndex] = createSignal(0);
+  const [isRevealed, setIsRevealed] = createSignal(false);
 
   const words = () => randomWordsQuery()?.language!.words.items;
   const word = () => words() ? words()![wordIndex()] : undefined;
@@ -29,6 +30,7 @@ export const CardsExercise: Component = () => {
         },
         fetchPolicy: 'no-cache',
       });
+      setIsRevealed(false);
       setWordIndex(0);
     }
   }
@@ -37,8 +39,14 @@ export const CardsExercise: Component = () => {
     fetchWords();
   });
 
-  const toPrevWord = () => setWordIndex((idx) => idx - 1);
-  const toNextWord = () => setWordIndex((idx) => idx + 1);
+  const toPrevWord = () => {
+    setIsRevealed(false);
+    setWordIndex((idx) => idx - 1);
+  }
+  const toNextWord = () => {
+    setIsRevealed(false);
+    setWordIndex((idx) => idx + 1);
+  }
 
   const colorContext: ColorContextType = {
     base: {
@@ -56,7 +64,11 @@ export const CardsExercise: Component = () => {
     <ColorProvider colorContext={colorContext}>
       <div class='flex flex-col items-center p-3'>
         <Show when={word()}>
-          <WordCard word={word()!} index={wordIndex()} total={words()?.length ?? 0} />
+          <WordCard
+            word={word()!}
+            isRevealed={isRevealed()} onReveal={setIsRevealed}
+            index={wordIndex()} total={words()?.length ?? 0}
+          />
           <div class='p-2 gap-2 flex flex-row'>
             <Button icon={BiRegularReset}
               onClick={fetchWords}
@@ -78,13 +90,13 @@ export const CardsExercise: Component = () => {
 
 type WordCardProps = {
   word: WordFieldsFragment;
+  isRevealed: boolean;
+  onReveal: (isRevealed: boolean) => void;
   index: number;
   total: number;
 }
 
 const WordCard: Component<WordCardProps> = (props) => {
-  const [isRevealed, setIsRevealed] = createSignal(false);
-
   const colorContext = useColorContext()!;
   const baseClasses = asClasses(
     colorContext.base?.textColor,
@@ -95,11 +107,11 @@ const WordCard: Component<WordCardProps> = (props) => {
 
   return (
     <div class={`relative w-[20rem] h-[10rem] p-3 flex items-center justify-center
-     cursor-pointer select-none ${baseClasses}`}
-      onClick={() => setIsRevealed((isRevealed) => !isRevealed)}
+    cursor-pointer select-none ${baseClasses}`}
+      onClick={() => props.onReveal(!props.isRevealed)}
     >
       <div class='absolute top-2 left-3 text-sm'>{`${props.index + 1}/${props.total}`}</div>
-      <div class='truncate text-lg'>{isRevealed() ? props.word.original : props.word.translation}</div>
+      <div class='truncate text-lg'>{props.isRevealed ? props.word.original : props.word.translation}</div>
     </div>
   );
 }
