@@ -56,7 +56,7 @@ export class WordRepository {
 
 
     if (order === WordOrder.Random) {
-      query.orderByRaw('RAND()');
+      query.limit(limit + 1).orderByRaw('RAND()');
     } else {
       query.offset(start).limit(limit + 1).orderBy(
         order === WordOrder.Chronological ? 'added_at' : 'original',
