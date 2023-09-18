@@ -10,10 +10,7 @@ export type ButtonProps = {
 };
 
 export const Button: Component<ButtonProps> = (props) => {
-  const {
-    base: baseColors,
-    disabled: disabledColors,
-  } = useColorContext()!;
+  const { base: baseColors, disabled: disabledColors } = useColorContext()!;
   const defaultClasses = asClasses(
     baseColors?.textColor,
     baseColors?.backgroundColor,
@@ -28,8 +25,7 @@ export const Button: Component<ButtonProps> = (props) => {
   );
 
   const onClick = () =>
-    !props.isDisabled &&
-    runWithOwner(owner, () => props.onClick());
+    !props.isDisabled && runWithOwner(owner, () => props.onClick());
 
   const owner = getOwner();
 

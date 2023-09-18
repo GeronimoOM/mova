@@ -22,6 +22,11 @@ const validationPlugin: MercuriusPlugin<MercuriusValidationOptions> = {
   plugin: mercuriusValidationPlugin,
   options: {
     schema: {
+      Language: {
+        wordsStats: {
+          fromDate: { type: 'string', format: 'date' },
+        },
+      },
       CreateLanguageInput: {
         name: { type: 'string', minLength: 3, maxLength: 20 },
       },

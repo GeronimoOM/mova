@@ -10,10 +10,7 @@ import { Topic, TopicId } from 'models/Topic';
 import { SearchClient, SearchTopicsParams } from 'clients/SearchClient';
 import { WordId } from 'models/Word';
 import { WordService } from './WordService';
-
-export const DEFAULT_LIMIT = 10;
-export const MAX_LIMIT = 100;
-export const QUERY_MIN_LENGTH = 3;
+import { DEFAULT_LIMIT, QUERY_MIN_LENGTH } from 'utils/constants';
 
 export interface GetTopicPageParms extends PageArgs {
   languageId: LanguageId;

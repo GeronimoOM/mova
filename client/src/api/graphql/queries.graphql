@@ -73,3 +73,21 @@ query GetTopics($languageId: ID!, $start: Int, $limit: Int, $query: String) {
     }
   }
 }
+
+query GetWordsStats($languageId: ID!, $from: String) {
+  language(id: $languageId) {
+    wordsStats(from: $from) {
+      total {
+        words
+      }
+      byDate {
+        from
+        until
+        dates {
+          date
+          words
+        }
+      }
+    }
+  }
+}

@@ -1,10 +1,4 @@
-import {
-  Component,
-  For,
-  createEffect,
-  createSignal,
-  Show,
-} from 'solid-js';
+import { Component, For, createEffect, createSignal, Show } from 'solid-js';
 import { createLazyQuery } from '@merged/solid-apollo';
 import {
   GetWordsDocument,
@@ -13,7 +7,7 @@ import {
 import { useLanguageContext } from '../LanguageContext';
 import { WordsSearchParams } from './WordsSearchBar/wordsSearchParams';
 import { cache } from '../../api/client';
-import { WordListItemLoading, WordsListItem } from './WordsListItem';
+import { WordsListItem } from './WordsListItem';
 
 const WORDS_PAGE_SIZE = 15;
 const SEARCH_MIN_TERM = 3;
@@ -38,7 +32,7 @@ export const WordsList: Component<WordsListProps> = (props) => {
   const words = () => wordsPageQuery()?.language?.words.items;
   const hasMore = () => wordsPageQuery()?.language?.words.hasMore;
   const isSearch = () => props.searchParams.query.length >= SEARCH_MIN_TERM;
-  const searchQuery = () => isSearch() ? props.searchParams.query : null;
+  const searchQuery = () => (isSearch() ? props.searchParams.query : null);
 
   const fetchWordsPageArgs = (): GetWordsQueryVariables => ({
     languageId: selectedLanguageId()!,
@@ -67,8 +61,8 @@ export const WordsList: Component<WordsListProps> = (props) => {
   });
 
   const observer = new IntersectionObserver(
-    entries => setIsListEndVisible(entries[0].isIntersecting),
-    { threshold: 1 }
+    (entries) => setIsListEndVisible(entries[0].isIntersecting),
+    { threshold: 1 },
   );
 
   createEffect(() => {
@@ -81,7 +75,7 @@ export const WordsList: Component<WordsListProps> = (props) => {
     if (isListEndVisible() && hasMore() && !wordsPageQuery.loading) {
       onFetchMore();
     }
-  })
+  });
 
   const onFetchMore = () => {
     fetchWordsPage({
@@ -94,9 +88,7 @@ export const WordsList: Component<WordsListProps> = (props) => {
   };
 
   return (
-    <div
-      class="w-full max-w-[60rem] mx-auto p-2 gap-y-2 flex flex-col items-center"
-    >
+    <div class="w-full max-w-[60rem] mx-auto p-2 gap-y-2 flex flex-col items-center">
       <For each={words()}>
         {(word) => (
           <WordsListItem

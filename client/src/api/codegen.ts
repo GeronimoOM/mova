@@ -7,13 +7,11 @@ const config: CodegenConfig = {
   generates: {
     './src/api/types/': {
       preset: 'client',
-      plugins: [],
       presetConfig: {
         fragmentMasking: false,
       },
     },
   },
-  ignoreNoDocuments: true,
 };
 
 export default config;

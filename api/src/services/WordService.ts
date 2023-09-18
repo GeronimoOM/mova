@@ -2,7 +2,7 @@ import { v1 as uuid } from 'uuid';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { LanguageId } from 'models/Language';
 import { mapPage, Page, PageArgs } from 'models/Page';
-import { PartOfSpeech, Word, WordId, WordOrder } from 'models/Word';
+import { PartOfSpeech, Word, WordId, WordOrder, WordsStats } from 'models/Word';
 import {
   WordRepository,
   WordWithoutProperties,
@@ -21,10 +21,8 @@ import { LanguageService } from './LanguageService';
 import { SearchClient, SearchWordsParams } from 'clients/SearchClient';
 import { TopicService } from './TopicService';
 import { TopicId } from 'models/Topic';
-
-export const DEFAULT_LIMIT = 10;
-export const MAX_LIMIT = 100;
-export const QUERY_MIN_LENGTH = 3;
+import { DateTime } from 'luxon';
+import { DEFAULT_LIMIT, MAX_LIMIT, QUERY_MIN_LENGTH } from 'utils/constants';
 
 export interface GetWordPageParams extends PageArgs {
   languageId: LanguageId;
@@ -224,6 +222,25 @@ export class WordService {
   async deleteForLanguage(languageId: LanguageId): Promise<void> {
     await this.wordRepository.deleteForLanguage(languageId);
     await this.searchClient.deleteLanguageWords(languageId);
+  }
+
+  async getStats(languageId: LanguageId, from?: DateTime): Promise<WordsStats> {
+    from = from ?? DateTime.now().minus({ year: 1 }).plus({ day: 1 });
+    const [count, dates] = await Promise.all([
+      this.wordRepository.getCount(languageId),
+      this.wordRepository.getDateStats(languageId, from),
+    ]);
+
+    return {
+      total: {
+        words: count,
+      },
+      byDate: {
+        from,
+        until: from.plus({ year: 1 }),
+        dates,
+      },
+    };
   }
 
   private setPropertyValues(

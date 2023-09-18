@@ -20,14 +20,8 @@ module.exports = {
         'charcoal-200': '#5e6681',
         'charcoal-100': '#707b9a',
       },
-      keyframes: {
-        flash: {
-          '0%, 100%': { opacity: 1 },
-          '50%': { opacity: 0.5 },
-        }
-      },
-      animation: {
-        flash: 'flash 1s ease-in-out 1'
+      gridTemplateRows: {
+        '7': 'repeat(7, minmax(0, 1fr))',
       },
     },
   },

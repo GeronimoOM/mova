@@ -47,9 +47,11 @@ type OptionWordProperty = Partial<OptionPropertyValueFieldsFragment> & {
   property: OptionPropertyFieldsFragment;
 };
 
-type WordState = Partial<WordFieldsFragment & {
-  properties: WordProperty[];
-}>
+type WordState = Partial<
+  WordFieldsFragment & {
+    properties: WordProperty[];
+  }
+>;
 
 export const WordDetails: Component<WordDetailsProps> = (props) => {
   const [selectedLanguageId] = useLanguageContext();
@@ -76,8 +78,14 @@ export const WordDetails: Component<WordDetailsProps> = (props) => {
   const [updateWord] = createMutation(UpdateWordDocument);
   const [deleteWord] = createMutation(DeleteWordDocument);
 
-  const selectedWord = () => props.selectedWordId && selectedWordQuery.state === 'ready' ? selectedWordQuery()?.word : undefined;
-  const properties = () => propertiesQuery.state === 'ready' ? propertiesQuery()?.language?.properties : undefined;
+  const selectedWord = () =>
+    props.selectedWordId && selectedWordQuery.state === 'ready'
+      ? selectedWordQuery()?.word
+      : undefined;
+  const properties = () =>
+    propertiesQuery.state === 'ready'
+      ? propertiesQuery()?.language?.properties
+      : undefined;
   const createdWord = () => createdWordMutation()?.createWord;
   const isCreateMode = () => !props.selectedWordId;
 
@@ -128,7 +136,10 @@ export const WordDetails: Component<WordDetailsProps> = (props) => {
   });
 
   createEffect(() => {
-    if (((isCreateMode() && word.partOfSpeech) || selectedWord()) && properties()) {
+    if (
+      ((isCreateMode() && word.partOfSpeech) || selectedWord()) &&
+      properties()
+    ) {
       initWordProperties();
     }
   });
@@ -141,7 +152,8 @@ export const WordDetails: Component<WordDetailsProps> = (props) => {
   };
 
   const initWordProperties = () => {
-    setWord('properties',
+    setWord(
+      'properties',
       (properties() ?? []).map((property) => {
         const propertyValue = selectedWord()?.properties.find(
           (propertyValue) => propertyValue.property.id === property.id,
@@ -154,7 +166,9 @@ export const WordDetails: Component<WordDetailsProps> = (props) => {
   };
 
   const onWordPropertyChange = (wordProperty: WordProperty) => {
-    const idx = word.properties!.findIndex((wp) => wp.property.id === wordProperty.property.id);
+    const idx = word.properties!.findIndex(
+      (wp) => wp.property.id === wordProperty.property.id,
+    );
     setWord('properties', idx, {
       ...(wordProperty.property.type === PropertyType.Text && {
         text: (wordProperty as TextWordProperty).text,
@@ -213,7 +227,10 @@ export const WordDetails: Component<WordDetailsProps> = (props) => {
           original: word.original!.trim(),
           translation: word.translation!.trim(),
           partOfSpeech: word.partOfSpeech!,
-          properties: Object.values(updatedProperties).map((value) => ({ ...value, text: value.text?.trim() })),
+          properties: Object.values(updatedProperties).map((value) => ({
+            ...value,
+            text: value.text?.trim(),
+          })),
         },
       },
       update: updateCacheOnCreateWord,
@@ -230,7 +247,10 @@ export const WordDetails: Component<WordDetailsProps> = (props) => {
           id: props.selectedWordId!,
           original: word.original!.trim(),
           translation: word.translation!.trim(),
-          properties:  Object.values(updatedProperties).map((value) => ({ ...value, text: value.text?.trim() })),
+          properties: Object.values(updatedProperties).map((value) => ({
+            ...value,
+            text: value.text?.trim(),
+          })),
         },
       },
     });
@@ -385,7 +405,7 @@ const WordDetailsTextInput: Component<WordDetailsTextInputProps> = (props) => {
       onInput={(e) => props.onTextChange(e.currentTarget.value)}
       disabled={props.isDisabled}
       spellcheck={false}
-      autoCapitalize='off'
+      autoCapitalize="off"
     />
   );
 };

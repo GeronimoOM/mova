@@ -1,13 +1,14 @@
-import { Routes, Route } from '@solidjs/router'
+import { Routes, Route } from '@solidjs/router';
 import { FaSolidEarthEurope } from 'solid-icons/fa';
-import { AppRoute } from '../routes'
-import { Component, Show } from 'solid-js'
-import { useLanguageContext } from './LanguageContext'
-import { Icon } from './utils/Icon'
+import { AppRoute } from '../routes';
+import { Component, Show } from 'solid-js';
+import { useLanguageContext } from './LanguageContext';
+import { Icon } from './utils/Icon';
 import { WordsPage } from './WordsPage/WordsPage';
 import { PropertiesPage } from './PropertiesPage/PropertiesPage';
 import { ExercisesPage } from './ExercisesPage/ExercisesPage';
 import { CardsExercise } from './ExercisesPage/CardsExercise';
+import { StatisticsPage } from './StatisticsPage/StatisticsPage';
 
 export const Main: Component = () => {
   const [selectedLanguage] = useLanguageContext();
@@ -19,20 +20,21 @@ export const Main: Component = () => {
           <Route path={AppRoute.Words} component={WordsPage} />
           <Route path={AppRoute.Properties} component={PropertiesPage} />
           <Route path={AppRoute.Exercises}>
-            <Route path='/' component={ExercisesPage} />
-            <Route path='/cards' component={CardsExercise} />
+            <Route path="/" component={ExercisesPage} />
+            <Route path="/cards" component={CardsExercise} />
           </Route>
+          <Route path={AppRoute.Statistics} component={StatisticsPage} />
         </Routes>
       </Show>
     </main>
-  )
-}
+  );
+};
 
 const NoLanguagePage: Component = () => {
   return (
-    <div class='w-full h-full flex flex-col items-center justify-center text-spacecadet-300'>
+    <div class="w-full h-full flex flex-col items-center justify-center text-spacecadet-300">
       <Icon icon={FaSolidEarthEurope} />
-      <p class='text-lg'>Select or Create Language</p>
+      <p class="text-lg">Select or Create Language</p>
     </div>
   );
-}
+};

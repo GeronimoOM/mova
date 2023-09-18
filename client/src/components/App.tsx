@@ -14,4 +14,4 @@ const App: Component = () => {
   );
 };
 
-export default App
+export default App;

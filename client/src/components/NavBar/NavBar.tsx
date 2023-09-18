@@ -1,13 +1,8 @@
-import {
-  Component,
-  Show,
-  createEffect,
-  createMemo,
-  createSignal,
-} from 'solid-js';
+import { Component, Show, createMemo, createSignal } from 'solid-js';
 import { useLocation, useNavigate } from '@solidjs/router';
 import { BsTranslate } from 'solid-icons/bs';
 import { FaSolidGear, FaSolidBrain } from 'solid-icons/fa';
+import { ImStatsBars } from 'solid-icons/im';
 import { AppRoute, getAppRouteMatch } from '../../routes';
 import { Languages } from './NavBarLanguages/Languages';
 import { NavBarItem } from './NavBarItem';
@@ -62,6 +57,11 @@ export const NavBar: Component = () => {
             href={AppRoute.Exercises}
             icon={FaSolidBrain}
             text="Exercises"
+          />
+          <NavBarItem
+            href={AppRoute.Statistics}
+            icon={ImStatsBars}
+            text="Statistics"
           />
         </Show>
 

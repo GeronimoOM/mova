@@ -14,7 +14,7 @@ export const LanguageInput: Component<LanguageInputProps> = (props) => (
     onInput={(e) => props.onLanguageInput(e.currentTarget.value)}
     disabled={props.isDisabled}
     spellcheck={false}
-    autoCapitalize='off'
+    autoCapitalize="off"
     onKeyDown={(e) => e.stopPropagation()}
   />
 );

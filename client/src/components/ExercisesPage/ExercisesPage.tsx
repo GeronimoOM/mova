@@ -1,22 +1,32 @@
 import { Component } from 'solid-js';
 import { ExerciseType, exercisesProps } from './exercises';
 import { IconTypes } from 'solid-icons';
-import { ColorContextType, ColorProvider, asClasses } from '../utils/ColorContext';
+import {
+  ColorContextType,
+  ColorProvider,
+  asClasses,
+} from '../utils/ColorContext';
 import { Icon } from '../utils/Icon';
 import { A } from '@solidjs/router';
 import { AppRoute } from '../../routes';
 
 export const ExercisesPage: Component = () => {
   return (
-    <div class='p-2 grid grid-cols-2 gap-2'>
-      {Object.entries(exercisesProps).map(([type, { title, icon, route }]) =>
-        <ExerciseBanner type={type as ExerciseType} title={title} icon={icon}
+    <div
+      class="mx-auto max-w-[24rem] sm:max-w-[48rem] p-2
+    grid grid-flow-row grid-cols-1 sm:grid-cols-2 justify-items-stretch gap-2"
+    >
+      {Object.entries(exercisesProps).map(([type, { title, icon, route }]) => (
+        <ExerciseBanner
+          type={type as ExerciseType}
+          title={title}
+          icon={icon}
           route={`${AppRoute.Exercises}${route}`}
         />
-      )}
+      ))}
     </div>
   );
-}
+};
 
 type ExerciseBannerProps = {
   type: ExerciseType;
@@ -44,13 +54,15 @@ export const ExerciseBanner: Component<ExerciseBannerProps> = (props) => {
   return (
     <ColorProvider colorContext={colorContext}>
       <A href={props.route} end={true}>
-        <div class={`${baseClasses} min-h-[10rem] p-3 flex flex-row items-center`}>
-          <div class='p-2'>
+        <div
+          class={`min-h-[10rem] p-3 flex flex-row items-center ${baseClasses}`}
+        >
+          <div class="p-2">
             <Icon icon={props.icon} />
           </div>
-          <p class='text-lg'>{props.title}</p>
+          <p class="text-lg">{props.title}</p>
         </div>
       </A>
     </ColorProvider>
   );
-}
+};

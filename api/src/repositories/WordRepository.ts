@@ -4,10 +4,19 @@ import { LanguageId } from 'models/Language';
 import { mapPage, Page, PageArgs, toPage } from 'models/Page';
 import { PropertyId } from 'models/Property';
 import { PropertyValue } from 'models/PropertyValue';
-import { PartOfSpeech, Word, WordId, WordOrder } from 'models/Word';
+import {
+  PartOfSpeech,
+  Word,
+  WordId,
+  WordOrder,
+  WordsByDateStats,
+  WordsDateStats,
+} from 'models/Word';
 import { DbConnectionManager } from './DbConnectionManager';
 import { TopicId } from 'models/Topic';
 import { TABLE_TOPICS_WORDS } from './TopicRepository';
+import { DateTime } from 'luxon';
+import { DATE_FORMAT } from 'utils/constants';
 
 const TABLE_WORDS = 'words';
 
@@ -49,19 +58,20 @@ export class WordRepository {
   }: GetWordPageParams): Promise<Page<WordWithoutProperties>> {
     const connection = this.connectionManager.getConnection();
 
-    let query = connection(TABLE_WORDS)
-      .where({
-        language_id: languageId,
-      })
-
+    let query = connection(TABLE_WORDS).where({
+      language_id: languageId,
+    });
 
     if (order === WordOrder.Random) {
       query.limit(limit + 1).orderByRaw('RAND()');
     } else {
-      query.offset(start).limit(limit + 1).orderBy(
-        order === WordOrder.Chronological ? 'added_at' : 'original',
-        order === WordOrder.Chronological ? 'desc' : 'asc',
-      );
+      query
+        .offset(start)
+        .limit(limit + 1)
+        .orderBy(
+          order === WordOrder.Chronological ? 'added_at' : 'original',
+          order === WordOrder.Chronological ? 'desc' : 'asc',
+        );
     }
 
     if (partsOfSpeech?.length) {
@@ -155,6 +165,42 @@ export class WordRepository {
       .getConnection()(TABLE_WORDS)
       .where({ language_id: languageId })
       .delete();
+  }
+
+  async getCount(languageId: LanguageId): Promise<number> {
+    const [{ count }] = await this.connectionManager
+      .getConnection()(TABLE_WORDS)
+      .where({ language_id: languageId })
+      .count('id', { as: 'count' });
+
+    return Number(count);
+  }
+
+  async getDateStats(
+    languageId: LanguageId,
+    from: DateTime,
+  ): Promise<WordsDateStats[]> {
+    const fromFormatted = from.toFormat(DATE_FORMAT);
+
+    const connection = this.connectionManager.getConnection();
+    const countsByDates = await connection(TABLE_WORDS)
+      .select({
+        date: connection.raw('date(added_at)'),
+        words: connection.raw('count(id)'),
+      })
+      .where('language_id', languageId)
+      .andWhere(connection.raw('date(added_at)'), '>=', fromFormatted)
+      .andWhere(
+        connection.raw('date(added_at)'),
+        '<',
+        connection.raw(`date_add(?, interval 1 year)`, [fromFormatted]),
+      )
+      .groupByRaw('date(added_at)');
+
+    return countsByDates.map(({ date, words }) => ({
+      date: DateTime.fromFormat(date, DATE_FORMAT),
+      words,
+    }));
   }
 
   streamRecords(): AsyncIterable<WordTable> {

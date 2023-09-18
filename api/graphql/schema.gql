@@ -8,6 +8,7 @@ type Language {
   properties(partOfSpeech: PartOfSpeech): [PropertyUnion!]!
   topics(start: Int! = 0, limit: Int, query: String): TopicPage!
   words(start: Int! = 0, limit: Int, query: String, partsOfSpeech: [PartOfSpeech!], topics: [ID!], order: WordOrder): WordPage!
+  wordsStats(from: String): WordsStats!
 }
 
 union PropertyUnion = TextProperty | OptionProperty
@@ -89,6 +90,26 @@ type Topic {
 type TopicPage {
   items: [Topic!]!
   hasMore: Boolean!
+}
+
+type WordsTotalStats {
+  words: Int!
+}
+
+type WordsDateStats {
+  date: String!
+  words: Int!
+}
+
+type WordsByDateStats {
+  from: String!
+  until: String!
+  dates: [WordsDateStats!]!
+}
+
+type WordsStats {
+  total: WordsTotalStats!
+  byDate: WordsByDateStats!
 }
 
 type Query {
