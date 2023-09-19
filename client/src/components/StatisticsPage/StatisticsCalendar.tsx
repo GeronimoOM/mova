@@ -1,13 +1,10 @@
-import { Component, For, Show } from 'solid-js';
+import { Component } from 'solid-js';
 import { DateTime } from 'luxon';
-import { Icon } from '../utils/Icon';
-import { FaSolidCalendarDays } from 'solid-icons/fa';
-import { WordsByDateStats, WordsDateStats } from '../../api/types/graphql';
+import { WordsByDateStats } from '../../api/types/graphql';
 import { DATE_FORMAT } from '../../constants';
 
 const N_WEEKDAYS = 7;
 const N_WEEKS = 53;
-const N_MONTHS = 12;
 
 const WORDS_THRESHOLD_TO_COLOR: [number, string][] = [
   [30, 'bg-violet-800'],
@@ -58,7 +55,7 @@ export const StatisticsCalendar: Component<StatisticsCalendarProps> = (
   );
 
   const getStatsByDateIndex = (index: number): ParsedWordsDateStats | null => {
-    if (index < fromOffset || index >= totalDays) {
+    if (index < fromOffset || index > totalDays) {
       return null;
     }
 

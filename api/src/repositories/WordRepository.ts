@@ -9,7 +9,6 @@ import {
   Word,
   WordId,
   WordOrder,
-  WordsByDateStats,
   WordsDateStats,
 } from 'models/Word';
 import { DbConnectionManager } from './DbConnectionManager';
@@ -179,8 +178,10 @@ export class WordRepository {
   async getDateStats(
     languageId: LanguageId,
     from: DateTime,
+    until: DateTime,
   ): Promise<WordsDateStats[]> {
     const fromFormatted = from.toFormat(DATE_FORMAT);
+    const untilFormatted = until.toFormat(DATE_FORMAT);
 
     const connection = this.connectionManager.getConnection();
     const countsByDates = await connection(TABLE_WORDS)
@@ -190,11 +191,7 @@ export class WordRepository {
       })
       .where('language_id', languageId)
       .andWhere(connection.raw('date(added_at)'), '>=', fromFormatted)
-      .andWhere(
-        connection.raw('date(added_at)'),
-        '<',
-        connection.raw(`date_add(?, interval 1 year)`, [fromFormatted]),
-      )
+      .andWhere(connection.raw('date(added_at)'), '<', untilFormatted)
       .groupByRaw('date(added_at)');
 
     return countsByDates.map(({ date, words }) => ({

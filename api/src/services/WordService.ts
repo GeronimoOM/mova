@@ -226,9 +226,10 @@ export class WordService {
 
   async getStats(languageId: LanguageId, from?: DateTime): Promise<WordsStats> {
     from = from ?? DateTime.now().minus({ year: 1 }).plus({ day: 1 });
+    const until = from.plus({ year: 1 });
     const [count, dates] = await Promise.all([
       this.wordRepository.getCount(languageId),
-      this.wordRepository.getDateStats(languageId, from),
+      this.wordRepository.getDateStats(languageId, from, until),
     ]);
 
     return {
@@ -237,7 +238,7 @@ export class WordService {
       },
       byDate: {
         from,
-        until: from.plus({ year: 1 }),
+        until,
         dates,
       },
     };
