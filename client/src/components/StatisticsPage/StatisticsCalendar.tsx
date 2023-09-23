@@ -55,7 +55,7 @@ export const StatisticsCalendar: Component<StatisticsCalendarProps> = (
   );
 
   const getStatsByDateIndex = (index: number): ParsedWordsDateStats | null => {
-    if (index < fromOffset || index > totalDays) {
+    if (index < fromOffset || index >= totalDays + fromOffset) {
       return null;
     }
 
