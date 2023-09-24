@@ -1,8 +1,8 @@
 import { useMatch, A } from '@solidjs/router';
 import { IconTypes } from 'solid-icons';
 import { Component } from 'solid-js';
-import { Icon } from '../utils/Icon';
-import { asClasses, useColorContext } from '../utils/ColorContext';
+import { Icon } from '../common/Icon';
+import { asClasses, useColorContext } from '../common/ColorContext';
 
 type NavBarItemProps = {
   href: string;

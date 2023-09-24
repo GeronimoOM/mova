@@ -1,6 +1,6 @@
 import { Component } from 'solid-js';
 import { LanguageFieldsFragment } from '../../../api/types/graphql';
-import { asClasses, useColorContext } from '../../utils/ColorContext';
+import { asClasses, useColorContext } from '../../common/ColorContext';
 
 export type LanguageNameProps = {
   language: LanguageFieldsFragment;

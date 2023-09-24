@@ -2,7 +2,7 @@ import { FaSolidFeatherPointed, FaSolidFire } from 'solid-icons/fa';
 import { SiAddthis } from 'solid-icons/si';
 import { IoArrowRedo } from 'solid-icons/io';
 import { Component, For, Show, getOwner, runWithOwner } from 'solid-js';
-import { Icon } from '../utils/Icon';
+import { Icon } from '../common/Icon';
 import { IconTypes } from 'solid-icons';
 import { asClasses, useColorContext } from './ColorContext';
 

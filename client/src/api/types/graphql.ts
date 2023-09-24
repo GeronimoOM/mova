@@ -84,6 +84,7 @@ export type LanguageWordsArgs = {
 };
 
 export type LanguageWordsStatsArgs = {
+  days?: InputMaybe<Scalars['Int']['input']>;
   from?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -748,7 +749,6 @@ export type GetTopicsQuery = {
 
 export type GetWordsStatsQueryVariables = Exact<{
   languageId: Scalars['ID']['input'];
-  from?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 export type GetWordsStatsQuery = {
@@ -3094,11 +3094,6 @@ export const GetWordsStatsDocument = {
             type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
           },
         },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'from' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'String' } },
-        },
       ],
       selectionSet: {
         kind: 'SelectionSet',
@@ -3122,16 +3117,6 @@ export const GetWordsStatsDocument = {
                 {
                   kind: 'Field',
                   name: { kind: 'Name', value: 'wordsStats' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'from' },
-                      value: {
-                        kind: 'Variable',
-                        name: { kind: 'Name', value: 'from' },
-                      },
-                    },
-                  ],
                   selectionSet: {
                     kind: 'SelectionSet',
                     selections: [

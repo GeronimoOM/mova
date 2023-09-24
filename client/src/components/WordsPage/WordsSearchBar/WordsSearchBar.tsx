@@ -5,8 +5,8 @@ import { WordsSearchParams } from './wordsSearchParams';
 import { WordSearchBarFilterPills } from './WordSearchBarFilterPills';
 import { WordSearchBarDropdown } from './WordSearchBarDropdown';
 import { PartOfSpeech } from '../../../api/types/graphql';
-import { Icon } from '../../utils/Icon';
-import { useColorContext } from '../../utils/ColorContext';
+import { Icon } from '../../common/Icon';
+import { useColorContext } from '../../common/ColorContext';
 
 export enum DropdownMode {
   Filters = 'filters',

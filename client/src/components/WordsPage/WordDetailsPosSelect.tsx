@@ -1,9 +1,9 @@
 import { Component, For, Show, createSignal } from 'solid-js';
 import { PartOfSpeech } from '../../api/types/graphql';
 import { IoShapes } from 'solid-icons/io';
-import { Icon } from '../utils/Icon';
-import { partsOfSpeech, partsOfSpeechProps } from '../utils/partsOfSpeech';
-import { asClasses, useColorContext } from '../utils/ColorContext';
+import { Icon } from '../common/Icon';
+import { partsOfSpeech, partsOfSpeechProps } from '../common/partsOfSpeech';
+import { asClasses, useColorContext } from '../common/ColorContext';
 
 type WordDetailsPosSelectProps = {
   selectedPartOfSpeech: PartOfSpeech | null;

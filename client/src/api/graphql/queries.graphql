@@ -74,9 +74,9 @@ query GetTopics($languageId: ID!, $start: Int, $limit: Int, $query: String) {
   }
 }
 
-query GetWordsStats($languageId: ID!, $from: String) {
+query GetWordsStats($languageId: ID!) {
   language(id: $languageId) {
-    wordsStats(from: $from) {
+    wordsStats {
       total {
         words
       }

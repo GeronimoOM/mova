@@ -1,7 +1,7 @@
 import { Component } from 'solid-js';
 import { WordFieldsFragment } from '../../api/types/graphql';
-import { Icon } from '../utils/Icon';
-import { partsOfSpeechProps } from '../utils/partsOfSpeech';
+import { Icon } from '../common/Icon';
+import { partsOfSpeechProps } from '../common/partsOfSpeech';
 
 export type WordsListItemProps = {
   word: WordFieldsFragment;

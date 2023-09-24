@@ -21,14 +21,14 @@ import {
   updateCacheOnDeleteWord,
 } from '../../api/mutations';
 import { BsTranslate } from 'solid-icons/bs';
-import { Icon } from '../utils/Icon';
+import { Icon } from '../common/Icon';
 import {
   ColorContextType,
   ColorProvider,
   asClasses,
   useColorContext,
-} from '../utils/ColorContext';
-import { ActionBar, Action } from '../utils/ActionBar';
+} from '../common/ColorContext';
+import { ActionBar, Action } from '../common/ActionBar';
 import { WordDetailsPosSelect } from './WordDetailsPosSelect';
 
 const MIN_WORD_ORIGINAL_LENGTH = 1;

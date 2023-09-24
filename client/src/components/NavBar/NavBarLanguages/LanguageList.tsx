@@ -1,8 +1,8 @@
 import { Component, For } from 'solid-js';
 import { LanguageFieldsFragment } from '../../../api/types/graphql';
 import { LanguageListItem } from './LanguageListItem';
-import { Action } from '../../utils/ActionBar';
-import { ColorContextType, ColorProvider } from '../../utils/ColorContext';
+import { Action } from '../../common/ActionBar';
+import { ColorContextType, ColorProvider } from '../../common/ColorContext';
 
 export type Languages = LanguageFieldsFragment[];
 

@@ -1,10 +1,10 @@
 import { Component } from 'solid-js';
-import { ActionButton, Action } from '../utils/ActionBar';
+import { ActionButton, Action } from '../common/ActionBar';
 import {
   WordsSearchBar,
   WordsSearchBarProps,
 } from './WordsSearchBar/WordsSearchBar';
-import { ColorContextType, ColorProvider } from '../utils/ColorContext';
+import { ColorContextType, ColorProvider } from '../common/ColorContext';
 
 type WordsPageHeader = WordsSearchBarProps & {
   isOpenCreateWord: boolean;

@@ -20,10 +20,10 @@ import {
   updateCacheOnCreateProperty,
   updateCacheOnDeleteProperty,
 } from '../../api/mutations';
-import { Icon } from '../utils/Icon';
+import { Icon } from '../common/Icon';
 import { PropertyTypeSelect, PropertyTypeIcon } from './PropertyTypeSelect';
-import { ActionBar, Action } from '../utils/ActionBar';
-import { asClasses, useColorContext } from '../utils/ColorContext';
+import { ActionBar, Action } from '../common/ActionBar';
+import { asClasses, useColorContext } from '../common/ColorContext';
 
 const MIN_PROPERTY_NAME_LENGTH = 3;
 

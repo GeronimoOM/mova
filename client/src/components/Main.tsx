@@ -3,7 +3,7 @@ import { FaSolidEarthEurope } from 'solid-icons/fa';
 import { AppRoute } from '../routes';
 import { Component, Show } from 'solid-js';
 import { useLanguageContext } from './LanguageContext';
-import { Icon } from './utils/Icon';
+import { Icon } from './common/Icon';
 import { WordsPage } from './WordsPage/WordsPage';
 import { PropertiesPage } from './PropertiesPage/PropertiesPage';
 import { ExercisesPage } from './ExercisesPage/ExercisesPage';

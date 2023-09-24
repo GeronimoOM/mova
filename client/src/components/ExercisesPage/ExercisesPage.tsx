@@ -5,8 +5,8 @@ import {
   ColorContextType,
   ColorProvider,
   asClasses,
-} from '../utils/ColorContext';
-import { Icon } from '../utils/Icon';
+} from '../common/ColorContext';
+import { Icon } from '../common/Icon';
 import { A } from '@solidjs/router';
 import { AppRoute } from '../../routes';
 

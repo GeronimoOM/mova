@@ -1,7 +1,7 @@
 import { Component } from 'solid-js';
 import { PartOfSpeech } from '../../api/types/graphql';
-import { partsOfSpeechProps } from '../utils/partsOfSpeech';
-import { Icon } from '../utils/Icon';
+import { partsOfSpeechProps } from '../common/partsOfSpeech';
+import { Icon } from '../common/Icon';
 
 export type PropertiesPosSelectProps = {
   selectedPos: PartOfSpeech;

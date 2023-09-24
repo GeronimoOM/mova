@@ -2,7 +2,7 @@ import { Component, createSignal, Show } from 'solid-js';
 import { LanguageFieldsFragment } from '../../../api/types/graphql';
 import { LanguageInput } from './LanguageInput';
 import { LanguageName } from './LanguageName';
-import { ActionBar, Action } from '../../utils/ActionBar';
+import { ActionBar, Action } from '../../common/ActionBar';
 
 export type LanguageListItemProps = {
   language: LanguageFieldsFragment;

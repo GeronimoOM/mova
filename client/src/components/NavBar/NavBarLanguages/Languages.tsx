@@ -25,8 +25,8 @@ import {
 } from '../../../api/mutations';
 import { LanguageList } from './LanguageList';
 import { LanguageInput } from './LanguageInput';
-import { Icon, ToggleIcon } from '../../utils/Icon';
-import { ActionBar, Action } from '../../utils/ActionBar';
+import { Icon, ToggleIcon } from '../../common/Icon';
+import { ActionBar, Action } from '../../common/ActionBar';
 
 const MIN_LANGUAGE_NAME_LENGTH = 3;
 

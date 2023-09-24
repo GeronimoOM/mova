@@ -8,7 +8,7 @@ type Language {
   properties(partOfSpeech: PartOfSpeech): [PropertyUnion!]!
   topics(start: Int! = 0, limit: Int, query: String): TopicPage!
   words(start: Int! = 0, limit: Int, query: String, partsOfSpeech: [PartOfSpeech!], topics: [ID!], order: WordOrder): WordPage!
-  wordsStats(from: String): WordsStats!
+  wordsStats(days: Int, from: String): WordsStats!
 }
 
 union PropertyUnion = TextProperty | OptionProperty

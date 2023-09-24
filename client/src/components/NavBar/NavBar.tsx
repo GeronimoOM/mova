@@ -7,7 +7,7 @@ import { AppRoute, getAppRouteMatch } from '../../routes';
 import { Languages } from './NavBarLanguages/Languages';
 import { NavBarItem } from './NavBarItem';
 import { createMediaQuery } from '@solid-primitives/media';
-import { ColorContextType, ColorProvider } from '../utils/ColorContext';
+import { ColorContextType, ColorProvider } from '../common/ColorContext';
 
 export const NavBar: Component = () => {
   const appRoute = createMemo(() => getAppRouteMatch(useLocation().pathname));

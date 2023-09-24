@@ -8,6 +8,7 @@ import {
   Mutation,
   InputType,
   Field,
+  Int,
 } from '@nestjs/graphql';
 import { LanguageId } from 'models/Language';
 import { mapPage, Page } from 'models/Page';
@@ -146,11 +147,14 @@ export class LanguageResolver {
   @ResolveField((type) => WordsStatsType)
   async wordsStats(
     @Parent() language: LanguageType,
+    @Args('days', { type: () => Int, nullable: true })
+    days?: number,
     @Args('from', { type: () => String, nullable: true })
     from?: string,
   ): Promise<WordsStatsType> {
     const stats = await this.wordService.getStats(
       language.id,
+      days,
       from ? DateTime.fromFormat(from, DATE_FORMAT) : undefined,
     );
 

@@ -224,9 +224,12 @@ export class WordService {
     await this.searchClient.deleteLanguageWords(languageId);
   }
 
-  async getStats(languageId: LanguageId, from?: DateTime): Promise<WordsStats> {
-    from = from ?? DateTime.now().minus({ year: 1 }).plus({ day: 1 });
-    const until = from.plus({ year: 1 });
+  async getStats(
+    languageId: LanguageId,
+    days: number = DateTime.now().diff(DateTime.now().minus({ months: 3 }), 'days').days,
+    from: DateTime = DateTime.now().minus({ days }).plus({ day: 1 }),
+  ): Promise<WordsStats> {
+    const until = from.plus({ days });
     const [count, dates] = await Promise.all([
       this.wordRepository.getCount(languageId),
       this.wordRepository.getDateStats(languageId, from, until),

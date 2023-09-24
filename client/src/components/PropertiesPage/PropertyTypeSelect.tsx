@@ -3,7 +3,7 @@ import { PropertyType } from '../../api/types/graphql';
 import { IconTypes } from 'solid-icons';
 import { BiRegularText } from 'solid-icons/bi';
 import { ImRadioChecked } from 'solid-icons/im';
-import { Icon } from '../utils/Icon';
+import { Icon } from '../common/Icon';
 
 const propertyTypeToIcon: Record<PropertyType, IconTypes> = {
   [PropertyType.Text]: BiRegularText,

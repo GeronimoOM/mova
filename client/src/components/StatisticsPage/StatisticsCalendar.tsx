@@ -1,10 +1,12 @@
-import { Component } from 'solid-js';
+import { Component, Show } from 'solid-js';
 import { DateTime } from 'luxon';
 import { WordsByDateStats } from '../../api/types/graphql';
-import { DATE_FORMAT } from '../../constants';
+import { DATE_FORMAT } from '../../utils/constants';
+import { seq } from '../../utils/arrays';
 
 const N_WEEKDAYS = 7;
-const N_WEEKS = 53;
+const WEEKDAY_FORMAT = 'ccc';
+const MONTH_FORMAT = 'LLL';
 
 const WORDS_THRESHOLD_TO_COLOR: [number, string][] = [
   [30, 'bg-violet-800'],
@@ -14,27 +16,9 @@ const WORDS_THRESHOLD_TO_COLOR: [number, string][] = [
   [-1, 'bg-neutral-100'],
 ];
 
-const WEEKDAY_FORMAT = 'ccc';
-const MONTH_FORMAT = 'LLL';
-
-const getColor = (words: number): string =>
-  Object.values(WORDS_THRESHOLD_TO_COLOR).find(
-    ([threshold]) => words > Number(threshold),
-  )![1];
-
 export type StatisticsCalendarProps = {
   stats: WordsByDateStats;
 };
-
-type ParsedWordsDateStats = {
-  date: DateTime;
-  words: number;
-};
-
-const repeat = <T,>(n: number, fn: (idx: number) => T): T[] =>
-  Array(n)
-    .fill(undefined)
-    .map((_, idx) => fn(idx));
 
 export const StatisticsCalendar: Component<StatisticsCalendarProps> = (
   props,
@@ -43,61 +27,28 @@ export const StatisticsCalendar: Component<StatisticsCalendarProps> = (
   const untilDate = DateTime.fromFormat(props.stats.until, DATE_FORMAT);
   const fromOffset = fromDate.weekday - 1;
   const totalDays = untilDate.diff(fromDate, 'days').days;
-  const statsByDateIndex = Object.fromEntries(
+  const totalWeeks = Math.ceil(totalDays / N_WEEKDAYS);
+
+  const statsByDayDiff = Object.fromEntries(
     props.stats.dates.map((dateStats) => [
-      DateTime.fromFormat(dateStats.date, DATE_FORMAT).diff(fromDate, 'days')
-        .days + fromOffset,
+      DateTime.fromFormat(dateStats.date, DATE_FORMAT).diff(fromDate, 'days').days,
       {
         ...dateStats,
         date: DateTime.fromFormat(dateStats.date, DATE_FORMAT),
       },
     ]),
   );
-
-  const getStatsByDateIndex = (index: number): ParsedWordsDateStats | null => {
-    if (index < fromOffset || index >= totalDays + fromOffset) {
-      return null;
-    }
-
-    return (
-      statsByDateIndex[index] ?? {
-        date: fromDate.plus({ days: index - fromOffset }),
-        words: 0,
-      }
-    );
-  };
-
-  const weekToMonthSpan: Array<{ month: number; span: number }> = [];
-  let currentMonth: { month: number; span: number } | null = null;
-  for (let i = 0; i < N_WEEKS; i++) {
-    const month = fromDate.minus({ days: fromOffset }).plus({ weeks: i }).month;
-    if (!currentMonth || month !== currentMonth.month) {
-      currentMonth = { month, span: 1 };
-      weekToMonthSpan.push(currentMonth);
-    } else {
-      currentMonth.span++;
-    }
-  }
+  const stats = seq(totalDays).map((dayDiff) => statsByDayDiff[dayDiff] ?? {
+    date: fromDate.plus({ days: dayDiff }),
+    words: 0,
+  });
 
   return (
     <div class="overflow-visible">
       <table>
-        <thead>
-          <tr>
-            <td></td>
-            {weekToMonthSpan.map(({ month, span }) => (
-              <td colSpan={span}>
-                <div class="px-1 text-xs">
-                  {span > 2
-                    ? DateTime.fromObject({ month }).toFormat(MONTH_FORMAT)
-                    : ''}
-                </div>
-              </td>
-            ))}
-          </tr>
-        </thead>
+        <StatisticsCalendarHeader fromDate={fromDate} untilDate={untilDate} />
         <tbody>
-          {repeat(N_WEEKDAYS, (dayOfWeek) => (
+          {seq(N_WEEKDAYS).map((dayOfWeek) => (
             <tr>
               <td>
                 <div class="px-1 text-xs">
@@ -107,13 +58,17 @@ export const StatisticsCalendar: Component<StatisticsCalendarProps> = (
                 </div>
               </td>
 
-              {repeat(N_WEEKS, (week) => (
-                <td>
-                  <StatisticsCalendarCell
-                    stats={getStatsByDateIndex(week * N_WEEKDAYS + dayOfWeek)}
-                  />
-                </td>
-              ))}
+              {seq(totalWeeks).map((week) => {
+                const dayDiff = week * N_WEEKDAYS + dayOfWeek - fromOffset;
+
+                return (
+                  <td>
+                    <Show when={stats[dayDiff]}>
+                      <StatisticsCalendarCell stats={stats[dayDiff]} />
+                    </Show>
+                  </td>
+                )
+              })}
             </tr>
           ))}
         </tbody>
@@ -122,22 +77,65 @@ export const StatisticsCalendar: Component<StatisticsCalendarProps> = (
   );
 };
 
+type StatisticCalendarHeaderProps = {
+  fromDate: DateTime;
+  untilDate: DateTime;
+};
+
+export const StatisticsCalendarHeader: Component<
+  StatisticCalendarHeaderProps
+> = (props) => {
+  const totalDays = props.untilDate.diff(props.fromDate, 'days').days;
+  const totalWeeks = Math.ceil(totalDays / N_WEEKDAYS);
+
+  let currentMonth: { month: number; span: number } | null = null;
+  const months = seq(totalWeeks)
+    .map((week) => props.fromDate.minus({ days: props.fromDate.weekday - 1 }).plus({ weeks: week }).month)
+    .reduce((months, month) => {
+      if (!currentMonth || month !== currentMonth.month) {
+        currentMonth = { month, span: 1 };
+        months.push(currentMonth);
+      } else {
+        currentMonth.span++;
+      }
+      return months;
+    }, [] as Array<{ month: number; span: number }>);
+
+  return (
+    <thead>
+      <tr>
+        <td></td>
+        {months.map(({ month, span }) => (
+          <td colSpan={span}>
+            <div class="px-1 text-xs">
+              {span > 2
+                ? DateTime.fromObject({ month }).toFormat(MONTH_FORMAT)
+                : ''}
+            </div>
+          </td>
+        ))}
+      </tr>
+    </thead>
+  );
+};
+
 type StatisticsCalendarCellProps = {
-  stats: ParsedWordsDateStats | null;
+  stats: {
+    date: DateTime;
+    words: number;
+  };
 };
 
 export const StatisticsCalendarCell: Component<StatisticsCalendarCellProps> = (
   props,
 ) => {
-  if (!props.stats) {
-    return null;
-  }
-
-  const color = () => getColor(props.stats!.words);
+  const color = () => Object.values(WORDS_THRESHOLD_TO_COLOR).find(
+    ([threshold]) => props.stats!.words > Number(threshold),
+  )![1];
 
   return (
     <div class="relative group p-0.5">
-      <div class={`w-3 h-3 ${color()}`}>
+      <div class={`w-4 h-4 ${color()}`}>
         <div
           class={`p-1 hidden group-hover:inline-block absolute top-full z-10 select-none `}
         >

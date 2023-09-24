@@ -26,8 +26,8 @@ import {
   PropertyListItem,
   PropertyListItemOverlay,
 } from './PropertiesListItem';
-import { ActionBar, Action } from '../utils/ActionBar';
-import { ColorContextType, ColorProvider } from '../utils/ColorContext';
+import { ActionBar, Action } from '../common/ActionBar';
+import { ColorContextType, ColorProvider } from '../common/ColorContext';
 
 export type PropertiesListProps = {
   partOfSpeech: PartOfSpeech;

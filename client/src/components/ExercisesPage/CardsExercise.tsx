@@ -11,14 +11,14 @@ import {
   ColorContextType,
   asClasses,
   useColorContext,
-} from '../utils/ColorContext';
+} from '../common/ColorContext';
 import {
   BiRegularRightArrow,
   BiRegularLeftArrow,
   BiRegularReset,
 } from 'solid-icons/bi';
 import { FaSolidBoltLightning, FaSolidLightbulb } from 'solid-icons/fa';
-import { Button } from '../utils/Button';
+import { Button } from '../common/Button';
 
 const N_WORDS = 30;
 

@@ -2,10 +2,10 @@ import { IconTypes } from 'solid-icons';
 import { IoShapes } from 'solid-icons/io';
 import { Component, Show } from 'solid-js';
 import { PartOfSpeech } from '../../../api/types/graphql';
-import { partsOfSpeechProps } from '../../utils/partsOfSpeech';
+import { partsOfSpeechProps } from '../../common/partsOfSpeech';
 import { DropdownMode } from './WordsSearchBar';
 import { WordsSearchParams } from './wordsSearchParams';
-import { Icon } from '../../utils/Icon';
+import { Icon } from '../../common/Icon';
 
 type WordSearchBarFilterPillsProps = {
   dropdownMode: DropdownMode | null;
