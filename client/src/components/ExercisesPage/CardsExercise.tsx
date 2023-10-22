@@ -17,8 +17,9 @@ import {
   BiRegularLeftArrow,
   BiRegularReset,
 } from 'solid-icons/bi';
-import { FaSolidBoltLightning, FaSolidLightbulb } from 'solid-icons/fa';
+import { BsTranslate } from 'solid-icons/bs';
 import { Button } from '../common/Button';
+import { Icon } from '../common/Icon';
 
 const N_WORDS = 30;
 
@@ -130,6 +131,11 @@ const WordCard: Component<WordCardProps> = (props) => {
       <div class="absolute top-2 left-3 text-sm">{`${props.index + 1}/${
         props.total
       }`}</div>
+      <Show when={props.isRevealed}>
+        <div class="absolute top-2 right-3">
+          <Icon icon={BsTranslate} />
+        </div>
+      </Show>
       <div class="truncate text-lg">
         {props.isRevealed ? props.word.original : props.word.translation}
       </div>
