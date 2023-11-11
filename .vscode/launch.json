@@ -3,23 +3,16 @@
     // Hover to view descriptions of existing attributes.
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
-	"configurations": [
-		{
-			"type": "node",
-			"request": "attach",
-			"name": "Debug (docker-compose up)",
-			"address": "localhost",
-			"port": 9001,
-			"localRoot": "${workspaceRoot}/api",
-			"remoteRoot": "/app",
-			"skipFiles": ["<node_internals>/**/*.js"],
-		},
-		{
-			"name": "Launch Chrome",
-			"request": "launch",
-			"type": "chrome",
-			"url": "http://localhost:9005",
-			"webRoot": "${workspaceFolder}/client"
-		},
-	]
+    "configurations": [
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "Debug (docker-compose up)",
+            "address": "localhost",
+            "port": 9001,
+            "localRoot": "${workspaceRoot}/api",
+            "remoteRoot": "/app",
+            "skipFiles": ["<node_internals>/**/*.js"],
+        },
+    ],
 }

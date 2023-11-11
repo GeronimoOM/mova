@@ -9,7 +9,7 @@
     "build": "nest build",
     "start": "nest start",
     "start:dev": "nest start --watch",
-    "start:debug": "nest start --debug 3001 --watch",
+    "start:debug": "nest start --debug 0.0.0.0:3001 --watch",
     "start:prod": "node --max-old-space-size=200 dist/main",
     "lint": "eslint \"{src,test}/**/*.ts\" --fix",
     "format": "prettier --write \"src/**/*.ts\""

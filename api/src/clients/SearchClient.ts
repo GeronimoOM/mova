@@ -75,12 +75,12 @@ export class SearchClient implements OnApplicationBootstrap {
     query = query.toLowerCase();
 
     const queryShould: QueryDslQueryContainer[] = [
-      { fuzzy: { original: { value: query } } },
-      { prefix: { original: { value: query } } },
-      { fuzzy: { translation: { value: query } } },
-      { prefix: { translation: { value: query } } },
-      { fuzzy: { properties: { value: query } } },
-      { prefix: { properties: { value: query } } },
+      { fuzzy: { original: { value: query, boost: 1 } } },
+      { prefix: { original: { value: query, boost: 2 } } },
+      { fuzzy: { translation: { value: query, boost: 1 } } },
+      { prefix: { translation: { value: query, boost: 2 } } },
+      { fuzzy: { properties: { value: query, boost: 1 } }},
+      { prefix: { properties: { value: query, boost: 2 } } },
     ];
 
     const searchResponse = await this.getClient().search<WordDocument>({
@@ -236,8 +236,6 @@ export class SearchClient implements OnApplicationBootstrap {
     for (const [index, mappings] of Object.entries(INDEX_TO_MAPPING)) {
       const indexExists = await this.indexExists(index);
       if (!indexExists) {
-        Logger.log(index);
-        Logger.log(mappings);
         await this.getClient().indices.create({
           index,
           mappings,
