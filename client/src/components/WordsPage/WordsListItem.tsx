@@ -27,8 +27,8 @@ export const WordsListItem: Component<WordsListItemProps> = (props) => {
           size="sm"
         />
       </div>
-      <div class="flex-[1_1_0%] p-3 truncate">{props.word.original}</div>
-      <div class="flex-[2_1_0%] p-3 truncate">{props.word.translation}</div>
+      <div class="flex-1 p-3 truncate">{props.word.original}</div>
+      <div class="flex-1 p-3 truncate">{props.word.translation}</div>
     </div>
   );
 };
