@@ -157,7 +157,7 @@ export const WordsSearchBar: Component<WordsSearchBarProps> = (props) => {
           ref={setInputElement}
           spellcheck={false}
           autoCapitalize="off"
-          placeholder={'Type : to add filter'}
+          placeholder={'Search'}
           value={props.searchParams.query}
           onInput={(e) => onInputChange(e.currentTarget.value)}
           onChange={(e) => onInputChange(e.currentTarget.value)}
