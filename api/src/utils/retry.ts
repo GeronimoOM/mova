@@ -11,7 +11,7 @@ export async function retry(
       await func();
       break;
     } catch (err) {
-      console.log('Retrying due to error', err);
+      console.log('Retrying due to error');
       await sleep(ms);
     }
   }
