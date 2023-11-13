@@ -7,7 +7,7 @@ type Language {
   name: String!
   properties(partOfSpeech: PartOfSpeech): [PropertyUnion!]!
   topics(start: Int! = 0, limit: Int, query: String): TopicPage!
-  words(start: Int! = 0, limit: Int, query: String, partsOfSpeech: [PartOfSpeech!], topics: [ID!], order: WordOrder): WordPage!
+  words(start: Int! = 0, limit: Int, query: String, partsOfSpeech: [PartOfSpeech!], topics: [ID!], order: WordOrder, from: String, until: String): WordPage!
   wordsStats(days: Int, from: String): WordsStats!
 }
 

@@ -131,14 +131,20 @@ export class LanguageResolver {
     topics?: TopicId[],
     @Args('order', { type: () => WordOrder, nullable: true })
     order?: WordOrder,
+    @Args('from', { type: () => String, nullable: true })
+    from?: string,
+    @Args('until', { type: () => String, nullable: true })
+    until?: string,
   ): Promise<Page<WordType>> {
     const wordPage = await this.wordService.getPage({
       languageId: language.id,
       query,
       partsOfSpeech,
       topics,
-      ...pageArgs,
       order,
+      from: from ?  DateTime.fromFormat(from, DATE_FORMAT) : undefined,
+      until: until ? DateTime.fromFormat(until, DATE_FORMAT) : undefined,
+      ...pageArgs,
     });
 
     return mapPage(wordPage, (word) => this.wordTypeMapper.map(word));

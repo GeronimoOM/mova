@@ -63,7 +63,7 @@ services:
       context: ./client
       dockerfile: Dockerfile.prod
     ports:
-      - 80:4001
+      - 9005:4001
     environment:
       - NODE_ENV=production
     depends_on:

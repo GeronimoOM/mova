@@ -27,9 +27,11 @@ export interface WordWithoutProperties extends Omit<Word, 'properties'> {
 
 export interface GetWordPageParams extends Required<PageArgs> {
   languageId: LanguageId;
+  order: WordOrder;
   partsOfSpeech?: PartOfSpeech[];
   topics?: TopicId[];
-  order: WordOrder;
+  from?: DateTime,
+  until?: DateTime,
 }
 
 @Injectable()
@@ -51,9 +53,11 @@ export class WordRepository {
     languageId,
     partsOfSpeech,
     topics,
+    order,
     start,
     limit,
-    order,
+    from,
+    until,
   }: GetWordPageParams): Promise<Page<WordWithoutProperties>> {
     const connection = this.connectionManager.getConnection();
 
@@ -84,6 +88,15 @@ export class WordRepository {
           .where({ word_id: connection.ref(`${TABLE_WORDS}.id`) })
           .whereIn('topic_id', topics),
       );
+    }
+
+    if (from) {
+      query.where(connection.raw('date(added_at)'), '>=', from.toFormat(DATE_FORMAT))
+
+    }
+
+    if (until) {
+      query.where(connection.raw('date(added_at)'), '<', until.toFormat(DATE_FORMAT))
     }
 
     const wordRows = await query;

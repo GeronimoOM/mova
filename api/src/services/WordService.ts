@@ -30,6 +30,8 @@ export interface GetWordPageParams extends PageArgs {
   topics?: TopicId[];
   query?: string;
   order?: WordOrder;
+  from?: DateTime;
+  until?: DateTime;
 }
 
 export interface CreateWordParams {
