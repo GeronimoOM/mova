@@ -22,6 +22,7 @@ export const WordsPage: Component = () => {
   const onOpenCreateWord = (isOpen: boolean) => {
     setSelectedWordId(null);
     setIsWordDetailsOpen(isOpen);
+    setSearchParams(defaultWordsSearchParams());
   };
 
   const onWordSelect = (selectedWordId: string | null) => {

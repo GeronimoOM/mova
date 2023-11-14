@@ -63,7 +63,7 @@ services:
       context: ./client
       dockerfile: Dockerfile.prod
     ports:
-      - 80:4001
+      - 9005:4001
     environment:
       - NODE_ENV=production
     depends_on:
@@ -75,6 +75,17 @@ services:
         limits:
           cpus: '0.5'
           memory: 128M
+
+  mova-nginx:
+    image: 'jc21/nginx-proxy-manager:latest'
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '81:81'
+      - '443:443'
+    volumes:
+      - ./nginx/data:/data
+      - ./nginx/letsencrypt:/etc/letsencrypt
 
 volumes:
   mova-db:
