@@ -19,6 +19,7 @@ import { ElasticClientModule } from './clients/ElasticClientModule';
 import { TopicResolver } from './graphql/resolvers/TopicResolver';
 import { GraphQLModule } from './graphql/GraphQLModule';
 import { MaintenanceService } from './services/MaintenanceService';
+import { TestController } from 'controllers/TestController';
 
 @Module({
   imports: [GraphQLModule, ElasticClientModule],
@@ -41,6 +42,9 @@ import { MaintenanceService } from './services/MaintenanceService';
     TopicRepository,
     DbConnectionManager,
   ],
-  controllers: [MaintenanceController],
+  controllers: [
+    TestController,
+    MaintenanceController,
+  ],
 })
 export class AppModule {}

@@ -14,8 +14,10 @@ async function bootstrap() {
       logger: console,
     },
   );
-  app.enableCors();
+
   await app.register(fastifyMultipart);
+
+  app.enableCors();
 
   await app.listen(3000, '0.0.0.0');
 }

@@ -6,7 +6,7 @@ import {
 } from '../../api/types/graphql';
 import { useLanguageContext } from '../LanguageContext';
 import { WordsSearchParams } from './WordsSearchBar/wordsSearchParams';
-import { cache } from '../../api/client';
+import { cache } from '../../api/cache';
 import { WordsListItem } from './WordsListItem';
 
 const WORDS_PAGE_SIZE = 15;

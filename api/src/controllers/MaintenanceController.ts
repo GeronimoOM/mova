@@ -17,7 +17,7 @@ import {
 import { LanguageId } from 'models/Language';
 import { MaintenanceService } from 'services/MaintenanceService';
 
-@Controller('/tools')
+@Controller('/api/tools')
 export class MaintenanceController {
   constructor(private maintenanceService: MaintenanceService) {}
 

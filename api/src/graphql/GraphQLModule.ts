@@ -3,10 +3,8 @@ import { GraphQLModule as NestGraphQlModule } from '@nestjs/graphql';
 import {
   MercuriusDriver,
   MercuriusDriverConfig,
-  MercuriusPlugin,
 } from '@nestjs/mercurius';
-import { MercuriusValidationOptions } from 'mercurius-validation';
-import mercuriusValidationPlugin from 'mercurius-validation';
+import { validationPlugin } from './validation';
 
 export const GraphQLModule =
   NestGraphQlModule.forRootAsync<MercuriusDriverConfig>({
@@ -15,33 +13,8 @@ export const GraphQLModule =
       autoSchemaFile: join(process.cwd(), 'graphql/schema.gql'),
       graphiql: true,
       plugins: [validationPlugin],
+      path: 'api/graphql',
     }),
   });
 
-const validationPlugin: MercuriusPlugin<MercuriusValidationOptions> = {
-  plugin: mercuriusValidationPlugin,
-  options: {
-    schema: {
-      Language: {
-        wordsStats: {
-          fromDate: { type: 'string', format: 'date' },
-        },
-      },
-      CreateLanguageInput: {
-        name: { type: 'string', minLength: 3, maxLength: 20 },
-      },
-      UpdateLanguageInput: {
-        name: { type: 'string', minLength: 3, maxLength: 20 },
-      },
-      CreatePropertyInput: {
-        name: { type: 'string', minLength: 3, maxLength: 30 },
-      },
-      UpdatePropertyInput: {
-        name: { type: 'string', minLength: 3, maxLength: 30 },
-      },
-      CreateTopicInput: {
-        name: { type: 'string', minLength: 3, maxLength: 20 },
-      },
-    },
-  },
-};
+
