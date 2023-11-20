@@ -9,7 +9,8 @@
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview",
-    "graphql:codegen": "graphql-codegen -c ./src/api/codegen.ts"
+    "graphql:codegen": "graphql-codegen -c ./src/api/codegen.ts",
+    "lint-staged": "lint-staged"
   },
   "dependencies": {
     "@merged/solid-apollo": "1.7.1",
