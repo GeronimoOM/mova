@@ -146,7 +146,7 @@ export const PropertiesList: Component<PropertiesListProps> = (props) => {
 
   return (
     <ColorProvider colorContext={colorContext}>
-      <div class="w-full max-w-[60rem] mx-auto p-2 gap-y-2 flex flex-col items-center">
+      <div class="mx-auto flex w-full max-w-[60rem] flex-col items-center gap-y-2 p-2">
         <DragDropProvider
           onDragStart={onDragStart}
           onDragEnd={onDragEnd}
@@ -182,7 +182,7 @@ export const PropertiesList: Component<PropertiesListProps> = (props) => {
           when={isCreateOpen()}
           fallback={
             <div
-              class={`sticky bottom-0 w-full p-2 flex flex-row justify-center
+              class={`sticky bottom-0 flex w-full flex-row justify-center p-2
             outline outline-8 outline-alabaster ${colorContext.base!
               .backgroundColor!}`}
             >

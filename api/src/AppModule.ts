@@ -42,9 +42,6 @@ import { TestController } from 'controllers/TestController';
     TopicRepository,
     DbConnectionManager,
   ],
-  controllers: [
-    TestController,
-    MaintenanceController,
-  ],
+  controllers: [TestController, MaintenanceController],
 })
 export class AppModule {}

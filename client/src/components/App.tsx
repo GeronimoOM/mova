@@ -6,7 +6,7 @@ import { NavBar } from './NavBar/NavBar';
 const App: Component = () => {
   return (
     <LanguageProvider>
-      <div class="flex flex-row w-full h-full justify-center">
+      <div class="flex h-full w-full flex-row justify-center">
         <NavBar />
         <Main />
       </div>

@@ -25,7 +25,7 @@ type MutationUpdaterFunction<MDocument> = MDocument extends TypedDocumentNode<
       MResult,
       MVariables,
       DefaultContext,
-      ApolloCache<any>
+      ApolloCache<unknown>
     >
   : never;
 

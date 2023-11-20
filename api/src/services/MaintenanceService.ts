@@ -146,7 +146,7 @@ export class MaintenanceService {
     recordStream: Readable,
   ): AsyncGenerator<[MigrationRecordType, MigrationRecord[]]> {
     let batch: MigrationRecord[] = [];
-    let types = MigrationRecordTypes[Symbol.iterator]();
+    const types = MigrationRecordTypes[Symbol.iterator]();
     let type: MigrationRecordType = types.next().value;
     for await (const { value } of recordStream) {
       const record = value as MigrationRecord;

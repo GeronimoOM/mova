@@ -1,9 +1,8 @@
-import { createLazyQuery } from '@merged/solid-apollo';
 import { IconTypes } from 'solid-icons';
 import { BsTagFill } from 'solid-icons/bs';
 import { IoShapes } from 'solid-icons/io';
 import { Component, Switch, Match, For } from 'solid-js';
-import { PartOfSpeech, GetTopicsDocument } from '../../../api/types/graphql';
+import { PartOfSpeech } from '../../../api/types/graphql';
 import { partsOfSpeech, partsOfSpeechProps } from '../../common/partsOfSpeech';
 import { DropdownMode } from './WordsSearchBar';
 import { WordsSearchParams } from './wordsSearchParams';
@@ -21,10 +20,10 @@ type WordSearchBarDropdownProps = {
 export const WordSearchBarDropdown: Component<WordSearchBarDropdownProps> = (
   props,
 ) => {
-  const [fetchTopics, topicsQuery] = createLazyQuery(GetTopicsDocument);
+  //const [fetchTopics, topicsQuery] = createLazyQuery(GetTopicsDocument);
 
   return (
-    <div class="absolute flex flex-col top-full w-full z-10 bg-coolgray-200 text-spacecadet-300 border-t-2 border-charcoal-300">
+    <div class="absolute top-full z-10 flex w-full flex-col border-t-2 border-charcoal-300 bg-coolgray-200 text-spacecadet-300">
       <Switch>
         <Match when={props.mode === DropdownMode.Filters}>
           <WordSearchBarDropdownFilterItems

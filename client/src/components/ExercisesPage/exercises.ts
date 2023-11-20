@@ -1,5 +1,5 @@
 import { IconTypes } from 'solid-icons';
-import { TbCards, TbTextRecognition } from 'solid-icons/tb';
+import { TbCards } from 'solid-icons/tb';
 import { FaSolidKeyboard } from 'solid-icons/fa';
 
 export enum ExerciseType {

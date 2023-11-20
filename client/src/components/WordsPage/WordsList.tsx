@@ -1,4 +1,4 @@
-import { Component, For, createEffect, createSignal, Show } from 'solid-js';
+import { Component, For, createEffect, createSignal } from 'solid-js';
 import { createLazyQuery } from '@merged/solid-apollo';
 import {
   GetWordsDocument,
@@ -88,7 +88,7 @@ export const WordsList: Component<WordsListProps> = (props) => {
   };
 
   return (
-    <div class="w-full max-w-[60rem] mx-auto p-2 gap-y-2 flex flex-col items-center">
+    <div class="mx-auto flex w-full max-w-[60rem] flex-col items-center gap-y-2 p-2">
       <For each={words()}>
         {(word) => (
           <WordsListItem
@@ -101,7 +101,7 @@ export const WordsList: Component<WordsListProps> = (props) => {
       {/* <Show when={wordsPageQuery.loading}>
         {new Array(15).fill(null).map(() => <WordListItemLoading />)}
       </Show> */}
-      <div ref={setListEndRef}></div>
+      <div ref={setListEndRef} />
     </div>
   );
 };

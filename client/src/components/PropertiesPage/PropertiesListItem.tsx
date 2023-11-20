@@ -119,7 +119,7 @@ export const PropertyListItem: Component<PropertyListItemProps> = (props) => {
   return (
     <div
       ref={sortableRef}
-      class={`group w-full max-w-[60rem] min-h-[6rem] p-2 flex flex-row
+      class={`group flex min-h-[6rem] w-full max-w-[60rem] flex-row p-2
       ${baseColors?.textColor} ${baseColors?.backgroundColor} transition-colors`}
       classList={{
         'opacity-75': sortable?.isActiveDraggable,
@@ -213,7 +213,7 @@ const PropertyNameInput: Component<PropertyNameInputProps> = (props) => {
 
   return (
     <input
-      class="p-3 w-full outline-none"
+      class="w-full p-3 outline-none"
       classList={{
         [disabledClasses]: props.isDisabled,
         [enabledClasses]: !props.isDisabled,

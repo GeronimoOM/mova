@@ -1,9 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 
 module.exports = {
-  content: [
-    "./src/**/*.{ts,tsx}",
-  ],
+  content: ['./src/**/*.{ts,tsx}'],
   theme: {
     extend: {
       colors: {
@@ -21,10 +19,9 @@ module.exports = {
         'charcoal-100': '#707b9a',
       },
       gridTemplateRows: {
-        '7': 'repeat(7, minmax(0, 1fr))',
+        7: 'repeat(7, minmax(0, 1fr))',
       },
     },
   },
   plugins: [],
-}
-
+};

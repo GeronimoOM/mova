@@ -19,7 +19,7 @@ export const LanguageName: Component<LanguageNameProps> = (props) => {
 
   return (
     <div
-      class="p-3 flex-auto cursor-pointer transition-colors whitespace-nowrap md:truncate"
+      class="flex-auto cursor-pointer whitespace-nowrap p-3 transition-colors md:truncate"
       classList={{
         [baseClasses]: !isSelected(),
         'text-spacecadet-300': isSelected(),

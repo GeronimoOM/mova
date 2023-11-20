@@ -14,7 +14,7 @@ export const WordsListItem: Component<WordsListItemProps> = (props) => {
 
   return (
     <div
-      class="w-full flex flex-row items-center cursor-pointer select-none text-spacecadet-300"
+      class="flex w-full cursor-pointer select-none flex-row items-center text-spacecadet-300"
       classList={{
         'bg-coolgray-300 hover:bg-coolgray-200': !isSelected(),
         'bg-spacecadet-300 text-white': isSelected(),
@@ -27,12 +27,12 @@ export const WordsListItem: Component<WordsListItemProps> = (props) => {
           size="sm"
         />
       </div>
-      <div class="flex-1 p-3 truncate">{props.word.original}</div>
-      <div class="flex-1 p-3 truncate">{props.word.translation}</div>
+      <div class="flex-1 truncate p-3">{props.word.original}</div>
+      <div class="flex-1 truncate p-3">{props.word.translation}</div>
     </div>
   );
 };
 
 export const WordListItemLoading: Component = () => {
-  return <div class="w-full h-12 icursor-none bg-coolgray-300 animate-pulse" />;
+  return <div class="icursor-none h-12 w-full animate-pulse bg-coolgray-300" />;
 };

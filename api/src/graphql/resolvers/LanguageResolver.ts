@@ -12,7 +12,7 @@ import {
 } from '@nestjs/graphql';
 import { LanguageId } from 'models/Language';
 import { mapPage, Page } from 'models/Page';
-import { PartOfSpeech, WordOrder, WordsStats } from 'models/Word';
+import { PartOfSpeech, WordOrder } from 'models/Word';
 import { LanguageService } from 'services/LanguageService';
 import { PropertyService } from 'services/PropertyService';
 import { WordService } from 'services/WordService';
@@ -142,7 +142,7 @@ export class LanguageResolver {
       partsOfSpeech,
       topics,
       order,
-      from: from ?  DateTime.fromFormat(from, DATE_FORMAT) : undefined,
+      from: from ? DateTime.fromFormat(from, DATE_FORMAT) : undefined,
       until: until ? DateTime.fromFormat(until, DATE_FORMAT) : undefined,
       ...pageArgs,
     });

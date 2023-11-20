@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Language, LanguageId } from 'models/Language';
 import { DbConnectionManager } from './DbConnectionManager';
-import { LanguageTable, WordTable } from 'knex/types/tables';
+import { LanguageTable } from 'knex/types/tables';
 
 const TABLE_LANGUAGES = 'languages';
 

@@ -1,4 +1,4 @@
-import { Component, Show } from 'solid-js';
+import { Component, Show, For } from 'solid-js';
 import { DateTime } from 'luxon';
 import { WordsByDateStats } from '../../api/types/graphql';
 import { DATE_FORMAT } from '../../utils/constants';
@@ -31,46 +31,54 @@ export const StatisticsCalendar: Component<StatisticsCalendarProps> = (
 
   const statsByDayDiff = Object.fromEntries(
     props.stats.dates.map((dateStats) => [
-      DateTime.fromFormat(dateStats.date, DATE_FORMAT).diff(fromDate, 'days').days,
+      DateTime.fromFormat(dateStats.date, DATE_FORMAT).diff(fromDate, 'days')
+        .days,
       {
         ...dateStats,
         date: DateTime.fromFormat(dateStats.date, DATE_FORMAT),
       },
     ]),
   );
-  const stats = seq(totalDays).map((dayDiff) => statsByDayDiff[dayDiff] ?? {
-    date: fromDate.plus({ days: dayDiff }),
-    words: 0,
-  });
+  const stats = seq(totalDays).map(
+    (dayDiff) =>
+      statsByDayDiff[dayDiff] ?? {
+        date: fromDate.plus({ days: dayDiff }),
+        words: 0,
+      },
+  );
 
   return (
     <div class="overflow-visible">
       <table>
         <StatisticsCalendarHeader fromDate={fromDate} untilDate={untilDate} />
         <tbody>
-          {seq(N_WEEKDAYS).map((dayOfWeek) => (
-            <tr>
-              <td>
-                <div class="px-1 text-xs">
-                  {DateTime.fromObject({ weekday: dayOfWeek + 1 }).toFormat(
-                    WEEKDAY_FORMAT,
-                  )}
-                </div>
-              </td>
+          <For each={seq(N_WEEKDAYS)}>
+            {(dayOfWeek) => (
+              <tr>
+                <td>
+                  <div class="px-1 text-xs">
+                    {DateTime.fromObject({ weekday: dayOfWeek + 1 }).toFormat(
+                      WEEKDAY_FORMAT,
+                    )}
+                  </div>
+                </td>
 
-              {seq(totalWeeks).map((week) => {
-                const dayDiff = week * N_WEEKDAYS + dayOfWeek - fromOffset;
+                <For each={seq(totalWeeks)}>
+                  {(week) => {
+                    const dayDiff = week * N_WEEKDAYS + dayOfWeek - fromOffset;
 
-                return (
-                  <td>
-                    <Show when={stats[dayDiff]}>
-                      <StatisticsCalendarCell stats={stats[dayDiff]} />
-                    </Show>
-                  </td>
-                )
-              })}
-            </tr>
-          ))}
+                    return (
+                      <td>
+                        <Show when={stats[dayDiff]}>
+                          <StatisticsCalendarCell stats={stats[dayDiff]} />
+                        </Show>
+                      </td>
+                    );
+                  }}
+                </For>
+              </tr>
+            )}
+          </For>
         </tbody>
       </table>
     </div>
@@ -90,30 +98,40 @@ export const StatisticsCalendarHeader: Component<
 
   let currentMonth: { month: number; span: number } | null = null;
   const months = seq(totalWeeks)
-    .map((week) => props.fromDate.minus({ days: props.fromDate.weekday - 1 }).plus({ weeks: week }).month)
-    .reduce((months, month) => {
-      if (!currentMonth || month !== currentMonth.month) {
-        currentMonth = { month, span: 1 };
-        months.push(currentMonth);
-      } else {
-        currentMonth.span++;
-      }
-      return months;
-    }, [] as Array<{ month: number; span: number }>);
+    .map(
+      (week) =>
+        props.fromDate
+          .minus({ days: props.fromDate.weekday - 1 })
+          .plus({ weeks: week }).month,
+    )
+    .reduce(
+      (months, month) => {
+        if (!currentMonth || month !== currentMonth.month) {
+          currentMonth = { month, span: 1 };
+          months.push(currentMonth);
+        } else {
+          currentMonth.span++;
+        }
+        return months;
+      },
+      [] as Array<{ month: number; span: number }>,
+    );
 
   return (
     <thead>
       <tr>
-        <td></td>
-        {months.map(({ month, span }) => (
-          <td colSpan={span}>
-            <div class="px-1 text-xs">
-              {span > 2
-                ? DateTime.fromObject({ month }).toFormat(MONTH_FORMAT)
-                : ''}
-            </div>
-          </td>
-        ))}
+        <td />
+        <For each={months}>
+          {({ month, span }) => (
+            <td colSpan={span}>
+              <div class="px-1 text-xs">
+                {span > 2
+                  ? DateTime.fromObject({ month }).toFormat(MONTH_FORMAT)
+                  : ''}
+              </div>
+            </td>
+          )}
+        </For>
       </tr>
     </thead>
   );
@@ -129,17 +147,18 @@ type StatisticsCalendarCellProps = {
 export const StatisticsCalendarCell: Component<StatisticsCalendarCellProps> = (
   props,
 ) => {
-  const color = () => Object.values(WORDS_THRESHOLD_TO_COLOR).find(
-    ([threshold]) => props.stats!.words > Number(threshold),
-  )![1];
+  const color = () =>
+    Object.values(WORDS_THRESHOLD_TO_COLOR).find(
+      ([threshold]) => props.stats!.words > Number(threshold),
+    )![1];
 
   return (
-    <div class="relative group p-0.5">
-      <div class={`w-4 h-4 ${color()}`}>
+    <div class="group relative p-0.5">
+      <div class={`h-4 w-4 ${color()}`}>
         <div
-          class={`p-1 hidden group-hover:inline-block absolute top-full z-10 select-none `}
+          class={`absolute top-full z-10 hidden select-none p-1 group-hover:inline-block `}
         >
-          <div class="w-fit p-1 bg-spacecadet-300 text-white text-sm whitespace-nowrap">
+          <div class="w-fit whitespace-nowrap bg-spacecadet-300 p-1 text-sm text-white">
             <p>
               {props.stats!.date.toLocaleString(DateTime.DATE_MED_WITH_WEEKDAY)}
             </p>

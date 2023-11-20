@@ -1,16 +1,16 @@
 {
   "name": "mova-client",
-  "version": "0.0.1",
-  "description": "",
+  "version": "1.0.0",
+  "description": "Mova App Client",
+  "author": "GeronimoOM",
+  "license": "UNLICENSED",
   "scripts": {
     "start": "vite",
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview",
-    "format": "prettier --write \"src/**/*.{ts,tsx,css,graphql}\"",
     "graphql:codegen": "graphql-codegen -c ./src/api/codegen.ts"
   },
-  "license": "MIT",
   "dependencies": {
     "@merged/solid-apollo": "1.7.1",
     "@solid-primitives/active-element": "2.0.15",
@@ -30,12 +30,25 @@
     "@graphql-codegen/client-preset": "4.0.1",
     "@graphql-typed-document-node/core": "3.2.0",
     "@types/luxon": "3.3.2",
+    "@typescript-eslint/eslint-plugin": "^6.12.0",
+    "@typescript-eslint/parser": "^6.12.0",
     "autoprefixer": "10.4.14",
+    "eslint": "8.50.0",
+    "eslint-config-prettier": "9.0.0",
+    "eslint-plugin-solid": "0.13.0",
+    "lint-staged": "15.1.0",
     "postcss": "8.4.26",
     "prettier": "3.0.0",
+    "prettier-plugin-tailwindcss": "0.5.7",
     "tailwindcss": "3.3.3",
     "typescript": "5.1.6",
     "vite": "4.4.4",
     "vite-plugin-solid": "2.7.0"
+  },
+  "lint-staged": {
+    "**/*.{js,jsx,ts,tsx}": [
+      "pnpm exec prettier . --write",
+      "pnpm exec eslint . --fix"
+    ]
   }
 }

@@ -1,17 +1,16 @@
-import { Component, Show, createMemo, createSignal } from 'solid-js';
-import { useLocation, useNavigate } from '@solidjs/router';
+import { Component, Show, createSignal } from 'solid-js';
 import { BsTranslate } from 'solid-icons/bs';
 import { FaSolidGear, FaSolidBrain } from 'solid-icons/fa';
 import { ImStatsBars } from 'solid-icons/im';
-import { AppRoute, getAppRouteMatch } from '../../routes';
+import { AppRoute } from '../../routes';
 import { Languages } from './NavBarLanguages/Languages';
 import { NavBarItem } from './NavBarItem';
 import { createMediaQuery } from '@solid-primitives/media';
 import { ColorContextType, ColorProvider } from '../common/ColorContext';
 
 export const NavBar: Component = () => {
-  const appRoute = createMemo(() => getAppRouteMatch(useLocation().pathname));
-  const navigate = useNavigate();
+  // const appRoute = createMemo(() => getAppRouteMatch(useLocation().pathname));
+  // const navigate = useNavigate();
   const isVertical = createMediaQuery('(min-width: 768px)');
 
   const [isLanguagesActive, setIsLanguagesActive] = createSignal(false);
@@ -42,8 +41,8 @@ export const NavBar: Component = () => {
   return (
     <ColorProvider colorContext={colorContext}>
       <nav
-        class={`flex flex-row items-center fixed bottom-0 w-full overflow-hidden
-        md:static md:flex-col md:items-stretch md:min-w-[14rem] md:max-w-[14rem] md:h-full
+        class={`fixed bottom-0 flex w-full flex-row items-center overflow-hidden
+        md:static md:h-full md:min-w-[14rem] md:max-w-[14rem] md:flex-col md:items-stretch
         ${colorContext.base?.textColor} ${colorContext.base?.backgroundColor} font-bold`}
       >
         <Show when={!isLanguagesActive() || isVertical()}>

@@ -22,7 +22,7 @@ export const StatisticsPage: Component = () => {
   });
 
   return (
-    <div class="h-full flex flex-col items-center justify-items-stretch">
+    <div class="flex h-full flex-col items-center justify-items-stretch">
       <div class="p-5">Total words: {totalStats()?.words ?? 0}</div>
       <Show when={byDateStats()}>
         <StatisticsCalendar stats={byDateStats()!} />

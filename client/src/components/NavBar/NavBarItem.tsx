@@ -28,14 +28,14 @@ export const NavBarItem: Component<NavBarItemProps> = (props) => {
   return (
     <A href={props.href}>
       <div
-        class="flex-none flex flex-row items-center"
+        class="flex flex-none flex-row items-center"
         classList={{
           [baseClasses]: !match(),
           [selectedClasses]: !!match(),
         }}
       >
         <Icon icon={props.icon} />
-        <div class="p-3 hidden md:inline-block">{props.text}</div>
+        <div class="hidden p-3 md:inline-block">{props.text}</div>
       </div>
     </A>
   );

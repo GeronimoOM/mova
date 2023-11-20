@@ -204,13 +204,13 @@ export const Languages: Component<NavBarLanguagesProps> = (props) => {
   };
 
   return (
-    <div class="flex-auto max-w-full flex flex-row items-center md:flex-col md:items-stretch">
+    <div class="flex max-w-full flex-auto flex-row items-center md:flex-col md:items-stretch">
       <div
-        class="flex-none flex flex-row items-stretch hover:bg-charcoal-100 hover:text-spacecadet-300 cursor-pointer transition-colors"
+        class="flex flex-none cursor-pointer flex-row items-stretch transition-colors hover:bg-charcoal-100 hover:text-spacecadet-300"
         onClick={() => props.setIsActive((isActive) => !isActive)}
       >
         <Icon icon={FaSolidEarthEurope} />
-        <div class="flex-auto p-3 hidden md:block truncate">
+        <div class="hidden flex-auto truncate p-3 md:block">
           {selectedLanguage()?.name ?? 'Language'}
         </div>
         <div class="hidden md:block">
@@ -224,7 +224,7 @@ export const Languages: Component<NavBarLanguagesProps> = (props) => {
 
       <Show when={props.isActive}>
         <Show when={!action() || props.isVertical}>
-          <div class="min-w-0 min-h-0 flex-1 flex flex-row items-stretch md:flex-col">
+          <div class="flex min-h-0 min-w-0 flex-1 flex-row items-stretch md:flex-col">
             <LanguageList
               languages={languages()}
               selectedLanguageId={selectedLanguageId()}

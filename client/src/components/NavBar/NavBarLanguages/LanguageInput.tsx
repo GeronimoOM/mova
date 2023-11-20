@@ -9,7 +9,7 @@ export type LanguageInputProps = {
 export const LanguageInput: Component<LanguageInputProps> = (props) => (
   <input
     type="text"
-    class="p-3 w-full outline-none bg-charcoal-100"
+    class="w-full bg-charcoal-100 p-3 outline-none"
     value={props.languageInput}
     onInput={(e) => props.onLanguageInput(e.currentTarget.value)}
     disabled={props.isDisabled}

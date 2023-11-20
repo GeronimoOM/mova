@@ -37,7 +37,7 @@ export const WordsPage: Component = () => {
   );
 
   return (
-    <div class="flex flex-col w-full h-full items-stretch">
+    <div class="flex h-full w-full flex-col items-stretch">
       <div class="flex-none">
         <WordsPageHeader
           searchParams={searchParams}
@@ -46,9 +46,9 @@ export const WordsPage: Component = () => {
           isOpenCreateWord={isOpenCreateWord()}
         />
       </div>
-      <div class="flex-1 min-h-0 flex flex-col xl:flex-row gap-2">
+      <div class="flex min-h-0 flex-1 flex-col gap-2 xl:flex-row">
         <div
-          class="flex-none w-full min-h-0 overflow-y-scroll"
+          class="min-h-0 w-full flex-none overflow-y-scroll"
           classList={{
             'basis-full': !isWordDetailsOpen(),
             'basis-1/2': isWordDetailsOpen(),
@@ -62,7 +62,7 @@ export const WordsPage: Component = () => {
           />
         </div>
         <Show when={isWordDetailsOpen()}>
-          <div class="flex-none basis-1/2 min-h-0 overflow-y-scroll">
+          <div class="min-h-0 flex-none basis-1/2 overflow-y-scroll">
             <WordDetails
               selectedWordId={selectedWordId()}
               onWordSelect={onWordSelect}

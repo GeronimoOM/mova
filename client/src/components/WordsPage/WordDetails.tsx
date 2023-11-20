@@ -1,4 +1,4 @@
-import { Component, For, createEffect, createSignal, untrack } from 'solid-js';
+import { Component, For, createEffect, createSignal } from 'solid-js';
 import { createLazyQuery, createMutation } from '@merged/solid-apollo';
 import {
   CreateWordDocument,
@@ -294,7 +294,7 @@ export const WordDetails: Component<WordDetailsProps> = (props) => {
     <ColorProvider colorContext={colorContext}>
       <div class="h-full w-full p-2">
         <div
-          class={`min-h-full h-fit flex flex-col p-5 gap-y-3
+          class={`flex h-fit min-h-full flex-col gap-y-3 p-5
         ${colorContext.base!.textColor} ${colorContext.base!.backgroundColor}`}
         >
           <div class="flex flex-row items-center justify-between">
@@ -327,7 +327,7 @@ export const WordDetails: Component<WordDetailsProps> = (props) => {
             <Icon
               icon={BsTranslate}
               size="sm"
-              class="text-coolgray-300 p-1.5"
+              class="p-1.5 text-coolgray-300"
             />
             <WordDetailsTextInput
               text={word.translation ?? ''}
@@ -395,7 +395,7 @@ const WordDetailsTextInput: Component<WordDetailsTextInputProps> = (props) => {
 
   return (
     <input
-      class="p-3 w-full outline-none"
+      class="w-full p-3 outline-none"
       classList={{
         [disabledClasses]: props.isDisabled,
         [enabledClasses]: !props.isDisabled,

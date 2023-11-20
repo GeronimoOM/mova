@@ -86,7 +86,7 @@ export const CardsExercise: Component = () => {
             index={wordIndex()}
             total={words()?.length ?? 0}
           />
-          <div class="p-2 gap-2 flex flex-row">
+          <div class="flex flex-row gap-2 p-2">
             <Button icon={BiRegularReset} onClick={fetchWords} />
             <Button
               icon={BiRegularLeftArrow}
@@ -124,15 +124,15 @@ const WordCard: Component<WordCardProps> = (props) => {
 
   return (
     <div
-      class={`relative w-[20rem] h-[10rem] p-3 flex items-center justify-center
-    cursor-pointer select-none ${baseClasses}`}
+      class={`relative flex h-[10rem] w-[20rem] cursor-pointer select-none items-center
+    justify-center p-3 ${baseClasses}`}
       onClick={() => props.onReveal(!props.isRevealed)}
     >
-      <div class="absolute top-2 left-3 text-sm">{`${props.index + 1}/${
+      <div class="absolute left-3 top-2 text-sm">{`${props.index + 1}/${
         props.total
       }`}</div>
       <Show when={props.isRevealed}>
-        <div class="absolute top-2 right-3">
+        <div class="absolute right-3 top-2">
           <Icon icon={BsTranslate} />
         </div>
       </Show>

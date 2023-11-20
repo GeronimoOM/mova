@@ -79,7 +79,7 @@ export class SearchClient implements OnApplicationBootstrap {
       { prefix: { original: { value: query, boost: 2 } } },
       { fuzzy: { translation: { value: query, boost: 1 } } },
       { prefix: { translation: { value: query, boost: 2 } } },
-      { fuzzy: { properties: { value: query, boost: 1 } }},
+      { fuzzy: { properties: { value: query, boost: 1 } } },
       { prefix: { properties: { value: query, boost: 2 } } },
     ];
 

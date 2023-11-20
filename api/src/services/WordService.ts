@@ -228,7 +228,10 @@ export class WordService {
 
   async getStats(
     languageId: LanguageId,
-    days: number = DateTime.now().diff(DateTime.now().minus({ months: 3 }), 'days').days,
+    days: number = DateTime.now().diff(
+      DateTime.now().minus({ months: 3 }),
+      'days',
+    ).days,
     from: DateTime = DateTime.now().minus({ days }).plus({ day: 1 }),
   ): Promise<WordsStats> {
     const until = from.plus({ days });

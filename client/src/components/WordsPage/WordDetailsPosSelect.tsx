@@ -30,7 +30,7 @@ export const WordDetailsPosSelect: Component<WordDetailsPosSelectProps> = (
       />
 
       <Show when={isOpen()}>
-        <div class={`absolute flex flex-col top-full w-full`}>
+        <div class={`absolute top-full flex w-full flex-col`}>
           <For each={partsOfSpeech}>
             {(partOfSpeech) => (
               <WordDetailsPosSelectItem
@@ -84,7 +84,7 @@ const WordDetailsPosSelectItem: Component<WordDetailsPosSelectItem> = (
       onClick={onClick}
     >
       <Icon icon={partOfSpeechIcon()} size="sm" />
-      <div class="flex-1 flex flex-row justify-center">
+      <div class="flex flex-1 flex-row justify-center">
         <p class="p-1">{label()}</p>
       </div>
     </div>

@@ -30,8 +30,8 @@ export interface GetWordPageParams extends Required<PageArgs> {
   order: WordOrder;
   partsOfSpeech?: PartOfSpeech[];
   topics?: TopicId[];
-  from?: DateTime,
-  until?: DateTime,
+  from?: DateTime;
+  until?: DateTime;
 }
 
 @Injectable()
@@ -91,12 +91,19 @@ export class WordRepository {
     }
 
     if (from) {
-      query.where(connection.raw('date(added_at)'), '>=', from.toFormat(DATE_FORMAT))
-
+      query.where(
+        connection.raw('date(added_at)'),
+        '>=',
+        from.toFormat(DATE_FORMAT),
+      );
     }
 
     if (until) {
-      query.where(connection.raw('date(added_at)'), '<', until.toFormat(DATE_FORMAT))
+      query.where(
+        connection.raw('date(added_at)'),
+        '<',
+        until.toFormat(DATE_FORMAT),
+      );
     }
 
     const wordRows = await query;
@@ -255,6 +262,7 @@ export class WordRepository {
       ? JSON.stringify(
           Object.fromEntries(
             Array.from(propertyValues).map(
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
               ([propertyId, { property, ...propertyValue }]) => [
                 propertyId,
                 propertyValue,

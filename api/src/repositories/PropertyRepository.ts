@@ -56,11 +56,10 @@ export class PropertyRepository {
     languageId: LanguageId,
     partOfSpeech: PartOfSpeech,
   ): Promise<number> {
-    const { count } = (await this.connectionManager
+    const [{ count }] = (await this.connectionManager
       .getConnection()(TABLE_PROPERTIES)
       .where({ language_id: languageId, part_of_speech: partOfSpeech })
-      .count('id as count')
-      .first()!) as any;
+      .count('id as count')) as [{ count: string }];
 
     return Number(count);
   }

@@ -1,4 +1,4 @@
-import { Component } from 'solid-js';
+import { Component, For } from 'solid-js';
 import { ExerciseType, exercisesProps } from './exercises';
 import { IconTypes } from 'solid-icons';
 import {
@@ -13,17 +13,19 @@ import { AppRoute } from '../../routes';
 export const ExercisesPage: Component = () => {
   return (
     <div
-      class="mx-auto max-w-[24rem] sm:max-w-[48rem] p-2
-    grid grid-flow-row grid-cols-1 sm:grid-cols-2 justify-items-stretch gap-2"
+      class="mx-auto grid max-w-[24rem] grid-flow-row
+    grid-cols-1 justify-items-stretch gap-2 p-2 sm:max-w-[48rem] sm:grid-cols-2"
     >
-      {Object.entries(exercisesProps).map(([type, { title, icon, route }]) => (
-        <ExerciseBanner
-          type={type as ExerciseType}
-          title={title}
-          icon={icon}
-          route={`${AppRoute.Exercises}${route}`}
-        />
-      ))}
+      <For each={Object.entries(exercisesProps)}>
+        {([type, { title, icon, route }]) => (
+          <ExerciseBanner
+            type={type as ExerciseType}
+            title={title}
+            icon={icon}
+            route={`${AppRoute.Exercises}${route}`}
+          />
+        )}
+      </For>
     </div>
   );
 };
@@ -55,7 +57,7 @@ export const ExerciseBanner: Component<ExerciseBannerProps> = (props) => {
     <ColorProvider colorContext={colorContext}>
       <A href={props.route} end={true}>
         <div
-          class={`min-h-[10rem] p-3 flex flex-row items-center ${baseClasses}`}
+          class={`flex min-h-[10rem] flex-row items-center p-3 ${baseClasses}`}
         >
           <div class="p-2">
             <Icon icon={props.icon} />

@@ -14,7 +14,7 @@ export const Main: Component = () => {
   const [selectedLanguage] = useLanguageContext();
 
   return (
-    <main class="w-full max-w-[72rem] pb-12 md:pb-0 overflow-hidden bg-alabaster">
+    <main class="w-full max-w-[72rem] overflow-hidden bg-alabaster pb-12 md:pb-0">
       <Show when={selectedLanguage()} fallback={<NoLanguagePage />}>
         <Routes>
           <Route path={AppRoute.Words} component={WordsPage} />
@@ -32,7 +32,7 @@ export const Main: Component = () => {
 
 const NoLanguagePage: Component = () => {
   return (
-    <div class="w-full h-full flex flex-col items-center justify-center text-spacecadet-300">
+    <div class="flex h-full w-full flex-col items-center justify-center text-spacecadet-300">
       <Icon icon={FaSolidEarthEurope} />
       <p class="text-lg">Select or Create Language</p>
     </div>

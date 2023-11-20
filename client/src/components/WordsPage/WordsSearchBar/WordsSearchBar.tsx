@@ -1,6 +1,5 @@
-import { Component, createEffect, createSignal, Show } from 'solid-js';
+import { Component, createSignal, Show } from 'solid-js';
 import { FaSolidMagnifyingGlass } from 'solid-icons/fa';
-import { useKeyDownEvent } from '@solid-primitives/keyboard';
 import { WordsSearchParams } from './wordsSearchParams';
 import { WordSearchBarFilterPills } from './WordSearchBarFilterPills';
 import { WordSearchBarDropdown } from './WordSearchBarDropdown';
@@ -14,7 +13,7 @@ export enum DropdownMode {
   Topics = 'topics',
 }
 
-const KEY_FOCUS_SEARCHBAR = 's';
+//const KEY_FOCUS_SEARCHBAR = 's';
 
 const KEY_DROPDOWN_FILTERS = 'Semicolon';
 const KEY_BACK = 'Backspace';
@@ -141,9 +140,9 @@ export const WordsSearchBar: Component<WordsSearchBarProps> = (props) => {
   const { base: baseColors } = useColorContext()!;
 
   return (
-    <div class="w-full max-w-2xl flex flex-row font-bold">
+    <div class="flex w-full max-w-2xl flex-row font-bold">
       <div
-        class={`relative w-full flex flex-row items-center ${baseColors?.textColor} ${baseColors?.backgroundColor}`}
+        class={`relative flex w-full flex-row items-center ${baseColors?.textColor} ${baseColors?.backgroundColor}`}
       >
         <Icon icon={FaSolidMagnifyingGlass} />
         <WordSearchBarFilterPills
@@ -152,7 +151,7 @@ export const WordsSearchBar: Component<WordsSearchBarProps> = (props) => {
           onFilterSelect={onFilterSelect}
         />
         <input
-          class="relative w-full p-3 outline-none bg-inherit placeholder:text-opacity-50"
+          class="relative w-full bg-inherit p-3 outline-none placeholder:text-opacity-50"
           type="text"
           ref={setInputElement}
           spellcheck={false}

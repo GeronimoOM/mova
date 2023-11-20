@@ -1,4 +1,3 @@
-import { knex } from 'knex';
 import { LanguageId } from 'models/Language';
 import { PropertyId, PropertyType } from 'models/Property';
 import { TopicId } from 'models/Topic';

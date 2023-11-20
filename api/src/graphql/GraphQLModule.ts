@@ -1,9 +1,6 @@
 import { join } from 'path';
 import { GraphQLModule as NestGraphQlModule } from '@nestjs/graphql';
-import {
-  MercuriusDriver,
-  MercuriusDriverConfig,
-} from '@nestjs/mercurius';
+import { MercuriusDriver, MercuriusDriverConfig } from '@nestjs/mercurius';
 import { validationPlugin } from './validation';
 
 export const GraphQLModule =
@@ -16,5 +13,3 @@ export const GraphQLModule =
       path: 'api/graphql',
     }),
   });
-
-

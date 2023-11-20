@@ -56,9 +56,8 @@ export class MaintenanceController {
 
   @Post('/generate')
   async generateTestData(@Body('name') name: string) {
-    const generatedLanguage = await this.maintenanceService.generateLanguage(
-      name,
-    );
+    const generatedLanguage =
+      await this.maintenanceService.generateLanguage(name);
 
     return generatedLanguage;
   }

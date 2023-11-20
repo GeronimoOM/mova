@@ -34,9 +34,9 @@ export const LanguageList: Component<LanguageListProps> = (props) => {
   return (
     <ColorProvider colorContext={colorContext}>
       <div
-        class="flex-1 flex flex-row items-stretch scrollbar-hide overflow-x-scroll
-        md:flex-col md:items-stretch md:overflow-x-clip md:min-h-0 md:overflow-y-scroll
-        bg-charcoal-200"
+        class="scrollbar-hide flex flex-1 flex-row items-stretch overflow-x-scroll
+        bg-charcoal-200 md:min-h-0 md:flex-col md:items-stretch md:overflow-x-clip
+        md:overflow-y-scroll"
         ref={props.setLanguagesContainer}
       >
         <For each={props.languages} fallback={'Loading languages...'}>
