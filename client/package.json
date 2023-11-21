@@ -48,8 +48,8 @@
   },
   "lint-staged": {
     "**/*.{js,jsx,ts,tsx}": [
-      "pnpm exec prettier . --write",
-      "pnpm exec eslint . --fix"
+      "prettier --write",
+      "eslint --fix"
     ]
   }
 }

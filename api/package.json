@@ -14,8 +14,8 @@
   },
   "dependencies": {
     "@elastic/elasticsearch": "8.9.0",
-    "@fastify/multipart": "7.7.3",
-    "@mercuriusjs/gateway": "2.0.0",
+    "@fastify/multipart": "8.0.0",
+    "@mercuriusjs/gateway": "1.2.0",
     "@nestjs/common": "10.2.6",
     "@nestjs/core": "10.2.6",
     "@nestjs/graphql": "12.0.9",
@@ -54,8 +54,8 @@
   },
   "lint-staged": {
     "**/*.{js,ts}": [
-      "pnpm exec prettier . --write",
-      "pnpm exec eslint . --fix"
+      "prettier --write",
+      "eslint --fix"
     ]
   }
 }
