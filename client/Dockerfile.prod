@@ -2,7 +2,7 @@ FROM node:20-alpine
 
 RUN ["npm", "install", "-g", "pnpm"]
 
-EXPOSE 4001
+EXPOSE 4000
 
 WORKDIR /app
 

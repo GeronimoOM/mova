@@ -9,7 +9,7 @@ export default defineConfig({
   },
   preview: {
     host: true,
-    port: 4001,
+    port: 4000,
   },
   build: {
     target: 'esnext',
