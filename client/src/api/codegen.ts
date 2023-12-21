@@ -2,7 +2,7 @@ import { CodegenConfig } from '@graphql-codegen/cli';
 import { GRAPHQL_URI } from './client';
 
 const config: CodegenConfig = {
-  schema: GRAPHQL_URI,
+  schema: `http://localhost${GRAPHQL_URI}`,
   documents: 'src/**/*.graphql',
   generates: {
     './src/api/types/': {

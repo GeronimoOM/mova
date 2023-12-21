@@ -27,7 +27,7 @@ export const StatisticsCalendar: Component<StatisticsCalendarProps> = (
   const untilDate = DateTime.fromFormat(props.stats.until, DATE_FORMAT);
   const fromOffset = fromDate.weekday - 1;
   const totalDays = untilDate.diff(fromDate, 'days').days;
-  const totalWeeks = Math.ceil(totalDays / N_WEEKDAYS);
+  const totalWeeks = Math.ceil((totalDays + fromOffset) / N_WEEKDAYS);
 
   const statsByDayDiff = Object.fromEntries(
     props.stats.dates.map((dateStats) => [
@@ -93,8 +93,9 @@ type StatisticCalendarHeaderProps = {
 export const StatisticsCalendarHeader: Component<
   StatisticCalendarHeaderProps
 > = (props) => {
+  const fromOffset = props.fromDate.weekday - 1;
   const totalDays = props.untilDate.diff(props.fromDate, 'days').days;
-  const totalWeeks = Math.ceil(totalDays / N_WEEKDAYS);
+  const totalWeeks = Math.ceil((totalDays + fromOffset) / N_WEEKDAYS);
 
   let currentMonth: { month: number; span: number } | null = null;
   const months = seq(totalWeeks)

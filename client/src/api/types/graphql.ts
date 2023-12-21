@@ -75,12 +75,14 @@ export type LanguageTopicsArgs = {
 };
 
 export type LanguageWordsArgs = {
+  from?: InputMaybe<Scalars['String']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   order?: InputMaybe<WordOrder>;
   partsOfSpeech?: InputMaybe<Array<PartOfSpeech>>;
   query?: InputMaybe<Scalars['String']['input']>;
   start?: Scalars['Int']['input'];
   topics?: InputMaybe<Array<Scalars['ID']['input']>>;
+  until?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type LanguageWordsStatsArgs = {
@@ -739,6 +741,7 @@ export type GetTopicsQuery = {
   __typename?: 'Query';
   language?: {
     __typename?: 'Language';
+    id: string;
     topics: {
       __typename?: 'TopicPage';
       hasMore: boolean;
@@ -755,6 +758,7 @@ export type GetWordsStatsQuery = {
   __typename?: 'Query';
   language?: {
     __typename?: 'Language';
+    id: string;
     wordsStats: {
       __typename?: 'WordsStats';
       total: { __typename?: 'WordsTotalStats'; words: number };
@@ -3011,6 +3015,7 @@ export const GetTopicsDocument = {
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
                 {
                   kind: 'Field',
                   name: { kind: 'Name', value: 'topics' },
@@ -3114,6 +3119,7 @@ export const GetWordsStatsDocument = {
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
                 {
                   kind: 'Field',
                   name: { kind: 'Name', value: 'wordsStats' },

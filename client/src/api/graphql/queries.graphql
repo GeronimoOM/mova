@@ -64,6 +64,7 @@ query GetProperty($id: ID!) {
 
 query GetTopics($languageId: ID!, $start: Int, $limit: Int, $query: String) {
   language(id: $languageId) {
+    id
     topics(start: $start, limit: $limit, query: $query) {
       items {
         id
@@ -76,6 +77,7 @@ query GetTopics($languageId: ID!, $start: Int, $limit: Int, $query: String) {
 
 query GetWordsStats($languageId: ID!) {
   language(id: $languageId) {
+    id
     wordsStats {
       total {
         words
