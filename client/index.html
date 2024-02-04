@@ -2,10 +2,10 @@
 <html lang="en">
   <head>
     <title>Mova</title>
+    <meta name="description" content="Mova - Language Learning App">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#453D75" />
-    <link rel="manifest" href="/src/assets/manifest.json" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -174,13 +174,5 @@
     <div id="root"></div>
 
     <script src="/src/index.tsx" type="module"></script>
-
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function () {
-          navigator.serviceWorker.register('sw.js');
-        });
-      }
-    </script>
   </body>
 </html>

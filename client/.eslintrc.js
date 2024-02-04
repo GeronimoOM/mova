@@ -13,12 +13,7 @@ module.exports = {
       env: {
         node: true,
       },
-      files: [
-        '.eslintrc.{js,cjs}',
-        'postcss.config.js',
-        'tailwind.config.js',
-        'sw.js',
-      ],
+      files: ['.eslintrc.{js,cjs}', 'postcss.config.js', 'tailwind.config.js'],
       parserOptions: {
         sourceType: 'script',
       },

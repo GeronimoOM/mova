@@ -4,6 +4,8 @@
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "jsx": "preserve",
@@ -11,6 +13,7 @@
     "types": ["vite/client"],
     "typeRoots": ["./node_modules/@types/", "./types", "./node_modules"],
     "noEmit": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "lib": ["ESNext", "DOM", "WebWorker"],
   }
 }
