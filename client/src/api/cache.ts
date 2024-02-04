@@ -15,7 +15,7 @@ const languageTypePolicy: TypePolicy = {
       merge(existing: WordPage | undefined, incoming: WordPage): WordPage {
         return {
           items: [...(existing?.items ?? []), ...incoming.items],
-          hasMore: incoming.hasMore,
+          nextCursor: incoming.nextCursor,
         };
       },
     },

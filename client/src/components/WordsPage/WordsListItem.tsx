@@ -34,5 +34,5 @@ export const WordsListItem: Component<WordsListItemProps> = (props) => {
 };
 
 export const WordListItemLoading: Component = () => {
-  return <div class="icursor-none h-12 w-full animate-pulse bg-coolgray-300" />;
+  return <div class="h-12 w-full animate-pulse cursor-none bg-coolgray-300" />;
 };

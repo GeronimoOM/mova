@@ -1,4 +1,4 @@
-import { Component, For, createEffect, createSignal } from 'solid-js';
+import { Component, For, Show, createEffect, createSignal } from 'solid-js';
 import { createLazyQuery } from '@merged/solid-apollo';
 import {
   GetWordsDocument,
@@ -7,7 +7,7 @@ import {
 import { useLanguageContext } from '../LanguageContext';
 import { WordsSearchParams } from './WordsSearchBar/wordsSearchParams';
 import { cache } from '../../api/cache';
-import { WordsListItem } from './WordsListItem';
+import { WordListItemLoading, WordsListItem } from './WordsListItem';
 
 const WORDS_PAGE_SIZE = 15;
 const SEARCH_MIN_TERM = 3;
@@ -30,7 +30,7 @@ export const WordsList: Component<WordsListProps> = (props) => {
   const [fetchWordsPage, wordsPageQuery] = createLazyQuery(GetWordsDocument);
 
   const words = () => wordsPageQuery()?.language?.words.items;
-  const hasMore = () => wordsPageQuery()?.language?.words.hasMore;
+  const nextCursor = () => wordsPageQuery()?.language?.words.nextCursor;
   const isSearch = () => props.searchParams.query.length >= SEARCH_MIN_TERM;
   const searchQuery = () => (isSearch() ? props.searchParams.query : null);
 
@@ -52,10 +52,7 @@ export const WordsList: Component<WordsListProps> = (props) => {
       }
 
       fetchWordsPage({
-        variables: {
-          ...fetchWordsPageArgs(),
-          start: 0,
-        },
+        variables: fetchWordsPageArgs(),
       });
     }
   });
@@ -72,7 +69,7 @@ export const WordsList: Component<WordsListProps> = (props) => {
   });
 
   createEffect(() => {
-    if (isListEndVisible() && hasMore() && !wordsPageQuery.loading) {
+    if (isListEndVisible() && nextCursor() && !wordsPageQuery.loading) {
       onFetchMore();
     }
   });
@@ -81,7 +78,7 @@ export const WordsList: Component<WordsListProps> = (props) => {
     fetchWordsPage({
       variables: {
         ...fetchWordsPageArgs(),
-        start: words()?.length ?? 0,
+        cursor: nextCursor(),
       },
       fetchPolicy: 'network-only',
     });
@@ -98,9 +95,9 @@ export const WordsList: Component<WordsListProps> = (props) => {
           />
         )}
       </For>
-      {/* <Show when={wordsPageQuery.loading}>
-        {new Array(15).fill(null).map(() => <WordListItemLoading />)}
-      </Show> */}
+      <Show when={wordsPageQuery.loading}>
+        <For each={Array(15).fill(null)}>{() => <WordListItemLoading />}</For>
+      </Show>
       <div ref={setListEndRef} />
     </div>
   );

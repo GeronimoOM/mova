@@ -69,18 +69,18 @@ export type LanguagePropertiesArgs = {
 };
 
 export type LanguageTopicsArgs = {
+  cursor?: InputMaybe<Scalars['String']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   query?: InputMaybe<Scalars['String']['input']>;
-  start?: Scalars['Int']['input'];
 };
 
 export type LanguageWordsArgs = {
+  cursor?: InputMaybe<Scalars['String']['input']>;
   from?: InputMaybe<Scalars['String']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   order?: InputMaybe<WordOrder>;
   partsOfSpeech?: InputMaybe<Array<PartOfSpeech>>;
   query?: InputMaybe<Scalars['String']['input']>;
-  start?: Scalars['Int']['input'];
   topics?: InputMaybe<Array<Scalars['ID']['input']>>;
   until?: InputMaybe<Scalars['String']['input']>;
 };
@@ -255,17 +255,17 @@ export type Topic = {
 };
 
 export type TopicWordsArgs = {
+  cursor?: InputMaybe<Scalars['String']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   order?: InputMaybe<WordOrder>;
   partOfSpeech?: InputMaybe<Array<PartOfSpeech>>;
   query?: InputMaybe<Scalars['String']['input']>;
-  start?: Scalars['Int']['input'];
 };
 
 export type TopicPage = {
   __typename?: 'TopicPage';
-  hasMore: Scalars['Boolean']['output'];
   items: Array<Topic>;
+  nextCursor?: Maybe<Scalars['String']['output']>;
 };
 
 export type UpdateLanguageInput = {
@@ -315,8 +315,8 @@ export enum WordOrder {
 
 export type WordPage = {
   __typename?: 'WordPage';
-  hasMore: Scalars['Boolean']['output'];
   items: Array<Word>;
+  nextCursor?: Maybe<Scalars['String']['output']>;
 };
 
 export type WordsByDateStats = {
@@ -353,7 +353,7 @@ export type LanguageWordsFragment = {
   __typename?: 'Language';
   words: {
     __typename?: 'WordPage';
-    hasMore: boolean;
+    nextCursor?: string | null;
     items: Array<{ __typename?: 'Word'; id: string }>;
   };
 };
@@ -621,7 +621,7 @@ export type GetLanguagesQuery = {
 
 export type GetWordsQueryVariables = Exact<{
   languageId: Scalars['ID']['input'];
-  start?: InputMaybe<Scalars['Int']['input']>;
+  cursor?: InputMaybe<Scalars['String']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   partsOfSpeech?: InputMaybe<Array<PartOfSpeech> | PartOfSpeech>;
   query?: InputMaybe<Scalars['String']['input']>;
@@ -636,7 +636,7 @@ export type GetWordsQuery = {
     id: string;
     words: {
       __typename?: 'WordPage';
-      hasMore: boolean;
+      nextCursor?: string | null;
       items: Array<{
         __typename?: 'Word';
         id: string;
@@ -732,7 +732,7 @@ export type GetPropertyQuery = {
 
 export type GetTopicsQueryVariables = Exact<{
   languageId: Scalars['ID']['input'];
-  start?: InputMaybe<Scalars['Int']['input']>;
+  cursor?: InputMaybe<Scalars['String']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   query?: InputMaybe<Scalars['String']['input']>;
 }>;
@@ -744,7 +744,7 @@ export type GetTopicsQuery = {
     id: string;
     topics: {
       __typename?: 'TopicPage';
-      hasMore: boolean;
+      nextCursor?: string | null;
       items: Array<{ __typename?: 'Topic'; id: string; name: string }>;
     };
   } | null;
@@ -825,7 +825,7 @@ export const LanguageWordsFragmentDoc = {
                     ],
                   },
                 },
-                { kind: 'Field', name: { kind: 'Name', value: 'hasMore' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'nextCursor' } },
               ],
             },
           },
@@ -2316,9 +2316,9 @@ export const GetWordsDocument = {
           kind: 'VariableDefinition',
           variable: {
             kind: 'Variable',
-            name: { kind: 'Name', value: 'start' },
+            name: { kind: 'Name', value: 'cursor' },
           },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'String' } },
         },
         {
           kind: 'VariableDefinition',
@@ -2405,10 +2405,10 @@ export const GetWordsDocument = {
                   arguments: [
                     {
                       kind: 'Argument',
-                      name: { kind: 'Name', value: 'start' },
+                      name: { kind: 'Name', value: 'cursor' },
                       value: {
                         kind: 'Variable',
-                        name: { kind: 'Name', value: 'start' },
+                        name: { kind: 'Name', value: 'cursor' },
                       },
                     },
                     {
@@ -2470,7 +2470,7 @@ export const GetWordsDocument = {
                       },
                       {
                         kind: 'Field',
-                        name: { kind: 'Name', value: 'hasMore' },
+                        name: { kind: 'Name', value: 'nextCursor' },
                       },
                     ],
                   },
@@ -2975,9 +2975,9 @@ export const GetTopicsDocument = {
           kind: 'VariableDefinition',
           variable: {
             kind: 'Variable',
-            name: { kind: 'Name', value: 'start' },
+            name: { kind: 'Name', value: 'cursor' },
           },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'String' } },
         },
         {
           kind: 'VariableDefinition',
@@ -3022,10 +3022,10 @@ export const GetTopicsDocument = {
                   arguments: [
                     {
                       kind: 'Argument',
-                      name: { kind: 'Name', value: 'start' },
+                      name: { kind: 'Name', value: 'cursor' },
                       value: {
                         kind: 'Variable',
-                        name: { kind: 'Name', value: 'start' },
+                        name: { kind: 'Name', value: 'cursor' },
                       },
                     },
                     {
@@ -3067,7 +3067,7 @@ export const GetTopicsDocument = {
                       },
                       {
                         kind: 'Field',
-                        name: { kind: 'Name', value: 'hasMore' },
+                        name: { kind: 'Name', value: 'nextCursor' },
                       },
                     ],
                   },

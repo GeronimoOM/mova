@@ -8,7 +8,7 @@ fragment LanguageWords on Language {
     items {
       id
     }
-    hasMore
+    nextCursor
   }
 }
 

@@ -6,7 +6,7 @@ query GetLanguages {
 
 query GetWords(
   $languageId: ID!
-  $start: Int
+  $cursor: String
   $limit: Int
   $partsOfSpeech: [PartOfSpeech!]
   $query: String
@@ -16,7 +16,7 @@ query GetWords(
   language(id: $languageId) {
     id
     words(
-      start: $start
+      cursor: $cursor
       limit: $limit
       partsOfSpeech: $partsOfSpeech
       query: $query
@@ -26,7 +26,7 @@ query GetWords(
       items {
         ...WordFields
       }
-      hasMore
+      nextCursor
     }
   }
 }
@@ -62,15 +62,20 @@ query GetProperty($id: ID!) {
   }
 }
 
-query GetTopics($languageId: ID!, $start: Int, $limit: Int, $query: String) {
+query GetTopics(
+  $languageId: ID!
+  $cursor: String
+  $limit: Int
+  $query: String
+) {
   language(id: $languageId) {
     id
-    topics(start: $start, limit: $limit, query: $query) {
+    topics(cursor: $cursor, limit: $limit, query: $query) {
       items {
         id
         name
       }
-      hasMore
+      nextCursor
     }
   }
 }
