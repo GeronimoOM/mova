@@ -1,6 +1,6 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { LanguageId } from 'models/Language';
-import { Page, PageArgs, emptyPage } from 'models/Page';
+import { Page, PageArgs, StartCursor, emptyPage } from 'models/Page';
 import { isTextPropertyValue, TextPropertyValue } from 'models/PropertyValue';
 import { Topic, TopicId } from 'models/Topic';
 import { PartOfSpeech, Word, WordId } from 'models/Word';
@@ -12,7 +12,11 @@ import {
   INDEX_WORDS,
   IndexType,
 } from './elasticConfig';
-import { QueryDslQueryContainer } from '@elastic/elasticsearch/lib/api/types';
+import {
+  QueryDslQueryContainer,
+  SearchResponse,
+} from '@elastic/elasticsearch/lib/api/types';
+import { decodeCursor, encodeCursor } from 'utils/cursors';
 
 export type WordDocument = Omit<Word, 'properties' | 'topics'> & {
   properties?: string[];
@@ -21,7 +25,7 @@ export type WordDocument = Omit<Word, 'properties' | 'topics'> & {
 
 export type TopicDocument = Topic;
 
-export interface SearchWordsParams extends Required<PageArgs> {
+export interface SearchWordsParams extends PageArgs {
   languageId: LanguageId;
   query: string;
   partsOfSpeech?: PartOfSpeech[];
@@ -42,13 +46,16 @@ export class SearchClient implements OnApplicationBootstrap {
     query,
     partsOfSpeech,
     topics,
-    start,
+    cursor,
     limit,
   }: SearchWordsParams): Promise<Page<WordId>> {
     const indexExists = await this.indexExists(INDEX_WORDS);
     if (!indexExists) {
       return emptyPage();
     }
+
+    const decodedCursor = cursor ? decodeCursor(cursor, StartCursor) : null;
+    const { start = 0 } = decodedCursor ?? {};
 
     const queryFilters: QueryDslQueryContainer[] = [{ term: { languageId } }];
 
@@ -96,22 +103,22 @@ export class SearchClient implements OnApplicationBootstrap {
       size: limit,
     });
 
-    return {
-      items: searchResponse.hits.hits.map((wordDocument) => wordDocument._id),
-      hasMore: (searchResponse.hits.total as number) > start + limit,
-    };
+    return this.toPage(searchResponse, start, limit);
   }
 
   async searchTopics({
     languageId,
     query,
-    start,
+    cursor,
     limit,
   }: SearchTopicsParams): Promise<Page<TopicId>> {
     const indexExists = await this.indexExists(INDEX_TOPICS);
     if (!indexExists) {
       return emptyPage();
     }
+
+    const decodedCursor = cursor ? decodeCursor(cursor, StartCursor) : null;
+    const { start = 0 } = decodedCursor ?? {};
 
     const filterQuery: QueryDslQueryContainer = {
       match: {
@@ -138,10 +145,7 @@ export class SearchClient implements OnApplicationBootstrap {
       size: limit,
     });
 
-    return {
-      items: searchResponse.hits.hits.map((topicDocument) => topicDocument._id),
-      hasMore: (searchResponse.hits.total as number) > start + limit,
-    };
+    return this.toPage(searchResponse, start, limit);
   }
 
   async indexWord(word: Word): Promise<void> {
@@ -290,6 +294,19 @@ export class SearchClient implements OnApplicationBootstrap {
         : undefined,
       ...(word.topics && {
         topics: word.topics.map((topic) => topic.id),
+      }),
+    };
+  }
+
+  private toPage<T>(
+    searchResponse: SearchResponse<T>,
+    start: number,
+    limit: number,
+  ) {
+    return {
+      items: searchResponse.hits.hits.map((doc) => doc._id),
+      ...((searchResponse.hits.total as number) > start + limit && {
+        nextCursor: encodeCursor<StartCursor>({ start: start + limit }),
       }),
     };
   }

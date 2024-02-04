@@ -11,8 +11,8 @@ export function pageType<T>(
     @Field((type) => [classRef])
     items: T[];
 
-    @Field()
-    hasMore: boolean;
+    @Field({ nullable: true })
+    nextCursor?: string;
   }
 
   return PageType as Type<Page<T>>;
@@ -20,8 +20,8 @@ export function pageType<T>(
 
 @ArgsType()
 export class PageArgsType {
-  @Field((type) => Int, { defaultValue: 0 })
-  start: number;
+  @Field({ nullable: true })
+  cursor?: string;
 
   @Field((type) => Int, { nullable: true })
   limit?: number;

@@ -22,7 +22,7 @@ import { SearchClient, SearchWordsParams } from 'clients/SearchClient';
 import { TopicService } from './TopicService';
 import { TopicId } from 'models/Topic';
 import { DateTime } from 'luxon';
-import { DEFAULT_LIMIT, MAX_LIMIT, QUERY_MIN_LENGTH } from 'utils/constants';
+import { QUERY_MIN_LENGTH } from 'utils/constants';
 
 export interface GetWordPageParams extends PageArgs {
   languageId: LanguageId;
@@ -81,20 +81,8 @@ export class WordService {
   }
 
   async getPage(params: GetWordPageParams): Promise<Page<Word>> {
-    if (!params.start) {
-      params.start = 0;
-    }
-    if (!params.limit) {
-      params.limit = DEFAULT_LIMIT;
-    }
-    if (!params.order) {
-      params.order = WordOrder.Chronological;
-    }
-
-    params.start = Math.max(0, params.start);
-    params.limit = Math.min(MAX_LIMIT, params.limit);
-
     let words: Page<WordWithoutProperties>;
+
     if (params.query && params.query.length >= QUERY_MIN_LENGTH) {
       const wordIds = await this.searchClient.searchWords(
         params as SearchWordsParams,

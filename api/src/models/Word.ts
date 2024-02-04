@@ -4,6 +4,7 @@ import { PropertyId } from './Property';
 import { PropertyValue } from './PropertyValue';
 import { Topic } from './Topic';
 import { DateTime } from 'luxon';
+import { Static, Type } from '@sinclair/typebox';
 
 export type WordId = Flavor<string, 'Word'>;
 
@@ -28,7 +29,7 @@ export enum PartOfSpeech {
 
 export enum WordOrder {
   Alphabetical = 'alphabetical',
-  Chronological = 'chronolocial',
+  Chronological = 'chronological',
   Random = 'random',
 }
 
@@ -51,3 +52,21 @@ export interface WordsDateStats {
   date: DateTime;
   words: number;
 }
+
+export type ChronologicalCursor = Static<typeof ChronologicalCursor>;
+export const ChronologicalCursor = Type.Object({
+  order: Type.Literal(WordOrder.Chronological),
+  // TODO proper validation
+  added_at: Type.String(),
+});
+
+export type AlphabeticalCursor = Static<typeof AlphabeticalCursor>;
+export const AlphabeticalCursor = Type.Object({
+  order: Type.Literal(WordOrder.Alphabetical),
+  original: Type.String(),
+});
+
+export const WordSortedCursor = Type.Union([
+  ChronologicalCursor,
+  AlphabeticalCursor,
+]);

@@ -10,7 +10,7 @@ import { Topic, TopicId } from 'models/Topic';
 import { SearchClient, SearchTopicsParams } from 'clients/SearchClient';
 import { WordId } from 'models/Word';
 import { WordService } from './WordService';
-import { DEFAULT_LIMIT, QUERY_MIN_LENGTH } from 'utils/constants';
+import { QUERY_MIN_LENGTH } from 'utils/constants';
 
 export interface GetTopicPageParms extends PageArgs {
   languageId: LanguageId;
@@ -40,13 +40,6 @@ export class TopicService {
   }
 
   async getPage(params: GetTopicPageParms): Promise<Page<Topic>> {
-    if (!params.start) {
-      params.start = 0;
-    }
-    if (!params.limit) {
-      params.limit = DEFAULT_LIMIT;
-    }
-
     let topics: Page<Topic>;
     if (params.query && params.query.length >= QUERY_MIN_LENGTH) {
       const topicIds = await this.searchClient.searchTopics(
@@ -123,7 +116,6 @@ export class TopicService {
     // TODO use paging
     const topics = await this.topicRepository.getPage({
       languageId,
-      start: 0,
       limit: 1000,
     });
 

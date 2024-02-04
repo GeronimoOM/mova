@@ -2,15 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { DbConnectionManager } from './DbConnectionManager';
 import { WordId } from 'models/Word';
 import * as maps from 'utils/maps';
-import { Topic, TopicId } from 'models/Topic';
+import { Topic, TopicId, TopicSortedCursor } from 'models/Topic';
 import { TopicTable, TopicWordTable } from 'knex/types/tables';
 import { Page, PageArgs, mapPage, toPage } from 'models/Page';
 import { LanguageId } from 'models/Language';
+import { decodeCursor, encodeCursor } from 'utils/cursors';
 
 const TABLE_TOPICS = 'topics';
 export const TABLE_TOPICS_WORDS = 'topics_words';
 
-export interface GetTopicPageParams extends Required<PageArgs> {
+export interface GetTopicPageParams extends PageArgs {
   languageId: LanguageId;
 }
 
@@ -29,20 +30,33 @@ export class TopicRepository {
 
   async getPage({
     languageId,
-    start,
+    cursor,
     limit,
   }: GetTopicPageParams): Promise<Page<Topic>> {
-    const topics = await this.connectionManager
+    const decodedCursor = cursor
+      ? decodeCursor(cursor, TopicSortedCursor)
+      : null;
+    const { added_at: addedAt = null } = decodedCursor;
+
+    const query = this.connectionManager
       .getConnection()(TABLE_TOPICS)
       .where({
         language_id: languageId,
       })
-      .offset(start)
       .limit(limit + 1)
       .orderBy('added_at', 'desc');
 
-    return mapPage(toPage(topics, limit), (topicRow) =>
-      this.mapToTopic(topicRow),
+    if (addedAt) {
+      query.where('added_at', '<', addedAt);
+    }
+
+    const topics = await query;
+
+    return mapPage(
+      toPage(topics, limit, (topic) =>
+        encodeCursor({ added_at: topic.added_at }),
+      ),
+      (topicRow) => this.mapToTopic(topicRow),
     );
   }
 

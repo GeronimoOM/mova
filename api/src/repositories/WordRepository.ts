@@ -10,12 +10,14 @@ import {
   WordId,
   WordOrder,
   WordsDateStats,
+  WordSortedCursor,
 } from 'models/Word';
 import { DbConnectionManager } from './DbConnectionManager';
 import { TopicId } from 'models/Topic';
 import { TABLE_TOPICS_WORDS } from './TopicRepository';
 import { DateTime } from 'luxon';
-import { DATE_FORMAT } from 'utils/constants';
+import { DATE_FORMAT, DEFAULT_LIMIT, MAX_LIMIT } from 'utils/constants';
+import { decodeCursor, encodeCursor } from 'utils/cursors';
 
 const TABLE_WORDS = 'words';
 
@@ -25,7 +27,7 @@ export interface WordWithoutProperties extends Omit<Word, 'properties'> {
   properties?: Map<PropertyId, Omit<PropertyValue, 'property'>>;
 }
 
-export interface GetWordPageParams extends Required<PageArgs> {
+export interface GetWordPageParams extends PageArgs {
   languageId: LanguageId;
   order: WordOrder;
   partsOfSpeech?: PartOfSpeech[];
@@ -53,9 +55,9 @@ export class WordRepository {
     languageId,
     partsOfSpeech,
     topics,
-    order,
-    start,
-    limit,
+    order = WordOrder.Chronological,
+    cursor,
+    limit = DEFAULT_LIMIT,
     from,
     until,
   }: GetWordPageParams): Promise<Page<WordWithoutProperties>> {
@@ -65,16 +67,33 @@ export class WordRepository {
       language_id: languageId,
     });
 
+    limit = Math.min(MAX_LIMIT, limit);
+
     if (order === WordOrder.Random) {
       query.limit(limit + 1).orderByRaw('RAND()');
     } else {
-      query
-        .offset(start)
-        .limit(limit + 1)
-        .orderBy(
-          order === WordOrder.Chronological ? 'added_at' : 'original',
-          order === WordOrder.Chronological ? 'desc' : 'asc',
+      const decodedCursor = cursor
+        ? decodeCursor(cursor, WordSortedCursor)
+        : null;
+      order = decodedCursor?.order ?? order;
+
+      const cursorKey =
+        order === WordOrder.Chronological ? 'added_at' : 'original';
+      const orderDirection = order === WordOrder.Chronological ? 'desc' : 'asc';
+      const cursorValue =
+        decodedCursor?.order === WordOrder.Chronological
+          ? decodedCursor?.added_at
+          : decodedCursor?.original;
+
+      query.limit(limit + 1).orderBy(cursorKey, orderDirection);
+
+      if (cursorValue) {
+        query.where(
+          cursorKey,
+          orderDirection === 'asc' ? '>' : '<',
+          cursorValue,
         );
+      }
     }
 
     if (partsOfSpeech?.length) {
@@ -108,7 +127,20 @@ export class WordRepository {
 
     const wordRows = await query;
 
-    return mapPage(toPage(wordRows, limit), (wordRow) =>
+    const toNextCursor = (word: WordTable) =>
+      encodeCursor(
+        order === WordOrder.Chronological
+          ? {
+              order,
+              added_at: word.added_at,
+            }
+          : {
+              order,
+              original: word.original,
+            },
+      );
+
+    return mapPage(toPage(wordRows, limit, toNextCursor), (wordRow) =>
       this.mapToWord(wordRow),
     );
   }
