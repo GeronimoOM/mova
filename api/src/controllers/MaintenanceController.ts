@@ -16,6 +16,7 @@ import {
 } from '@nestjs/common';
 import { LanguageId } from 'models/Language';
 import { MaintenanceService } from 'services/MaintenanceService';
+import { DATE_FORMAT } from 'utils/constants';
 
 @Controller('/api/tools')
 export class MaintenanceController {
@@ -27,7 +28,7 @@ export class MaintenanceController {
       this.maintenanceService.export(),
       jsonStringer(),
     ]);
-    const fileName = `mova-db:${DateTime.now().toFormat('yyyy-LL-dd')}.jsonl`;
+    const fileName = `mova-db:${DateTime.now().toFormat(DATE_FORMAT)}.jsonl`;
 
     return new StreamableFile(jsonStream, {
       type: 'application/json',

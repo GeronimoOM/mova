@@ -23,6 +23,7 @@ export class WordTypeMapper {
       original: word.original,
       translation: word.translation,
       partOfSpeech: word.partOfSpeech,
+      addedAt: word.addedAt.toUnixInteger(),
       properties: Array.from(word.properties?.values() ?? []).map((value) =>
         this.mapPropertyValue(value),
       ),

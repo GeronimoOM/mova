@@ -60,6 +60,7 @@ type Word {
   original: String!
   translation: String!
   partOfSpeech: PartOfSpeech!
+  addedAt: Int!
   properties: [PropertyValueUnion!]!
   languageId: ID!
 }

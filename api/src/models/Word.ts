@@ -14,6 +14,7 @@ export interface Word {
   translation: string;
   languageId: LanguageId;
   partOfSpeech: PartOfSpeech;
+  addedAt: DateTime;
   properties?: Map<PropertyId, PropertyValue>;
   topics?: Topic[];
 }

@@ -1,4 +1,4 @@
-import { Field, ID, ObjectType, registerEnumType } from '@nestjs/graphql';
+import { Field, ID, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { PartOfSpeech, WordId, WordOrder } from 'models/Word';
 import { pageType } from './PageType';
 import { PropertyValueUnionType } from './PropertyValueType';
@@ -21,6 +21,9 @@ export class WordType {
 
   @Field((type) => PartOfSpeech)
   partOfSpeech: PartOfSpeech;
+
+  @Field((type) => Int)
+  addedAt: number;
 
   @Field((type) => [PropertyValueUnionType])
   properties: Array<typeof PropertyValueUnionType>;

@@ -28,6 +28,7 @@ fragment WordFields on Word {
   original
   translation
   partOfSpeech
+  addedAt
 }
 
 fragment WordFieldsFull on Word {
@@ -43,6 +44,7 @@ fragment WordFieldsFull on Word {
       ...OptionPropertyValueFields
     }
   }
+  addedAt
 }
 
 fragment TextPropertyValueFields on TextPropertyValue {

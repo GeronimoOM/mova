@@ -7,7 +7,7 @@ declare module 'knex/types/tables' {
   interface LanguageTable {
     id: LanguageId;
     name: string;
-    added_at: number;
+    added_at: string;
   }
 
   interface PropertyTable {
@@ -17,7 +17,7 @@ declare module 'knex/types/tables' {
     language_id: LanguageId;
     part_of_speech: PartOfSpeech;
     order: number;
-    added_at: number;
+    added_at: string;
     data?: string;
   }
 
@@ -27,7 +27,7 @@ declare module 'knex/types/tables' {
     translation: string;
     language_id: LanguageId;
     part_of_speech: PartOfSpeech;
-    added_at: number;
+    added_at: string;
     properties?: string;
   }
 
@@ -35,7 +35,7 @@ declare module 'knex/types/tables' {
     id: TopicId;
     name: string;
     language_id: LanguageId;
-    added_at: number;
+    added_at: string;
   }
 
   interface TopicWordTable {

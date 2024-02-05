@@ -16,7 +16,12 @@ import { DbConnectionManager } from './DbConnectionManager';
 import { TopicId } from 'models/Topic';
 import { TABLE_TOPICS_WORDS } from './TopicRepository';
 import { DateTime } from 'luxon';
-import { DATE_FORMAT, DEFAULT_LIMIT, MAX_LIMIT } from 'utils/constants';
+import {
+  DATE_FORMAT,
+  DATETIME_FORMAT,
+  DEFAULT_LIMIT,
+  MAX_LIMIT,
+} from 'utils/constants';
 import { decodeCursor, encodeCursor } from 'utils/cursors';
 
 const TABLE_WORDS = 'words';
@@ -189,6 +194,7 @@ export class WordRepository {
         translation: word.translation,
         language_id: word.languageId,
         part_of_speech: word.partOfSpeech,
+        added_at: word.addedAt.toFormat(DATETIME_FORMAT),
         properties: this.mapToWordRowProperties(word.properties),
       });
   }
@@ -275,6 +281,7 @@ export class WordRepository {
       translation: row.translation,
       languageId: row.language_id,
       partOfSpeech: row.part_of_speech,
+      addedAt: DateTime.fromFormat(row.added_at, DATETIME_FORMAT),
       properties: this.mapToWordProperties(row.properties),
     };
   }

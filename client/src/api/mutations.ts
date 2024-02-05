@@ -117,7 +117,7 @@ export const updateCacheOnCreateWord: MutationUpdaterFunction<
     (wordsPage) => ({
       words: {
         items: [data!.createWord, ...(wordsPage?.words.items ?? [])],
-        hasMore: wordsPage?.words.hasMore ?? false,
+        nextCursor: wordsPage?.words.nextCursor,
       },
     }),
   );
@@ -137,7 +137,7 @@ export const updateCacheOnDeleteWord: MutationUpdaterFunction<
         items: (wordsPage?.words.items ?? []).filter(
           ({ id }) => id !== data!.deleteWord.id,
         ),
-        hasMore: wordsPage?.words.hasMore ?? false,
+        nextCursor: wordsPage?.words.nextCursor,
       },
     }),
   );

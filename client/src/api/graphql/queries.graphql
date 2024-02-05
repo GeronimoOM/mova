@@ -6,11 +6,11 @@ query GetLanguages {
 
 query GetWords(
   $languageId: ID!
+  $query: String
+  $partsOfSpeech: [PartOfSpeech!]
+  $topics: [ID!]
   $cursor: String
   $limit: Int
-  $partsOfSpeech: [PartOfSpeech!]
-  $query: String
-  $topics: [ID!]
   $order: WordOrder
 ) {
   language(id: $languageId) {
@@ -47,17 +47,6 @@ query GetProperties($languageId: ID!, $partOfSpeech: PartOfSpeech) {
       ... on OptionProperty {
         ...OptionPropertyFields
       }
-    }
-  }
-}
-
-query GetProperty($id: ID!) {
-  property(id: $id) {
-    ... on TextProperty {
-      ...TextPropertyFields
-    }
-    ... on OptionProperty {
-      ...OptionPropertyFields
     }
   }
 }

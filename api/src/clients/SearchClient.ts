@@ -18,7 +18,7 @@ import {
 } from '@elastic/elasticsearch/lib/api/types';
 import { decodeCursor, encodeCursor } from 'utils/cursors';
 
-export type WordDocument = Omit<Word, 'properties' | 'topics'> & {
+export type WordDocument = Omit<Word, 'addedAt' | 'properties' | 'topics'> & {
   properties?: string[];
   topics?: TopicId[];
 };

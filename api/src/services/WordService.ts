@@ -123,6 +123,7 @@ export class WordService {
       translation: params.translation,
       languageId: params.languageId,
       partOfSpeech: params.partOfSpeech,
+      addedAt: DateTime.now(),
     };
 
     if (params.properties) {
