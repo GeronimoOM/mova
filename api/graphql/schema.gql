@@ -5,11 +5,17 @@
 type Language {
   id: ID!
   name: String!
+  addedAt: Timestamp!
   properties(partOfSpeech: PartOfSpeech): [PropertyUnion!]!
   topics(cursor: String, limit: Int, query: String): TopicPage!
   words(cursor: String, limit: Int, query: String, partsOfSpeech: [PartOfSpeech!], topics: [ID!], from: String, until: String, order: WordOrder): WordPage!
   wordsStats(days: Int, from: String): WordsStats!
 }
+
+"""
+The `Timestamp` scalar type represents points as a number seconds since the UNIX epoch.
+"""
+scalar Timestamp
 
 union PropertyUnion = TextProperty | OptionProperty
 

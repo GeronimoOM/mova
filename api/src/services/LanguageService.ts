@@ -5,9 +5,12 @@ import { LanguageRepository } from 'repositories/LanguageRepository';
 import { PropertyService } from './PropertyService';
 import { TopicService } from './TopicService';
 import { WordService } from './WordService';
+import { DateTime } from 'luxon';
 
 export interface CreateLanguageParams {
+  id?: LanguageId;
   name: string;
+  addedAt?: DateTime;
 }
 
 export interface UpdateLanguageParams {
@@ -41,8 +44,9 @@ export class LanguageService {
 
   async create(params: CreateLanguageParams): Promise<Language> {
     const language: Language = {
-      id: uuid(),
+      id: params.id ?? uuid(),
       name: params.name,
+      addedAt: params.addedAt ?? DateTime.now(),
     };
     await this.languageRepository.create(language);
     return language;

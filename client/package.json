@@ -19,7 +19,7 @@
     "@solid-primitives/media": "2.2.3",
     "@solidjs/router": "0.8.2",
     "@thisbeyond/solid-dnd": "0.7.4",
-    "idb-keyval": "6.2.1",
+    "dexie": "3.2.5",
     "luxon": "3.4.3",
     "solid-icons": "1.0.11",
     "solid-js": "1.7.8"

@@ -1,3 +1,4 @@
+//import Dexie from 'dexie';
 import { clientsClaim } from 'workbox-core';
 import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching';
 //import { ServiceWorkerMessage, ServiceWorkerMessageType } from './sw/messages';

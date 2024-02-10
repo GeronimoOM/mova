@@ -1,26 +1,7 @@
 fragment LanguageFields on Language {
   id
   name
-}
-
-fragment LanguageWords on Language {
-  words {
-    items {
-      id
-    }
-    nextCursor
-  }
-}
-
-fragment LanguageProperties on Language {
-  properties(partOfSpeech: $partOfSpeech) {
-    ... on TextProperty {
-      id
-    }
-    ... on OptionProperty {
-      id
-    }
-  }
+  addedAt
 }
 
 fragment WordFields on Word {

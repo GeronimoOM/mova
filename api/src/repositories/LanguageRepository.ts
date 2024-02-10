@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { Language, LanguageId } from 'models/Language';
 import { DbConnectionManager } from './DbConnectionManager';
 import { LanguageTable } from 'knex/types/tables';
+import { DateTime } from 'luxon';
+import { DATETIME_FORMAT } from 'utils/constants';
 
 const TABLE_LANGUAGES = 'languages';
 
@@ -10,16 +12,20 @@ export class LanguageRepository {
   constructor(private connectionManager: DbConnectionManager) {}
 
   async getAll(): Promise<Language[]> {
-    return await this.connectionManager
+    const languages = await this.connectionManager
       .getConnection()(TABLE_LANGUAGES)
       .orderBy('added_at', 'asc');
+
+    return languages.map((language) => this.mapToLanguage(language));
   }
 
   async getById(id: LanguageId): Promise<Language | null> {
-    return await this.connectionManager
+    const language = await this.connectionManager
       .getConnection()(TABLE_LANGUAGES)
       .where({ id })
       .first();
+
+    return language ? this.mapToLanguage(language) : null;
   }
 
   async create(language: Language): Promise<void> {
@@ -56,5 +62,13 @@ export class LanguageRepository {
 
   async deleteAll(): Promise<void> {
     await this.connectionManager.getConnection()(TABLE_LANGUAGES).delete();
+  }
+
+  private mapToLanguage(row: LanguageTable): Language {
+    return {
+      id: row.id,
+      name: row.name,
+      addedAt: DateTime.fromFormat(row.added_at, DATETIME_FORMAT),
+    };
   }
 }
