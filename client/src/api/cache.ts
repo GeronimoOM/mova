@@ -13,6 +13,7 @@ const languageTypePolicy: TypePolicy = {
           : false;
       },
       merge(existing: WordPage | undefined, incoming: WordPage): WordPage {
+        // TODO smarter merging
         return {
           items: [...(existing?.items ?? []), ...incoming.items],
           nextCursor: incoming.nextCursor,
@@ -23,6 +24,15 @@ const languageTypePolicy: TypePolicy = {
 };
 
 export const cache = new InMemoryCache({
+  dataIdFromObject: (obj, context) => {
+    if (
+      context.typename === 'TextProperty' ||
+      context.typename === 'OptionProperty'
+    ) {
+      return `Property:${obj.id}`;
+    }
+    return `${context.typename}:${obj.id}`;
+  },
   typePolicies: {
     Language: languageTypePolicy,
   },

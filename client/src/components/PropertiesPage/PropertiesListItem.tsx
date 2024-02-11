@@ -8,17 +8,14 @@ import { Component, Show, createEffect, createSignal } from 'solid-js';
 import {
   TextPropertyFieldsFragment,
   OptionPropertyFieldsFragment,
-  CreatePropertyDocument,
-  UpdatePropertyDocument,
-  DeletePropertyDocument,
   PartOfSpeech,
   PropertyType,
 } from '../../api/types/graphql';
-import { createMutation } from '@merged/solid-apollo';
 import { useLanguageContext } from '../LanguageContext';
 import {
-  updateCacheOnCreateProperty,
-  updateCacheOnDeleteProperty,
+  createPropertyMutation,
+  deletePropertyMutation,
+  updatePropertyMutation,
 } from '../../api/mutations';
 import { Icon } from '../common/Icon';
 import { PropertyTypeSelect, PropertyTypeIcon } from './PropertyTypeSelect';
@@ -51,9 +48,9 @@ export const PropertyListItem: Component<PropertyListItemProps> = (props) => {
   const sortableRef = sortable?.ref ?? (() => {});
   const [dragDropState] = props.isSortable ? useDragDropContext()! : [];
 
-  const [createProperty] = createMutation(CreatePropertyDocument);
-  const [updateProperty] = createMutation(UpdatePropertyDocument);
-  const [deleteProperty] = createMutation(DeletePropertyDocument);
+  const [createProperty] = createPropertyMutation();
+  const [updateProperty] = updatePropertyMutation();
+  const [deleteProperty] = deletePropertyMutation();
 
   const onActionSelect = (newAction: Action | null) => {
     if (newAction && newAction === props.selectedAction) {
@@ -84,7 +81,6 @@ export const PropertyListItem: Component<PropertyListItemProps> = (props) => {
           name: propertyName().trim(),
         },
       },
-      update: updateCacheOnCreateProperty,
     });
   };
 
@@ -104,7 +100,6 @@ export const PropertyListItem: Component<PropertyListItemProps> = (props) => {
       variables: {
         id: props.property!.id,
       },
-      update: updateCacheOnDeleteProperty,
     });
   };
 

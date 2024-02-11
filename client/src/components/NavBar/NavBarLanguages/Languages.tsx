@@ -6,22 +6,18 @@ import {
   createEffect,
   batch,
 } from 'solid-js';
-import { createMutation, createQuery } from '@merged/solid-apollo';
+import { createQuery } from '@merged/solid-apollo';
 import { FaSolidEarthEurope } from 'solid-icons/fa';
 import {
   RiArrowsArrowDropDownLine,
   RiArrowsArrowDropUpLine,
 } from 'solid-icons/ri';
-import {
-  CreateLanguageDocument,
-  DeleteLanguageDocument,
-  GetLanguagesDocument,
-  UpdateLanguageDocument,
-} from '../../../api/types/graphql';
+import { GetLanguagesDocument } from '../../../api/types/graphql';
 import { useLanguageContext } from '../../LanguageContext';
 import {
-  updateCacheOnCreateLanguage,
-  updateCacheOnDeleteLanguage,
+  createLanguageMutation,
+  deleteLanguageMutation,
+  updateLanguageMutation,
 } from '../../../api/mutations';
 import { LanguageList } from './LanguageList';
 import { LanguageInput } from './LanguageInput';
@@ -57,9 +53,9 @@ export const Languages: Component<NavBarLanguagesProps> = (props) => {
   const actionLanguage = () =>
     languages()?.find((language) => language.id === actionLanguageId());
 
-  const [createLanguage] = createMutation(CreateLanguageDocument);
-  const [updateLanguage] = createMutation(UpdateLanguageDocument);
-  const [deleteLanguage] = createMutation(DeleteLanguageDocument);
+  const [createLanguage] = createLanguageMutation();
+  const [updateLanguage] = updateLanguageMutation();
+  const [deleteLanguage] = deleteLanguageMutation();
 
   createEffect(() => {
     if (props.isActive) {
@@ -151,7 +147,6 @@ export const Languages: Component<NavBarLanguagesProps> = (props) => {
           name: languageInput().trim(),
         },
       },
-      update: updateCacheOnCreateLanguage,
     });
 
     setAction(null);
@@ -176,7 +171,6 @@ export const Languages: Component<NavBarLanguagesProps> = (props) => {
       variables: {
         id: actionLanguageId()!,
       },
-      update: updateCacheOnDeleteLanguage,
     });
 
     setAction(null);

@@ -4,7 +4,7 @@
 
 - [x] Cursor-based pagination
 - [x] Mutation API `id` and `addedAt` optional parameters
-- [ ] Apollo optimistic updates
+- [x] Apollo optimistic updates
 - [ ] Intercept queries: saving to client DB, serving from client DB
 - [ ] Client init state
 - [ ] Sync API: download changes

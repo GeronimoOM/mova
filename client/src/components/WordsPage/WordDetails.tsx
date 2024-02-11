@@ -1,8 +1,6 @@
 import { Component, For, createEffect, createSignal } from 'solid-js';
-import { createLazyQuery, createMutation } from '@merged/solid-apollo';
+import { createLazyQuery } from '@merged/solid-apollo';
 import {
-  CreateWordDocument,
-  DeleteWordDocument,
   GetPropertiesDocument,
   GetWordDocument,
   OptionPropertyFieldsFragment,
@@ -10,15 +8,15 @@ import {
   TextPropertyFieldsFragment,
   TextPropertyValueFieldsFragment,
   UpdatePropertyValueInput,
-  UpdateWordDocument,
   WordFieldsFragment,
 } from '../../api/types/graphql';
 import { PropertyType } from '../../api/types/graphql';
 import { createStore, reconcile } from 'solid-js/store';
 import { useLanguageContext } from '../LanguageContext';
 import {
-  updateCacheOnCreateWord,
-  updateCacheOnDeleteWord,
+  createWordMutation,
+  deleteWordMutation,
+  updateWordMutation,
 } from '../../api/mutations';
 import { BsTranslate } from 'solid-icons/bs';
 import { Icon } from '../common/Icon';
@@ -74,9 +72,9 @@ export const WordDetails: Component<WordDetailsProps> = (props) => {
   const [fetchProperties, propertiesQuery] = createLazyQuery(
     GetPropertiesDocument,
   );
-  const [createWord, createdWordMutation] = createMutation(CreateWordDocument);
-  const [updateWord] = createMutation(UpdateWordDocument);
-  const [deleteWord] = createMutation(DeleteWordDocument);
+  const [createWord, createdWordMutation] = createWordMutation();
+  const [updateWord] = updateWordMutation();
+  const [deleteWord] = deleteWordMutation();
 
   const selectedWord = () =>
     props.selectedWordId && selectedWordQuery.state === 'ready'
@@ -233,7 +231,6 @@ export const WordDetails: Component<WordDetailsProps> = (props) => {
           })),
         },
       },
-      update: updateCacheOnCreateWord,
     });
 
     setSelectedAction(null);
@@ -263,7 +260,6 @@ export const WordDetails: Component<WordDetailsProps> = (props) => {
       variables: {
         id: props.selectedWordId!,
       },
-      update: updateCacheOnDeleteWord,
     });
 
     setSelectedAction(null);

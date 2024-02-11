@@ -1,7 +1,6 @@
 mutation CreateLanguage($input: CreateLanguageInput!) {
   createLanguage(input: $input) {
-    id
-    name
+    ...LanguageFields
   }
 }
 
@@ -20,23 +19,13 @@ mutation DeleteLanguage($id: ID!) {
 
 mutation CreateProperty($input: CreatePropertyInput!) {
   createProperty(input: $input) {
-    ... on TextProperty {
-      ...TextPropertyFields
-    }
-    ... on OptionProperty {
-      ...OptionPropertyFields
-    }
+    ...PropertyFields
   }
 }
 
 mutation UpdateProperty($input: UpdatePropertyInput!) {
   updateProperty(input: $input) {
-    ... on TextProperty {
-      ...TextPropertyFields
-    }
-    ... on OptionProperty {
-      ...OptionPropertyFields
-    }
+    ...PropertyFields
   }
 }
 

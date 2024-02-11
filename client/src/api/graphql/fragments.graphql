@@ -1,6 +1,7 @@
 fragment LanguageFields on Language {
   id
   name
+  addedAt
 }
 
 fragment LanguageWords on Language {
@@ -36,6 +37,8 @@ fragment WordFieldsFull on Word {
   original
   translation
   partOfSpeech
+  addedAt
+  languageId
   properties {
     ... on TextPropertyValue {
       ...TextPropertyValueFields
@@ -64,11 +67,22 @@ fragment OptionPropertyValueFields on OptionPropertyValue {
   }
 }
 
+fragment PropertyFields on PropertyUnion {
+  ... on TextProperty {
+    ...TextPropertyFields
+  }
+  ... on OptionProperty {
+    ...OptionPropertyFields
+  }
+}
+
 fragment TextPropertyFields on TextProperty {
   id
   name
   type
   partOfSpeech
+  languageId
+  addedAt
 }
 
 fragment OptionPropertyFields on OptionProperty {
@@ -76,6 +90,8 @@ fragment OptionPropertyFields on OptionProperty {
   name
   type
   partOfSpeech
+  languageId
+  addedAt
   options {
     id
     value

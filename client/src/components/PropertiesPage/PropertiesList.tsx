@@ -6,7 +6,7 @@ import {
   createEffect,
   createSignal,
 } from 'solid-js';
-import { createLazyQuery, createMutation } from '@merged/solid-apollo';
+import { createLazyQuery } from '@merged/solid-apollo';
 import {
   DragDropProvider,
   DragDropSensors,
@@ -16,12 +16,8 @@ import {
   DragOverlay,
 } from '@thisbeyond/solid-dnd';
 import { useLanguageContext } from '../LanguageContext';
-import {
-  GetPropertiesDocument,
-  PartOfSpeech,
-  ReorderPropertiesDocument,
-} from '../../api/types/graphql';
-import { updateCacheOnReorderProperties } from '../../api/mutations';
+import { GetPropertiesDocument, PartOfSpeech } from '../../api/types/graphql';
+import { reorderPropertiesMutation } from '../../api/mutations';
 import {
   PropertyListItem,
   PropertyListItemOverlay,
@@ -53,7 +49,7 @@ export const PropertiesList: Component<PropertiesListProps> = (props) => {
   const draggedProperty = () =>
     properties()?.find((property) => property.id === draggedPropertyId());
 
-  const [reorderProperties] = createMutation(ReorderPropertiesDocument);
+  const [reorderProperties] = reorderPropertiesMutation();
 
   createEffect(() => {
     if (selectedLanguageId()) {
@@ -104,10 +100,6 @@ export const PropertiesList: Component<PropertiesListProps> = (props) => {
           0,
           ...reorderedPropertyIds.splice(fromIndex, 1),
         );
-        const currentProperties = properties()!;
-        const reorderedProperties = reorderedPropertyIds.map(
-          (id) => currentProperties.find((p) => p.id === id)!,
-        );
 
         reorderProperties({
           variables: {
@@ -117,8 +109,6 @@ export const PropertiesList: Component<PropertiesListProps> = (props) => {
               propertyIds: reorderedPropertyIds,
             },
           },
-          optimisticResponse: { reorderProperties: reorderedProperties },
-          update: updateCacheOnReorderProperties,
         });
       }
     }

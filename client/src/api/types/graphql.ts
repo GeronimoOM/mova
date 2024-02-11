@@ -359,6 +359,7 @@ export type LanguageFieldsFragment = {
   __typename?: 'Language';
   id: string;
   name: string;
+  addedAt: number;
 };
 
 export type LanguageWordsFragment = {
@@ -394,6 +395,7 @@ export type WordFieldsFullFragment = {
   translation: string;
   partOfSpeech: PartOfSpeech;
   addedAt: number;
+  languageId: string;
   properties: Array<
     | {
         __typename?: 'OptionPropertyValue';
@@ -420,12 +422,39 @@ export type OptionPropertyValueFieldsFragment = {
   option: { __typename?: 'Option'; id: string; value: string };
 };
 
+type PropertyFields_OptionProperty_Fragment = {
+  __typename?: 'OptionProperty';
+  id: string;
+  name: string;
+  type: PropertyType;
+  partOfSpeech: PartOfSpeech;
+  languageId: string;
+  addedAt: number;
+  options: Array<{ __typename?: 'Option'; id: string; value: string }>;
+};
+
+type PropertyFields_TextProperty_Fragment = {
+  __typename?: 'TextProperty';
+  id: string;
+  name: string;
+  type: PropertyType;
+  partOfSpeech: PartOfSpeech;
+  languageId: string;
+  addedAt: number;
+};
+
+export type PropertyFieldsFragment =
+  | PropertyFields_OptionProperty_Fragment
+  | PropertyFields_TextProperty_Fragment;
+
 export type TextPropertyFieldsFragment = {
   __typename?: 'TextProperty';
   id: string;
   name: string;
   type: PropertyType;
   partOfSpeech: PartOfSpeech;
+  languageId: string;
+  addedAt: number;
 };
 
 export type OptionPropertyFieldsFragment = {
@@ -434,6 +463,8 @@ export type OptionPropertyFieldsFragment = {
   name: string;
   type: PropertyType;
   partOfSpeech: PartOfSpeech;
+  languageId: string;
+  addedAt: number;
   options: Array<{ __typename?: 'Option'; id: string; value: string }>;
 };
 
@@ -443,7 +474,12 @@ export type CreateLanguageMutationVariables = Exact<{
 
 export type CreateLanguageMutation = {
   __typename?: 'Mutation';
-  createLanguage: { __typename?: 'Language'; id: string; name: string };
+  createLanguage: {
+    __typename?: 'Language';
+    id: string;
+    name: string;
+    addedAt: number;
+  };
 };
 
 export type UpdateLanguageMutationVariables = Exact<{
@@ -477,6 +513,8 @@ export type CreatePropertyMutation = {
         name: string;
         type: PropertyType;
         partOfSpeech: PartOfSpeech;
+        languageId: string;
+        addedAt: number;
         options: Array<{ __typename?: 'Option'; id: string; value: string }>;
       }
     | {
@@ -485,6 +523,8 @@ export type CreatePropertyMutation = {
         name: string;
         type: PropertyType;
         partOfSpeech: PartOfSpeech;
+        languageId: string;
+        addedAt: number;
       };
 };
 
@@ -501,6 +541,8 @@ export type UpdatePropertyMutation = {
         name: string;
         type: PropertyType;
         partOfSpeech: PartOfSpeech;
+        languageId: string;
+        addedAt: number;
         options: Array<{ __typename?: 'Option'; id: string; value: string }>;
       }
     | {
@@ -509,6 +551,8 @@ export type UpdatePropertyMutation = {
         name: string;
         type: PropertyType;
         partOfSpeech: PartOfSpeech;
+        languageId: string;
+        addedAt: number;
       };
 };
 
@@ -558,6 +602,7 @@ export type CreateWordMutation = {
     translation: string;
     partOfSpeech: PartOfSpeech;
     addedAt: number;
+    languageId: string;
     properties: Array<
       | {
           __typename?: 'OptionPropertyValue';
@@ -586,6 +631,7 @@ export type UpdateWordMutation = {
     translation: string;
     partOfSpeech: PartOfSpeech;
     addedAt: number;
+    languageId: string;
     properties: Array<
       | {
           __typename?: 'OptionPropertyValue';
@@ -632,7 +678,12 @@ export type GetLanguagesQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetLanguagesQuery = {
   __typename?: 'Query';
-  languages: Array<{ __typename?: 'Language'; id: string; name: string }>;
+  languages: Array<{
+    __typename?: 'Language';
+    id: string;
+    name: string;
+    addedAt: number;
+  }>;
 };
 
 export type GetWordsQueryVariables = Exact<{
@@ -678,6 +729,7 @@ export type GetWordQuery = {
     translation: string;
     partOfSpeech: PartOfSpeech;
     addedAt: number;
+    languageId: string;
     properties: Array<
       | {
           __typename?: 'OptionPropertyValue';
@@ -710,6 +762,8 @@ export type GetPropertiesQuery = {
           name: string;
           type: PropertyType;
           partOfSpeech: PartOfSpeech;
+          languageId: string;
+          addedAt: number;
           options: Array<{ __typename?: 'Option'; id: string; value: string }>;
         }
       | {
@@ -718,6 +772,8 @@ export type GetPropertiesQuery = {
           name: string;
           type: PropertyType;
           partOfSpeech: PartOfSpeech;
+          languageId: string;
+          addedAt: number;
         }
     >;
   } | null;
@@ -784,6 +840,7 @@ export const LanguageFieldsFragmentDoc = {
         selections: [
           { kind: 'Field', name: { kind: 'Name', value: 'id' } },
           { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'addedAt' } },
         ],
       },
     },
@@ -998,6 +1055,8 @@ export const WordFieldsFullFragmentDoc = {
           { kind: 'Field', name: { kind: 'Name', value: 'original' } },
           { kind: 'Field', name: { kind: 'Name', value: 'translation' } },
           { kind: 'Field', name: { kind: 'Name', value: 'partOfSpeech' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'addedAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'languageId' } },
           {
             kind: 'Field',
             name: { kind: 'Name', value: 'properties' },
@@ -1126,6 +1185,8 @@ export const TextPropertyFieldsFragmentDoc = {
           { kind: 'Field', name: { kind: 'Name', value: 'name' } },
           { kind: 'Field', name: { kind: 'Name', value: 'type' } },
           { kind: 'Field', name: { kind: 'Name', value: 'partOfSpeech' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'languageId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'addedAt' } },
         ],
       },
     },
@@ -1148,6 +1209,8 @@ export const OptionPropertyFieldsFragmentDoc = {
           { kind: 'Field', name: { kind: 'Name', value: 'name' } },
           { kind: 'Field', name: { kind: 'Name', value: 'type' } },
           { kind: 'Field', name: { kind: 'Name', value: 'partOfSpeech' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'languageId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'addedAt' } },
           {
             kind: 'Field',
             name: { kind: 'Name', value: 'options' },
@@ -1164,6 +1227,105 @@ export const OptionPropertyFieldsFragmentDoc = {
     },
   ],
 } as unknown as DocumentNode<OptionPropertyFieldsFragment, unknown>;
+export const PropertyFieldsFragmentDoc = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'PropertyFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'PropertyUnion' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'InlineFragment',
+            typeCondition: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'TextProperty' },
+            },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'TextPropertyFields' },
+                },
+              ],
+            },
+          },
+          {
+            kind: 'InlineFragment',
+            typeCondition: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'OptionProperty' },
+            },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'OptionPropertyFields' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'TextPropertyFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'TextProperty' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'type' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'partOfSpeech' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'languageId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'addedAt' } },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'OptionPropertyFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'OptionProperty' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'type' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'partOfSpeech' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'languageId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'addedAt' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'options' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'value' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<PropertyFieldsFragment, unknown>;
 export const CreateLanguageDocument = {
   kind: 'Document',
   definitions: [
@@ -1206,11 +1368,29 @@ export const CreateLanguageDocument = {
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'LanguageFields' },
+                },
               ],
             },
           },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'LanguageFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'Language' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'addedAt' } },
         ],
       },
     },
@@ -1365,36 +1545,8 @@ export const CreatePropertyDocument = {
               kind: 'SelectionSet',
               selections: [
                 {
-                  kind: 'InlineFragment',
-                  typeCondition: {
-                    kind: 'NamedType',
-                    name: { kind: 'Name', value: 'TextProperty' },
-                  },
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      {
-                        kind: 'FragmentSpread',
-                        name: { kind: 'Name', value: 'TextPropertyFields' },
-                      },
-                    ],
-                  },
-                },
-                {
-                  kind: 'InlineFragment',
-                  typeCondition: {
-                    kind: 'NamedType',
-                    name: { kind: 'Name', value: 'OptionProperty' },
-                  },
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      {
-                        kind: 'FragmentSpread',
-                        name: { kind: 'Name', value: 'OptionPropertyFields' },
-                      },
-                    ],
-                  },
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'PropertyFields' },
                 },
               ],
             },
@@ -1416,6 +1568,8 @@ export const CreatePropertyDocument = {
           { kind: 'Field', name: { kind: 'Name', value: 'name' } },
           { kind: 'Field', name: { kind: 'Name', value: 'type' } },
           { kind: 'Field', name: { kind: 'Name', value: 'partOfSpeech' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'languageId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'addedAt' } },
         ],
       },
     },
@@ -1433,6 +1587,8 @@ export const CreatePropertyDocument = {
           { kind: 'Field', name: { kind: 'Name', value: 'name' } },
           { kind: 'Field', name: { kind: 'Name', value: 'type' } },
           { kind: 'Field', name: { kind: 'Name', value: 'partOfSpeech' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'languageId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'addedAt' } },
           {
             kind: 'Field',
             name: { kind: 'Name', value: 'options' },
@@ -1441,6 +1597,51 @@ export const CreatePropertyDocument = {
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'value' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'PropertyFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'PropertyUnion' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'InlineFragment',
+            typeCondition: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'TextProperty' },
+            },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'TextPropertyFields' },
+                },
+              ],
+            },
+          },
+          {
+            kind: 'InlineFragment',
+            typeCondition: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'OptionProperty' },
+            },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'OptionPropertyFields' },
+                },
               ],
             },
           },
@@ -1495,36 +1696,8 @@ export const UpdatePropertyDocument = {
               kind: 'SelectionSet',
               selections: [
                 {
-                  kind: 'InlineFragment',
-                  typeCondition: {
-                    kind: 'NamedType',
-                    name: { kind: 'Name', value: 'TextProperty' },
-                  },
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      {
-                        kind: 'FragmentSpread',
-                        name: { kind: 'Name', value: 'TextPropertyFields' },
-                      },
-                    ],
-                  },
-                },
-                {
-                  kind: 'InlineFragment',
-                  typeCondition: {
-                    kind: 'NamedType',
-                    name: { kind: 'Name', value: 'OptionProperty' },
-                  },
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      {
-                        kind: 'FragmentSpread',
-                        name: { kind: 'Name', value: 'OptionPropertyFields' },
-                      },
-                    ],
-                  },
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'PropertyFields' },
                 },
               ],
             },
@@ -1546,6 +1719,8 @@ export const UpdatePropertyDocument = {
           { kind: 'Field', name: { kind: 'Name', value: 'name' } },
           { kind: 'Field', name: { kind: 'Name', value: 'type' } },
           { kind: 'Field', name: { kind: 'Name', value: 'partOfSpeech' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'languageId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'addedAt' } },
         ],
       },
     },
@@ -1563,6 +1738,8 @@ export const UpdatePropertyDocument = {
           { kind: 'Field', name: { kind: 'Name', value: 'name' } },
           { kind: 'Field', name: { kind: 'Name', value: 'type' } },
           { kind: 'Field', name: { kind: 'Name', value: 'partOfSpeech' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'languageId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'addedAt' } },
           {
             kind: 'Field',
             name: { kind: 'Name', value: 'options' },
@@ -1571,6 +1748,51 @@ export const UpdatePropertyDocument = {
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'value' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'PropertyFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'PropertyUnion' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'InlineFragment',
+            typeCondition: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'TextProperty' },
+            },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'TextPropertyFields' },
+                },
+              ],
+            },
+          },
+          {
+            kind: 'InlineFragment',
+            typeCondition: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'OptionProperty' },
+            },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'OptionPropertyFields' },
+                },
               ],
             },
           },
@@ -1874,6 +2096,8 @@ export const CreateWordDocument = {
           { kind: 'Field', name: { kind: 'Name', value: 'original' } },
           { kind: 'Field', name: { kind: 'Name', value: 'translation' } },
           { kind: 'Field', name: { kind: 'Name', value: 'partOfSpeech' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'addedAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'languageId' } },
           {
             kind: 'Field',
             name: { kind: 'Name', value: 'properties' },
@@ -2051,6 +2275,8 @@ export const UpdateWordDocument = {
           { kind: 'Field', name: { kind: 'Name', value: 'original' } },
           { kind: 'Field', name: { kind: 'Name', value: 'translation' } },
           { kind: 'Field', name: { kind: 'Name', value: 'partOfSpeech' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'addedAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'languageId' } },
           {
             kind: 'Field',
             name: { kind: 'Name', value: 'properties' },
@@ -2285,6 +2511,7 @@ export const GetLanguagesDocument = {
         selections: [
           { kind: 'Field', name: { kind: 'Name', value: 'id' } },
           { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'addedAt' } },
         ],
       },
     },
@@ -2616,6 +2843,8 @@ export const GetWordDocument = {
           { kind: 'Field', name: { kind: 'Name', value: 'original' } },
           { kind: 'Field', name: { kind: 'Name', value: 'translation' } },
           { kind: 'Field', name: { kind: 'Name', value: 'partOfSpeech' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'addedAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'languageId' } },
           {
             kind: 'Field',
             name: { kind: 'Name', value: 'properties' },
@@ -2797,6 +3026,8 @@ export const GetPropertiesDocument = {
           { kind: 'Field', name: { kind: 'Name', value: 'name' } },
           { kind: 'Field', name: { kind: 'Name', value: 'type' } },
           { kind: 'Field', name: { kind: 'Name', value: 'partOfSpeech' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'languageId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'addedAt' } },
         ],
       },
     },
@@ -2814,6 +3045,8 @@ export const GetPropertiesDocument = {
           { kind: 'Field', name: { kind: 'Name', value: 'name' } },
           { kind: 'Field', name: { kind: 'Name', value: 'type' } },
           { kind: 'Field', name: { kind: 'Name', value: 'partOfSpeech' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'languageId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'addedAt' } },
           {
             kind: 'Field',
             name: { kind: 'Name', value: 'options' },
