@@ -5,6 +5,8 @@ import {
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
+import { TimestampScalar } from 'graphql/scalars/Timestamp';
+import { DateTime } from 'luxon';
 import { LanguageId } from 'models/Language';
 import {
   PropertyId,
@@ -30,6 +32,9 @@ export abstract class IPropertyType {
 
   @Field((type) => PartOfSpeech)
   partOfSpeech: PartOfSpeech;
+
+  @Field((type) => TimestampScalar)
+  addedAt: DateTime;
 
   @Field((type) => ID)
   languageId: LanguageId;

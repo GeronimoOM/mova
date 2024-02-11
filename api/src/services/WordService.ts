@@ -35,10 +35,12 @@ export interface GetWordPageParams extends PageArgs {
 }
 
 export interface CreateWordParams {
+  id?: WordId;
   original: string;
   translation: string;
   languageId: LanguageId;
   partOfSpeech: PartOfSpeech;
+  addedAt?: DateTime;
   properties?: Map<PropertyId, UpdatePropertyValueParams>;
 }
 
@@ -118,12 +120,12 @@ export class WordService {
     await this.languageService.getById(params.languageId);
 
     const word: Word = {
-      id: uuid(),
+      id: params.id ?? uuid(),
       original: params.original,
       translation: params.translation,
       languageId: params.languageId,
       partOfSpeech: params.partOfSpeech,
-      addedAt: DateTime.now(),
+      addedAt: params.addedAt ?? DateTime.now(),
     };
 
     if (params.properties) {

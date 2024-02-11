@@ -4,7 +4,7 @@
 
 @layer base {
   html {
-    font-family: Source Code Pro;
+    font-family: 'Source Code Pro';
     -webkit-tap-highlight-color: transparent;
   }
 }

@@ -13,9 +13,14 @@ import { PartOfSpeech } from 'models/Word';
 import { PropertyService } from 'services/PropertyService';
 import { PropertyTypeMapper } from '../mappers/PropertyTypeMapper';
 import { PropertyUnionType } from '../types/PropertyType';
+import { TimestampScalar } from 'graphql/scalars/Timestamp';
+import { DateTime } from 'luxon';
 
 @InputType()
 export class CreatePropertyInput {
+  @Field((type) => ID, { nullable: true })
+  id?: PropertyId;
+
   @Field()
   name: string;
 
@@ -27,6 +32,9 @@ export class CreatePropertyInput {
 
   @Field((type) => PartOfSpeech)
   partOfSpeech: PartOfSpeech;
+
+  @Field((type) => TimestampScalar, { nullable: true })
+  addedAt?: DateTime;
 
   @Field((type) => [String], { nullable: true })
   options: string[];

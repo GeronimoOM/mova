@@ -13,9 +13,14 @@ import { WordType } from '../types/WordType';
 import { UpdatePropertyValueParams, WordService } from 'services/WordService';
 import { WordTypeMapper } from '../mappers/WordTypeMapper';
 import { OptionId, PropertyId } from 'models/Property';
+import { TimestampScalar } from 'graphql/scalars/Timestamp';
+import { DateTime } from 'luxon';
 
 @InputType()
 export class CreateWordInput {
+  @Field((type) => ID, { nullable: true })
+  id?: WordId;
+
   @Field()
   original: string;
 
@@ -27,6 +32,9 @@ export class CreateWordInput {
 
   @Field((type) => PartOfSpeech)
   partOfSpeech: PartOfSpeech;
+
+  @Field((type) => TimestampScalar, { nullable: true })
+  addedAt?: DateTime;
 
   @Field((type) => [UpdatePropertyValueInput], { nullable: true })
   properties?: UpdatePropertyValueInput[];

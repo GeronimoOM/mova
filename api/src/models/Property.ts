@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon';
 import { Flavor } from '../utils/flavor';
 import { LanguageId } from './Language';
 import { PartOfSpeech } from './Word';
@@ -15,6 +16,7 @@ export interface BaseProperty {
   type: PropertyType;
   languageId: LanguageId;
   partOfSpeech: PartOfSpeech;
+  addedAt: DateTime;
   order: number;
 }
 

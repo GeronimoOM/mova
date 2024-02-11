@@ -1,8 +1,10 @@
-import { Field, ID, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
+import { Field, ID, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { PartOfSpeech, WordId, WordOrder } from 'models/Word';
 import { pageType } from './PageType';
 import { PropertyValueUnionType } from './PropertyValueType';
 import { LanguageId } from 'models/Language';
+import { TimestampScalar } from 'graphql/scalars/Timestamp';
+import { DateTime } from 'luxon';
 
 registerEnumType(PartOfSpeech, {
   name: 'PartOfSpeech',
@@ -22,14 +24,14 @@ export class WordType {
   @Field((type) => PartOfSpeech)
   partOfSpeech: PartOfSpeech;
 
-  @Field((type) => Int)
-  addedAt: number;
-
-  @Field((type) => [PropertyValueUnionType])
-  properties: Array<typeof PropertyValueUnionType>;
+  @Field((type) => TimestampScalar)
+  addedAt: DateTime;
 
   @Field((type) => ID)
   languageId: LanguageId;
+
+  @Field((type) => [PropertyValueUnionType])
+  properties: Array<typeof PropertyValueUnionType>;
 }
 
 export const WordPageType = pageType('Word', WordType);

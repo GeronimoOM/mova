@@ -13,6 +13,8 @@ import {
 } from 'models/Property';
 import { DbConnectionManager } from './DbConnectionManager';
 import { PartOfSpeech } from 'models/Word';
+import { DATETIME_FORMAT } from 'utils/constants';
+import { DateTime } from 'luxon';
 
 const TABLE_PROPERTIES = 'properties';
 
@@ -71,6 +73,7 @@ export class PropertyRepository {
       type: property.type,
       language_id: property.languageId,
       part_of_speech: property.partOfSpeech,
+      added_at: property.addedAt.toFormat(DATETIME_FORMAT),
       order: property.order,
     };
 
@@ -151,6 +154,7 @@ export class PropertyRepository {
       type: row.type,
       languageId: row.language_id,
       partOfSpeech: row.part_of_speech,
+      addedAt: DateTime.fromFormat(row.added_at, DATETIME_FORMAT),
       order: row.order,
     };
 

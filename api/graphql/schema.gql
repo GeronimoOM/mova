@@ -5,11 +5,17 @@
 type Language {
   id: ID!
   name: String!
+  addedAt: Timestamp!
   properties(partOfSpeech: PartOfSpeech): [PropertyUnion!]!
   topics(cursor: String, limit: Int, query: String): TopicPage!
   words(cursor: String, limit: Int, query: String, partsOfSpeech: [PartOfSpeech!], topics: [ID!], from: String, until: String, order: WordOrder): WordPage!
   wordsStats(days: Int, from: String): WordsStats!
 }
+
+"""
+The `Timestamp` scalar type represents points as a number seconds since the UNIX epoch.
+"""
+scalar Timestamp
 
 union PropertyUnion = TextProperty | OptionProperty
 
@@ -33,6 +39,7 @@ type TextProperty {
   name: String!
   type: PropertyType!
   partOfSpeech: PartOfSpeech!
+  addedAt: Timestamp!
   languageId: ID!
 }
 
@@ -46,6 +53,7 @@ type OptionProperty {
   name: String!
   type: PropertyType!
   partOfSpeech: PartOfSpeech!
+  addedAt: Timestamp!
   languageId: ID!
   options: [Option!]!
 }
@@ -60,9 +68,9 @@ type Word {
   original: String!
   translation: String!
   partOfSpeech: PartOfSpeech!
-  addedAt: Int!
-  properties: [PropertyValueUnion!]!
+  addedAt: Timestamp!
   languageId: ID!
+  properties: [PropertyValueUnion!]!
 }
 
 union PropertyValueUnion = TextPropertyValue | OptionPropertyValue
@@ -138,7 +146,9 @@ type Mutation {
 }
 
 input CreateLanguageInput {
+  id: ID
   name: String!
+  addedAt: Timestamp
 }
 
 input UpdateLanguageInput {
@@ -147,10 +157,12 @@ input UpdateLanguageInput {
 }
 
 input CreatePropertyInput {
+  id: ID
   name: String!
   type: PropertyType!
   languageId: ID!
   partOfSpeech: PartOfSpeech!
+  addedAt: Timestamp
   options: [String!]
 }
 
@@ -172,10 +184,12 @@ input ReorderPropertiesInput {
 }
 
 input CreateWordInput {
+  id: ID
   original: String!
   translation: String!
   languageId: ID!
   partOfSpeech: PartOfSpeech!
+  addedAt: Timestamp
   properties: [UpdatePropertyValueInput!]
 }
 

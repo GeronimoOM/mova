@@ -27,13 +27,19 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean };
   Int: { input: number; output: number };
   Float: { input: number; output: number };
+  /** The `Timestamp` scalar type represents points as a number seconds since the UNIX epoch. */
+  Timestamp: { input: number; output: number };
 };
 
 export type CreateLanguageInput = {
+  addedAt?: InputMaybe<Scalars['Timestamp']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
   name: Scalars['String']['input'];
 };
 
 export type CreatePropertyInput = {
+  addedAt?: InputMaybe<Scalars['Timestamp']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
   languageId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
   options?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -47,6 +53,8 @@ export type CreateTopicInput = {
 };
 
 export type CreateWordInput = {
+  addedAt?: InputMaybe<Scalars['Timestamp']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
   languageId: Scalars['ID']['input'];
   original: Scalars['String']['input'];
   partOfSpeech: PartOfSpeech;
@@ -56,6 +64,7 @@ export type CreateWordInput = {
 
 export type Language = {
   __typename?: 'Language';
+  addedAt: Scalars['Timestamp']['output'];
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   properties: Array<PropertyUnion>;
@@ -174,6 +183,7 @@ export type Option = {
 
 export type OptionProperty = {
   __typename?: 'OptionProperty';
+  addedAt: Scalars['Timestamp']['output'];
   id: Scalars['ID']['output'];
   languageId: Scalars['ID']['output'];
   name: Scalars['String']['output'];
@@ -234,6 +244,7 @@ export type ReorderPropertiesInput = {
 
 export type TextProperty = {
   __typename?: 'TextProperty';
+  addedAt: Scalars['Timestamp']['output'];
   id: Scalars['ID']['output'];
   languageId: Scalars['ID']['output'];
   name: Scalars['String']['output'];
@@ -299,7 +310,7 @@ export type UpdateWordInput = {
 
 export type Word = {
   __typename?: 'Word';
-  addedAt: Scalars['Int']['output'];
+  addedAt: Scalars['Timestamp']['output'];
   id: Scalars['String']['output'];
   languageId: Scalars['ID']['output'];
   original: Scalars['String']['output'];

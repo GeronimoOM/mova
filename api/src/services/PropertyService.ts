@@ -15,12 +15,15 @@ import { PropertyRepository } from 'repositories/PropertyRepository';
 import { LanguageService } from './LanguageService';
 import { PartOfSpeech } from 'models/Word';
 import * as arrays from 'utils/arrays';
+import { DateTime } from 'luxon';
 
 export interface CreateBasePropertyParams {
+  id?: PropertyId;
   name: string;
   type: PropertyType;
   languageId: LanguageId;
   partOfSpeech: PartOfSpeech;
+  addedAt?: DateTime;
 }
 
 export interface CreateTextPropertyParams extends CreateBasePropertyParams {
@@ -82,11 +85,12 @@ export class PropertyService {
       )) + 1;
 
     const baseProperty: BaseProperty = {
-      id: uuid(),
+      id: params.id ?? uuid(),
       name: params.name,
       type: params.type,
       languageId: params.languageId,
       partOfSpeech: params.partOfSpeech,
+      addedAt: params.addedAt ?? DateTime.now(),
       order,
     };
 

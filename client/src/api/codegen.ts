@@ -10,6 +10,11 @@ const config: CodegenConfig = {
       presetConfig: {
         fragmentMasking: false,
       },
+      config: {
+        scalars: {
+          Timestamp: 'number',
+        },
+      },
     },
   },
 };

@@ -28,11 +28,18 @@ import { TopicId } from 'models/Topic';
 import { WordsStatsType } from 'graphql/types/WordsDateStatsType';
 import { DateTime } from 'luxon';
 import { DATE_FORMAT } from 'utils/constants';
+import { TimestampScalar } from 'graphql/scalars/Timestamp';
 
 @InputType()
 export class CreateLanguageInput {
+  @Field((type) => ID, { nullable: true })
+  id?: LanguageId;
+
   @Field()
   name: string;
+
+  @Field((type) => TimestampScalar, { nullable: true })
+  addedAt?: DateTime;
 }
 
 @InputType()

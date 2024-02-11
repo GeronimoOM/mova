@@ -36,7 +36,7 @@ export class TopicRepository {
     const decodedCursor = cursor
       ? decodeCursor(cursor, TopicSortedCursor)
       : null;
-    const { added_at: addedAt = null } = decodedCursor;
+    const { added_at: addedAt = null } = decodedCursor ?? {};
 
     const query = this.connectionManager
       .getConnection()(TABLE_TOPICS)
