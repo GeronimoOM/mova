@@ -31,7 +31,7 @@ export const cache = new InMemoryCache({
     ) {
       return `Property:${obj.id}`;
     }
-    return `${context.typename}:${obj.id}`;
+    return obj.id ? `${context.typename}:${obj.id}` : false;
   },
   typePolicies: {
     Language: languageTypePolicy,

@@ -21,6 +21,8 @@ import { Icon } from '../common/Icon';
 import { PropertyTypeSelect, PropertyTypeIcon } from './PropertyTypeSelect';
 import { ActionBar, Action } from '../common/ActionBar';
 import { asClasses, useColorContext } from '../common/ColorContext';
+import { v1 as uuid } from 'uuid';
+import { DateTime } from 'luxon';
 
 const MIN_PROPERTY_NAME_LENGTH = 3;
 
@@ -75,10 +77,12 @@ export const PropertyListItem: Component<PropertyListItemProps> = (props) => {
     createProperty({
       variables: {
         input: {
+          id: uuid(),
           languageId: selectedLanguageId()!,
           partOfSpeech: props.partOfSpeech,
           type: propertyType(),
           name: propertyName().trim(),
+          addedAt: DateTime.now().toSeconds(),
         },
       },
     });

@@ -3,6 +3,14 @@ import { LanguageProvider } from './LanguageContext';
 import { Main } from './Main';
 import { NavBar } from './NavBar/NavBar';
 
+window.addEventListener('offline', () => {
+  console.log('offline');
+});
+
+window.addEventListener('online', () => {
+  console.log('online');
+});
+
 const App: Component = () => {
   return (
     <LanguageProvider>

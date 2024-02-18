@@ -15,14 +15,14 @@ export async function registerServiceWorker({
       );
     });
 
-    const registration = await window.navigator.serviceWorker.ready;
-    try {
-      await registration.periodicSync.register('sync-mova-data', {
-        minInterval: 1 * 60 * 60 * 1000,
-      });
-    } catch (err) {
-      console.log(err, 'Periodic sync could not be registered!');
-    }
+    // const registration = await window.navigator.serviceWorker.ready;
+    // try {
+    //   await registration.periodicSync.register('sync-mova-data', {
+    //     minInterval: 1 * 60 * 60 * 1000,
+    //   });
+    // } catch (err) {
+    //   console.log(err, 'Periodic sync could not be registered!');
+    // }
 
     navigator.serviceWorker.addEventListener('message', (e) =>
       onMessage(e.data),

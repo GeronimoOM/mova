@@ -28,6 +28,8 @@ import {
 } from '../common/ColorContext';
 import { ActionBar, Action } from '../common/ActionBar';
 import { WordDetailsPosSelect } from './WordDetailsPosSelect';
+import { v1 as uuid } from 'uuid';
+import { DateTime } from 'luxon';
 
 const MIN_WORD_ORIGINAL_LENGTH = 1;
 const MIN_WORD_TRANSLATION_LENGTH = 1;
@@ -221,6 +223,7 @@ export const WordDetails: Component<WordDetailsProps> = (props) => {
     await createWord({
       variables: {
         input: {
+          id: uuid(),
           languageId: selectedLanguageId()!,
           original: word.original!.trim(),
           translation: word.translation!.trim(),
@@ -229,6 +232,7 @@ export const WordDetails: Component<WordDetailsProps> = (props) => {
             ...value,
             text: value.text?.trim(),
           })),
+          addedAt: DateTime.now().toSeconds(),
         },
       },
     });

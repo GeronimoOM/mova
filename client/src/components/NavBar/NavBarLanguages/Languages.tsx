@@ -23,6 +23,8 @@ import { LanguageList } from './LanguageList';
 import { LanguageInput } from './LanguageInput';
 import { Icon, ToggleIcon } from '../../common/Icon';
 import { ActionBar, Action } from '../../common/ActionBar';
+import { v1 as uuid } from 'uuid';
+import { DateTime } from 'luxon';
 
 const MIN_LANGUAGE_NAME_LENGTH = 3;
 
@@ -144,7 +146,9 @@ export const Languages: Component<NavBarLanguagesProps> = (props) => {
     const { createLanguage: createdLanguage } = await createLanguage({
       variables: {
         input: {
+          id: uuid(),
           name: languageInput().trim(),
+          addedAt: DateTime.now().toSeconds(),
         },
       },
     });

@@ -262,6 +262,7 @@ function readProperty(id: string): PropertyFieldsFragment | null {
   return cache.readFragment({
     id: `Property:${id}`,
     fragment: PropertyFieldsFragmentDoc,
+    fragmentName: 'PropertyFields',
   })!;
 }
 
@@ -269,5 +270,6 @@ function readWordFull(id: string): WordFieldsFullFragment | null {
   return cache.readFragment({
     id: `Word:${id}`,
     fragment: WordFieldsFullFragmentDoc,
+    fragmentName: 'WordFieldsFull',
   })!;
 }

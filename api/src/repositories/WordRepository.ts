@@ -87,7 +87,11 @@ export class WordRepository {
       const orderDirection = order === WordOrder.Chronological ? 'desc' : 'asc';
       const cursorValue =
         decodedCursor?.order === WordOrder.Chronological
-          ? decodedCursor?.added_at
+          ? decodedCursor
+            ? DateTime.fromSeconds(decodedCursor.addedAt).toFormat(
+                DATETIME_FORMAT,
+              )
+            : null
           : decodedCursor?.original;
 
       query.limit(limit + 1).orderBy(cursorKey, orderDirection);
@@ -137,7 +141,10 @@ export class WordRepository {
         order === WordOrder.Chronological
           ? {
               order,
-              added_at: word.added_at,
+              addedAt: DateTime.fromFormat(
+                word.added_at,
+                DATETIME_FORMAT,
+              ).toSeconds(),
             }
           : {
               order,

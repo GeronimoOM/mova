@@ -57,8 +57,7 @@ export interface WordsDateStats {
 export type ChronologicalCursor = Static<typeof ChronologicalCursor>;
 export const ChronologicalCursor = Type.Object({
   order: Type.Literal(WordOrder.Chronological),
-  // TODO proper validation
-  added_at: Type.String(),
+  addedAt: Type.Integer(),
 });
 
 export type AlphabeticalCursor = Static<typeof AlphabeticalCursor>;
