@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Word } from 'models/Word';
+import { Word, WordCreate, WordUpdate } from 'models/Word';
 import {
   isOptionPropertyValue,
   isTextPropertyValue,
@@ -12,6 +12,7 @@ import {
   PropertyValueUnionType,
   TextPropertyValueType,
 } from '../types/PropertyValueType';
+import { WordCreateType, WordUpdateType } from 'graphql/types/ChangeType';
 
 @Injectable()
 export class WordTypeMapper {
@@ -25,13 +26,36 @@ export class WordTypeMapper {
       partOfSpeech: word.partOfSpeech,
       addedAt: word.addedAt,
       languageId: word.languageId,
-      properties: Array.from(word.properties?.values() ?? []).map((value) =>
+      properties: Object.values(word.properties ?? {}).map((value) =>
         this.mapPropertyValue(value),
       ),
     };
   }
 
-  mapPropertyValue(
+  mapCreate(wordCreate: WordCreate): WordCreateType {
+    return {
+      id: wordCreate.id,
+      original: wordCreate.original,
+      translation: wordCreate.translation,
+      partOfSpeech: wordCreate.partOfSpeech,
+      addedAt: wordCreate.addedAt,
+      languageId: wordCreate.languageId,
+      properties: Object.values(wordCreate.properties ?? {}),
+    };
+  }
+
+  mapUpdate(wordUpdate: WordUpdate): WordUpdateType {
+    return {
+      id: wordUpdate.id,
+      original: wordUpdate.original,
+      translation: wordUpdate.translation,
+      ...(wordUpdate.properties && {
+        properties: Object.values(wordUpdate.properties),
+      }),
+    };
+  }
+
+  private mapPropertyValue(
     propertyValue: PropertyValue,
   ): typeof PropertyValueUnionType {
     const property = this.propertyTypeMapper.map(propertyValue.property);
@@ -41,9 +65,7 @@ export class WordTypeMapper {
         text: propertyValue.text,
       } as TextPropertyValueType;
     } else if (isOptionPropertyValue(propertyValue)) {
-      const optionValue = propertyValue.property.options.get(
-        propertyValue.option,
-      )!;
+      const optionValue = propertyValue.property.options[propertyValue.option];
       return {
         property,
         option: {

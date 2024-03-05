@@ -13,11 +13,12 @@ import { PageArgsType } from 'graphql/types/PageType';
 import { TopicType } from 'graphql/types/TopicType';
 import { WordPageType, WordType } from 'graphql/types/WordType';
 import { LanguageId } from 'models/Language';
-import { Page, mapPage } from 'models/Page';
+import { Direction, Page, encodePageCursor, mapPage } from 'models/Page';
 import { TopicId } from 'models/Topic';
-import { PartOfSpeech, WordId, WordOrder } from 'models/Word';
+import { PartOfSpeech, WordCursor, WordId, WordOrder } from 'models/Word';
 import { TopicService } from 'services/TopicService';
 import { WordService } from 'services/WordService';
+import { decodeCursor } from 'utils/cursors';
 
 @InputType()
 export class CreateTopicInput {
@@ -45,17 +46,25 @@ export class TopicResolver {
     partsOfSpeech?: PartOfSpeech[],
     @Args('order', { type: () => WordOrder, nullable: true })
     order: WordOrder = WordOrder.Chronological,
-  ): Promise<Page<WordType>> {
+    @Args('direction', { type: () => Direction, nullable: true })
+    direction?: Direction,
+  ): Promise<Page<WordType, string>> {
     const wordPage = await this.wordService.getPage({
       languageId: topic.languageId,
       query,
       partsOfSpeech,
       topics: [topic.id],
       order,
-      ...pageArgs,
+      direction,
+      cursor: pageArgs.cursor
+        ? decodeCursor(pageArgs.cursor, WordCursor)
+        : null,
+      limit: pageArgs.limit,
     });
 
-    return mapPage(wordPage, (word) => this.wordTypeMapper.map(word));
+    return encodePageCursor(
+      mapPage(wordPage, (word) => this.wordTypeMapper.map(word)),
+    );
   }
 
   @Mutation((returns) => TopicType)

@@ -23,6 +23,7 @@ import { ActionBar, Action } from '../common/ActionBar';
 import { asClasses, useColorContext } from '../common/ColorContext';
 import { v1 as uuid } from 'uuid';
 import { DateTime } from 'luxon';
+import { DATETIME_FORMAT } from '../../utils/constants';
 
 const MIN_PROPERTY_NAME_LENGTH = 3;
 
@@ -82,7 +83,7 @@ export const PropertyListItem: Component<PropertyListItemProps> = (props) => {
           partOfSpeech: props.partOfSpeech,
           type: propertyType(),
           name: propertyName().trim(),
-          addedAt: DateTime.now().toSeconds(),
+          addedAt: DateTime.utc().toFormat(DATETIME_FORMAT),
         },
       },
     });

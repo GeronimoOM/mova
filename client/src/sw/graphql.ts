@@ -181,7 +181,11 @@ async function handleGraphQlQueryWordsFromCache(
 ): Promise<Response> {
   const { languageId, query, cursor, limit } =
     request.variables as GetWordsQueryVariables;
-  const { addedAt, start }: { addedAt?: number; start?: number } = cursor
+  const {
+    addedAt,
+    id,
+    start,
+  }: { addedAt?: number; id?: string; start?: number } = cursor
     ? JSON.parse(atob(cursor))
     : {};
 
@@ -189,7 +193,7 @@ async function handleGraphQlQueryWordsFromCache(
   if (query) {
     words = await cache.searchWords(languageId, query, limit! + 1, start);
   } else {
-    words = await cache.fetchWords(languageId, limit! + 1, addedAt);
+    words = await cache.fetchWords(languageId, limit! + 1, addedAt, id);
   }
 
   let nextCursor: string | null = null;
@@ -199,7 +203,7 @@ async function handleGraphQlQueryWordsFromCache(
       JSON.stringify(
         query
           ? { start: (start ?? 0) + limit! }
-          : { addedAt: lastWord.addedAt },
+          : { addedAt: lastWord.addedAt, id: lastWord.id },
       ),
     );
   }

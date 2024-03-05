@@ -4,17 +4,20 @@ import {
   TopicRepository,
   GetTopicPageParams as RepoGetTopicPageParams,
 } from 'repositories/TopicRepository';
-import { Page, PageArgs, mapPage } from 'models/Page';
+import { Page, mapPage } from 'models/Page';
 import { LanguageId } from 'models/Language';
-import { Topic, TopicId } from 'models/Topic';
+import { Topic, TopicCursor, TopicId } from 'models/Topic';
 import { SearchClient, SearchTopicsParams } from 'clients/SearchClient';
 import { WordId } from 'models/Word';
 import { WordService } from './WordService';
 import { QUERY_MIN_LENGTH } from 'utils/constants';
+import * as records from 'utils/records';
 
-export interface GetTopicPageParms extends PageArgs {
+export interface GetTopicPageParms {
   languageId: LanguageId;
   query?: string;
+  cursor?: TopicCursor;
+  limit?: number;
 }
 
 export interface CreateTopicParams {
@@ -39,15 +42,15 @@ export class TopicService {
     return topic;
   }
 
-  async getPage(params: GetTopicPageParms): Promise<Page<Topic>> {
-    let topics: Page<Topic>;
+  async getPage(params: GetTopicPageParms): Promise<Page<Topic, TopicCursor>> {
+    let topics: Page<Topic, TopicCursor>;
     if (params.query && params.query.length >= QUERY_MIN_LENGTH) {
       const topicIds = await this.searchClient.searchTopics(
         params as SearchTopicsParams,
       );
       const repoTopics = await this.topicRepository.getByIds(topicIds.items);
-      const topicById = new Map(repoTopics.map((topic) => [topic.id, topic]));
-      topics = mapPage(topicIds, (topicId) => topicById.get(topicId)!);
+      const topicById = records.byKey(repoTopics, (topic) => topic.id);
+      topics = mapPage(topicIds, (topicId) => topicById[topicId]);
     } else {
       topics = await this.topicRepository.getPage(
         params as RepoGetTopicPageParams,
@@ -61,7 +64,7 @@ export class TopicService {
     return this.topicRepository.getForWord(wordId);
   }
 
-  async getForWords(wordIds: WordId[]): Promise<Map<WordId, Topic[]>> {
+  async getForWords(wordIds: WordId[]): Promise<Record<WordId, Topic[]>> {
     return this.topicRepository.getForWords(wordIds);
   }
 

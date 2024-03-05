@@ -12,7 +12,7 @@ const config: CodegenConfig = {
       },
       config: {
         scalars: {
-          Timestamp: 'number',
+          Timestamp: 'string',
         },
       },
     },

@@ -1,15 +1,16 @@
 import { GraphQLScalarType, Kind } from 'graphql';
 import { DateTime } from 'luxon';
+import { fromTimestamp, toTimestamp } from 'utils/datetime';
 
-export const TimestampScalar = new GraphQLScalarType<DateTime, number>({
+export const TimestampScalar = new GraphQLScalarType<DateTime, string>({
   name: 'Timestamp',
   description:
-    'The `Timestamp` scalar type represents points as a number seconds since the UNIX epoch.',
-  serialize: (value: DateTime) => value.toSeconds(),
-  parseValue: (value: number) => DateTime.fromSeconds(value),
+    'The `Timestamp` scalar type represents a timepoint as a string in the format YYYY-MM-DD hh:mm:ss.',
+  serialize: (value: DateTime) => toTimestamp(value),
+  parseValue: (value: string) => fromTimestamp(value),
   parseLiteral: (ast) => {
-    if (ast.kind === Kind.INT) {
-      return DateTime.fromMillis(Number(ast.value));
+    if (ast.kind === Kind.STRING) {
+      return fromTimestamp(ast.value);
     }
     return null;
   },

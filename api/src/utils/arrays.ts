@@ -1,4 +1,4 @@
-export function diff<T>(array1: T[], array2: T[]): T[] {
+export function diffItems<T>(array1: T[], array2: T[]): T[] {
   const diffElements: T[] = [];
 
   for (const a of array1) {

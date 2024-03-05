@@ -1,26 +1,53 @@
 import { Injectable } from '@nestjs/common';
-import { isOptionProperty, isTextProperty, Property } from 'models/Property';
+import {
+  isTextProperty,
+  isTextPropertyUpdate,
+  OptionId,
+  Property,
+  PropertyUpdate,
+} from 'models/Property';
 import {
   OptionPropertyType,
+  OptionType,
   PropertyUnionType,
   TextPropertyType,
 } from '../types/PropertyType';
+import {
+  OptionPropertyUpdateType,
+  PropertyUpdateUnionType,
+  TextPropertyUpdateType,
+} from 'graphql/types/ChangeType';
 
 @Injectable()
 export class PropertyTypeMapper {
   map(property: Property): typeof PropertyUnionType {
     if (isTextProperty(property)) {
       return property as TextPropertyType;
-    } else if (isOptionProperty(property)) {
+    } else {
       return {
         ...property,
-        options: Array.from(property.options).map(
-          ([optionId, optionValue]) => ({
-            id: optionId,
-            value: optionValue,
-          }),
-        ),
+        options: this.mapOptions(property.options),
       } as OptionPropertyType;
     }
+  }
+
+  mapUpdate(propertyUpdate: PropertyUpdate): typeof PropertyUpdateUnionType {
+    if (isTextPropertyUpdate(propertyUpdate)) {
+      return propertyUpdate as TextPropertyUpdateType;
+    } else {
+      return {
+        ...propertyUpdate,
+        ...(propertyUpdate.options && {
+          options: this.mapOptions(propertyUpdate.options),
+        }),
+      } as OptionPropertyUpdateType;
+    }
+  }
+
+  private mapOptions(options: Record<OptionId, string>): OptionType[] {
+    return Object.entries(options).map(([optionId, optionValue]) => ({
+      id: optionId,
+      value: optionValue,
+    }));
   }
 }

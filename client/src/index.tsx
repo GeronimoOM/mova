@@ -5,11 +5,11 @@ import './index.css';
 import { ApolloProvider } from '@merged/solid-apollo';
 import { client } from './api/client';
 import { Router } from '@solidjs/router';
-import { lazy } from 'solid-js';
 import { registerServiceWorker } from './register-sw';
+import App from './components/App';
+import { LanguageProvider } from './components/LanguageContext';
 
-const root = document.getElementById('root');
-const App = lazy(() => import('./components/App'));
+const root = document.getElementById('root')!;
 
 registerServiceWorker({
   onMessage: (message) => console.log(message),
@@ -18,12 +18,12 @@ registerServiceWorker({
 render(
   () => (
     <ApolloProvider client={client}>
-      <Router>
-        {/* <Suspense fallback={<AppLoading />}> */}
-        <App />
-        {/* </Suspense> */}
-      </Router>
+      <LanguageProvider>
+        <Router>
+          <App />
+        </Router>
+      </LanguageProvider>
     </ApolloProvider>
   ),
-  root!,
+  root,
 );

@@ -25,7 +25,7 @@ export class OptionPropertyValueType {
 }
 
 export const PropertyValueUnionType = createUnionType({
-  name: 'PropertyValueUnion',
+  name: 'PropertyValue',
   types: () => [TextPropertyValueType, OptionPropertyValueType] as const,
   resolveType: (value) => {
     switch (value.property.type) {

@@ -10,6 +10,7 @@ import {
   GetLanguagesDocument,
   LanguagePropertiesFragmentDoc,
   LanguageWordsFragmentDoc,
+  PartOfSpeech,
   PropertyFieldsFragment,
   PropertyFieldsFragmentDoc,
   ReorderPropertiesDocument,
@@ -92,18 +93,28 @@ export function createPropertyMutation(): CreateMutationResult<
   typeof CreatePropertyDocument
 > {
   return createMutation(CreatePropertyDocument, {
-    optimisticResponse: ({ input }) => ({
-      createProperty: {
-        ...input,
-        id: input.id!,
-        addedAt: input.addedAt!,
-      },
-    }),
+    optimisticResponse: ({ input }) => {
+      const properties = readPartOfSpeechProperties(
+        input.languageId,
+        input.partOfSpeech,
+      );
+
+      return {
+        createProperty: {
+          ...input,
+          id: input.id!,
+          addedAt: input.addedAt!,
+          order: properties.length,
+          __typename: 'TextProperty',
+        },
+      };
+    },
     update: (cache, { data }, { variables }) => {
       cache.updateFragment(
         {
           id: `Language:${variables!.input.languageId}`,
           fragment: LanguagePropertiesFragmentDoc,
+          fragmentName: 'LanguageProperties',
           variables: { partOfSpeech: variables!.input.partOfSpeech },
           overwrite: true,
         },
@@ -128,31 +139,6 @@ export function updatePropertyMutation(): CreateMutationResult<
   });
 }
 
-export function deletePropertyMutation(): CreateMutationResult<
-  typeof DeletePropertyDocument
-> {
-  return createMutation(DeletePropertyDocument, {
-    optimisticResponse: ({ id }) => ({
-      deleteProperty: readProperty(id)!,
-    }),
-    update: (cache, { data }) => {
-      cache.updateFragment(
-        {
-          id: `Language:${data!.deleteProperty.languageId}`,
-          fragment: LanguagePropertiesFragmentDoc,
-          variables: { partOfSpeech: data!.deleteProperty.partOfSpeech },
-          overwrite: true,
-        },
-        (properties) => ({
-          properties: (properties?.properties ?? []).filter(
-            ({ id }) => id !== data!.deleteProperty.id,
-          ),
-        }),
-      );
-    },
-  });
-}
-
 export function reorderPropertiesMutation(): CreateMutationResult<
   typeof ReorderPropertiesDocument
 > {
@@ -163,13 +149,44 @@ export function reorderPropertiesMutation(): CreateMutationResult<
       ),
     }),
     update: (cache, { data }, { variables }) => {
-      cache.writeFragment({
-        id: `Language:${variables!.input.languageId}`,
-        fragment: LanguagePropertiesFragmentDoc,
-        variables: { partOfSpeech: variables!.input.partOfSpeech },
-        overwrite: true,
-        data: { properties: data!.reorderProperties },
-      });
+      cache.updateFragment(
+        {
+          id: `Language:${variables!.input.languageId}`,
+          fragment: LanguagePropertiesFragmentDoc,
+          fragmentName: 'LanguageProperties',
+          variables: { partOfSpeech: variables!.input.partOfSpeech },
+        },
+        (fragment) => ({
+          ...fragment,
+          properties: data!.reorderProperties.map(
+            ({ id }) => fragment!.properties.find((prop) => prop.id === id)!,
+          ),
+        }),
+      );
+    },
+  });
+}
+
+export function deletePropertyMutation(): CreateMutationResult<
+  typeof DeletePropertyDocument
+> {
+  return createMutation(DeletePropertyDocument, {
+    optimisticResponse: ({ id }) => ({ deleteProperty: readProperty(id)! }),
+    update: (cache, { data }) => {
+      cache.updateFragment(
+        {
+          id: `Language:${data!.deleteProperty.languageId}`,
+          fragment: LanguagePropertiesFragmentDoc,
+          fragmentName: 'LanguageProperties',
+          variables: { partOfSpeech: data!.deleteProperty.partOfSpeech },
+          overwrite: true,
+        },
+        (properties) => ({
+          properties: (properties?.properties ?? []).filter(
+            ({ id }) => id !== data!.deleteProperty.id,
+          ),
+        }),
+      );
     },
   });
 }
@@ -185,9 +202,14 @@ export function createWordMutation(): CreateMutationResult<
         addedAt: input.addedAt!,
         properties:
           input.properties?.map(({ id, text }) => ({
-            property: { id },
+            property: {
+              id,
+              __typename: 'TextProperty',
+            },
             text: text!,
+            __typename: 'TextPropertyValue',
           })) ?? [],
+        __typename: 'Word',
       },
     }),
     update: (cache, { data }, { variables }) => {
@@ -195,6 +217,7 @@ export function createWordMutation(): CreateMutationResult<
         {
           id: `Language:${variables!.input.languageId}`,
           fragment: LanguageWordsFragmentDoc,
+          fragmentName: 'LanguageWords',
           overwrite: true,
         },
         (wordsPage) => ({
@@ -219,8 +242,12 @@ export function updateWordMutation(): CreateMutationResult<
         ...(input.translation && { name: input.translation }),
         ...(input.properties && {
           properties: input.properties.map(({ id, text }) => ({
-            property: { id },
+            property: {
+              id,
+              __typename: 'TextProperty',
+            },
             text: text!,
+            __typename: 'TextPropertyValue',
           })),
         }),
       },
@@ -243,6 +270,7 @@ export function deleteWordMutation(): CreateMutationResult<
         {
           id: `Language:${data!.deleteWord.languageId}`,
           fragment: LanguageWordsFragmentDoc,
+          fragmentName: 'LanguageWords',
           overwrite: true,
         },
         (wordsPage) => ({
@@ -264,6 +292,18 @@ function readProperty(id: string): PropertyFieldsFragment | null {
     fragment: PropertyFieldsFragmentDoc,
     fragmentName: 'PropertyFields',
   })!;
+}
+
+function readPartOfSpeechProperties(
+  languageId: string,
+  partOfSpeech: PartOfSpeech,
+): { id: string }[] {
+  return cache.readFragment({
+    id: `Language:${languageId}`,
+    variables: { partOfSpeech },
+    fragment: LanguagePropertiesFragmentDoc,
+    fragmentName: 'LanguageProperties',
+  })!.properties;
 }
 
 function readWordFull(id: string): WordFieldsFullFragment | null {

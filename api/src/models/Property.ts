@@ -28,7 +28,7 @@ export interface TextProperty extends BaseProperty {
 
 export interface OptionProperty extends BaseProperty {
   type: PropertyType.Option;
-  options: Map<OptionId, string>;
+  options: Record<OptionId, string>;
 }
 
 export type Property = TextProperty | OptionProperty;
@@ -42,3 +42,38 @@ export function isOptionProperty(
 ): property is OptionProperty {
   return property.type === PropertyType.Option;
 }
+
+export interface BasePropertyUpdate {
+  id: PropertyId;
+  type: PropertyType;
+  name?: string;
+}
+
+export interface TextPropertyUpdate extends BasePropertyUpdate {
+  type: PropertyType.Text;
+}
+
+export interface OptionPropertyUpdate extends BasePropertyUpdate {
+  type: PropertyType.Option;
+  options?: Record<OptionId, string | null>;
+}
+
+export type PropertyUpdate = TextPropertyUpdate | OptionPropertyUpdate;
+
+export function isTextPropertyUpdate(
+  propertyUpdate: PropertyUpdate,
+): propertyUpdate is TextPropertyUpdate {
+  return propertyUpdate.type === PropertyType.Text;
+}
+
+export function isOptionPropertyUpdate(
+  propertyUpdate: PropertyUpdate,
+): propertyUpdate is OptionPropertyUpdate {
+  return propertyUpdate.type === PropertyType.Option;
+}
+
+export type PropertiesReorder = {
+  languageId: LanguageId;
+  partOfSpeech: PartOfSpeech;
+  propertyIds: PropertyId[];
+};

@@ -6,18 +6,18 @@ type Language {
   id: ID!
   name: String!
   addedAt: Timestamp!
-  properties(partOfSpeech: PartOfSpeech): [PropertyUnion!]!
+  properties(partOfSpeech: PartOfSpeech): [Property!]!
   topics(cursor: String, limit: Int, query: String): TopicPage!
-  words(cursor: String, limit: Int, query: String, partsOfSpeech: [PartOfSpeech!], topics: [ID!], from: String, until: String, order: WordOrder): WordPage!
+  words(cursor: String, limit: Int, query: String, partsOfSpeech: [PartOfSpeech!], topics: [ID!], order: WordOrder, direction: Direction): WordPage!
   wordsStats(days: Int, from: String): WordsStats!
 }
 
 """
-The `Timestamp` scalar type represents points as a number seconds since the UNIX epoch.
+The `Timestamp` scalar type represents a timepoint as a string in the format YYYY-MM-DD hh:mm:ss.
 """
 scalar Timestamp
 
-union PropertyUnion = TextProperty | OptionProperty
+union Property = TextProperty | OptionProperty
 
 enum PartOfSpeech {
   Noun
@@ -34,12 +34,28 @@ enum WordOrder {
   Random
 }
 
-type TextProperty {
+enum Direction {
+  Asc
+  Desc
+}
+
+type TextProperty implements IProperty {
   id: ID!
   name: String!
   type: PropertyType!
   partOfSpeech: PartOfSpeech!
   addedAt: Timestamp!
+  order: Int!
+  languageId: ID!
+}
+
+interface IProperty {
+  id: ID!
+  name: String!
+  type: PropertyType!
+  partOfSpeech: PartOfSpeech!
+  addedAt: Timestamp!
+  order: Int!
   languageId: ID!
 }
 
@@ -48,12 +64,13 @@ enum PropertyType {
   Option
 }
 
-type OptionProperty {
+type OptionProperty implements IProperty {
   id: ID!
   name: String!
   type: PropertyType!
   partOfSpeech: PartOfSpeech!
   addedAt: Timestamp!
+  order: Int!
   languageId: ID!
   options: [Option!]!
 }
@@ -64,16 +81,16 @@ type Option {
 }
 
 type Word {
-  id: String!
+  id: ID!
   original: String!
   translation: String!
   partOfSpeech: PartOfSpeech!
   addedAt: Timestamp!
   languageId: ID!
-  properties: [PropertyValueUnion!]!
+  properties: [PropertyValue!]!
 }
 
-union PropertyValueUnion = TextPropertyValue | OptionPropertyValue
+union PropertyValue = TextPropertyValue | OptionPropertyValue
 
 type TextPropertyValue {
   property: TextProperty!
@@ -93,7 +110,7 @@ type WordPage {
 type Topic {
   id: ID!
   name: String!
-  words(cursor: String, limit: Int, query: String, partOfSpeech: [PartOfSpeech!], order: WordOrder): WordPage!
+  words(cursor: String, limit: Int, query: String, partOfSpeech: [PartOfSpeech!], order: WordOrder, direction: Direction): WordPage!
 }
 
 type TopicPage {
@@ -121,10 +138,181 @@ type WordsStats {
   byDate: WordsByDateStats!
 }
 
+type LanguageUpdate {
+  id: ID!
+  name: String!
+}
+
+type PropertiesReorder {
+  languageId: ID!
+  partOfSpeech: PartOfSpeech!
+  propertyIds: [ID!]!
+}
+
+type WordCreate {
+  id: ID!
+  original: String!
+  translation: String!
+  partOfSpeech: PartOfSpeech!
+  addedAt: Timestamp!
+  languageId: ID!
+  properties: [PropertyValueSave!]!
+}
+
+union PropertyValueSave = TextPropertyValueSave | OptionPropertyValueSave
+
+type TextPropertyValueSave implements IPropertyValueSave {
+  propertyId: ID!
+  type: PropertyType!
+  text: String
+}
+
+interface IPropertyValueSave {
+  propertyId: ID!
+  type: PropertyType!
+}
+
+type OptionPropertyValueSave implements IPropertyValueSave {
+  propertyId: ID!
+  type: PropertyType!
+  optionId: ID
+}
+
+type WordUpdate {
+  id: ID!
+  original: String
+  translation: String
+  properties: [PropertyValueSave!]
+}
+
+type ChangePage {
+  items: [Change!]!
+  nextCursor: String
+  syncType: SyncType!
+}
+
+union Change = CreateLanguageChange | UpdateLanguageChange | DeleteLanguageChange | CreatePropertyChange | UpdatePropertyChange | ReorderPropertiesChange | DeletePropertyChange | CreateWordChange | UpdateWordChange | DeleteWordChange
+
+type CreateLanguageChange implements IChange {
+  id: ID!
+  changedAt: Timestamp!
+  type: ChangeType!
+  created: Language!
+}
+
+interface IChange {
+  id: ID!
+  changedAt: Timestamp!
+  type: ChangeType!
+}
+
+enum ChangeType {
+  CreateLanguage
+  UpdateLanguage
+  DeleteLanguage
+  CreateProperty
+  UpdateProperty
+  ReorderProperties
+  DeleteProperty
+  CreateWord
+  UpdateWord
+  DeleteWord
+}
+
+type UpdateLanguageChange implements IChange {
+  id: ID!
+  changedAt: Timestamp!
+  type: ChangeType!
+  updated: LanguageUpdate!
+}
+
+type DeleteLanguageChange implements IChange {
+  id: ID!
+  changedAt: Timestamp!
+  type: ChangeType!
+  deleted: ID!
+}
+
+type CreatePropertyChange implements IChange {
+  id: ID!
+  changedAt: Timestamp!
+  type: ChangeType!
+  created: Property!
+}
+
+type UpdatePropertyChange implements IChange {
+  id: ID!
+  changedAt: Timestamp!
+  type: ChangeType!
+  updated: PropertyUpdate!
+}
+
+union PropertyUpdate = TextPropertyUpdate | OptionPropertyUpdate
+
+type TextPropertyUpdate implements IPropertyUpdate {
+  id: ID!
+  type: PropertyType!
+  name: String
+}
+
+interface IPropertyUpdate {
+  id: ID!
+  type: PropertyType!
+  name: String
+}
+
+type OptionPropertyUpdate implements IPropertyUpdate {
+  id: ID!
+  type: PropertyType!
+  name: String
+  options: [Option!]
+}
+
+type ReorderPropertiesChange implements IChange {
+  id: ID!
+  changedAt: Timestamp!
+  type: ChangeType!
+  reordered: PropertiesReorder!
+}
+
+type DeletePropertyChange implements IChange {
+  id: ID!
+  changedAt: Timestamp!
+  type: ChangeType!
+  deleted: ID!
+}
+
+type CreateWordChange implements IChange {
+  id: ID!
+  changedAt: Timestamp!
+  type: ChangeType!
+  created: WordCreate!
+}
+
+type UpdateWordChange implements IChange {
+  id: ID!
+  changedAt: Timestamp!
+  type: ChangeType!
+  updated: WordUpdate!
+}
+
+type DeleteWordChange implements IChange {
+  id: ID!
+  changedAt: Timestamp!
+  type: ChangeType!
+  deleted: ID!
+}
+
+enum SyncType {
+  Full
+  Delta
+}
+
 type Query {
   languages: [Language!]!
   language(id: ID!): Language
-  property(id: ID!): PropertyUnion
+  property(id: ID!): Property
+  changes(cursor: String, limit: Int, syncType: SyncType, changedAt: Timestamp, clientId: String): ChangePage!
   word(id: ID!): Word
 }
 
@@ -132,10 +320,10 @@ type Mutation {
   createLanguage(input: CreateLanguageInput!): Language!
   updateLanguage(input: UpdateLanguageInput!): Language!
   deleteLanguage(id: ID!): Language!
-  createProperty(input: CreatePropertyInput!): PropertyUnion!
-  updateProperty(input: UpdatePropertyInput!): PropertyUnion!
-  reorderProperties(input: ReorderPropertiesInput!): [PropertyUnion!]!
-  deleteProperty(id: ID!): PropertyUnion!
+  createProperty(input: CreatePropertyInput!): Property!
+  updateProperty(input: UpdatePropertyInput!): Property!
+  reorderProperties(input: ReorderPropertiesInput!): [Property!]!
+  deleteProperty(id: ID!): Property!
   createWord(input: CreateWordInput!): Word!
   updateWord(input: UpdateWordInput!): Word!
   deleteWord(id: ID!): Word!

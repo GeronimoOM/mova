@@ -15,12 +15,16 @@ import { DbConnectionManager } from './DbConnectionManager';
 import { PartOfSpeech } from 'models/Word';
 import { DATETIME_FORMAT } from 'utils/constants';
 import { DateTime } from 'luxon';
+import { Serializer } from './Serializer';
 
 const TABLE_PROPERTIES = 'properties';
 
 @Injectable()
 export class PropertyRepository {
-  constructor(private connectionManager: DbConnectionManager) {}
+  constructor(
+    private connectionManager: DbConnectionManager,
+    private serializer: Serializer,
+  ) {}
 
   async getByLanguageId(
     languageId: LanguageId,
@@ -54,6 +58,14 @@ export class PropertyRepository {
     return propertyRows.map((propertyRow) => this.mapToProperty(propertyRow));
   }
 
+  async getAll(): Promise<Property[]> {
+    const propertyRows = await this.connectionManager
+      .getConnection()(TABLE_PROPERTIES)
+      .orderBy('added_at', 'asc');
+
+    return propertyRows.map((propertyRow) => this.mapToProperty(propertyRow));
+  }
+
   async getCount(
     languageId: LanguageId,
     partOfSpeech: PartOfSpeech,
@@ -78,8 +90,8 @@ export class PropertyRepository {
     };
 
     if (isOptionProperty(property)) {
-      propertyRow.data = JSON.stringify({
-        options: Object.fromEntries(property.options),
+      propertyRow.data = this.serializer.serialize({
+        options: property.options,
       });
     }
 
@@ -94,8 +106,8 @@ export class PropertyRepository {
     };
 
     if (isOptionProperty(property)) {
-      propertyRow.data = JSON.stringify({
-        options: Object.fromEntries(property.options),
+      propertyRow.data = this.serializer.serialize({
+        options: property.options,
       });
     }
 
@@ -162,10 +174,11 @@ export class PropertyRepository {
       case PropertyType.Text:
         return baseProperty as TextProperty;
       case PropertyType.Option:
-        const options: Record<OptionId, string> = JSON.parse(row.data).options;
+        const options: Record<OptionId, string> =
+          this.serializer.deserialize<OptionProperty>(row.data).options;
         return {
           ...baseProperty,
-          options: new Map(Object.entries(options)),
+          options,
         } as OptionProperty;
     }
   }

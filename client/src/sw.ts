@@ -7,6 +7,11 @@ declare let self: ServiceWorkerGlobalScope;
 
 precacheAndRoute(self.__WB_MANIFEST);
 cleanupOutdatedCaches();
+clientsClaim();
+
+self.addEventListener('install', () => {
+  self.skipWaiting();
+});
 
 self.addEventListener('fetch', (event) => {
   if (isGraphQlRequest(event.request)) {
@@ -14,15 +19,17 @@ self.addEventListener('fetch', (event) => {
   }
 });
 
-// self.addEventListener('periodicsync', (e) => {
-//   const event = e as ExtendableEvent & { tag: string };
-//   if (event.tag === 'sync-mova-data') {
-//     event.waitUntil(syncMovaData());
-//   }
-// });
+self.addEventListener('message', (event) => {
+  console.log('message', event.data);
+});
 
-self.skipWaiting();
-clientsClaim();
+self.addEventListener('periodicsync', (e) => {
+  const event = e as ExtendableEvent & { tag: string };
+  if (event.tag === 'sync-mova-data') {
+    console.log('periodic data sync');
+    //event.waitUntil(syncMovaData());
+  }
+});
 
 // async function postMessage(message: ServiceWorkerMessage): Promise<void> {
 //   for (const client of await self.clients.matchAll()) {

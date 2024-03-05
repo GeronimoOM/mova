@@ -1,18 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { DbConnectionManager } from './DbConnectionManager';
 import { WordId } from 'models/Word';
-import * as maps from 'utils/maps';
+import * as records from 'utils/records';
 import { Topic, TopicId, TopicSortedCursor } from 'models/Topic';
 import { TopicTable, TopicWordTable } from 'knex/types/tables';
-import { Page, PageArgs, mapPage, toPage } from 'models/Page';
+import { Page, mapPage, toPage } from 'models/Page';
 import { LanguageId } from 'models/Language';
-import { decodeCursor, encodeCursor } from 'utils/cursors';
 
 const TABLE_TOPICS = 'topics';
 export const TABLE_TOPICS_WORDS = 'topics_words';
 
-export interface GetTopicPageParams extends PageArgs {
+export interface GetTopicPageParams {
   languageId: LanguageId;
+  cursor?: TopicSortedCursor;
+  limit?: number;
 }
 
 @Injectable()
@@ -32,11 +33,8 @@ export class TopicRepository {
     languageId,
     cursor,
     limit,
-  }: GetTopicPageParams): Promise<Page<Topic>> {
-    const decodedCursor = cursor
-      ? decodeCursor(cursor, TopicSortedCursor)
-      : null;
-    const { added_at: addedAt = null } = decodedCursor ?? {};
+  }: GetTopicPageParams): Promise<Page<Topic, TopicSortedCursor>> {
+    const addedAt = cursor?.addedAt;
 
     const query = this.connectionManager
       .getConnection()(TABLE_TOPICS)
@@ -44,18 +42,26 @@ export class TopicRepository {
         language_id: languageId,
       })
       .limit(limit + 1)
-      .orderBy('added_at', 'desc');
+      .orderBy([
+        { column: 'added_at', order: 'desc' },
+        { column: 'id', order: 'desc' },
+      ]);
 
     if (addedAt) {
-      query.where('added_at', '<', addedAt);
+      query
+        .where('added_at', '<=', addedAt)
+        .andWhere((query) =>
+          query.where('id', '<', cursor.id).orWhere('added_at', '<', addedAt),
+        );
     }
 
     const topics = await query;
 
     return mapPage(
-      toPage(topics, limit, (topic) =>
-        encodeCursor({ added_at: topic.added_at }),
-      ),
+      toPage(topics, limit, (topic) => ({
+        addedAt: topic.added_at,
+        id: topic.id,
+      })),
       (topicRow) => this.mapToTopic(topicRow),
     );
   }
@@ -77,13 +83,13 @@ export class TopicRepository {
     return topicWordRows.map((row) => this.mapToTopic(row));
   }
 
-  async getForWords(wordIds: WordId[]): Promise<Map<WordId, Topic[]>> {
+  async getForWords(wordIds: WordId[]): Promise<Record<WordId, Topic[]>> {
     const topicWordRows = await this.connectionManager
       .getConnection()(TABLE_TOPICS_WORDS)
       .leftJoin<TopicTable>(TABLE_TOPICS, 'topic_id', 'id')
       .whereIn('word_id', wordIds);
 
-    return maps.groupByKeyAndMap(
+    return records.groupByKeyAndMap(
       topicWordRows,
       (row) => row.word_id,
       (row) => this.mapToTopic(row),

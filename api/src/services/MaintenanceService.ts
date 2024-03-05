@@ -18,9 +18,9 @@ import {
 } from 'knex/types/tables';
 import { Language, LanguageId } from 'models/Language';
 import { LanguageService } from './LanguageService';
-import { UpdatePropertyValueParams, WordService } from './WordService';
+import { WordService } from './WordService';
 import { TopicService } from './TopicService';
-import { PropertyType, PropertyId, OptionProperty } from 'models/Property';
+import { PropertyType, OptionProperty } from 'models/Property';
 import { PartOfSpeech } from 'models/Word';
 import { PropertyService } from './PropertyService';
 import { SearchClient } from 'clients/SearchClient';
@@ -221,21 +221,16 @@ export class MaintenanceService {
         translation: 'dog',
         partOfSpeech: PartOfSpeech.Noun,
         languageId: language.id,
-        properties: new Map<PropertyId, UpdatePropertyValueParams>([
-          [
-            nounTextProp.id,
-            {
-              text: 'koera',
-            },
-          ],
-          [
-            nounOptionProp.id,
-            {
-              option: (nounOptionProp as OptionProperty).options.keys().next()
-                .value,
-            },
-          ],
-        ]),
+        properties: {
+          [nounTextProp.id]: {
+            text: 'koera',
+          },
+          [nounOptionProp.id]: {
+            option: Object.values(
+              (nounOptionProp as OptionProperty).options,
+            )[0],
+          },
+        },
       }),
 
       this.wordService.create({
@@ -257,14 +252,11 @@ export class MaintenanceService {
         translation: 'small',
         partOfSpeech: PartOfSpeech.Adj,
         languageId: language.id,
-        properties: new Map<PropertyId, UpdatePropertyValueParams>([
-          [
-            adjTextProp.id,
-            {
-              text: 'väikse',
-            },
-          ],
-        ]),
+        properties: {
+          [adjTextProp.id]: {
+            text: 'väikse',
+          },
+        },
       }),
 
       this.wordService.create({

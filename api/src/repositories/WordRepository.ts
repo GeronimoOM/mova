@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { WordTable } from 'knex/types/tables';
 import { LanguageId } from 'models/Language';
-import { mapPage, Page, PageArgs, toPage } from 'models/Page';
-import { PropertyId } from 'models/Property';
-import { PropertyValue } from 'models/PropertyValue';
+import { Direction, Page, toPage } from 'models/Page';
 import {
+  AlphabeticalCursor,
+  ChronologicalCursor,
   PartOfSpeech,
   Word,
   WordId,
@@ -22,30 +22,43 @@ import {
   DEFAULT_LIMIT,
   MAX_LIMIT,
 } from 'utils/constants';
-import { decodeCursor, encodeCursor } from 'utils/cursors';
+import { Property, PropertyId } from 'models/Property';
+import { PropertyValue } from 'models/PropertyValue';
+import { PropertyService } from 'services/PropertyService';
+import * as records from 'utils/records';
+import { Serializer } from './Serializer';
 
 const TABLE_WORDS = 'words';
 
 const BATCH_SIZE = 100;
 
-export interface WordWithoutProperties extends Omit<Word, 'properties'> {
-  properties?: Map<PropertyId, Omit<PropertyValue, 'property'>>;
-}
-
-export interface GetWordPageParams extends PageArgs {
-  languageId: LanguageId;
-  order: WordOrder;
+export interface GetWordPageParams {
+  languageId?: LanguageId;
+  order?: WordOrder;
+  direction?: Direction;
   partsOfSpeech?: PartOfSpeech[];
   topics?: TopicId[];
   from?: DateTime;
   until?: DateTime;
+  cursor?: WordSortedCursor;
+  limit?: number;
 }
+
+type WordLite = Omit<Word, 'properties'> & {
+  properties?: WordPropertiesLite;
+};
+
+type WordPropertiesLite = Record<PropertyId, Omit<PropertyValue, 'property'>>;
 
 @Injectable()
 export class WordRepository {
-  constructor(private connectionManager: DbConnectionManager) {}
+  constructor(
+    private connectionManager: DbConnectionManager,
+    private propertyService: PropertyService,
+    private serializer: Serializer,
+  ) {}
 
-  async getById(id: WordId): Promise<WordWithoutProperties | null> {
+  async getById(id: WordId): Promise<Word | null> {
     const wordRow = await this.connectionManager
       .getConnection()(TABLE_WORDS)
       .where({
@@ -53,7 +66,7 @@ export class WordRepository {
       })
       .first();
 
-    return wordRow ? this.mapToWord(wordRow) : null;
+    return wordRow ? await this.mapToWord(wordRow) : null;
   }
 
   async getPage({
@@ -61,47 +74,56 @@ export class WordRepository {
     partsOfSpeech,
     topics,
     order = WordOrder.Chronological,
+    direction = Direction.Desc,
     cursor,
     limit = DEFAULT_LIMIT,
     from,
     until,
-  }: GetWordPageParams): Promise<Page<WordWithoutProperties>> {
+  }: GetWordPageParams): Promise<Page<Word, WordSortedCursor>> {
     const connection = this.connectionManager.getConnection();
 
-    let query = connection(TABLE_WORDS).where({
-      language_id: languageId,
-    });
+    let query = connection(TABLE_WORDS);
+    if (languageId) {
+      query.where({ language_id: languageId });
+    }
 
     limit = Math.min(MAX_LIMIT, limit);
+    let cursorKey: string;
+    let cursorValue: string | null;
 
     if (order === WordOrder.Random) {
       query.limit(limit + 1).orderByRaw('RAND()');
     } else {
-      const decodedCursor = cursor
-        ? decodeCursor(cursor, WordSortedCursor)
-        : null;
-      order = decodedCursor?.order ?? order;
+      if (order === WordOrder.Chronological) {
+        cursorKey = 'added_at';
+        cursorValue = (cursor as ChronologicalCursor)?.addedAt;
+      } else if (order === WordOrder.Alphabetical) {
+        cursorKey = 'original';
+        cursorValue = (cursor as AlphabeticalCursor)?.original;
+        direction = Direction.Asc;
+      }
 
-      const cursorKey =
-        order === WordOrder.Chronological ? 'added_at' : 'original';
-      const orderDirection = order === WordOrder.Chronological ? 'desc' : 'asc';
-      const cursorValue =
-        decodedCursor?.order === WordOrder.Chronological
-          ? decodedCursor
-            ? DateTime.fromSeconds(decodedCursor.addedAt).toFormat(
-                DATETIME_FORMAT,
-              )
-            : null
-          : decodedCursor?.original;
+      query.limit(limit + 1).orderBy([
+        { column: cursorKey, order: direction },
+        { column: 'id', order: direction },
+      ]);
 
-      query.limit(limit + 1).orderBy(cursorKey, orderDirection);
-
-      if (cursorValue) {
-        query.where(
-          cursorKey,
-          orderDirection === 'asc' ? '>' : '<',
-          cursorValue,
-        );
+      if (cursorValue && cursor?.id) {
+        query
+          .where(
+            cursorKey,
+            direction === Direction.Asc ? '>=' : '<=',
+            cursorValue,
+          )
+          .andWhere((query) =>
+            query
+              .where('id', direction === Direction.Asc ? '>' : '<', cursor.id)
+              .orWhere(
+                cursorKey,
+                direction === Direction.Asc ? '>' : '<',
+                cursorValue,
+              ),
+          );
       }
     }
 
@@ -136,39 +158,42 @@ export class WordRepository {
 
     const wordRows = await query;
 
-    const toNextCursor = (word: WordTable) =>
-      encodeCursor(
-        order === WordOrder.Chronological
-          ? {
-              order,
-              addedAt: DateTime.fromFormat(
-                word.added_at,
-                DATETIME_FORMAT,
-              ).toSeconds(),
-            }
-          : {
-              order,
-              original: word.original,
-            },
-      );
+    const toNextCursor = (word: WordTable): WordSortedCursor => {
+      switch (order) {
+        case WordOrder.Chronological:
+          return {
+            addedAt: word.added_at,
+            id: word.id,
+          };
+        case WordOrder.Alphabetical:
+          return {
+            original: word.original,
+            id: word.id,
+          };
+        case WordOrder.Random:
+          return null;
+      }
+    };
 
-    return mapPage(toPage(wordRows, limit, toNextCursor), (wordRow) =>
-      this.mapToWord(wordRow),
-    );
+    const wordsPage = toPage(wordRows, limit, toNextCursor);
+    return {
+      ...wordsPage,
+      items: await this.mapToWords(wordsPage.items),
+    };
   }
 
-  async getByIds(ids: WordId[]): Promise<WordWithoutProperties[]> {
+  async getByIds(ids: WordId[]): Promise<Word[]> {
     const wordRows = await this.connectionManager
       .getConnection()(TABLE_WORDS)
       .whereIn('id', ids);
 
-    return wordRows.map((wordRow) => this.mapToWord(wordRow));
+    return await this.mapToWords(wordRows);
   }
 
   async *getBatches(
     languageId: LanguageId,
     batchSize: number = BATCH_SIZE,
-  ): AsyncGenerator<WordWithoutProperties[]> {
+  ): AsyncGenerator<Word[]> {
     let offset = 0;
 
     do {
@@ -180,9 +205,7 @@ export class WordRepository {
         .offset(offset)
         .limit(batchSize + 1);
 
-      yield wordRows
-        .slice(0, batchSize)
-        .map((wordRow) => this.mapToWord(wordRow));
+      yield this.mapToWords(wordRows.slice(0, batchSize));
 
       if (wordRows.length <= batchSize) {
         break;
@@ -202,7 +225,7 @@ export class WordRepository {
         language_id: word.languageId,
         part_of_speech: word.partOfSpeech,
         added_at: word.addedAt.toFormat(DATETIME_FORMAT),
-        properties: this.mapToWordRowProperties(word.properties),
+        properties: this.mapFromWordProperties(word.properties),
       });
   }
 
@@ -212,7 +235,7 @@ export class WordRepository {
       .update({
         original: word.original,
         translation: word.translation,
-        properties: this.mapToWordRowProperties(word.properties),
+        properties: this.mapFromWordProperties(word.properties),
       })
       .where({ id: word.id });
   }
@@ -281,7 +304,22 @@ export class WordRepository {
     await this.connectionManager.getConnection()(TABLE_WORDS).delete();
   }
 
-  private mapToWord(row: WordTable): WordWithoutProperties {
+  private async mapToWord(row: WordTable): Promise<Word> {
+    const [word] = await this.mapToWords([row]);
+    return word;
+  }
+
+  private async mapToWords(rows: WordTable[]): Promise<Word[]> {
+    const words = rows.map((row) => this.mapToWordLite(row));
+
+    const properties = await this.fetchPropertiesForWords(words);
+    return words.map((word) => ({
+      ...word,
+      properties: this.mapToWordProperties(word.properties, properties),
+    }));
+  }
+
+  private mapToWordLite(row: WordTable): WordLite {
     return {
       id: row.id,
       original: row.original,
@@ -289,33 +327,64 @@ export class WordRepository {
       languageId: row.language_id,
       partOfSpeech: row.part_of_speech,
       addedAt: DateTime.fromFormat(row.added_at, DATETIME_FORMAT),
-      properties: this.mapToWordProperties(row.properties),
+      ...(row.properties && {
+        properties: this.serializer.deserialize(row.properties),
+      }),
     };
   }
 
-  private mapToWordProperties(
-    rowProperties: string | undefined,
-  ): WordWithoutProperties['properties'] {
-    return rowProperties
-      ? new Map(Object.entries(JSON.parse(rowProperties)))
-      : undefined;
+  private async fetchPropertiesForWords(
+    words: WordLite[],
+  ): Promise<Property[]> {
+    const propertyIds = new Set<PropertyId>();
+    for (const word of words) {
+      for (const propertyId of Object.keys(word.properties ?? {})) {
+        propertyIds.add(propertyId);
+      }
+    }
+
+    return await this.propertyService.getByIds(Array.from(propertyIds));
   }
 
-  private mapToWordRowProperties(
+  private mapToWordProperties(
+    wordProperties: WordPropertiesLite | undefined,
+    properties: Property[],
+  ): Word['properties'] {
+    if (!wordProperties) {
+      return;
+    }
+
+    const propertyValues: Record<PropertyId, PropertyValue> = {};
+    for (const property of properties) {
+      const propertyValue = wordProperties[property.id];
+      if (!propertyValue) {
+        continue;
+      }
+
+      propertyValues[property.id] = {
+        property,
+        ...propertyValue,
+      } as PropertyValue;
+    }
+
+    if (!Object.keys(propertyValues).length) {
+      return;
+    }
+
+    return propertyValues;
+  }
+
+  private mapFromWordProperties(
     propertyValues: Word['properties'],
-  ): string | undefined {
+  ): string | null {
     return propertyValues
-      ? JSON.stringify(
-          Object.fromEntries(
-            Array.from(propertyValues).map(
-              // eslint-disable-next-line @typescript-eslint/no-unused-vars
-              ([propertyId, { property, ...propertyValue }]) => [
-                propertyId,
-                propertyValue,
-              ],
-            ),
+      ? this.serializer.serialize(
+          records.mapValues(
+            propertyValues,
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            ({ property, ...propertyValue }) => propertyValue,
           ),
         )
-      : undefined;
+      : null;
   }
 }

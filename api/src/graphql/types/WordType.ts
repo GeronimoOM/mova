@@ -12,7 +12,7 @@ registerEnumType(PartOfSpeech, {
 
 @ObjectType('Word')
 export class WordType {
-  @Field()
+  @Field((type) => ID)
   id: WordId;
 
   @Field()

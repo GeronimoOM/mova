@@ -2,6 +2,8 @@ import {
   createUnionType,
   Field,
   ID,
+  Int,
+  InterfaceType,
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
@@ -9,6 +11,7 @@ import { TimestampScalar } from 'graphql/scalars/Timestamp';
 import { DateTime } from 'luxon';
 import { LanguageId } from 'models/Language';
 import {
+  Property,
   PropertyId,
   PropertyType,
   PropertyType as PropertyTypeEnum,
@@ -19,8 +22,8 @@ registerEnumType(PropertyTypeEnum, {
   name: 'PropertyType',
 });
 
-@ObjectType()
-export abstract class IPropertyType {
+@InterfaceType('IProperty')
+export abstract class PropertyInterface {
   @Field((type) => ID)
   id: PropertyId;
 
@@ -36,15 +39,22 @@ export abstract class IPropertyType {
   @Field((type) => TimestampScalar)
   addedAt: DateTime;
 
+  @Field((type) => Int)
+  order: number;
+
   @Field((type) => ID)
   languageId: LanguageId;
 }
 
-@ObjectType('TextProperty')
-export class TextPropertyType extends IPropertyType {}
+@ObjectType('TextProperty', {
+  implements: () => PropertyInterface,
+})
+export class TextPropertyType extends PropertyInterface {}
 
-@ObjectType('OptionProperty')
-export class OptionPropertyType extends IPropertyType {
+@ObjectType('OptionProperty', {
+  implements: () => PropertyInterface,
+})
+export class OptionPropertyType extends PropertyInterface {
   @Field(() => [OptionType])
   options: OptionType[];
 }
@@ -59,9 +69,9 @@ export class OptionType {
 }
 
 export const PropertyUnionType = createUnionType({
-  name: 'PropertyUnion',
+  name: 'Property',
   types: () => [TextPropertyType, OptionPropertyType] as const,
-  resolveType: (value) => {
+  resolveType: (value: Property) => {
     switch (value.type) {
       case PropertyType.Text:
         return TextPropertyType;

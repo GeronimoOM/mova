@@ -20,27 +20,39 @@ import { TopicResolver } from './graphql/resolvers/TopicResolver';
 import { GraphQLModule } from './graphql/GraphQLModule';
 import { MaintenanceService } from './services/MaintenanceService';
 import { TestController } from 'controllers/TestController';
+import { ChangeRepository } from 'repositories/ChangeRepository';
+import { Serializer } from 'repositories/Serializer';
+import { ChangeService } from 'services/ChangeService';
+import { ChangeTypeMapper } from 'graphql/mappers/ChangeTypeMapper';
+import { ChangeResolver } from 'graphql/resolvers/ChangeResolver';
+import { ChangeBuilder } from 'services/ChangeBuilder';
 
 @Module({
   imports: [GraphQLModule, ElasticClientModule],
   providers: [
     LanguageResolver,
     PropertyResolver,
+    ChangeResolver,
     WordResolver,
     TopicResolver,
     PropertyTypeMapper,
     WordTypeMapper,
+    ChangeTypeMapper,
     LanguageService,
     PropertyService,
     WordService,
     TopicService,
+    ChangeService,
     MaintenanceService,
     SearchClient,
+    ChangeBuilder,
     LanguageRepository,
     PropertyRepository,
     WordRepository,
     TopicRepository,
+    ChangeRepository,
     DbConnectionManager,
+    Serializer,
   ],
   controllers: [TestController, MaintenanceController],
 })

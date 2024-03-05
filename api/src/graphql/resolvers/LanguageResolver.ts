@@ -11,8 +11,8 @@ import {
   Int,
 } from '@nestjs/graphql';
 import { LanguageId } from 'models/Language';
-import { mapPage, Page } from 'models/Page';
-import { PartOfSpeech, WordOrder } from 'models/Word';
+import { Direction, encodePageCursor, mapPage, Page } from 'models/Page';
+import { PartOfSpeech, WordCursor, WordOrder } from 'models/Word';
 import { LanguageService } from 'services/LanguageService';
 import { PropertyService } from 'services/PropertyService';
 import { WordService } from 'services/WordService';
@@ -24,11 +24,12 @@ import { PropertyUnionType } from '../types/PropertyType';
 import { WordPageType, WordType } from '../types/WordType';
 import { TopicPageType, TopicType } from 'graphql/types/TopicType';
 import { TopicService } from 'services/TopicService';
-import { TopicId } from 'models/Topic';
+import { TopicCursor, TopicId } from 'models/Topic';
 import { WordsStatsType } from 'graphql/types/WordsDateStatsType';
 import { DateTime } from 'luxon';
 import { DATE_FORMAT } from 'utils/constants';
 import { TimestampScalar } from 'graphql/scalars/Timestamp';
+import { decodeCursor } from 'utils/cursors';
 
 @InputType()
 export class CreateLanguageInput {
@@ -117,14 +118,17 @@ export class LanguageResolver {
     @Parent() language: LanguageType,
     @Args() pageArgs: PageArgsType,
     @Args('query', { nullable: true }) query?: string,
-  ): Promise<Page<TopicType>> {
+  ): Promise<Page<TopicType, string>> {
     const topicPage = await this.topicService.getPage({
       languageId: language.id,
       query,
-      ...pageArgs,
+      cursor: pageArgs.cursor
+        ? decodeCursor(pageArgs.cursor, TopicCursor)
+        : null,
+      limit: pageArgs.limit,
     });
 
-    return topicPage;
+    return encodePageCursor(topicPage);
   }
 
   @ResolveField((type) => WordPageType)
@@ -136,25 +140,27 @@ export class LanguageResolver {
     partsOfSpeech?: PartOfSpeech[],
     @Args('topics', { type: () => [ID], nullable: true })
     topics?: TopicId[],
-    @Args('from', { type: () => String, nullable: true })
-    from?: string,
-    @Args('until', { type: () => String, nullable: true })
-    until?: string,
     @Args('order', { type: () => WordOrder, nullable: true })
     order?: WordOrder,
-  ): Promise<Page<WordType>> {
+    @Args('direction', { type: () => Direction, nullable: true })
+    direction?: Direction,
+  ): Promise<Page<WordType, string>> {
     const wordPage = await this.wordService.getPage({
       languageId: language.id,
       query,
       partsOfSpeech,
       topics,
-      from: from ? DateTime.fromFormat(from, DATE_FORMAT) : undefined,
-      until: until ? DateTime.fromFormat(until, DATE_FORMAT) : undefined,
       order,
-      ...pageArgs,
+      direction,
+      cursor: pageArgs.cursor
+        ? decodeCursor(pageArgs.cursor, WordCursor)
+        : null,
+      limit: pageArgs.limit,
     });
 
-    return mapPage(wordPage, (word) => this.wordTypeMapper.map(word));
+    return encodePageCursor(
+      mapPage(wordPage, (word) => this.wordTypeMapper.map(word)),
+    );
   }
 
   @ResolveField((type) => WordsStatsType)

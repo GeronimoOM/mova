@@ -25,6 +25,7 @@ import { Icon, ToggleIcon } from '../../common/Icon';
 import { ActionBar, Action } from '../../common/ActionBar';
 import { v1 as uuid } from 'uuid';
 import { DateTime } from 'luxon';
+import { DATETIME_FORMAT } from '../../../utils/constants';
 
 const MIN_LANGUAGE_NAME_LENGTH = 3;
 
@@ -148,7 +149,7 @@ export const Languages: Component<NavBarLanguagesProps> = (props) => {
         input: {
           id: uuid(),
           name: languageInput().trim(),
-          addedAt: DateTime.now().toSeconds(),
+          addedAt: DateTime.utc().toFormat(DATETIME_FORMAT),
         },
       },
     });

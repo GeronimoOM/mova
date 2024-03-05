@@ -2,39 +2,64 @@
 import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
-export type Exact<T extends { [key: string]: unknown }> = {
-  [K in keyof T]: T[K];
-};
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
-  [SubKey in K]?: Maybe<T[SubKey]>;
-};
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
-  [SubKey in K]: Maybe<T[SubKey]>;
-};
-export type MakeEmpty<
-  T extends { [key: string]: unknown },
-  K extends keyof T,
-> = { [_ in K]?: never };
-export type Incremental<T> =
-  | T
-  | {
-      [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never;
-    };
+export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: { input: string; output: string };
-  String: { input: string; output: string };
-  Boolean: { input: boolean; output: boolean };
-  Int: { input: number; output: number };
-  Float: { input: number; output: number };
-  /** The `Timestamp` scalar type represents points as a number seconds since the UNIX epoch. */
-  Timestamp: { input: number; output: number };
+  ID: { input: string; output: string; }
+  String: { input: string; output: string; }
+  Boolean: { input: boolean; output: boolean; }
+  Int: { input: number; output: number; }
+  Float: { input: number; output: number; }
+  /** The `Timestamp` scalar type represents a timepoint as a string in the format YYYY-MM-DD hh:mm:ss. */
+  Timestamp: { input: string; output: string; }
+};
+
+export type Change = CreateLanguageChange | CreatePropertyChange | CreateWordChange | DeleteLanguageChange | DeletePropertyChange | DeleteWordChange | ReorderPropertiesChange | UpdateLanguageChange | UpdatePropertyChange | UpdateWordChange;
+
+export type ChangePage = {
+  __typename?: 'ChangePage';
+  items: Array<Change>;
+  nextCursor?: Maybe<Scalars['String']['output']>;
+  syncType: SyncType;
+};
+
+export enum ChangeType {
+  CreateLanguage = 'CreateLanguage',
+  CreateProperty = 'CreateProperty',
+  CreateWord = 'CreateWord',
+  DeleteLanguage = 'DeleteLanguage',
+  DeleteProperty = 'DeleteProperty',
+  DeleteWord = 'DeleteWord',
+  ReorderProperties = 'ReorderProperties',
+  UpdateLanguage = 'UpdateLanguage',
+  UpdateProperty = 'UpdateProperty',
+  UpdateWord = 'UpdateWord'
+}
+
+export type CreateLanguageChange = IChange & {
+  __typename?: 'CreateLanguageChange';
+  changedAt: Scalars['Timestamp']['output'];
+  created: Language;
+  id: Scalars['ID']['output'];
+  type: ChangeType;
 };
 
 export type CreateLanguageInput = {
   addedAt?: InputMaybe<Scalars['Timestamp']['input']>;
   id?: InputMaybe<Scalars['ID']['input']>;
   name: Scalars['String']['input'];
+};
+
+export type CreatePropertyChange = IChange & {
+  __typename?: 'CreatePropertyChange';
+  changedAt: Scalars['Timestamp']['output'];
+  created: Property;
+  id: Scalars['ID']['output'];
+  type: ChangeType;
 };
 
 export type CreatePropertyInput = {
@@ -52,6 +77,14 @@ export type CreateTopicInput = {
   name: Scalars['String']['input'];
 };
 
+export type CreateWordChange = IChange & {
+  __typename?: 'CreateWordChange';
+  changedAt: Scalars['Timestamp']['output'];
+  created: WordCreate;
+  id: Scalars['ID']['output'];
+  type: ChangeType;
+};
+
 export type CreateWordInput = {
   addedAt?: InputMaybe<Scalars['Timestamp']['input']>;
   id?: InputMaybe<Scalars['ID']['input']>;
@@ -62,20 +95,78 @@ export type CreateWordInput = {
   translation: Scalars['String']['input'];
 };
 
+export type DeleteLanguageChange = IChange & {
+  __typename?: 'DeleteLanguageChange';
+  changedAt: Scalars['Timestamp']['output'];
+  deleted: Scalars['ID']['output'];
+  id: Scalars['ID']['output'];
+  type: ChangeType;
+};
+
+export type DeletePropertyChange = IChange & {
+  __typename?: 'DeletePropertyChange';
+  changedAt: Scalars['Timestamp']['output'];
+  deleted: Scalars['ID']['output'];
+  id: Scalars['ID']['output'];
+  type: ChangeType;
+};
+
+export type DeleteWordChange = IChange & {
+  __typename?: 'DeleteWordChange';
+  changedAt: Scalars['Timestamp']['output'];
+  deleted: Scalars['ID']['output'];
+  id: Scalars['ID']['output'];
+  type: ChangeType;
+};
+
+export enum Direction {
+  Asc = 'Asc',
+  Desc = 'Desc'
+}
+
+export type IChange = {
+  changedAt: Scalars['Timestamp']['output'];
+  id: Scalars['ID']['output'];
+  type: ChangeType;
+};
+
+export type IProperty = {
+  addedAt: Scalars['Timestamp']['output'];
+  id: Scalars['ID']['output'];
+  languageId: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  order: Scalars['Int']['output'];
+  partOfSpeech: PartOfSpeech;
+  type: PropertyType;
+};
+
+export type IPropertyUpdate = {
+  id: Scalars['ID']['output'];
+  name?: Maybe<Scalars['String']['output']>;
+  type: PropertyType;
+};
+
+export type IPropertyValueSave = {
+  propertyId: Scalars['ID']['output'];
+  type: PropertyType;
+};
+
 export type Language = {
   __typename?: 'Language';
   addedAt: Scalars['Timestamp']['output'];
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
-  properties: Array<PropertyUnion>;
+  properties: Array<Property>;
   topics: TopicPage;
   words: WordPage;
   wordsStats: WordsStats;
 };
 
+
 export type LanguagePropertiesArgs = {
   partOfSpeech?: InputMaybe<PartOfSpeech>;
 };
+
 
 export type LanguageTopicsArgs = {
   cursor?: InputMaybe<Scalars['String']['input']>;
@@ -83,93 +174,114 @@ export type LanguageTopicsArgs = {
   query?: InputMaybe<Scalars['String']['input']>;
 };
 
+
 export type LanguageWordsArgs = {
   cursor?: InputMaybe<Scalars['String']['input']>;
-  from?: InputMaybe<Scalars['String']['input']>;
+  direction?: InputMaybe<Direction>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   order?: InputMaybe<WordOrder>;
   partsOfSpeech?: InputMaybe<Array<PartOfSpeech>>;
   query?: InputMaybe<Scalars['String']['input']>;
   topics?: InputMaybe<Array<Scalars['ID']['input']>>;
-  until?: InputMaybe<Scalars['String']['input']>;
 };
+
 
 export type LanguageWordsStatsArgs = {
   days?: InputMaybe<Scalars['Int']['input']>;
   from?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type LanguageUpdate = {
+  __typename?: 'LanguageUpdate';
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   addTopicWord: Topic;
   createLanguage: Language;
-  createProperty: PropertyUnion;
+  createProperty: Property;
   createTopic: Topic;
   createWord: Word;
   deleteLanguage: Language;
-  deleteProperty: PropertyUnion;
+  deleteProperty: Property;
   deleteTopic: Topic;
   deleteWord: Word;
   removeTopicWord: Topic;
-  reorderProperties: Array<PropertyUnion>;
+  reorderProperties: Array<Property>;
   updateLanguage: Language;
-  updateProperty: PropertyUnion;
+  updateProperty: Property;
   updateWord: Word;
 };
+
 
 export type MutationAddTopicWordArgs = {
   topicId: Scalars['ID']['input'];
   wordId: Scalars['ID']['input'];
 };
 
+
 export type MutationCreateLanguageArgs = {
   input: CreateLanguageInput;
 };
+
 
 export type MutationCreatePropertyArgs = {
   input: CreatePropertyInput;
 };
 
+
 export type MutationCreateTopicArgs = {
   input: CreateTopicInput;
 };
+
 
 export type MutationCreateWordArgs = {
   input: CreateWordInput;
 };
 
+
 export type MutationDeleteLanguageArgs = {
   id: Scalars['ID']['input'];
 };
+
 
 export type MutationDeletePropertyArgs = {
   id: Scalars['ID']['input'];
 };
 
+
 export type MutationDeleteTopicArgs = {
   id: Scalars['ID']['input'];
 };
 
+
 export type MutationDeleteWordArgs = {
   id: Scalars['ID']['input'];
 };
+
 
 export type MutationRemoveTopicWordArgs = {
   topicId: Scalars['ID']['input'];
   wordId: Scalars['ID']['input'];
 };
 
+
 export type MutationReorderPropertiesArgs = {
   input: ReorderPropertiesInput;
 };
+
 
 export type MutationUpdateLanguageArgs = {
   input: UpdateLanguageInput;
 };
 
+
 export type MutationUpdatePropertyArgs = {
   input: UpdatePropertyInput;
 };
+
 
 export type MutationUpdateWordArgs = {
   input: UpdateWordInput;
@@ -181,14 +293,23 @@ export type Option = {
   value: Scalars['String']['output'];
 };
 
-export type OptionProperty = {
+export type OptionProperty = IProperty & {
   __typename?: 'OptionProperty';
   addedAt: Scalars['Timestamp']['output'];
   id: Scalars['ID']['output'];
   languageId: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   options: Array<Option>;
+  order: Scalars['Int']['output'];
   partOfSpeech: PartOfSpeech;
+  type: PropertyType;
+};
+
+export type OptionPropertyUpdate = IPropertyUpdate & {
+  __typename?: 'OptionPropertyUpdate';
+  id: Scalars['ID']['output'];
+  name?: Maybe<Scalars['String']['output']>;
+  options?: Maybe<Array<Option>>;
   type: PropertyType;
 };
 
@@ -198,42 +319,81 @@ export type OptionPropertyValue = {
   property: OptionProperty;
 };
 
+export type OptionPropertyValueSave = IPropertyValueSave & {
+  __typename?: 'OptionPropertyValueSave';
+  optionId?: Maybe<Scalars['ID']['output']>;
+  propertyId: Scalars['ID']['output'];
+  type: PropertyType;
+};
+
 export enum PartOfSpeech {
   Adj = 'Adj',
   Adv = 'Adv',
   Misc = 'Misc',
   Noun = 'Noun',
   Pron = 'Pron',
-  Verb = 'Verb',
+  Verb = 'Verb'
 }
+
+export type PropertiesReorder = {
+  __typename?: 'PropertiesReorder';
+  languageId: Scalars['ID']['output'];
+  partOfSpeech: PartOfSpeech;
+  propertyIds: Array<Scalars['ID']['output']>;
+};
+
+export type Property = OptionProperty | TextProperty;
 
 export enum PropertyType {
   Option = 'Option',
-  Text = 'Text',
+  Text = 'Text'
 }
 
-export type PropertyUnion = OptionProperty | TextProperty;
+export type PropertyUpdate = OptionPropertyUpdate | TextPropertyUpdate;
 
-export type PropertyValueUnion = OptionPropertyValue | TextPropertyValue;
+export type PropertyValue = OptionPropertyValue | TextPropertyValue;
+
+export type PropertyValueSave = OptionPropertyValueSave | TextPropertyValueSave;
 
 export type Query = {
   __typename?: 'Query';
+  changes: ChangePage;
   language?: Maybe<Language>;
   languages: Array<Language>;
-  property?: Maybe<PropertyUnion>;
+  property?: Maybe<Property>;
   word?: Maybe<Word>;
 };
+
+
+export type QueryChangesArgs = {
+  changedAt?: InputMaybe<Scalars['Timestamp']['input']>;
+  clientId?: InputMaybe<Scalars['String']['input']>;
+  cursor?: InputMaybe<Scalars['String']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  syncType?: InputMaybe<SyncType>;
+};
+
 
 export type QueryLanguageArgs = {
   id: Scalars['ID']['input'];
 };
 
+
 export type QueryPropertyArgs = {
   id: Scalars['ID']['input'];
 };
 
+
 export type QueryWordArgs = {
   id: Scalars['ID']['input'];
+};
+
+export type ReorderPropertiesChange = IChange & {
+  __typename?: 'ReorderPropertiesChange';
+  changedAt: Scalars['Timestamp']['output'];
+  id: Scalars['ID']['output'];
+  reordered: PropertiesReorder;
+  type: ChangeType;
 };
 
 export type ReorderPropertiesInput = {
@@ -242,13 +402,26 @@ export type ReorderPropertiesInput = {
   propertyIds: Array<Scalars['ID']['input']>;
 };
 
-export type TextProperty = {
+export enum SyncType {
+  Delta = 'Delta',
+  Full = 'Full'
+}
+
+export type TextProperty = IProperty & {
   __typename?: 'TextProperty';
   addedAt: Scalars['Timestamp']['output'];
   id: Scalars['ID']['output'];
   languageId: Scalars['ID']['output'];
   name: Scalars['String']['output'];
+  order: Scalars['Int']['output'];
   partOfSpeech: PartOfSpeech;
+  type: PropertyType;
+};
+
+export type TextPropertyUpdate = IPropertyUpdate & {
+  __typename?: 'TextPropertyUpdate';
+  id: Scalars['ID']['output'];
+  name?: Maybe<Scalars['String']['output']>;
   type: PropertyType;
 };
 
@@ -258,6 +431,13 @@ export type TextPropertyValue = {
   text: Scalars['String']['output'];
 };
 
+export type TextPropertyValueSave = IPropertyValueSave & {
+  __typename?: 'TextPropertyValueSave';
+  propertyId: Scalars['ID']['output'];
+  text?: Maybe<Scalars['String']['output']>;
+  type: PropertyType;
+};
+
 export type Topic = {
   __typename?: 'Topic';
   id: Scalars['ID']['output'];
@@ -265,8 +445,10 @@ export type Topic = {
   words: WordPage;
 };
 
+
 export type TopicWordsArgs = {
   cursor?: InputMaybe<Scalars['String']['input']>;
+  direction?: InputMaybe<Direction>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   order?: InputMaybe<WordOrder>;
   partOfSpeech?: InputMaybe<Array<PartOfSpeech>>;
@@ -279,6 +461,14 @@ export type TopicPage = {
   nextCursor?: Maybe<Scalars['String']['output']>;
 };
 
+export type UpdateLanguageChange = IChange & {
+  __typename?: 'UpdateLanguageChange';
+  changedAt: Scalars['Timestamp']['output'];
+  id: Scalars['ID']['output'];
+  type: ChangeType;
+  updated: LanguageUpdate;
+};
+
 export type UpdateLanguageInput = {
   id: Scalars['ID']['input'];
   name: Scalars['String']['input'];
@@ -287,6 +477,14 @@ export type UpdateLanguageInput = {
 export type UpdateOptionInput = {
   id: Scalars['ID']['input'];
   value: Scalars['String']['input'];
+};
+
+export type UpdatePropertyChange = IChange & {
+  __typename?: 'UpdatePropertyChange';
+  changedAt: Scalars['Timestamp']['output'];
+  id: Scalars['ID']['output'];
+  type: ChangeType;
+  updated: PropertyUpdate;
 };
 
 export type UpdatePropertyInput = {
@@ -301,6 +499,14 @@ export type UpdatePropertyValueInput = {
   text?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type UpdateWordChange = IChange & {
+  __typename?: 'UpdateWordChange';
+  changedAt: Scalars['Timestamp']['output'];
+  id: Scalars['ID']['output'];
+  type: ChangeType;
+  updated: WordUpdate;
+};
+
 export type UpdateWordInput = {
   id: Scalars['ID']['input'];
   original?: InputMaybe<Scalars['String']['input']>;
@@ -311,24 +517,43 @@ export type UpdateWordInput = {
 export type Word = {
   __typename?: 'Word';
   addedAt: Scalars['Timestamp']['output'];
-  id: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
   languageId: Scalars['ID']['output'];
   original: Scalars['String']['output'];
   partOfSpeech: PartOfSpeech;
-  properties: Array<PropertyValueUnion>;
+  properties: Array<PropertyValue>;
+  translation: Scalars['String']['output'];
+};
+
+export type WordCreate = {
+  __typename?: 'WordCreate';
+  addedAt: Scalars['Timestamp']['output'];
+  id: Scalars['ID']['output'];
+  languageId: Scalars['ID']['output'];
+  original: Scalars['String']['output'];
+  partOfSpeech: PartOfSpeech;
+  properties: Array<PropertyValueSave>;
   translation: Scalars['String']['output'];
 };
 
 export enum WordOrder {
   Alphabetical = 'Alphabetical',
   Chronological = 'Chronological',
-  Random = 'Random',
+  Random = 'Random'
 }
 
 export type WordPage = {
   __typename?: 'WordPage';
   items: Array<Word>;
   nextCursor?: Maybe<Scalars['String']['output']>;
+};
+
+export type WordUpdate = {
+  __typename?: 'WordUpdate';
+  id: Scalars['ID']['output'];
+  original?: Maybe<Scalars['String']['output']>;
+  properties?: Maybe<Array<PropertyValueSave>>;
+  translation?: Maybe<Scalars['String']['output']>;
 };
 
 export type WordsByDateStats = {
@@ -355,353 +580,124 @@ export type WordsTotalStats = {
   words: Scalars['Int']['output'];
 };
 
-export type LanguageFieldsFragment = {
-  __typename?: 'Language';
-  id: string;
-  name: string;
-  addedAt: number;
-};
+export type LanguageFieldsFragment = { __typename?: 'Language', id: string, name: string, addedAt: string };
 
-export type LanguageWordsFragment = {
-  __typename?: 'Language';
-  words: {
-    __typename?: 'WordPage';
-    nextCursor?: string | null;
-    items: Array<{ __typename?: 'Word'; id: string }>;
-  };
-};
+export type LanguageWordsFragment = { __typename?: 'Language', words: { __typename?: 'WordPage', nextCursor?: string | null, items: Array<{ __typename?: 'Word', id: string }> } };
 
-export type LanguagePropertiesFragment = {
-  __typename?: 'Language';
-  properties: Array<
-    | { __typename?: 'OptionProperty'; id: string }
-    | { __typename?: 'TextProperty'; id: string }
-  >;
-};
+export type LanguagePropertiesFragment = { __typename?: 'Language', properties: Array<{ __typename?: 'OptionProperty', id: string, name: string, type: PropertyType, partOfSpeech: PartOfSpeech, languageId: string, addedAt: string, order: number, options: Array<{ __typename?: 'Option', id: string, value: string }> } | { __typename?: 'TextProperty', id: string, name: string, type: PropertyType, partOfSpeech: PartOfSpeech, languageId: string, addedAt: string, order: number }> };
 
-export type WordFieldsFragment = {
-  __typename?: 'Word';
-  id: string;
-  original: string;
-  translation: string;
-  partOfSpeech: PartOfSpeech;
-  addedAt: number;
-  languageId: string;
-};
+export type WordFieldsFragment = { __typename?: 'Word', id: string, original: string, translation: string, partOfSpeech: PartOfSpeech, addedAt: string, languageId: string };
 
-export type WordFieldsFullFragment = {
-  __typename?: 'Word';
-  id: string;
-  original: string;
-  translation: string;
-  partOfSpeech: PartOfSpeech;
-  addedAt: number;
-  languageId: string;
-  properties: Array<
-    | {
-        __typename?: 'OptionPropertyValue';
-        property: { __typename?: 'OptionProperty'; id: string };
-        option: { __typename?: 'Option'; id: string; value: string };
-      }
-    | {
-        __typename?: 'TextPropertyValue';
-        text: string;
-        property: { __typename?: 'TextProperty'; id: string };
-      }
-  >;
-};
+export type WordFieldsFullFragment = { __typename?: 'Word', id: string, original: string, translation: string, partOfSpeech: PartOfSpeech, addedAt: string, languageId: string, properties: Array<{ __typename?: 'OptionPropertyValue', property: { __typename?: 'OptionProperty', id: string }, option: { __typename?: 'Option', id: string, value: string } } | { __typename?: 'TextPropertyValue', text: string, property: { __typename?: 'TextProperty', id: string } }> };
 
-type PropertyValueFields_OptionPropertyValue_Fragment = {
-  __typename?: 'OptionPropertyValue';
-  property: { __typename?: 'OptionProperty'; id: string };
-  option: { __typename?: 'Option'; id: string; value: string };
-};
+export type TextPropertyValueFieldsFragment = { __typename?: 'TextPropertyValue', text: string, property: { __typename?: 'TextProperty', id: string } };
 
-type PropertyValueFields_TextPropertyValue_Fragment = {
-  __typename?: 'TextPropertyValue';
-  text: string;
-  property: { __typename?: 'TextProperty'; id: string };
-};
+export type OptionPropertyValueFieldsFragment = { __typename?: 'OptionPropertyValue', property: { __typename?: 'OptionProperty', id: string }, option: { __typename?: 'Option', id: string, value: string } };
 
-export type PropertyValueFieldsFragment =
-  | PropertyValueFields_OptionPropertyValue_Fragment
-  | PropertyValueFields_TextPropertyValue_Fragment;
+type PropertyFields_OptionProperty_Fragment = { __typename?: 'OptionProperty', id: string, name: string, type: PropertyType, partOfSpeech: PartOfSpeech, languageId: string, addedAt: string, order: number, options: Array<{ __typename?: 'Option', id: string, value: string }> };
 
-export type TextPropertyValueFieldsFragment = {
-  __typename?: 'TextPropertyValue';
-  text: string;
-  property: { __typename?: 'TextProperty'; id: string };
-};
+type PropertyFields_TextProperty_Fragment = { __typename?: 'TextProperty', id: string, name: string, type: PropertyType, partOfSpeech: PartOfSpeech, languageId: string, addedAt: string, order: number };
 
-export type OptionPropertyValueFieldsFragment = {
-  __typename?: 'OptionPropertyValue';
-  property: { __typename?: 'OptionProperty'; id: string };
-  option: { __typename?: 'Option'; id: string; value: string };
-};
+export type PropertyFieldsFragment = PropertyFields_OptionProperty_Fragment | PropertyFields_TextProperty_Fragment;
 
-type PropertyFields_OptionProperty_Fragment = {
-  __typename?: 'OptionProperty';
-  id: string;
-  name: string;
-  type: PropertyType;
-  partOfSpeech: PartOfSpeech;
-  languageId: string;
-  addedAt: number;
-  options: Array<{ __typename?: 'Option'; id: string; value: string }>;
-};
+type IPropertyFields_OptionProperty_Fragment = { __typename?: 'OptionProperty', id: string, name: string, type: PropertyType, partOfSpeech: PartOfSpeech, languageId: string, addedAt: string, order: number };
 
-type PropertyFields_TextProperty_Fragment = {
-  __typename?: 'TextProperty';
-  id: string;
-  name: string;
-  type: PropertyType;
-  partOfSpeech: PartOfSpeech;
-  languageId: string;
-  addedAt: number;
-};
+type IPropertyFields_TextProperty_Fragment = { __typename?: 'TextProperty', id: string, name: string, type: PropertyType, partOfSpeech: PartOfSpeech, languageId: string, addedAt: string, order: number };
 
-export type PropertyFieldsFragment =
-  | PropertyFields_OptionProperty_Fragment
-  | PropertyFields_TextProperty_Fragment;
+export type IPropertyFieldsFragment = IPropertyFields_OptionProperty_Fragment | IPropertyFields_TextProperty_Fragment;
 
-export type TextPropertyFieldsFragment = {
-  __typename?: 'TextProperty';
-  id: string;
-  name: string;
-  type: PropertyType;
-  partOfSpeech: PartOfSpeech;
-  languageId: string;
-  addedAt: number;
-};
+export type TextPropertyFieldsFragment = { __typename?: 'TextProperty', id: string, name: string, type: PropertyType, partOfSpeech: PartOfSpeech, languageId: string, addedAt: string, order: number };
 
-export type OptionPropertyFieldsFragment = {
-  __typename?: 'OptionProperty';
-  id: string;
-  name: string;
-  type: PropertyType;
-  partOfSpeech: PartOfSpeech;
-  languageId: string;
-  addedAt: number;
-  options: Array<{ __typename?: 'Option'; id: string; value: string }>;
-};
+export type OptionPropertyFieldsFragment = { __typename?: 'OptionProperty', id: string, name: string, type: PropertyType, partOfSpeech: PartOfSpeech, languageId: string, addedAt: string, order: number, options: Array<{ __typename?: 'Option', id: string, value: string }> };
 
 export type CreateLanguageMutationVariables = Exact<{
   input: CreateLanguageInput;
 }>;
 
-export type CreateLanguageMutation = {
-  __typename?: 'Mutation';
-  createLanguage: {
-    __typename?: 'Language';
-    id: string;
-    name: string;
-    addedAt: number;
-  };
-};
+
+export type CreateLanguageMutation = { __typename?: 'Mutation', createLanguage: { __typename?: 'Language', id: string, name: string, addedAt: string } };
 
 export type UpdateLanguageMutationVariables = Exact<{
   input: UpdateLanguageInput;
 }>;
 
-export type UpdateLanguageMutation = {
-  __typename?: 'Mutation';
-  updateLanguage: { __typename?: 'Language'; id: string; name: string };
-};
+
+export type UpdateLanguageMutation = { __typename?: 'Mutation', updateLanguage: { __typename?: 'Language', id: string, name: string } };
 
 export type DeleteLanguageMutationVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
-export type DeleteLanguageMutation = {
-  __typename?: 'Mutation';
-  deleteLanguage: { __typename?: 'Language'; id: string };
-};
+
+export type DeleteLanguageMutation = { __typename?: 'Mutation', deleteLanguage: { __typename?: 'Language', id: string } };
 
 export type CreatePropertyMutationVariables = Exact<{
   input: CreatePropertyInput;
 }>;
 
-export type CreatePropertyMutation = {
-  __typename?: 'Mutation';
-  createProperty:
-    | {
-        __typename?: 'OptionProperty';
-        id: string;
-        name: string;
-        type: PropertyType;
-        partOfSpeech: PartOfSpeech;
-        languageId: string;
-        addedAt: number;
-        options: Array<{ __typename?: 'Option'; id: string; value: string }>;
-      }
-    | {
-        __typename?: 'TextProperty';
-        id: string;
-        name: string;
-        type: PropertyType;
-        partOfSpeech: PartOfSpeech;
-        languageId: string;
-        addedAt: number;
-      };
-};
+
+export type CreatePropertyMutation = { __typename?: 'Mutation', createProperty: { __typename?: 'OptionProperty', id: string, name: string, type: PropertyType, partOfSpeech: PartOfSpeech, languageId: string, addedAt: string, order: number, options: Array<{ __typename?: 'Option', id: string, value: string }> } | { __typename?: 'TextProperty', id: string, name: string, type: PropertyType, partOfSpeech: PartOfSpeech, languageId: string, addedAt: string, order: number } };
 
 export type UpdatePropertyMutationVariables = Exact<{
   input: UpdatePropertyInput;
 }>;
 
-export type UpdatePropertyMutation = {
-  __typename?: 'Mutation';
-  updateProperty:
-    | {
-        __typename?: 'OptionProperty';
-        id: string;
-        name: string;
-        type: PropertyType;
-        partOfSpeech: PartOfSpeech;
-        languageId: string;
-        addedAt: number;
-        options: Array<{ __typename?: 'Option'; id: string; value: string }>;
-      }
-    | {
-        __typename?: 'TextProperty';
-        id: string;
-        name: string;
-        type: PropertyType;
-        partOfSpeech: PartOfSpeech;
-        languageId: string;
-        addedAt: number;
-      };
-};
+
+export type UpdatePropertyMutation = { __typename?: 'Mutation', updateProperty: { __typename?: 'OptionProperty', id: string, name: string, type: PropertyType, partOfSpeech: PartOfSpeech, languageId: string, addedAt: string, order: number, options: Array<{ __typename?: 'Option', id: string, value: string }> } | { __typename?: 'TextProperty', id: string, name: string, type: PropertyType, partOfSpeech: PartOfSpeech, languageId: string, addedAt: string, order: number } };
 
 export type DeletePropertyMutationVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
-export type DeletePropertyMutation = {
-  __typename?: 'Mutation';
-  deleteProperty:
-    | {
-        __typename?: 'OptionProperty';
-        id: string;
-        languageId: string;
-        partOfSpeech: PartOfSpeech;
-      }
-    | {
-        __typename?: 'TextProperty';
-        id: string;
-        languageId: string;
-        partOfSpeech: PartOfSpeech;
-      };
-};
+
+export type DeletePropertyMutation = { __typename?: 'Mutation', deleteProperty: { __typename?: 'OptionProperty', id: string, languageId: string, partOfSpeech: PartOfSpeech } | { __typename?: 'TextProperty', id: string, languageId: string, partOfSpeech: PartOfSpeech } };
 
 export type ReorderPropertiesMutationVariables = Exact<{
   input: ReorderPropertiesInput;
 }>;
 
-export type ReorderPropertiesMutation = {
-  __typename?: 'Mutation';
-  reorderProperties: Array<
-    | { __typename?: 'OptionProperty'; id: string }
-    | { __typename?: 'TextProperty'; id: string }
-  >;
-};
+
+export type ReorderPropertiesMutation = { __typename?: 'Mutation', reorderProperties: Array<{ __typename?: 'OptionProperty', id: string, order: number } | { __typename?: 'TextProperty', id: string, order: number }> };
 
 export type CreateWordMutationVariables = Exact<{
   input: CreateWordInput;
 }>;
 
-export type CreateWordMutation = {
-  __typename?: 'Mutation';
-  createWord: {
-    __typename?: 'Word';
-    id: string;
-    original: string;
-    translation: string;
-    partOfSpeech: PartOfSpeech;
-    addedAt: number;
-    languageId: string;
-    properties: Array<
-      | {
-          __typename?: 'OptionPropertyValue';
-          property: { __typename?: 'OptionProperty'; id: string };
-          option: { __typename?: 'Option'; id: string; value: string };
-        }
-      | {
-          __typename?: 'TextPropertyValue';
-          text: string;
-          property: { __typename?: 'TextProperty'; id: string };
-        }
-    >;
-  };
-};
+
+export type CreateWordMutation = { __typename?: 'Mutation', createWord: { __typename?: 'Word', id: string, original: string, translation: string, partOfSpeech: PartOfSpeech, addedAt: string, languageId: string, properties: Array<{ __typename?: 'OptionPropertyValue', property: { __typename?: 'OptionProperty', id: string }, option: { __typename?: 'Option', id: string, value: string } } | { __typename?: 'TextPropertyValue', text: string, property: { __typename?: 'TextProperty', id: string } }> } };
 
 export type UpdateWordMutationVariables = Exact<{
   input: UpdateWordInput;
 }>;
 
-export type UpdateWordMutation = {
-  __typename?: 'Mutation';
-  updateWord: {
-    __typename?: 'Word';
-    id: string;
-    original: string;
-    translation: string;
-    partOfSpeech: PartOfSpeech;
-    addedAt: number;
-    languageId: string;
-    properties: Array<
-      | {
-          __typename?: 'OptionPropertyValue';
-          property: { __typename?: 'OptionProperty'; id: string };
-          option: { __typename?: 'Option'; id: string; value: string };
-        }
-      | {
-          __typename?: 'TextPropertyValue';
-          text: string;
-          property: { __typename?: 'TextProperty'; id: string };
-        }
-    >;
-  };
-};
+
+export type UpdateWordMutation = { __typename?: 'Mutation', updateWord: { __typename?: 'Word', id: string, original: string, translation: string, partOfSpeech: PartOfSpeech, addedAt: string, languageId: string, properties: Array<{ __typename?: 'OptionPropertyValue', property: { __typename?: 'OptionProperty', id: string }, option: { __typename?: 'Option', id: string, value: string } } | { __typename?: 'TextPropertyValue', text: string, property: { __typename?: 'TextProperty', id: string } }> } };
 
 export type DeleteWordMutationVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
-export type DeleteWordMutation = {
-  __typename?: 'Mutation';
-  deleteWord: { __typename?: 'Word'; id: string; languageId: string };
-};
+
+export type DeleteWordMutation = { __typename?: 'Mutation', deleteWord: { __typename?: 'Word', id: string, languageId: string } };
 
 export type CreateTopicMutationVariables = Exact<{
   input: CreateTopicInput;
 }>;
 
-export type CreateTopicMutation = {
-  __typename?: 'Mutation';
-  createTopic: { __typename?: 'Topic'; id: string; name: string };
-};
+
+export type CreateTopicMutation = { __typename?: 'Mutation', createTopic: { __typename?: 'Topic', id: string, name: string } };
 
 export type DeleteTopicMutationVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
-export type DeleteTopicMutation = {
-  __typename?: 'Mutation';
-  deleteTopic: { __typename?: 'Topic'; id: string };
-};
 
-export type GetLanguagesQueryVariables = Exact<{ [key: string]: never }>;
+export type DeleteTopicMutation = { __typename?: 'Mutation', deleteTopic: { __typename?: 'Topic', id: string } };
 
-export type GetLanguagesQuery = {
-  __typename?: 'Query';
-  languages: Array<{
-    __typename?: 'Language';
-    id: string;
-    name: string;
-    addedAt: number;
-  }>;
-};
+export type GetLanguagesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetLanguagesQuery = { __typename?: 'Query', languages: Array<{ __typename?: 'Language', id: string, name: string, addedAt: string }> };
 
 export type GetWordsQueryVariables = Exact<{
   languageId: Scalars['ID']['input'];
@@ -713,89 +709,23 @@ export type GetWordsQueryVariables = Exact<{
   order?: InputMaybe<WordOrder>;
 }>;
 
-export type GetWordsQuery = {
-  __typename?: 'Query';
-  language?: {
-    __typename?: 'Language';
-    id: string;
-    words: {
-      __typename?: 'WordPage';
-      nextCursor?: string | null;
-      items: Array<{
-        __typename?: 'Word';
-        id: string;
-        original: string;
-        translation: string;
-        partOfSpeech: PartOfSpeech;
-        addedAt: number;
-        languageId: string;
-      }>;
-    };
-  } | null;
-};
+
+export type GetWordsQuery = { __typename?: 'Query', language?: { __typename?: 'Language', id: string, words: { __typename?: 'WordPage', nextCursor?: string | null, items: Array<{ __typename?: 'Word', id: string, original: string, translation: string, partOfSpeech: PartOfSpeech, addedAt: string, languageId: string }> } } | null };
 
 export type GetWordQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
-export type GetWordQuery = {
-  __typename?: 'Query';
-  word?: {
-    __typename?: 'Word';
-    id: string;
-    original: string;
-    translation: string;
-    partOfSpeech: PartOfSpeech;
-    addedAt: number;
-    languageId: string;
-    properties: Array<
-      | {
-          __typename?: 'OptionPropertyValue';
-          property: { __typename?: 'OptionProperty'; id: string };
-          option: { __typename?: 'Option'; id: string; value: string };
-        }
-      | {
-          __typename?: 'TextPropertyValue';
-          text: string;
-          property: { __typename?: 'TextProperty'; id: string };
-        }
-    >;
-  } | null;
-};
+
+export type GetWordQuery = { __typename?: 'Query', word?: { __typename?: 'Word', id: string, original: string, translation: string, partOfSpeech: PartOfSpeech, addedAt: string, languageId: string, properties: Array<{ __typename?: 'OptionPropertyValue', property: { __typename?: 'OptionProperty', id: string }, option: { __typename?: 'Option', id: string, value: string } } | { __typename?: 'TextPropertyValue', text: string, property: { __typename?: 'TextProperty', id: string } }> } | null };
 
 export type GetPropertiesQueryVariables = Exact<{
   languageId: Scalars['ID']['input'];
   partOfSpeech?: InputMaybe<PartOfSpeech>;
 }>;
 
-export type GetPropertiesQuery = {
-  __typename?: 'Query';
-  language?: {
-    __typename?: 'Language';
-    id: string;
-    properties: Array<
-      | {
-          __typename?: 'OptionProperty';
-          id: string;
-          name: string;
-          type: PropertyType;
-          partOfSpeech: PartOfSpeech;
-          languageId: string;
-          addedAt: number;
-          options: Array<{ __typename?: 'Option'; id: string; value: string }>;
-        }
-      | {
-          __typename?: 'TextProperty';
-          id: string;
-          name: string;
-          type: PropertyType;
-          partOfSpeech: PartOfSpeech;
-          languageId: string;
-          addedAt: number;
-        }
-    >;
-  } | null;
-};
+
+export type GetPropertiesQuery = { __typename?: 'Query', language?: { __typename?: 'Language', id: string, properties: Array<{ __typename?: 'OptionProperty', id: string, name: string, type: PropertyType, partOfSpeech: PartOfSpeech, languageId: string, addedAt: string, order: number, options: Array<{ __typename?: 'Option', id: string, value: string }> } | { __typename?: 'TextProperty', id: string, name: string, type: PropertyType, partOfSpeech: PartOfSpeech, languageId: string, addedAt: string, order: number }> } | null };
 
 export type GetTopicsQueryVariables = Exact<{
   languageId: Scalars['ID']['input'];
@@ -804,2778 +734,42 @@ export type GetTopicsQueryVariables = Exact<{
   query?: InputMaybe<Scalars['String']['input']>;
 }>;
 
-export type GetTopicsQuery = {
-  __typename?: 'Query';
-  language?: {
-    __typename?: 'Language';
-    id: string;
-    topics: {
-      __typename?: 'TopicPage';
-      nextCursor?: string | null;
-      items: Array<{ __typename?: 'Topic'; id: string; name: string }>;
-    };
-  } | null;
-};
+
+export type GetTopicsQuery = { __typename?: 'Query', language?: { __typename?: 'Language', id: string, topics: { __typename?: 'TopicPage', nextCursor?: string | null, items: Array<{ __typename?: 'Topic', id: string, name: string }> } } | null };
 
 export type GetWordsStatsQueryVariables = Exact<{
   languageId: Scalars['ID']['input'];
 }>;
 
-export type GetWordsStatsQuery = {
-  __typename?: 'Query';
-  language?: {
-    __typename?: 'Language';
-    id: string;
-    wordsStats: {
-      __typename?: 'WordsStats';
-      total: { __typename?: 'WordsTotalStats'; words: number };
-      byDate: {
-        __typename?: 'WordsByDateStats';
-        from: string;
-        until: string;
-        dates: Array<{
-          __typename?: 'WordsDateStats';
-          date: string;
-          words: number;
-        }>;
-      };
-    };
-  } | null;
-};
 
-export const LanguageFieldsFragmentDoc = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'LanguageFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'Language' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'addedAt' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<LanguageFieldsFragment, unknown>;
-export const LanguageWordsFragmentDoc = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'LanguageWords' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'Language' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'words' },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'items' },
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                    ],
-                  },
-                },
-                { kind: 'Field', name: { kind: 'Name', value: 'nextCursor' } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<LanguageWordsFragment, unknown>;
-export const LanguagePropertiesFragmentDoc = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'LanguageProperties' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'Language' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'properties' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'partOfSpeech' },
-                value: {
-                  kind: 'Variable',
-                  name: { kind: 'Name', value: 'partOfSpeech' },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'InlineFragment',
-                  typeCondition: {
-                    kind: 'NamedType',
-                    name: { kind: 'Name', value: 'TextProperty' },
-                  },
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                    ],
-                  },
-                },
-                {
-                  kind: 'InlineFragment',
-                  typeCondition: {
-                    kind: 'NamedType',
-                    name: { kind: 'Name', value: 'OptionProperty' },
-                  },
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<LanguagePropertiesFragment, unknown>;
-export const WordFieldsFragmentDoc = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'WordFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'Word' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'original' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'translation' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'partOfSpeech' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'addedAt' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'languageId' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<WordFieldsFragment, unknown>;
-export const TextPropertyValueFieldsFragmentDoc = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'TextPropertyValueFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'TextPropertyValue' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'property' },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-              ],
-            },
-          },
-          { kind: 'Field', name: { kind: 'Name', value: 'text' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<TextPropertyValueFieldsFragment, unknown>;
-export const OptionPropertyValueFieldsFragmentDoc = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'OptionPropertyValueFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'OptionPropertyValue' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'property' },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-              ],
-            },
-          },
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'option' },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'value' } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<OptionPropertyValueFieldsFragment, unknown>;
-export const PropertyValueFieldsFragmentDoc = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'PropertyValueFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'PropertyValueUnion' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'InlineFragment',
-            typeCondition: {
-              kind: 'NamedType',
-              name: { kind: 'Name', value: 'TextPropertyValue' },
-            },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'FragmentSpread',
-                  name: { kind: 'Name', value: 'TextPropertyValueFields' },
-                },
-              ],
-            },
-          },
-          {
-            kind: 'InlineFragment',
-            typeCondition: {
-              kind: 'NamedType',
-              name: { kind: 'Name', value: 'OptionPropertyValue' },
-            },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'FragmentSpread',
-                  name: { kind: 'Name', value: 'OptionPropertyValueFields' },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'TextPropertyValueFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'TextPropertyValue' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'property' },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-              ],
-            },
-          },
-          { kind: 'Field', name: { kind: 'Name', value: 'text' } },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'OptionPropertyValueFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'OptionPropertyValue' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'property' },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-              ],
-            },
-          },
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'option' },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'value' } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<PropertyValueFieldsFragment, unknown>;
-export const WordFieldsFullFragmentDoc = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'WordFieldsFull' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'Word' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'FragmentSpread',
-            name: { kind: 'Name', value: 'WordFields' },
-          },
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'properties' },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'InlineFragment',
-                  typeCondition: {
-                    kind: 'NamedType',
-                    name: { kind: 'Name', value: 'PropertyValueUnion' },
-                  },
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      {
-                        kind: 'FragmentSpread',
-                        name: { kind: 'Name', value: 'PropertyValueFields' },
-                      },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'TextPropertyValueFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'TextPropertyValue' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'property' },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-              ],
-            },
-          },
-          { kind: 'Field', name: { kind: 'Name', value: 'text' } },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'OptionPropertyValueFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'OptionPropertyValue' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'property' },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-              ],
-            },
-          },
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'option' },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'value' } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'WordFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'Word' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'original' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'translation' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'partOfSpeech' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'addedAt' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'languageId' } },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'PropertyValueFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'PropertyValueUnion' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'InlineFragment',
-            typeCondition: {
-              kind: 'NamedType',
-              name: { kind: 'Name', value: 'TextPropertyValue' },
-            },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'FragmentSpread',
-                  name: { kind: 'Name', value: 'TextPropertyValueFields' },
-                },
-              ],
-            },
-          },
-          {
-            kind: 'InlineFragment',
-            typeCondition: {
-              kind: 'NamedType',
-              name: { kind: 'Name', value: 'OptionPropertyValue' },
-            },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'FragmentSpread',
-                  name: { kind: 'Name', value: 'OptionPropertyValueFields' },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<WordFieldsFullFragment, unknown>;
-export const TextPropertyFieldsFragmentDoc = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'TextPropertyFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'TextProperty' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'type' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'partOfSpeech' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'languageId' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'addedAt' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<TextPropertyFieldsFragment, unknown>;
-export const OptionPropertyFieldsFragmentDoc = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'OptionPropertyFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'OptionProperty' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'type' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'partOfSpeech' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'languageId' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'addedAt' } },
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'options' },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'value' } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<OptionPropertyFieldsFragment, unknown>;
-export const PropertyFieldsFragmentDoc = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'PropertyFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'PropertyUnion' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'InlineFragment',
-            typeCondition: {
-              kind: 'NamedType',
-              name: { kind: 'Name', value: 'TextProperty' },
-            },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'FragmentSpread',
-                  name: { kind: 'Name', value: 'TextPropertyFields' },
-                },
-              ],
-            },
-          },
-          {
-            kind: 'InlineFragment',
-            typeCondition: {
-              kind: 'NamedType',
-              name: { kind: 'Name', value: 'OptionProperty' },
-            },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'FragmentSpread',
-                  name: { kind: 'Name', value: 'OptionPropertyFields' },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'TextPropertyFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'TextProperty' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'type' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'partOfSpeech' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'languageId' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'addedAt' } },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'OptionPropertyFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'OptionProperty' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'type' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'partOfSpeech' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'languageId' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'addedAt' } },
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'options' },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'value' } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<PropertyFieldsFragment, unknown>;
-export const CreateLanguageDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'mutation',
-      name: { kind: 'Name', value: 'CreateLanguage' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: {
-            kind: 'Variable',
-            name: { kind: 'Name', value: 'input' },
-          },
-          type: {
-            kind: 'NonNullType',
-            type: {
-              kind: 'NamedType',
-              name: { kind: 'Name', value: 'CreateLanguageInput' },
-            },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'createLanguage' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'input' },
-                value: {
-                  kind: 'Variable',
-                  name: { kind: 'Name', value: 'input' },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'FragmentSpread',
-                  name: { kind: 'Name', value: 'LanguageFields' },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'LanguageFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'Language' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'addedAt' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<
-  CreateLanguageMutation,
-  CreateLanguageMutationVariables
->;
-export const UpdateLanguageDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'mutation',
-      name: { kind: 'Name', value: 'UpdateLanguage' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: {
-            kind: 'Variable',
-            name: { kind: 'Name', value: 'input' },
-          },
-          type: {
-            kind: 'NonNullType',
-            type: {
-              kind: 'NamedType',
-              name: { kind: 'Name', value: 'UpdateLanguageInput' },
-            },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'updateLanguage' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'input' },
-                value: {
-                  kind: 'Variable',
-                  name: { kind: 'Name', value: 'input' },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<
-  UpdateLanguageMutation,
-  UpdateLanguageMutationVariables
->;
-export const DeleteLanguageDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'mutation',
-      name: { kind: 'Name', value: 'DeleteLanguage' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'deleteLanguage' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'id' },
-                value: {
-                  kind: 'Variable',
-                  name: { kind: 'Name', value: 'id' },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<
-  DeleteLanguageMutation,
-  DeleteLanguageMutationVariables
->;
-export const CreatePropertyDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'mutation',
-      name: { kind: 'Name', value: 'CreateProperty' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: {
-            kind: 'Variable',
-            name: { kind: 'Name', value: 'input' },
-          },
-          type: {
-            kind: 'NonNullType',
-            type: {
-              kind: 'NamedType',
-              name: { kind: 'Name', value: 'CreatePropertyInput' },
-            },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'createProperty' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'input' },
-                value: {
-                  kind: 'Variable',
-                  name: { kind: 'Name', value: 'input' },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'FragmentSpread',
-                  name: { kind: 'Name', value: 'PropertyFields' },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'TextPropertyFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'TextProperty' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'type' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'partOfSpeech' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'languageId' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'addedAt' } },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'OptionPropertyFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'OptionProperty' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'type' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'partOfSpeech' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'languageId' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'addedAt' } },
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'options' },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'value' } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'PropertyFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'PropertyUnion' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'InlineFragment',
-            typeCondition: {
-              kind: 'NamedType',
-              name: { kind: 'Name', value: 'TextProperty' },
-            },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'FragmentSpread',
-                  name: { kind: 'Name', value: 'TextPropertyFields' },
-                },
-              ],
-            },
-          },
-          {
-            kind: 'InlineFragment',
-            typeCondition: {
-              kind: 'NamedType',
-              name: { kind: 'Name', value: 'OptionProperty' },
-            },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'FragmentSpread',
-                  name: { kind: 'Name', value: 'OptionPropertyFields' },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<
-  CreatePropertyMutation,
-  CreatePropertyMutationVariables
->;
-export const UpdatePropertyDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'mutation',
-      name: { kind: 'Name', value: 'UpdateProperty' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: {
-            kind: 'Variable',
-            name: { kind: 'Name', value: 'input' },
-          },
-          type: {
-            kind: 'NonNullType',
-            type: {
-              kind: 'NamedType',
-              name: { kind: 'Name', value: 'UpdatePropertyInput' },
-            },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'updateProperty' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'input' },
-                value: {
-                  kind: 'Variable',
-                  name: { kind: 'Name', value: 'input' },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'FragmentSpread',
-                  name: { kind: 'Name', value: 'PropertyFields' },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'TextPropertyFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'TextProperty' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'type' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'partOfSpeech' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'languageId' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'addedAt' } },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'OptionPropertyFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'OptionProperty' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'type' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'partOfSpeech' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'languageId' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'addedAt' } },
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'options' },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'value' } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'PropertyFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'PropertyUnion' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'InlineFragment',
-            typeCondition: {
-              kind: 'NamedType',
-              name: { kind: 'Name', value: 'TextProperty' },
-            },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'FragmentSpread',
-                  name: { kind: 'Name', value: 'TextPropertyFields' },
-                },
-              ],
-            },
-          },
-          {
-            kind: 'InlineFragment',
-            typeCondition: {
-              kind: 'NamedType',
-              name: { kind: 'Name', value: 'OptionProperty' },
-            },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'FragmentSpread',
-                  name: { kind: 'Name', value: 'OptionPropertyFields' },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<
-  UpdatePropertyMutation,
-  UpdatePropertyMutationVariables
->;
-export const DeletePropertyDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'mutation',
-      name: { kind: 'Name', value: 'DeleteProperty' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'deleteProperty' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'id' },
-                value: {
-                  kind: 'Variable',
-                  name: { kind: 'Name', value: 'id' },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'InlineFragment',
-                  typeCondition: {
-                    kind: 'NamedType',
-                    name: { kind: 'Name', value: 'TextProperty' },
-                  },
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'languageId' },
-                      },
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'partOfSpeech' },
-                      },
-                    ],
-                  },
-                },
-                {
-                  kind: 'InlineFragment',
-                  typeCondition: {
-                    kind: 'NamedType',
-                    name: { kind: 'Name', value: 'OptionProperty' },
-                  },
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'languageId' },
-                      },
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'partOfSpeech' },
-                      },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<
-  DeletePropertyMutation,
-  DeletePropertyMutationVariables
->;
-export const ReorderPropertiesDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'mutation',
-      name: { kind: 'Name', value: 'ReorderProperties' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: {
-            kind: 'Variable',
-            name: { kind: 'Name', value: 'input' },
-          },
-          type: {
-            kind: 'NonNullType',
-            type: {
-              kind: 'NamedType',
-              name: { kind: 'Name', value: 'ReorderPropertiesInput' },
-            },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'reorderProperties' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'input' },
-                value: {
-                  kind: 'Variable',
-                  name: { kind: 'Name', value: 'input' },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'InlineFragment',
-                  typeCondition: {
-                    kind: 'NamedType',
-                    name: { kind: 'Name', value: 'TextProperty' },
-                  },
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                    ],
-                  },
-                },
-                {
-                  kind: 'InlineFragment',
-                  typeCondition: {
-                    kind: 'NamedType',
-                    name: { kind: 'Name', value: 'OptionProperty' },
-                  },
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<
-  ReorderPropertiesMutation,
-  ReorderPropertiesMutationVariables
->;
-export const CreateWordDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'mutation',
-      name: { kind: 'Name', value: 'CreateWord' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: {
-            kind: 'Variable',
-            name: { kind: 'Name', value: 'input' },
-          },
-          type: {
-            kind: 'NonNullType',
-            type: {
-              kind: 'NamedType',
-              name: { kind: 'Name', value: 'CreateWordInput' },
-            },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'createWord' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'input' },
-                value: {
-                  kind: 'Variable',
-                  name: { kind: 'Name', value: 'input' },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'FragmentSpread',
-                  name: { kind: 'Name', value: 'WordFieldsFull' },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'WordFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'Word' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'original' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'translation' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'partOfSpeech' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'addedAt' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'languageId' } },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'TextPropertyValueFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'TextPropertyValue' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'property' },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-              ],
-            },
-          },
-          { kind: 'Field', name: { kind: 'Name', value: 'text' } },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'OptionPropertyValueFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'OptionPropertyValue' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'property' },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-              ],
-            },
-          },
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'option' },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'value' } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'PropertyValueFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'PropertyValueUnion' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'InlineFragment',
-            typeCondition: {
-              kind: 'NamedType',
-              name: { kind: 'Name', value: 'TextPropertyValue' },
-            },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'FragmentSpread',
-                  name: { kind: 'Name', value: 'TextPropertyValueFields' },
-                },
-              ],
-            },
-          },
-          {
-            kind: 'InlineFragment',
-            typeCondition: {
-              kind: 'NamedType',
-              name: { kind: 'Name', value: 'OptionPropertyValue' },
-            },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'FragmentSpread',
-                  name: { kind: 'Name', value: 'OptionPropertyValueFields' },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'WordFieldsFull' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'Word' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'FragmentSpread',
-            name: { kind: 'Name', value: 'WordFields' },
-          },
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'properties' },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'InlineFragment',
-                  typeCondition: {
-                    kind: 'NamedType',
-                    name: { kind: 'Name', value: 'PropertyValueUnion' },
-                  },
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      {
-                        kind: 'FragmentSpread',
-                        name: { kind: 'Name', value: 'PropertyValueFields' },
-                      },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<CreateWordMutation, CreateWordMutationVariables>;
-export const UpdateWordDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'mutation',
-      name: { kind: 'Name', value: 'UpdateWord' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: {
-            kind: 'Variable',
-            name: { kind: 'Name', value: 'input' },
-          },
-          type: {
-            kind: 'NonNullType',
-            type: {
-              kind: 'NamedType',
-              name: { kind: 'Name', value: 'UpdateWordInput' },
-            },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'updateWord' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'input' },
-                value: {
-                  kind: 'Variable',
-                  name: { kind: 'Name', value: 'input' },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'FragmentSpread',
-                  name: { kind: 'Name', value: 'WordFieldsFull' },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'WordFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'Word' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'original' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'translation' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'partOfSpeech' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'addedAt' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'languageId' } },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'TextPropertyValueFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'TextPropertyValue' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'property' },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-              ],
-            },
-          },
-          { kind: 'Field', name: { kind: 'Name', value: 'text' } },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'OptionPropertyValueFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'OptionPropertyValue' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'property' },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-              ],
-            },
-          },
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'option' },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'value' } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'PropertyValueFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'PropertyValueUnion' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'InlineFragment',
-            typeCondition: {
-              kind: 'NamedType',
-              name: { kind: 'Name', value: 'TextPropertyValue' },
-            },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'FragmentSpread',
-                  name: { kind: 'Name', value: 'TextPropertyValueFields' },
-                },
-              ],
-            },
-          },
-          {
-            kind: 'InlineFragment',
-            typeCondition: {
-              kind: 'NamedType',
-              name: { kind: 'Name', value: 'OptionPropertyValue' },
-            },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'FragmentSpread',
-                  name: { kind: 'Name', value: 'OptionPropertyValueFields' },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'WordFieldsFull' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'Word' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'FragmentSpread',
-            name: { kind: 'Name', value: 'WordFields' },
-          },
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'properties' },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'InlineFragment',
-                  typeCondition: {
-                    kind: 'NamedType',
-                    name: { kind: 'Name', value: 'PropertyValueUnion' },
-                  },
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      {
-                        kind: 'FragmentSpread',
-                        name: { kind: 'Name', value: 'PropertyValueFields' },
-                      },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<UpdateWordMutation, UpdateWordMutationVariables>;
-export const DeleteWordDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'mutation',
-      name: { kind: 'Name', value: 'DeleteWord' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'deleteWord' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'id' },
-                value: {
-                  kind: 'Variable',
-                  name: { kind: 'Name', value: 'id' },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'languageId' } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<DeleteWordMutation, DeleteWordMutationVariables>;
-export const CreateTopicDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'mutation',
-      name: { kind: 'Name', value: 'CreateTopic' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: {
-            kind: 'Variable',
-            name: { kind: 'Name', value: 'input' },
-          },
-          type: {
-            kind: 'NonNullType',
-            type: {
-              kind: 'NamedType',
-              name: { kind: 'Name', value: 'CreateTopicInput' },
-            },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'createTopic' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'input' },
-                value: {
-                  kind: 'Variable',
-                  name: { kind: 'Name', value: 'input' },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<CreateTopicMutation, CreateTopicMutationVariables>;
-export const DeleteTopicDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'mutation',
-      name: { kind: 'Name', value: 'DeleteTopic' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'deleteTopic' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'id' },
-                value: {
-                  kind: 'Variable',
-                  name: { kind: 'Name', value: 'id' },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<DeleteTopicMutation, DeleteTopicMutationVariables>;
-export const GetLanguagesDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'GetLanguages' },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'languages' },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'FragmentSpread',
-                  name: { kind: 'Name', value: 'LanguageFields' },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'LanguageFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'Language' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'addedAt' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetLanguagesQuery, GetLanguagesQueryVariables>;
-export const GetWordsDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'GetWords' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: {
-            kind: 'Variable',
-            name: { kind: 'Name', value: 'languageId' },
-          },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-          },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: {
-            kind: 'Variable',
-            name: { kind: 'Name', value: 'query' },
-          },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'String' } },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: {
-            kind: 'Variable',
-            name: { kind: 'Name', value: 'partsOfSpeech' },
-          },
-          type: {
-            kind: 'ListType',
-            type: {
-              kind: 'NonNullType',
-              type: {
-                kind: 'NamedType',
-                name: { kind: 'Name', value: 'PartOfSpeech' },
-              },
-            },
-          },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: {
-            kind: 'Variable',
-            name: { kind: 'Name', value: 'topics' },
-          },
-          type: {
-            kind: 'ListType',
-            type: {
-              kind: 'NonNullType',
-              type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-            },
-          },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: {
-            kind: 'Variable',
-            name: { kind: 'Name', value: 'cursor' },
-          },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'String' } },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: {
-            kind: 'Variable',
-            name: { kind: 'Name', value: 'limit' },
-          },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: {
-            kind: 'Variable',
-            name: { kind: 'Name', value: 'order' },
-          },
-          type: {
-            kind: 'NamedType',
-            name: { kind: 'Name', value: 'WordOrder' },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'language' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'id' },
-                value: {
-                  kind: 'Variable',
-                  name: { kind: 'Name', value: 'languageId' },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'words' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'cursor' },
-                      value: {
-                        kind: 'Variable',
-                        name: { kind: 'Name', value: 'cursor' },
-                      },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: {
-                        kind: 'Variable',
-                        name: { kind: 'Name', value: 'limit' },
-                      },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'partsOfSpeech' },
-                      value: {
-                        kind: 'Variable',
-                        name: { kind: 'Name', value: 'partsOfSpeech' },
-                      },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'query' },
-                      value: {
-                        kind: 'Variable',
-                        name: { kind: 'Name', value: 'query' },
-                      },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'topics' },
-                      value: {
-                        kind: 'Variable',
-                        name: { kind: 'Name', value: 'topics' },
-                      },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'order' },
-                      value: {
-                        kind: 'Variable',
-                        name: { kind: 'Name', value: 'order' },
-                      },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'items' },
-                        selectionSet: {
-                          kind: 'SelectionSet',
-                          selections: [
-                            {
-                              kind: 'FragmentSpread',
-                              name: { kind: 'Name', value: 'WordFields' },
-                            },
-                          ],
-                        },
-                      },
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'nextCursor' },
-                      },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'WordFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'Word' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'original' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'translation' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'partOfSpeech' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'addedAt' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'languageId' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetWordsQuery, GetWordsQueryVariables>;
-export const GetWordDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'GetWord' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'word' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'id' },
-                value: {
-                  kind: 'Variable',
-                  name: { kind: 'Name', value: 'id' },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'FragmentSpread',
-                  name: { kind: 'Name', value: 'WordFieldsFull' },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'WordFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'Word' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'original' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'translation' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'partOfSpeech' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'addedAt' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'languageId' } },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'TextPropertyValueFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'TextPropertyValue' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'property' },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-              ],
-            },
-          },
-          { kind: 'Field', name: { kind: 'Name', value: 'text' } },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'OptionPropertyValueFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'OptionPropertyValue' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'property' },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-              ],
-            },
-          },
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'option' },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'value' } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'PropertyValueFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'PropertyValueUnion' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'InlineFragment',
-            typeCondition: {
-              kind: 'NamedType',
-              name: { kind: 'Name', value: 'TextPropertyValue' },
-            },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'FragmentSpread',
-                  name: { kind: 'Name', value: 'TextPropertyValueFields' },
-                },
-              ],
-            },
-          },
-          {
-            kind: 'InlineFragment',
-            typeCondition: {
-              kind: 'NamedType',
-              name: { kind: 'Name', value: 'OptionPropertyValue' },
-            },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'FragmentSpread',
-                  name: { kind: 'Name', value: 'OptionPropertyValueFields' },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'WordFieldsFull' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'Word' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'FragmentSpread',
-            name: { kind: 'Name', value: 'WordFields' },
-          },
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'properties' },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'InlineFragment',
-                  typeCondition: {
-                    kind: 'NamedType',
-                    name: { kind: 'Name', value: 'PropertyValueUnion' },
-                  },
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      {
-                        kind: 'FragmentSpread',
-                        name: { kind: 'Name', value: 'PropertyValueFields' },
-                      },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetWordQuery, GetWordQueryVariables>;
-export const GetPropertiesDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'GetProperties' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: {
-            kind: 'Variable',
-            name: { kind: 'Name', value: 'languageId' },
-          },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-          },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: {
-            kind: 'Variable',
-            name: { kind: 'Name', value: 'partOfSpeech' },
-          },
-          type: {
-            kind: 'NamedType',
-            name: { kind: 'Name', value: 'PartOfSpeech' },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'language' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'id' },
-                value: {
-                  kind: 'Variable',
-                  name: { kind: 'Name', value: 'languageId' },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'properties' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'partOfSpeech' },
-                      value: {
-                        kind: 'Variable',
-                        name: { kind: 'Name', value: 'partOfSpeech' },
-                      },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      {
-                        kind: 'InlineFragment',
-                        typeCondition: {
-                          kind: 'NamedType',
-                          name: { kind: 'Name', value: 'TextProperty' },
-                        },
-                        selectionSet: {
-                          kind: 'SelectionSet',
-                          selections: [
-                            {
-                              kind: 'FragmentSpread',
-                              name: {
-                                kind: 'Name',
-                                value: 'TextPropertyFields',
-                              },
-                            },
-                          ],
-                        },
-                      },
-                      {
-                        kind: 'InlineFragment',
-                        typeCondition: {
-                          kind: 'NamedType',
-                          name: { kind: 'Name', value: 'OptionProperty' },
-                        },
-                        selectionSet: {
-                          kind: 'SelectionSet',
-                          selections: [
-                            {
-                              kind: 'FragmentSpread',
-                              name: {
-                                kind: 'Name',
-                                value: 'OptionPropertyFields',
-                              },
-                            },
-                          ],
-                        },
-                      },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'TextPropertyFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'TextProperty' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'type' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'partOfSpeech' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'languageId' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'addedAt' } },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'OptionPropertyFields' },
-      typeCondition: {
-        kind: 'NamedType',
-        name: { kind: 'Name', value: 'OptionProperty' },
-      },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'type' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'partOfSpeech' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'languageId' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'addedAt' } },
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'options' },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'value' } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetPropertiesQuery, GetPropertiesQueryVariables>;
-export const GetTopicsDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'GetTopics' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: {
-            kind: 'Variable',
-            name: { kind: 'Name', value: 'languageId' },
-          },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-          },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: {
-            kind: 'Variable',
-            name: { kind: 'Name', value: 'cursor' },
-          },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'String' } },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: {
-            kind: 'Variable',
-            name: { kind: 'Name', value: 'limit' },
-          },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: {
-            kind: 'Variable',
-            name: { kind: 'Name', value: 'query' },
-          },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'String' } },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'language' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'id' },
-                value: {
-                  kind: 'Variable',
-                  name: { kind: 'Name', value: 'languageId' },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'topics' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'cursor' },
-                      value: {
-                        kind: 'Variable',
-                        name: { kind: 'Name', value: 'cursor' },
-                      },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: {
-                        kind: 'Variable',
-                        name: { kind: 'Name', value: 'limit' },
-                      },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'query' },
-                      value: {
-                        kind: 'Variable',
-                        name: { kind: 'Name', value: 'query' },
-                      },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'items' },
-                        selectionSet: {
-                          kind: 'SelectionSet',
-                          selections: [
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: 'id' },
-                            },
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: 'name' },
-                            },
-                          ],
-                        },
-                      },
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'nextCursor' },
-                      },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetTopicsQuery, GetTopicsQueryVariables>;
-export const GetWordsStatsDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'GetWordsStats' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: {
-            kind: 'Variable',
-            name: { kind: 'Name', value: 'languageId' },
-          },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'language' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'id' },
-                value: {
-                  kind: 'Variable',
-                  name: { kind: 'Name', value: 'languageId' },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'wordsStats' },
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'total' },
-                        selectionSet: {
-                          kind: 'SelectionSet',
-                          selections: [
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: 'words' },
-                            },
-                          ],
-                        },
-                      },
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'byDate' },
-                        selectionSet: {
-                          kind: 'SelectionSet',
-                          selections: [
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: 'from' },
-                            },
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: 'until' },
-                            },
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: 'dates' },
-                              selectionSet: {
-                                kind: 'SelectionSet',
-                                selections: [
-                                  {
-                                    kind: 'Field',
-                                    name: { kind: 'Name', value: 'date' },
-                                  },
-                                  {
-                                    kind: 'Field',
-                                    name: { kind: 'Name', value: 'words' },
-                                  },
-                                ],
-                              },
-                            },
-                          ],
-                        },
-                      },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetWordsStatsQuery, GetWordsStatsQueryVariables>;
+export type GetWordsStatsQuery = { __typename?: 'Query', language?: { __typename?: 'Language', id: string, wordsStats: { __typename?: 'WordsStats', total: { __typename?: 'WordsTotalStats', words: number }, byDate: { __typename?: 'WordsByDateStats', from: string, until: string, dates: Array<{ __typename?: 'WordsDateStats', date: string, words: number }> } } } | null };
+
+export const LanguageFieldsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"LanguageFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Language"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"addedAt"}}]}}]} as unknown as DocumentNode<LanguageFieldsFragment, unknown>;
+export const LanguageWordsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"LanguageWords"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Language"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"words"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"items"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"nextCursor"}}]}}]}}]} as unknown as DocumentNode<LanguageWordsFragment, unknown>;
+export const IPropertyFieldsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"IPropertyFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"IProperty"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"partOfSpeech"}},{"kind":"Field","name":{"kind":"Name","value":"languageId"}},{"kind":"Field","name":{"kind":"Name","value":"addedAt"}},{"kind":"Field","name":{"kind":"Name","value":"order"}}]}}]} as unknown as DocumentNode<IPropertyFieldsFragment, unknown>;
+export const TextPropertyFieldsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"TextPropertyFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"TextProperty"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"IPropertyFields"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"IPropertyFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"IProperty"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"partOfSpeech"}},{"kind":"Field","name":{"kind":"Name","value":"languageId"}},{"kind":"Field","name":{"kind":"Name","value":"addedAt"}},{"kind":"Field","name":{"kind":"Name","value":"order"}}]}}]} as unknown as DocumentNode<TextPropertyFieldsFragment, unknown>;
+export const OptionPropertyFieldsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OptionPropertyFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"OptionProperty"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"IPropertyFields"}},{"kind":"Field","name":{"kind":"Name","value":"options"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"value"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"IPropertyFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"IProperty"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"partOfSpeech"}},{"kind":"Field","name":{"kind":"Name","value":"languageId"}},{"kind":"Field","name":{"kind":"Name","value":"addedAt"}},{"kind":"Field","name":{"kind":"Name","value":"order"}}]}}]} as unknown as DocumentNode<OptionPropertyFieldsFragment, unknown>;
+export const PropertyFieldsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"PropertyFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Property"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"TextProperty"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"TextPropertyFields"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"OptionProperty"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"OptionPropertyFields"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"IPropertyFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"IProperty"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"partOfSpeech"}},{"kind":"Field","name":{"kind":"Name","value":"languageId"}},{"kind":"Field","name":{"kind":"Name","value":"addedAt"}},{"kind":"Field","name":{"kind":"Name","value":"order"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"TextPropertyFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"TextProperty"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"IPropertyFields"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OptionPropertyFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"OptionProperty"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"IPropertyFields"}},{"kind":"Field","name":{"kind":"Name","value":"options"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"value"}}]}}]}}]} as unknown as DocumentNode<PropertyFieldsFragment, unknown>;
+export const LanguagePropertiesFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"LanguageProperties"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Language"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"properties"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"partOfSpeech"},"value":{"kind":"Variable","name":{"kind":"Name","value":"partOfSpeech"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"PropertyFields"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"IPropertyFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"IProperty"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"partOfSpeech"}},{"kind":"Field","name":{"kind":"Name","value":"languageId"}},{"kind":"Field","name":{"kind":"Name","value":"addedAt"}},{"kind":"Field","name":{"kind":"Name","value":"order"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"TextPropertyFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"TextProperty"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"IPropertyFields"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OptionPropertyFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"OptionProperty"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"IPropertyFields"}},{"kind":"Field","name":{"kind":"Name","value":"options"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"value"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"PropertyFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Property"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"TextProperty"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"TextPropertyFields"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"OptionProperty"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"OptionPropertyFields"}}]}}]}}]} as unknown as DocumentNode<LanguagePropertiesFragment, unknown>;
+export const WordFieldsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"WordFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Word"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"original"}},{"kind":"Field","name":{"kind":"Name","value":"translation"}},{"kind":"Field","name":{"kind":"Name","value":"partOfSpeech"}},{"kind":"Field","name":{"kind":"Name","value":"addedAt"}},{"kind":"Field","name":{"kind":"Name","value":"languageId"}}]}}]} as unknown as DocumentNode<WordFieldsFragment, unknown>;
+export const TextPropertyValueFieldsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"TextPropertyValueFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"TextPropertyValue"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"property"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"text"}}]}}]} as unknown as DocumentNode<TextPropertyValueFieldsFragment, unknown>;
+export const OptionPropertyValueFieldsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OptionPropertyValueFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"OptionPropertyValue"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"property"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"option"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"value"}}]}}]}}]} as unknown as DocumentNode<OptionPropertyValueFieldsFragment, unknown>;
+export const WordFieldsFullFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"WordFieldsFull"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Word"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"WordFields"}},{"kind":"Field","name":{"kind":"Name","value":"properties"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"TextPropertyValue"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"TextPropertyValueFields"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"OptionPropertyValue"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"OptionPropertyValueFields"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"WordFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Word"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"original"}},{"kind":"Field","name":{"kind":"Name","value":"translation"}},{"kind":"Field","name":{"kind":"Name","value":"partOfSpeech"}},{"kind":"Field","name":{"kind":"Name","value":"addedAt"}},{"kind":"Field","name":{"kind":"Name","value":"languageId"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"TextPropertyValueFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"TextPropertyValue"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"property"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"text"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OptionPropertyValueFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"OptionPropertyValue"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"property"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"option"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"value"}}]}}]}}]} as unknown as DocumentNode<WordFieldsFullFragment, unknown>;
+export const CreateLanguageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateLanguage"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateLanguageInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createLanguage"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"LanguageFields"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"LanguageFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Language"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"addedAt"}}]}}]} as unknown as DocumentNode<CreateLanguageMutation, CreateLanguageMutationVariables>;
+export const UpdateLanguageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateLanguage"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateLanguageInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateLanguage"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<UpdateLanguageMutation, UpdateLanguageMutationVariables>;
+export const DeleteLanguageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteLanguage"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteLanguage"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<DeleteLanguageMutation, DeleteLanguageMutationVariables>;
+export const CreatePropertyDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateProperty"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreatePropertyInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createProperty"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"PropertyFields"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"IPropertyFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"IProperty"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"partOfSpeech"}},{"kind":"Field","name":{"kind":"Name","value":"languageId"}},{"kind":"Field","name":{"kind":"Name","value":"addedAt"}},{"kind":"Field","name":{"kind":"Name","value":"order"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"TextPropertyFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"TextProperty"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"IPropertyFields"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OptionPropertyFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"OptionProperty"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"IPropertyFields"}},{"kind":"Field","name":{"kind":"Name","value":"options"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"value"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"PropertyFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Property"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"TextProperty"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"TextPropertyFields"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"OptionProperty"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"OptionPropertyFields"}}]}}]}}]} as unknown as DocumentNode<CreatePropertyMutation, CreatePropertyMutationVariables>;
+export const UpdatePropertyDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateProperty"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdatePropertyInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateProperty"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"PropertyFields"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"IPropertyFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"IProperty"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"partOfSpeech"}},{"kind":"Field","name":{"kind":"Name","value":"languageId"}},{"kind":"Field","name":{"kind":"Name","value":"addedAt"}},{"kind":"Field","name":{"kind":"Name","value":"order"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"TextPropertyFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"TextProperty"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"IPropertyFields"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OptionPropertyFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"OptionProperty"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"IPropertyFields"}},{"kind":"Field","name":{"kind":"Name","value":"options"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"value"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"PropertyFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Property"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"TextProperty"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"TextPropertyFields"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"OptionProperty"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"OptionPropertyFields"}}]}}]}}]} as unknown as DocumentNode<UpdatePropertyMutation, UpdatePropertyMutationVariables>;
+export const DeletePropertyDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteProperty"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteProperty"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"IProperty"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"languageId"}},{"kind":"Field","name":{"kind":"Name","value":"partOfSpeech"}}]}}]}}]}}]} as unknown as DocumentNode<DeletePropertyMutation, DeletePropertyMutationVariables>;
+export const ReorderPropertiesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ReorderProperties"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ReorderPropertiesInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"reorderProperties"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"IProperty"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"order"}}]}}]}}]}}]} as unknown as DocumentNode<ReorderPropertiesMutation, ReorderPropertiesMutationVariables>;
+export const CreateWordDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateWord"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateWordInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createWord"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"WordFieldsFull"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"WordFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Word"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"original"}},{"kind":"Field","name":{"kind":"Name","value":"translation"}},{"kind":"Field","name":{"kind":"Name","value":"partOfSpeech"}},{"kind":"Field","name":{"kind":"Name","value":"addedAt"}},{"kind":"Field","name":{"kind":"Name","value":"languageId"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"TextPropertyValueFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"TextPropertyValue"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"property"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"text"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OptionPropertyValueFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"OptionPropertyValue"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"property"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"option"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"value"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"WordFieldsFull"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Word"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"WordFields"}},{"kind":"Field","name":{"kind":"Name","value":"properties"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"TextPropertyValue"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"TextPropertyValueFields"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"OptionPropertyValue"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"OptionPropertyValueFields"}}]}}]}}]}}]} as unknown as DocumentNode<CreateWordMutation, CreateWordMutationVariables>;
+export const UpdateWordDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateWord"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateWordInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateWord"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"WordFieldsFull"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"WordFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Word"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"original"}},{"kind":"Field","name":{"kind":"Name","value":"translation"}},{"kind":"Field","name":{"kind":"Name","value":"partOfSpeech"}},{"kind":"Field","name":{"kind":"Name","value":"addedAt"}},{"kind":"Field","name":{"kind":"Name","value":"languageId"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"TextPropertyValueFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"TextPropertyValue"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"property"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"text"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OptionPropertyValueFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"OptionPropertyValue"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"property"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"option"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"value"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"WordFieldsFull"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Word"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"WordFields"}},{"kind":"Field","name":{"kind":"Name","value":"properties"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"TextPropertyValue"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"TextPropertyValueFields"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"OptionPropertyValue"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"OptionPropertyValueFields"}}]}}]}}]}}]} as unknown as DocumentNode<UpdateWordMutation, UpdateWordMutationVariables>;
+export const DeleteWordDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteWord"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteWord"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"languageId"}}]}}]}}]} as unknown as DocumentNode<DeleteWordMutation, DeleteWordMutationVariables>;
+export const CreateTopicDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateTopic"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateTopicInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createTopic"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<CreateTopicMutation, CreateTopicMutationVariables>;
+export const DeleteTopicDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteTopic"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteTopic"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<DeleteTopicMutation, DeleteTopicMutationVariables>;
+export const GetLanguagesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetLanguages"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"languages"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"LanguageFields"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"LanguageFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Language"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"addedAt"}}]}}]} as unknown as DocumentNode<GetLanguagesQuery, GetLanguagesQueryVariables>;
+export const GetWordsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetWords"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"languageId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"query"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"partsOfSpeech"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"PartOfSpeech"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"topics"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"cursor"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"order"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"WordOrder"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"language"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"languageId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"words"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"cursor"},"value":{"kind":"Variable","name":{"kind":"Name","value":"cursor"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}},{"kind":"Argument","name":{"kind":"Name","value":"partsOfSpeech"},"value":{"kind":"Variable","name":{"kind":"Name","value":"partsOfSpeech"}}},{"kind":"Argument","name":{"kind":"Name","value":"query"},"value":{"kind":"Variable","name":{"kind":"Name","value":"query"}}},{"kind":"Argument","name":{"kind":"Name","value":"topics"},"value":{"kind":"Variable","name":{"kind":"Name","value":"topics"}}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"Variable","name":{"kind":"Name","value":"order"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"items"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"WordFields"}}]}},{"kind":"Field","name":{"kind":"Name","value":"nextCursor"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"WordFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Word"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"original"}},{"kind":"Field","name":{"kind":"Name","value":"translation"}},{"kind":"Field","name":{"kind":"Name","value":"partOfSpeech"}},{"kind":"Field","name":{"kind":"Name","value":"addedAt"}},{"kind":"Field","name":{"kind":"Name","value":"languageId"}}]}}]} as unknown as DocumentNode<GetWordsQuery, GetWordsQueryVariables>;
+export const GetWordDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetWord"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"word"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"WordFieldsFull"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"WordFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Word"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"original"}},{"kind":"Field","name":{"kind":"Name","value":"translation"}},{"kind":"Field","name":{"kind":"Name","value":"partOfSpeech"}},{"kind":"Field","name":{"kind":"Name","value":"addedAt"}},{"kind":"Field","name":{"kind":"Name","value":"languageId"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"TextPropertyValueFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"TextPropertyValue"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"property"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"text"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OptionPropertyValueFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"OptionPropertyValue"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"property"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"option"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"value"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"WordFieldsFull"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Word"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"WordFields"}},{"kind":"Field","name":{"kind":"Name","value":"properties"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"TextPropertyValue"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"TextPropertyValueFields"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"OptionPropertyValue"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"OptionPropertyValueFields"}}]}}]}}]}}]} as unknown as DocumentNode<GetWordQuery, GetWordQueryVariables>;
+export const GetPropertiesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetProperties"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"languageId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"partOfSpeech"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"PartOfSpeech"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"language"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"languageId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"properties"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"partOfSpeech"},"value":{"kind":"Variable","name":{"kind":"Name","value":"partOfSpeech"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"PropertyFields"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"IPropertyFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"IProperty"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"partOfSpeech"}},{"kind":"Field","name":{"kind":"Name","value":"languageId"}},{"kind":"Field","name":{"kind":"Name","value":"addedAt"}},{"kind":"Field","name":{"kind":"Name","value":"order"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"TextPropertyFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"TextProperty"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"IPropertyFields"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OptionPropertyFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"OptionProperty"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"IPropertyFields"}},{"kind":"Field","name":{"kind":"Name","value":"options"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"value"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"PropertyFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Property"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"TextProperty"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"TextPropertyFields"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"OptionProperty"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"OptionPropertyFields"}}]}}]}}]} as unknown as DocumentNode<GetPropertiesQuery, GetPropertiesQueryVariables>;
+export const GetTopicsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetTopics"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"languageId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"cursor"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"query"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"language"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"languageId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"topics"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"cursor"},"value":{"kind":"Variable","name":{"kind":"Name","value":"cursor"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}},{"kind":"Argument","name":{"kind":"Name","value":"query"},"value":{"kind":"Variable","name":{"kind":"Name","value":"query"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"items"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"nextCursor"}}]}}]}}]}}]} as unknown as DocumentNode<GetTopicsQuery, GetTopicsQueryVariables>;
+export const GetWordsStatsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetWordsStats"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"languageId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"language"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"languageId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"wordsStats"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"total"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"words"}}]}},{"kind":"Field","name":{"kind":"Name","value":"byDate"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"from"}},{"kind":"Field","name":{"kind":"Name","value":"until"}},{"kind":"Field","name":{"kind":"Name","value":"dates"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"words"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetWordsStatsQuery, GetWordsStatsQueryVariables>;

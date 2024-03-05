@@ -1,3 +1,12 @@
+//const SYNC_INTERVAL_S = 60;
+
+export type SwState = {
+  id: 1;
+  clientId: string;
+  syncTimestamp?: string;
+  syncCursor?: string;
+};
+
 export enum SyncStatus {
   Desynced = 'Desynced',
   Synced = 'Synced',
@@ -6,5 +15,5 @@ export enum SyncStatus {
 
 // TODO: Implement sync status
 export async function getSyncStatus(): Promise<SyncStatus> {
-  return SyncStatus.Synced;
+  return SyncStatus.Desynced;
 }

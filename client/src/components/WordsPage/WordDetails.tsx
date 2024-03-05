@@ -30,6 +30,7 @@ import { ActionBar, Action } from '../common/ActionBar';
 import { WordDetailsPosSelect } from './WordDetailsPosSelect';
 import { v1 as uuid } from 'uuid';
 import { DateTime } from 'luxon';
+import { DATETIME_FORMAT } from '../../utils/constants';
 
 const MIN_WORD_ORIGINAL_LENGTH = 1;
 const MIN_WORD_TRANSLATION_LENGTH = 1;
@@ -232,7 +233,7 @@ export const WordDetails: Component<WordDetailsProps> = (props) => {
             ...value,
             text: value.text?.trim(),
           })),
-          addedAt: DateTime.now().toSeconds(),
+          addedAt: DateTime.utc().toFormat(DATETIME_FORMAT),
         },
       },
     });

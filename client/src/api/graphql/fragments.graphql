@@ -15,12 +15,7 @@ fragment LanguageWords on Language {
 
 fragment LanguageProperties on Language {
   properties(partOfSpeech: $partOfSpeech) {
-    ... on TextProperty {
-      id
-    }
-    ... on OptionProperty {
-      id
-    }
+    ...PropertyFields
   }
 }
 
@@ -36,18 +31,12 @@ fragment WordFields on Word {
 fragment WordFieldsFull on Word {
   ...WordFields
   properties {
-    ...on PropertyValueUnion {
-      ...PropertyValueFields
+    ... on TextPropertyValue {
+      ...TextPropertyValueFields
     }
-  }
-}
-
-fragment PropertyValueFields on PropertyValueUnion {
-  ... on TextPropertyValue {
-    ...TextPropertyValueFields
-  }
-  ... on OptionPropertyValue {
-    ...OptionPropertyValueFields
+    ... on OptionPropertyValue {
+      ...OptionPropertyValueFields
+    }
   }
 }
 
@@ -68,7 +57,7 @@ fragment OptionPropertyValueFields on OptionPropertyValue {
   }
 }
 
-fragment PropertyFields on PropertyUnion {
+fragment PropertyFields on Property {
   ... on TextProperty {
     ...TextPropertyFields
   }
@@ -77,22 +66,22 @@ fragment PropertyFields on PropertyUnion {
   }
 }
 
-fragment TextPropertyFields on TextProperty {
+fragment IPropertyFields on IProperty {
   id
   name
   type
   partOfSpeech
   languageId
   addedAt
+  order
+}
+
+fragment TextPropertyFields on TextProperty {
+  ...IPropertyFields
 }
 
 fragment OptionPropertyFields on OptionProperty {
-  id
-  name
-  type
-  partOfSpeech
-  languageId
-  addedAt
+  ...IPropertyFields
   options {
     id
     value

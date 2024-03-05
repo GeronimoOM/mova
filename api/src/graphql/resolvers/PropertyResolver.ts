@@ -103,7 +103,9 @@ export class PropertyResolver {
     const updatedProperty = await this.propertyService.update({
       ...input,
       ...(input.options && {
-        options: new Map(input.options.map(({ id, value }) => [id, value])),
+        options: Object.fromEntries(
+          input.options.map(({ id, value }) => [id, value]),
+        ),
       }),
     });
     return this.propertyTypeMapper.map(updatedProperty);
@@ -113,11 +115,7 @@ export class PropertyResolver {
   async reorderProperties(
     @Args('input') input: ReorderPropertiesInput,
   ): Promise<Array<typeof PropertyUnionType>> {
-    await this.propertyService.reorder(
-      input.languageId,
-      input.partOfSpeech,
-      input.propertyIds,
-    );
+    await this.propertyService.reorder(input);
 
     const properties = await this.propertyService.getByLanguageId(
       input.languageId,

@@ -7,4 +7,7 @@ export const client = new ApolloClient({
   uri: GRAPHQL_URI,
   cache,
   connectToDevTools: true,
+  headers: {
+    // 'Sync-Client-ID': '',
+  },
 });

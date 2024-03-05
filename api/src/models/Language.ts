@@ -8,3 +8,8 @@ export interface Language {
   name: string;
   addedAt: DateTime;
 }
+
+export interface LanguageUpdate {
+  id: LanguageId;
+  name: string;
+}

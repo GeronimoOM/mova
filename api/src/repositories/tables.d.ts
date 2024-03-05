@@ -1,3 +1,4 @@
+import { ChangeId } from 'models/Change';
 import { LanguageId } from 'models/Language';
 import { PropertyId, PropertyType } from 'models/Property';
 import { TopicId } from 'models/Topic';
@@ -41,6 +42,14 @@ declare module 'knex/types/tables' {
   interface TopicWordTable {
     topic_id: TopicId;
     word_id: WordId;
+  }
+
+  interface ChangeTable {
+    id: ChangeId;
+    changed_at: string;
+    type: string;
+    client_id?: string;
+    data?: string;
   }
 
   interface Tables {

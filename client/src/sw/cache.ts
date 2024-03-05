@@ -3,13 +3,15 @@ import type {
   Language,
   LanguageFieldsFragment,
   PartOfSpeech,
+  Property,
   PropertyFieldsFragment,
-  PropertyUnion,
   WordFieldsFragment,
   WordFieldsFullFragment,
 } from '../api/types/graphql';
+import { SwState } from './sync';
 
 export class MovaDb extends Dexie {
+  state!: Dexie.Table<SwState>;
   languages!: Dexie.Table<LanguageFieldsFragment & Partial<Language>>;
   properties!: Dexie.Table<PropertyFieldsFragment>;
   words!: Dexie.Table<WordFieldsFragment | WordFieldsFullFragment>;
@@ -20,10 +22,19 @@ const DB_VERSION = 1;
 const db = new Dexie('mova') as MovaDb;
 
 db.version(DB_VERSION).stores({
+  state: 'id',
   languages: 'id,addedAt',
   properties: 'id,[languageId+partOfSpeech]',
-  words: 'id,[languageId+addedAt],[languageId+original]',
+  words: 'id,[languageId+addedAt+id],[languageId+original+id]',
 });
+
+export async function fetchState(): Promise<SwState | null> {
+  return (await db.state.get(1)) ?? null;
+}
+
+export async function saveState(state: SwState): Promise<void> {
+  await db.state.put(state);
+}
 
 export async function fetchLanguages(): Promise<LanguageFieldsFragment[]> {
   return await db.languages.orderBy('addedAt').toArray();
@@ -42,15 +53,13 @@ export async function deleteLanguages(): Promise<void> {
 export async function fetchProperties(
   languageId: string,
   partOfSpeech?: PartOfSpeech,
-): Promise<PropertyUnion[]> {
-  return partOfSpeech
-    ? db.properties.where({ languageId, partOfSpeech }).toArray()
-    : db.properties.where({ languageId }).toArray();
+): Promise<Property[]> {
+  return db.properties
+    .where(partOfSpeech ? { languageId, partOfSpeech } : { languageId })
+    .sortBy('order');
 }
 
-export async function saveProperties(
-  properties: PropertyUnion[],
-): Promise<void> {
+export async function saveProperties(properties: Property[]): Promise<void> {
   await db.properties.bulkPut(properties);
 }
 
@@ -62,10 +71,15 @@ export async function fetchWords(
   languageId: string,
   limit: number,
   before?: number,
+  beforeId?: string,
 ): Promise<WordFieldsFragment[]> {
   return await db.words
-    .where('[languageId+addedAt]')
-    .belowOrEqual([languageId, before ?? Dexie.maxKey])
+    .where('[languageId+addedAt+id]')
+    .belowOrEqual([
+      languageId,
+      before ?? Dexie.maxKey,
+      beforeId ?? Dexie.maxKey,
+    ])
     .reverse()
     .limit(limit)
     .toArray();
@@ -78,7 +92,7 @@ export async function searchWords(
   start?: number,
 ): Promise<WordFieldsFragment[]> {
   const words = db.words
-    .where('[languageId+original]')
+    .where('[languageId+original+id]')
     .aboveOrEqual([languageId, query])
     .limit(limit);
   if (start) {

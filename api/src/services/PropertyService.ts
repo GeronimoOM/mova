@@ -16,6 +16,9 @@ import { LanguageService } from './LanguageService';
 import { PartOfSpeech } from 'models/Word';
 import * as arrays from 'utils/arrays';
 import { DateTime } from 'luxon';
+import { ChangeService } from './ChangeService';
+import { ChangeBuilder } from './ChangeBuilder';
+import { copy } from 'utils/copy';
 
 export interface CreateBasePropertyParams {
   id?: PropertyId;
@@ -42,7 +45,13 @@ export type CreatePropertyParams =
 export interface UpdatePropertyParams {
   id: PropertyId;
   name?: string;
-  options?: Map<OptionId, string>;
+  options?: Record<OptionId, string>;
+}
+
+export interface ReorderPropertiesParams {
+  languageId: LanguageId;
+  partOfSpeech: PartOfSpeech;
+  propertyIds: PropertyId[];
 }
 
 @Injectable()
@@ -51,6 +60,9 @@ export class PropertyService {
     private propertyRepository: PropertyRepository,
     @Inject(forwardRef(() => LanguageService))
     private languageService: LanguageService,
+    @Inject(forwardRef(() => ChangeService))
+    private changeService: ChangeService,
+    private changeBuilder: ChangeBuilder,
   ) {}
 
   async getByLanguageId(
@@ -75,6 +87,10 @@ export class PropertyService {
     return await this.propertyRepository.getByIds(ids);
   }
 
+  async getAll(): Promise<Property[]> {
+    return await this.propertyRepository.getAll();
+  }
+
   async create(params: CreatePropertyParams): Promise<Property> {
     await this.languageService.getById(params.languageId);
 
@@ -90,7 +106,7 @@ export class PropertyService {
       type: params.type,
       languageId: params.languageId,
       partOfSpeech: params.partOfSpeech,
-      addedAt: params.addedAt ?? DateTime.now(),
+      addedAt: params.addedAt ?? DateTime.utc(),
       order,
     };
 
@@ -106,45 +122,59 @@ export class PropertyService {
         }
         property = {
           ...baseProperty,
-          options: new Map(options.map((option) => [uuid(), option])),
+          options: Object.fromEntries(
+            options.map((option) => [uuid(), option]),
+          ),
         } as OptionProperty;
         break;
     }
 
     await this.propertyRepository.create(property);
+    await this.changeService.create(
+      this.changeBuilder.buildCreatePropertyChange(property),
+    );
     return property;
   }
 
   async update(params: UpdatePropertyParams): Promise<Property> {
-    const property = await this.propertyRepository.getById(params.id);
-    if (!property) {
-      throw new Error('Property does not exist');
-    }
+    const property = await this.getById(params.id);
+    const currentProperty = copy(property);
 
     if (params.name) {
-      property.name = params.name;
+      property.name = params.name.trim();
     }
 
     if (isOptionProperty(property)) {
       if (params.options) {
-        for (const [optionId, optionValue] of params.options) {
-          if (!property.options.has(optionId)) {
+        for (const [optionId, optionValue] of Object.entries(params.options)) {
+          if (!property.options[optionId]) {
             throw new Error('Option does not exist');
+          } else if (!optionValue) {
+            delete property[optionId];
+          } else {
+            property.options[optionId] = optionValue;
           }
-          property.options.set(optionId, optionValue);
         }
       }
     }
 
-    await this.propertyRepository.update(property);
+    const change = this.changeBuilder.buildUpdatePropertyChange(
+      property,
+      currentProperty,
+    );
+    if (change) {
+      await this.propertyRepository.update(property);
+      await this.changeService.create(change);
+    }
+
     return property;
   }
 
-  async reorder(
-    languageId: LanguageId,
-    partOfSpeech: PartOfSpeech,
-    orderedIds: PropertyId[],
-  ): Promise<void> {
+  async reorder({
+    languageId,
+    partOfSpeech,
+    propertyIds,
+  }: ReorderPropertiesParams): Promise<void> {
     await this.languageService.getById(languageId);
 
     const properties = await this.propertyRepository.getByLanguageId(
@@ -152,17 +182,30 @@ export class PropertyService {
       partOfSpeech,
     );
     const currentOrderedIds = properties.map((property) => property.id);
-    if (arrays.diff(orderedIds, currentOrderedIds).length) {
+    if (arrays.diffItems(propertyIds, currentOrderedIds).length) {
       throw new Error('Reordered properties are not same as current');
     }
 
-    await this.propertyRepository.updateOrder(orderedIds);
+    const change = this.changeBuilder.buildReorderPropertiesChange(
+      languageId,
+      partOfSpeech,
+      propertyIds,
+      currentOrderedIds,
+    );
+
+    if (change) {
+      await this.propertyRepository.updateOrder(propertyIds);
+      await this.changeService.create(change);
+    }
   }
 
   async delete(id: PropertyId): Promise<Property> {
     const property = await this.propertyRepository.getById(id);
 
     await this.propertyRepository.delete(id);
+    await this.changeService.create(
+      this.changeBuilder.buildDeletePropertyChange(property),
+    );
     return property;
   }
 

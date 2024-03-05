@@ -4,6 +4,8 @@ import {
   OptionId,
   OptionProperty,
   Property,
+  PropertyId,
+  PropertyType,
   TextProperty,
 } from './Property';
 
@@ -34,3 +36,20 @@ export function isOptionPropertyValue(
 ): propertyValue is OptionPropertyValue {
   return isOptionProperty(propertyValue.property);
 }
+
+export interface BasePropertyValueSave {
+  propertyId: PropertyId;
+  type: PropertyType;
+}
+
+export interface TextPropertyValueSave extends BasePropertyValueSave {
+  type: PropertyType.Text;
+  text: string | null;
+}
+
+export interface OptionPropertyValueSave extends BasePropertyValueSave {
+  type: PropertyType.Option;
+  option: OptionId | null;
+}
+
+export type PropertyValueSave = TextPropertyValueSave | OptionPropertyValueSave;

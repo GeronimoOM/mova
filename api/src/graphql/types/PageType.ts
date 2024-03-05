@@ -1,11 +1,21 @@
-import { Field, ObjectType, Int, ArgsType } from '@nestjs/graphql';
+import {
+  Field,
+  ObjectType,
+  Int,
+  ArgsType,
+  registerEnumType,
+} from '@nestjs/graphql';
 import { Type } from '@nestjs/common';
-import { Page } from 'models/Page';
+import { Direction, Page } from 'models/Page';
+
+registerEnumType(Direction, {
+  name: 'Direction',
+});
 
 export function pageType<T>(
   typeName: string,
   classRef: Type<T>,
-): Type<Page<T>> {
+): Type<Page<T, string>> {
   @ObjectType(`${typeName}Page`)
   abstract class PageType {
     @Field((type) => [classRef])
@@ -15,7 +25,7 @@ export function pageType<T>(
     nextCursor?: string;
   }
 
-  return PageType as Type<Page<T>>;
+  return PageType as Type<Page<T, string>>;
 }
 
 @ArgsType()

@@ -1,11 +1,17 @@
 import { v1 as uuid } from 'uuid';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { LanguageId } from 'models/Language';
-import { mapPage, Page, PageArgs } from 'models/Page';
-import { PartOfSpeech, Word, WordId, WordOrder, WordsStats } from 'models/Word';
+import { Direction, mapPage, Page } from 'models/Page';
+import {
+  PartOfSpeech,
+  Word,
+  WordCursor,
+  WordId,
+  WordOrder,
+  WordsStats,
+} from 'models/Word';
 import {
   WordRepository,
-  WordWithoutProperties,
   GetWordPageParams as RepoGetWordPageParams,
 } from 'repositories/WordRepository';
 import {
@@ -15,7 +21,6 @@ import {
   Property,
   PropertyId,
 } from 'models/Property';
-import { PropertyValue } from 'models/PropertyValue';
 import { PropertyService } from './PropertyService';
 import { LanguageService } from './LanguageService';
 import { SearchClient, SearchWordsParams } from 'clients/SearchClient';
@@ -23,13 +28,21 @@ import { TopicService } from './TopicService';
 import { TopicId } from 'models/Topic';
 import { DateTime } from 'luxon';
 import { QUERY_MIN_LENGTH } from 'utils/constants';
+import * as records from 'utils/records';
+import { ChangeService } from './ChangeService';
+import { ChangeType } from 'models/Change';
+import { ChangeBuilder } from './ChangeBuilder';
+import { copy } from 'utils/copy';
 
-export interface GetWordPageParams extends PageArgs {
-  languageId: LanguageId;
+export interface GetWordPageParams {
+  languageId?: LanguageId;
   partsOfSpeech?: PartOfSpeech[];
   topics?: TopicId[];
   query?: string;
   order?: WordOrder;
+  direction?: Direction;
+  cursor?: WordCursor;
+  limit?: number;
   from?: DateTime;
   until?: DateTime;
 }
@@ -41,14 +54,14 @@ export interface CreateWordParams {
   languageId: LanguageId;
   partOfSpeech: PartOfSpeech;
   addedAt?: DateTime;
-  properties?: Map<PropertyId, UpdatePropertyValueParams>;
+  properties?: Record<PropertyId, UpdatePropertyValueParams>;
 }
 
 export interface UpdateWordParams {
   id: WordId;
   original?: string;
   translation?: string;
-  properties?: Map<PropertyId, UpdatePropertyValueParams>;
+  properties?: Record<PropertyId, UpdatePropertyValueParams>;
 }
 
 export interface UpdatePropertyValueParams {
@@ -59,61 +72,46 @@ export interface UpdatePropertyValueParams {
 @Injectable()
 export class WordService {
   constructor(
+    @Inject(forwardRef(() => WordRepository))
     private wordRepository: WordRepository,
     private searchClient: SearchClient,
+    @Inject(forwardRef(() => PropertyService))
     private propertyService: PropertyService,
     @Inject(forwardRef(() => TopicService))
     private topicService: TopicService,
     @Inject(forwardRef(() => LanguageService))
     private languageService: LanguageService,
+    @Inject(forwardRef(() => ChangeService))
+    private changeService: ChangeService,
+    private changeBuilder: ChangeBuilder,
   ) {}
 
   async getById(wordId: WordId): Promise<Word> {
-    const repoWord = await this.wordRepository.getById(wordId);
-    if (!repoWord) {
+    const word = await this.wordRepository.getById(wordId);
+    if (!word) {
       throw new Error('Word does not exist');
     }
 
-    const properties = await this.propertyService.getByLanguageId(
-      repoWord.languageId,
-      repoWord.partOfSpeech,
-    );
-
-    return this.withProperties(repoWord, properties);
+    return word;
   }
 
-  async getPage(params: GetWordPageParams): Promise<Page<Word>> {
-    let words: Page<WordWithoutProperties>;
+  async getPage(params: GetWordPageParams): Promise<Page<Word, WordCursor>> {
+    let words: Page<Word, WordCursor>;
 
     if (params.query && params.query.length >= QUERY_MIN_LENGTH) {
       const wordIds = await this.searchClient.searchWords(
         params as SearchWordsParams,
       );
-      const repoWords = await this.wordRepository.getByIds(wordIds.items);
-      const wordById = new Map(repoWords.map((word) => [word.id, word]));
-      words = mapPage(wordIds, (wordId) => wordById.get(wordId)!);
+      const wordsByIds = await this.wordRepository.getByIds(wordIds.items);
+      const wordById = records.byKey(wordsByIds, (word) => word.id);
+      words = mapPage(wordIds, (wordId) => wordById[wordId]);
     } else {
       words = await this.wordRepository.getPage(
         params as RepoGetWordPageParams,
       );
     }
 
-    const propertyIds = words.items.reduce<Set<PropertyId>>(
-      (propertyIds, word) => {
-        if (word.properties) {
-          for (const propertyId of word.properties.keys()) {
-            propertyIds.add(propertyId);
-          }
-        }
-        return propertyIds;
-      },
-      new Set(),
-    );
-    const properties = await this.propertyService.getByIds(
-      Array.from(propertyIds),
-    );
-
-    return mapPage(words, (word) => this.withProperties(word, properties));
+    return words;
   }
 
   async create(params: CreateWordParams): Promise<Word> {
@@ -125,7 +123,7 @@ export class WordService {
       translation: params.translation,
       languageId: params.languageId,
       partOfSpeech: params.partOfSpeech,
-      addedAt: params.addedAt ?? DateTime.now(),
+      addedAt: params.addedAt ?? DateTime.utc(),
     };
 
     if (params.properties) {
@@ -139,36 +137,42 @@ export class WordService {
 
     await this.wordRepository.create(word);
 
+    await this.changeService.create(
+      this.changeBuilder.buildCreateWordChange(word),
+    );
+
     await this.searchClient.indexWord(word);
 
     return word;
   }
 
   async update(params: UpdateWordParams): Promise<Word> {
-    const wordWithoutProperties = await this.wordRepository.getById(params.id);
-    if (!wordWithoutProperties) {
-      throw new Error('Word does not exist');
-    }
-
-    const properties = await this.propertyService.getByLanguageId(
-      wordWithoutProperties.languageId,
-      wordWithoutProperties.partOfSpeech,
-    );
-    const word = this.withProperties(wordWithoutProperties, properties);
+    const word = await this.getById(params.id);
+    const currentWord = copy(word);
 
     if (params.original) {
-      word.original = params.original;
+      word.original = params.original.trim();
     }
 
     if (params.translation) {
-      word.translation = params.translation;
+      word.translation = params.translation.trim();
     }
 
     if (params.properties) {
+      const properties = await this.propertyService.getByLanguageId(
+        word.languageId,
+        word.partOfSpeech,
+      );
+
       this.setPropertyValues(word, properties, params.properties);
     }
 
-    await this.wordRepository.update(word);
+    const change = this.changeBuilder.buildUpdateWordChange(word, currentWord);
+
+    if (change) {
+      await this.wordRepository.update(word);
+      await this.changeService.create(change);
+    }
 
     await this.searchClient.indexWord(word);
 
@@ -176,9 +180,16 @@ export class WordService {
   }
 
   async delete(id: WordId): Promise<Word> {
-    const word = this.getById(id);
+    const word = await this.getById(id);
 
     await this.wordRepository.delete(id);
+
+    await this.changeService.create({
+      id: word.id,
+      type: ChangeType.DeleteWord,
+      changedAt: DateTime.utc(),
+      deleted: word.id,
+    });
 
     await this.searchClient.deleteWord(id);
 
@@ -196,16 +207,14 @@ export class WordService {
   async indexLanguage(languageId: LanguageId): Promise<void> {
     await this.searchClient.deleteLanguageWords(languageId);
 
-    const properties = await this.propertyService.getByLanguageId(languageId);
-
     for await (const wordsBatch of this.wordRepository.getBatches(languageId)) {
       const topicsByWords = await this.topicService.getForWords(
         wordsBatch.map((word) => word.id),
       );
 
       const words = wordsBatch.map((word) => ({
-        ...this.withProperties(word, properties),
-        topics: topicsByWords.get(word.id),
+        ...word,
+        topics: topicsByWords[word.id],
       }));
 
       await this.searchClient.indexWords(words);
@@ -217,13 +226,17 @@ export class WordService {
     await this.searchClient.deleteLanguageWords(languageId);
   }
 
+  async getCount(languageId: LanguageId): Promise<number> {
+    return await this.wordRepository.getCount(languageId);
+  }
+
   async getStats(
     languageId: LanguageId,
-    days: number = DateTime.now().diff(
-      DateTime.now().minus({ months: 3 }),
+    days: number = DateTime.utc().diff(
+      DateTime.utc().minus({ months: 3 }),
       'days',
     ).days,
-    from: DateTime = DateTime.now().minus({ days }).plus({ day: 1 }),
+    from: DateTime = DateTime.utc().minus({ days }).plus({ day: 1 }),
   ): Promise<WordsStats> {
     const until = from.plus({ days });
     const [count, dates] = await Promise.all([
@@ -246,11 +259,11 @@ export class WordService {
   private setPropertyValues(
     word: Word,
     properties: Property[],
-    propertyValues: Map<PropertyId, UpdatePropertyValueParams>,
-  ) {
-    word.properties = word.properties ?? new Map();
+    propertyValues: Record<PropertyId, UpdatePropertyValueParams>,
+  ): void {
+    word.properties = word.properties ?? {};
 
-    for (const [propertyId, propertyValue] of propertyValues) {
+    for (const [propertyId, propertyValue] of Object.entries(propertyValues)) {
       const property = properties.find(
         (property) => property.id === propertyId,
       );
@@ -259,57 +272,30 @@ export class WordService {
       }
 
       if (isTextProperty(property)) {
-        if (!propertyValue.text || !propertyValue.text.length) {
-          word.properties.delete(propertyId);
+        if (!propertyValue.text) {
+          delete word.properties[propertyId];
         } else {
-          word.properties.set(propertyId, {
+          word.properties[propertyId] = {
             property,
-            text: propertyValue.text,
-          });
+            text: propertyValue.text.trim(),
+          };
         }
       } else if (isOptionProperty(property)) {
-        if (!propertyValue.option || !propertyValue.option.length) {
-          word.properties.delete(propertyId);
-        } else if (!property.options.has(propertyValue.option)) {
+        if (!propertyValue.option) {
+          delete word.properties[propertyId];
+        } else if (!property.options[propertyValue.option]) {
           throw new Error('Options is not valid for property');
         } else {
-          word.properties.set(propertyId, {
+          word.properties[propertyId] = {
             property,
             option: propertyValue.option,
-          });
+          };
         }
       }
     }
 
-    if (!word.properties.size) {
+    if (!Object.keys(word.properties).length) {
       delete word.properties;
     }
-  }
-
-  private withProperties(
-    word: WordWithoutProperties,
-    properties: Property[],
-  ): Word {
-    if (!word.properties) {
-      return word as Word;
-    }
-
-    const propertyValues = new Map<PropertyId, PropertyValue>();
-    for (const property of properties) {
-      const propertyValue = word.properties.get(property.id);
-      if (!propertyValue) {
-        continue;
-      }
-
-      propertyValues.set(property.id, {
-        property,
-        ...propertyValue,
-      } as PropertyValue);
-    }
-
-    return {
-      ...word,
-      properties: propertyValues.size ? propertyValues : undefined,
-    };
   }
 }

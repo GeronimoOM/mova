@@ -1,5 +1,4 @@
 import { Component } from 'solid-js';
-import { LanguageProvider } from './LanguageContext';
 import { Main } from './Main';
 import { NavBar } from './NavBar/NavBar';
 
@@ -13,12 +12,10 @@ window.addEventListener('online', () => {
 
 const App: Component = () => {
   return (
-    <LanguageProvider>
-      <div class="flex h-full w-full flex-row justify-center">
-        <NavBar />
-        <Main />
-      </div>
-    </LanguageProvider>
+    <div class="flex h-full w-full flex-row justify-center">
+      <NavBar />
+      <Main />
+    </div>
   );
 };
 

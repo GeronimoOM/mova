@@ -41,12 +41,7 @@ query GetProperties($languageId: ID!, $partOfSpeech: PartOfSpeech) {
   language(id: $languageId) {
     id
     properties(partOfSpeech: $partOfSpeech) {
-      ... on TextProperty {
-        ...TextPropertyFields
-      }
-      ... on OptionProperty {
-        ...OptionPropertyFields
-      }
+      ...PropertyFields
     }
   }
 }

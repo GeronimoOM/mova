@@ -24,6 +24,42 @@ const languageTypePolicy: TypePolicy = {
 };
 
 export const cache = new InMemoryCache({
+  typePolicies: {
+    Language: languageTypePolicy,
+  },
+  possibleTypes: {
+    IProperty: ['TextProperty', 'OptionProperty'],
+    Property: ['TextProperty', 'OptionProperty'],
+    IPropertyUpdate: ['TextPropertyUpdate', 'OptionPropertyUpdate'],
+    PropertyUpdate: ['TextPropertyUpdate', 'OptionPropertyUpdate'],
+    PropertyValue: ['TextPropertyValue', 'OptionPropertyValue'],
+    IPropertyValueSave: ['TextPropertyValueSave', 'OptionPropertyValueSave'],
+    PropertyValueSave: ['TextPropertyValueSave', 'OptionPropertyValueSave'],
+    IChange: [
+      'CreateLanguageChange',
+      'UpdateLanguageChange',
+      'DeleteLanguageChange',
+      'CreatePropertyChange',
+      'UpdatePropertyChange',
+      'ReorderPropertiesChange',
+      'DeletePropertyChange',
+      'CreateWordChange',
+      'UpdateWordChange',
+      'DeleteWordChange',
+    ],
+    Change: [
+      'CreateLanguageChange',
+      'UpdateLanguageChange',
+      'DeleteLanguageChange',
+      'CreatePropertyChange',
+      'UpdatePropertyChange',
+      'ReorderPropertiesChange',
+      'DeletePropertyChange',
+      'CreateWordChange',
+      'UpdateWordChange',
+      'DeleteWordChange',
+    ],
+  },
   dataIdFromObject: (obj, context) => {
     if (
       context.typename === 'TextProperty' ||
@@ -32,8 +68,5 @@ export const cache = new InMemoryCache({
       return `Property:${obj.id}`;
     }
     return obj.id ? `${context.typename}:${obj.id}` : false;
-  },
-  typePolicies: {
-    Language: languageTypePolicy,
   },
 });

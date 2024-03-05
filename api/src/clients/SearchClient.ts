@@ -1,6 +1,6 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { LanguageId } from 'models/Language';
-import { Page, PageArgs, StartCursor, emptyPage } from 'models/Page';
+import { Page, StartCursor, emptyPage } from 'models/Page';
 import { isTextPropertyValue, TextPropertyValue } from 'models/PropertyValue';
 import { Topic, TopicId } from 'models/Topic';
 import { PartOfSpeech, Word, WordId } from 'models/Word';
@@ -16,7 +16,6 @@ import {
   QueryDslQueryContainer,
   SearchResponse,
 } from '@elastic/elasticsearch/lib/api/types';
-import { decodeCursor, encodeCursor } from 'utils/cursors';
 
 export type WordDocument = Omit<Word, 'addedAt' | 'properties' | 'topics'> & {
   properties?: string[];
@@ -25,16 +24,20 @@ export type WordDocument = Omit<Word, 'addedAt' | 'properties' | 'topics'> & {
 
 export type TopicDocument = Topic;
 
-export interface SearchWordsParams extends PageArgs {
+export interface SearchWordsParams {
   languageId: LanguageId;
   query: string;
   partsOfSpeech?: PartOfSpeech[];
   topics?: TopicId[];
+  cursor?: StartCursor;
+  limit?: number;
 }
 
-export interface SearchTopicsParams extends Required<PageArgs> {
+export interface SearchTopicsParams {
   languageId: LanguageId;
   query: string;
+  cursor?: StartCursor;
+  limit?: number;
 }
 
 @Injectable()
@@ -48,15 +51,13 @@ export class SearchClient implements OnApplicationBootstrap {
     topics,
     cursor,
     limit,
-  }: SearchWordsParams): Promise<Page<WordId>> {
+  }: SearchWordsParams): Promise<Page<WordId, StartCursor>> {
     const indexExists = await this.indexExists(INDEX_WORDS);
     if (!indexExists) {
       return emptyPage();
     }
 
-    const decodedCursor = cursor ? decodeCursor(cursor, StartCursor) : null;
-    const { start = 0 } = decodedCursor ?? {};
-
+    const start = cursor?.start ?? 0;
     const queryFilters: QueryDslQueryContainer[] = [{ term: { languageId } }];
 
     if (partsOfSpeech?.length) {
@@ -111,15 +112,13 @@ export class SearchClient implements OnApplicationBootstrap {
     query,
     cursor,
     limit,
-  }: SearchTopicsParams): Promise<Page<TopicId>> {
+  }: SearchTopicsParams): Promise<Page<TopicId, StartCursor>> {
     const indexExists = await this.indexExists(INDEX_TOPICS);
     if (!indexExists) {
       return emptyPage();
     }
 
-    const decodedCursor = cursor ? decodeCursor(cursor, StartCursor) : null;
-    const { start = 0 } = decodedCursor ?? {};
-
+    const start = cursor?.start ?? 0;
     const filterQuery: QueryDslQueryContainer = {
       match: {
         languageId,
@@ -286,7 +285,7 @@ export class SearchClient implements OnApplicationBootstrap {
       languageId: word.languageId,
       partOfSpeech: word.partOfSpeech,
       properties: word.properties
-        ? [...word.properties.values()]
+        ? Object.values(word.properties)
             .filter((value): value is TextPropertyValue =>
               isTextPropertyValue(value),
             )
@@ -302,11 +301,13 @@ export class SearchClient implements OnApplicationBootstrap {
     searchResponse: SearchResponse<T>,
     start: number,
     limit: number,
-  ) {
+  ): Page<string, StartCursor> {
     return {
       items: searchResponse.hits.hits.map((doc) => doc._id),
       ...((searchResponse.hits.total as number) > start + limit && {
-        nextCursor: encodeCursor<StartCursor>({ start: start + limit }),
+        nextCursor: {
+          start: start + limit,
+        },
       }),
     };
   }

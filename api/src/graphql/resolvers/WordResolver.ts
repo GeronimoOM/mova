@@ -110,11 +110,11 @@ export class WordResolver {
 
   mapPropertyValues(
     input?: UpdatePropertyValueInput[],
-  ): Map<PropertyId, UpdatePropertyValueParams> | undefined {
+  ): Record<PropertyId, UpdatePropertyValueParams> | undefined {
     if (!input) {
       return;
     }
-    return new Map(
+    return Object.fromEntries(
       input.map((propertyInput) => [
         propertyInput.id,
         this.mapPropertyValue(propertyInput),
