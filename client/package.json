@@ -19,7 +19,6 @@
     "@solid-primitives/media": "2.2.3",
     "@solidjs/router": "0.8.2",
     "@thisbeyond/solid-dnd": "0.7.4",
-    "dexie": "3.2.5",
     "luxon": "3.4.3",
     "solid-icons": "1.0.11",
     "solid-js": "1.7.8",
@@ -29,17 +28,20 @@
     "@apollo/client": "3.7.13"
   },
   "devDependencies": {
-    "@types/uuid": "9.0.8",
     "@graphql-codegen/cli": "4.0.1",
     "@graphql-codegen/client-preset": "4.0.1",
     "@graphql-typed-document-node/core": "3.2.0",
     "@types/luxon": "3.3.2",
+    "@types/uuid": "9.0.8",
     "@typescript-eslint/eslint-plugin": "6.12.0",
     "@typescript-eslint/parser": "6.12.0",
     "autoprefixer": "10.4.14",
+    "dexie": "3.2.6",
     "eslint": "8.50.0",
     "eslint-config-prettier": "9.0.0",
     "eslint-plugin-solid": "0.13.0",
+    "graphql": "16.8.1",
+    "graphql-request": "6.1.0",
     "lint-staged": "15.1.0",
     "postcss": "8.4.26",
     "prettier": "3.0.0",
@@ -50,7 +52,8 @@
     "vite-plugin-pwa": "0.17.4",
     "vite-plugin-solid": "2.7.0",
     "workbox-core": "7.0.0",
-    "workbox-precaching": "7.0.0"
+    "workbox-precaching": "7.0.0",
+    "workbox-routing": "7.0.0"
   },
   "lint-staged": {
     "**/*.{js,ts,tsx}": [

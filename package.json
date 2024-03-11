@@ -10,6 +10,7 @@
   },
   "scripts": {
     "start": "docker-compose -f docker-compose.dev.yml up",
+    "start:build": "docker-compose -f docker-compose.dev.yml up --build",
     "stop": "docker-compose -f docker-compose.dev.yml down",
     "start:prod": "docker-compose -f docker-compose.prod.yml up",
     "stop:prod": "docker-compose -f docker-compose.prod.yml down",

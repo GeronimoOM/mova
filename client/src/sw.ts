@@ -1,26 +1,28 @@
 import { clientsClaim } from 'workbox-core';
 import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching';
-import { isGraphQlRequest, handleGraphQlRequest } from './sw/graphql';
+import { registerRoute } from 'workbox-routing';
+import { matchGraphqlRequest, handleGraphQlRequest } from './sw/graphql-route';
+import { sync } from './sw/sync';
 //import { ServiceWorkerMessage, ServiceWorkerMessageType } from './sw/messages';
 
 declare let self: ServiceWorkerGlobalScope;
 
 precacheAndRoute(self.__WB_MANIFEST);
 cleanupOutdatedCaches();
+self.skipWaiting();
 clientsClaim();
 
-self.addEventListener('install', () => {
-  self.skipWaiting();
-});
-
-self.addEventListener('fetch', (event) => {
-  if (isGraphQlRequest(event.request)) {
-    event.respondWith(handleGraphQlRequest(event));
-  }
-});
+registerRoute(
+  ({ url }) => matchGraphqlRequest(url),
+  ({ event }) => handleGraphQlRequest(event as FetchEvent),
+  'POST',
+);
 
 self.addEventListener('message', (event) => {
   console.log('message', event.data);
+  if (event.data === 'sync') {
+    event.waitUntil(sync());
+  }
 });
 
 self.addEventListener('periodicsync', (e) => {
@@ -30,9 +32,3 @@ self.addEventListener('periodicsync', (e) => {
     //event.waitUntil(syncMovaData());
   }
 });
-
-// async function postMessage(message: ServiceWorkerMessage): Promise<void> {
-//   for (const client of await self.clients.matchAll()) {
-//     client.postMessage(message);
-//   }
-// }

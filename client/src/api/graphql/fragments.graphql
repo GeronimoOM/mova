@@ -87,3 +87,108 @@ fragment OptionPropertyFields on OptionProperty {
     value
   }
 }
+
+fragment ChangeFields on Change {
+  ...on IChange {
+    id
+    changedAt
+    type
+
+  }
+  ...CreateLanguageChangeFields
+  ...UpdateLanguageChangeFields
+  ...DeleteLanguageChangeFields
+
+  ...CreatePropertyChangeFields
+  ...UpdatePropertyChangeFields
+  ...ReorderPropertiesChangeFields
+  ...DeletePropertyChangeFields
+
+  ...CreateWordChangeFields
+  ...UpdateWordChangeFields
+  ...DeleteWordChangeFields
+}
+
+fragment CreateLanguageChangeFields on CreateLanguageChange {
+  createdLanguage: created {
+    id
+    name
+    addedAt
+  }
+}
+
+fragment UpdateLanguageChangeFields on UpdateLanguageChange {
+  updatedLanguage: updated {
+    id
+    name
+  }
+}
+
+fragment DeleteLanguageChangeFields on DeleteLanguageChange {
+  deletedLanguage: deleted
+}
+
+fragment CreatePropertyChangeFields on CreatePropertyChange {
+  createdProperty: created {
+    ...PropertyFields
+  }
+}
+
+fragment UpdatePropertyChangeFields on UpdatePropertyChange {
+  updatedProperty: updated {
+    ...on IPropertyUpdate {
+      id
+      name
+    }
+  }
+}
+
+fragment ReorderPropertiesChangeFields on ReorderPropertiesChange {
+  reorderedProperties: reordered {
+    propertyIds
+  }
+}
+
+fragment DeletePropertyChangeFields on DeletePropertyChange {
+  deletedProperty: deleted
+}
+
+fragment CreateWordChangeFields on CreateWordChange {
+  createdWord: created {
+    id
+    original
+    translation
+    partOfSpeech
+    properties {
+      ...PropertyValueSaveFields
+    }
+  }
+}
+
+fragment UpdateWordChangeFields on UpdateWordChange {
+  updatedWord: updated {
+    id
+    original
+    translation
+    properties {
+      ...PropertyValueSaveFields
+    }
+  }
+}
+
+fragment DeleteWordChangeFields on DeleteWordChange {
+  deletedWord: deleted
+}
+
+fragment PropertyValueSaveFields on PropertyValueSave {
+  ...on IPropertyValueSave {
+    propertyId
+    type
+  }
+  ...on TextPropertyValueSave {
+    text
+  }
+  ...on OptionPropertyValueSave {
+    optionId
+  }
+}

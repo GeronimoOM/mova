@@ -6,7 +6,7 @@ import { PropertyService } from './PropertyService';
 import { WordService } from './WordService';
 import { LanguageService } from './LanguageService';
 import { ChronologicalCursor, WordOrder } from 'models/Word';
-import { Direction } from 'models/Page';
+import { Direction, mapCursor, mapPage } from 'models/Page';
 import { ChangeBuilder } from './ChangeBuilder';
 
 const DEFAULT_LIMIT = 100;
@@ -76,18 +76,17 @@ export class ChangeService {
         : null,
       limit: params.limit,
     });
-    const nextCursor = wordsPage.nextCursor as ChronologicalCursor;
 
     const changes: ChangePage = {
-      items: wordsPage.items.map((word) =>
-        this.changeBuilder.buildCreateWordChange(word),
+      ...mapCursor(
+        mapPage(wordsPage, (word) =>
+          this.changeBuilder.buildCreateWordChange(word),
+        ),
+        (cursor: ChronologicalCursor) => ({
+          changedAt: cursor.addedAt,
+          id: cursor.id,
+        }),
       ),
-      ...(nextCursor && {
-        nextCursor: {
-          changedAt: nextCursor.addedAt,
-          id: nextCursor.id,
-        },
-      }),
       syncType: SyncType.Full,
     };
 

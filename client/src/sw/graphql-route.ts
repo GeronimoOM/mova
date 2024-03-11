@@ -42,8 +42,8 @@ enum GraphQlMutation {
   DeleteWord = 'DeleteWord',
 }
 
-export function isGraphQlRequest(request: Request): boolean {
-  return new URL(request.url).pathname === '/api/graphql';
+export function matchGraphqlRequest(url: URL): boolean {
+  return url.pathname === '/api/graphql';
 }
 
 export async function handleGraphQlRequest(
@@ -86,33 +86,35 @@ async function handleGraphQlQuery(
   event: FetchEvent,
   request: GraphQlRequest,
 ): Promise<Response> {
-  const policy = getGraphQlQueryPolicy(request);
+  let policy = getGraphQlQueryPolicy(request);
   const syncStatus = await getSyncStatus();
-
-  if (policy === GraphQlQueryPolicy.NetworkFirst) {
-    return handleGraphQlQueryNetworkFirst(event, syncStatus, request);
+  if (syncStatus === SyncStatus.Empty) {
+    policy = GraphQlQueryPolicy.NetworkOnly;
   } else if (
-    policy === GraphQlQueryPolicy.CacheFirst &&
-    syncStatus === SyncStatus.Synced
+    syncStatus === SyncStatus.Stale &&
+    policy === GraphQlQueryPolicy.CacheFirst
   ) {
-    return handleGraphQlQueryCacheFirst(event, request);
-  } else {
-    return handleGraphQlQueryNetworkOnly(event, request);
+    policy = GraphQlQueryPolicy.NetworkFirst;
+  }
+
+  switch (policy) {
+    case GraphQlQueryPolicy.NetworkFirst:
+      return handleGraphQlQueryNetworkFirst(event, request);
+    case GraphQlQueryPolicy.CacheFirst:
+      return handleGraphQlQueryCacheFirst(event, request);
+    case GraphQlQueryPolicy.NetworkOnly:
+      return handleGraphQlQueryNetworkOnly(event, request);
   }
 }
 
 async function handleGraphQlQueryNetworkFirst(
   event: FetchEvent,
-  syncStatus: SyncStatus,
   request: GraphQlRequest,
 ): Promise<Response> {
   try {
     return await tryFetch(event, request);
   } catch (error) {
-    if (syncStatus === SyncStatus.Synced) {
-      return handleGraphQlQueryFromCache(request);
-    }
-    throw error;
+    return handleGraphQlQueryFromCache(request);
   }
 }
 

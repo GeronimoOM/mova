@@ -25,7 +25,7 @@ export function emptyPage<T, C>(): Page<T, C> {
 export function toPage<T, C>(
   items: T[],
   limit: number,
-  toNextCursor: (item: T) => C,
+  toCursor: (item: T) => C,
 ): Page<T, C> {
   let hasMore = false;
   if (items.length > limit) {
@@ -36,7 +36,7 @@ export function toPage<T, C>(
   return {
     items,
     ...(hasMore && {
-      nextCursor: toNextCursor(items[items.length - 1]),
+      nextCursor: toCursor(items[items.length - 1]),
     }),
   };
 }
@@ -46,9 +46,19 @@ export function mapPage<T, S, C>(
   mapping: (item: T) => S,
 ): Page<S, C> {
   return {
+    ...page,
     items: page.items.map(mapping),
+  };
+}
+
+export function mapCursor<T, C, K>(
+  page: Page<T, C>,
+  mapping: (cursor: C) => K,
+): Page<T, K> {
+  return {
+    ...page,
     ...(page.nextCursor && {
-      nextCursor: page.nextCursor,
+      nextCursor: mapping(page.nextCursor),
     }),
   };
 }

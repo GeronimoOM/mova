@@ -42,12 +42,14 @@ const manifest: Partial<ManifestOptions> = {
 const pwaOptions: Partial<VitePWAOptions> = {
   manifest,
 
-  mode: 'development',
+  registerType: 'autoUpdate',
   strategies: 'injectManifest',
   srcDir: 'src',
   filename: 'sw.ts',
-  registerType: 'autoUpdate',
   injectRegister: null,
+  injectManifest: {
+    globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+  },
   devOptions: {
     enabled: true,
     type: 'module',
