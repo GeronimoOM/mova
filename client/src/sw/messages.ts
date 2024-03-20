@@ -1,12 +1,21 @@
-export type ServiceWorkerMessage = SyncingMessage | SyncingOverMessage;
+export type ServiceWorkerMessage =
+  | InitMessage
+  | SyncingMessage
+  | SyncingOverMessage;
 
 export interface BaseServiceWorkerMessage {
   type: ServiceWorkerMessageType;
 }
 
 export enum ServiceWorkerMessageType {
+  InitMessage = 'init',
   Syncing = 'syncing',
   SyncingOver = 'syncing_over',
+}
+
+export interface InitMessage extends BaseServiceWorkerMessage {
+  type: ServiceWorkerMessageType.InitMessage;
+  clientId: string;
 }
 
 export interface SyncingMessage extends BaseServiceWorkerMessage {

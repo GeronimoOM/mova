@@ -13,6 +13,7 @@ import {
   UpdatePropertyChange,
   UpdateWordChange,
 } from 'models/Change';
+import { Context } from 'models/Context';
 import { Language, LanguageId } from 'models/Language';
 import {
   OptionProperty,
@@ -34,16 +35,21 @@ import * as records from 'utils/records';
 
 @Injectable()
 export class ChangeBuilder {
-  buildCreateLanguageChange(language: Language): CreateLanguageChange {
+  buildCreateLanguageChange(
+    ctx: Context,
+    language: Language,
+  ): CreateLanguageChange {
     return {
       id: language.id,
       type: ChangeType.CreateLanguage,
       changedAt: language.addedAt,
       created: language,
+      clientId: ctx.clientId,
     };
   }
 
   buildUpdateLanguageChange(
+    ctx: Context,
     language: Language,
     currentLanguage: Language,
   ): UpdateLanguageChange | null {
@@ -59,28 +65,38 @@ export class ChangeBuilder {
         id: language.id,
         name: language.name,
       },
+      clientId: ctx.clientId,
     };
   }
 
-  buildDeleteLanguageChange(language: Language): DeleteLanguageChange {
+  buildDeleteLanguageChange(
+    ctx: Context,
+    language: Language,
+  ): DeleteLanguageChange {
     return {
       id: language.id,
       type: ChangeType.DeleteLanguage,
       changedAt: DateTime.utc(),
       deleted: language.id,
+      clientId: ctx.clientId,
     };
   }
 
-  buildCreatePropertyChange(property: Property): CreatePropertyChange {
+  buildCreatePropertyChange(
+    ctx: Context,
+    property: Property,
+  ): CreatePropertyChange {
     return {
       id: property.id,
       type: ChangeType.CreateProperty,
       changedAt: property.addedAt,
       created: property,
+      clientId: ctx.clientId,
     };
   }
 
   buildUpdatePropertyChange(
+    ctx: Context,
     property: Property,
     currentProperty: Property,
   ): UpdatePropertyChange | null {
@@ -105,10 +121,12 @@ export class ChangeBuilder {
         ...(property.name !== currentProperty.name && { name: property.name }),
         ...(isOptionsChange && { options: property.options }),
       },
+      clientId: ctx.clientId,
     };
   }
 
   buildReorderPropertiesChange(
+    ctx: Context,
     languageId: LanguageId,
     partOfSpeech: PartOfSpeech,
     propertyIds: PropertyId[],
@@ -131,19 +149,24 @@ export class ChangeBuilder {
         partOfSpeech,
         propertyIds,
       },
+      clientId: ctx.clientId,
     };
   }
 
-  buildDeletePropertyChange(property: Property): DeletePropertyChange {
+  buildDeletePropertyChange(
+    ctx: Context,
+    property: Property,
+  ): DeletePropertyChange {
     return {
       id: property.id,
       type: ChangeType.DeleteProperty,
       changedAt: DateTime.utc(),
       deleted: property.id,
+      clientId: ctx.clientId,
     };
   }
 
-  buildCreateWordChange(word: Word): CreateWordChange {
+  buildCreateWordChange(ctx: Context, word: Word): CreateWordChange {
     return {
       id: word.id,
       type: ChangeType.CreateWord,
@@ -156,10 +179,12 @@ export class ChangeBuilder {
           ),
         }),
       },
+      clientId: ctx.clientId,
     };
   }
 
   buildUpdateWordChange(
+    ctx: Context,
     word: Word,
     currentWord: Word,
   ): UpdateWordChange | null {
@@ -217,15 +242,17 @@ export class ChangeBuilder {
           },
         }),
       },
+      clientId: ctx.clientId,
     };
   }
 
-  buildDeleteWordChange(word: Word): DeleteWordChange {
+  buildDeleteWordChange(ctx: Context, word: Word): DeleteWordChange {
     return {
       id: word.id,
       type: ChangeType.DeleteWord,
       changedAt: DateTime.utc(),
       deleted: word.id,
+      clientId: ctx.clientId,
     };
   }
 

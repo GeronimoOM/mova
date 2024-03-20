@@ -103,7 +103,9 @@ export const PropertyListItem: Component<PropertyListItemProps> = (props) => {
   const executeDelete = () => {
     deleteProperty({
       variables: {
-        id: props.property!.id,
+        input: {
+          id: props.property!.id,
+        },
       },
     });
   };

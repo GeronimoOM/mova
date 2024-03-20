@@ -1,71 +1,21 @@
 import {
   Args,
-  Field,
   ID,
-  InputType,
   Mutation,
   Resolver,
   Query,
+  Context as ContextDec,
 } from '@nestjs/graphql';
-import { LanguageId } from 'models/Language';
-import { PartOfSpeech, WordId } from 'models/Word';
-import { WordType } from '../types/WordType';
-import { UpdatePropertyValueParams, WordService } from 'services/WordService';
+import {
+  CreateWordInput,
+  DeleteWordInput,
+  UpdateWordInput,
+  WordType,
+} from '../types/WordType';
+import { WordService } from 'services/WordService';
 import { WordTypeMapper } from '../mappers/WordTypeMapper';
-import { OptionId, PropertyId } from 'models/Property';
-import { TimestampScalar } from 'graphql/scalars/Timestamp';
-import { DateTime } from 'luxon';
-
-@InputType()
-export class CreateWordInput {
-  @Field((type) => ID, { nullable: true })
-  id?: WordId;
-
-  @Field()
-  original: string;
-
-  @Field()
-  translation: string;
-
-  @Field((type) => ID)
-  languageId: LanguageId;
-
-  @Field((type) => PartOfSpeech)
-  partOfSpeech: PartOfSpeech;
-
-  @Field((type) => TimestampScalar, { nullable: true })
-  addedAt?: DateTime;
-
-  @Field((type) => [UpdatePropertyValueInput], { nullable: true })
-  properties?: UpdatePropertyValueInput[];
-}
-
-@InputType()
-export class UpdateWordInput {
-  @Field((type) => ID)
-  id: WordId;
-
-  @Field({ nullable: true })
-  original?: string;
-
-  @Field({ nullable: true })
-  translation?: string;
-
-  @Field((type) => [UpdatePropertyValueInput], { nullable: true })
-  properties?: UpdatePropertyValueInput[];
-}
-
-@InputType()
-export class UpdatePropertyValueInput {
-  @Field((type) => ID)
-  id: PropertyId;
-
-  @Field({ nullable: true })
-  text?: string;
-
-  @Field((type) => ID, { nullable: true })
-  option?: OptionId;
-}
+import { WordId } from 'models/Word';
+import { Context } from 'models/Context';
 
 @Resolver((of) => WordType)
 export class WordResolver {
@@ -83,49 +33,35 @@ export class WordResolver {
   }
 
   @Mutation((returns) => WordType)
-  async createWord(@Args('input') input: CreateWordInput): Promise<WordType> {
-    const createdWord = await this.wordService.create({
-      ...input,
-      properties: this.mapPropertyValues(input.properties),
-    });
+  async createWord(
+    @ContextDec('ctx') ctx: Context,
+    @Args('input') input: CreateWordInput,
+  ): Promise<WordType> {
+    const createdWord = await this.wordService.create(
+      ctx,
+      this.wordTypeMapper.mapFromCreateInput(input),
+    );
     return this.wordTypeMapper.map(createdWord);
   }
 
   @Mutation((returns) => WordType)
-  async updateWord(@Args('input') input: UpdateWordInput): Promise<WordType> {
-    const updatedWord = await this.wordService.update({
-      ...input,
-      properties: this.mapPropertyValues(input.properties),
-    });
+  async updateWord(
+    @ContextDec('ctx') ctx: Context,
+    @Args('input') input: UpdateWordInput,
+  ): Promise<WordType> {
+    const updatedWord = await this.wordService.update(
+      ctx,
+      this.wordTypeMapper.mapFromUpdateInput(input),
+    );
     return this.wordTypeMapper.map(updatedWord);
   }
 
   @Mutation((returns) => WordType)
   async deleteWord(
-    @Args('id', { type: () => ID }) id: WordId,
+    @ContextDec('ctx') ctx: Context,
+    @Args('input') input: DeleteWordInput,
   ): Promise<WordType> {
-    const deletedWord = await this.wordService.delete(id);
+    const deletedWord = await this.wordService.delete(ctx, input);
     return this.wordTypeMapper.map(deletedWord);
-  }
-
-  mapPropertyValues(
-    input?: UpdatePropertyValueInput[],
-  ): Record<PropertyId, UpdatePropertyValueParams> | undefined {
-    if (!input) {
-      return;
-    }
-    return Object.fromEntries(
-      input.map((propertyInput) => [
-        propertyInput.id,
-        this.mapPropertyValue(propertyInput),
-      ]),
-    );
-  }
-
-  mapPropertyValue(input: UpdatePropertyValueInput): UpdatePropertyValueParams {
-    return {
-      ...(input.text && { text: input.text }),
-      ...(input.option && { option: input.option }),
-    };
   }
 }

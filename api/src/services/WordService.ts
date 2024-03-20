@@ -30,9 +30,10 @@ import { DateTime } from 'luxon';
 import { QUERY_MIN_LENGTH } from 'utils/constants';
 import * as records from 'utils/records';
 import { ChangeService } from './ChangeService';
-import { ChangeType } from 'models/Change';
 import { ChangeBuilder } from './ChangeBuilder';
 import { copy } from 'utils/copy';
+import { Context } from 'models/Context';
+import { DbConnectionManager } from 'repositories/DbConnectionManager';
 
 export interface GetWordPageParams {
   languageId?: LanguageId;
@@ -69,6 +70,10 @@ export interface UpdatePropertyValueParams {
   option?: OptionId;
 }
 
+export interface DeleteWordParams {
+  id: WordId;
+}
+
 @Injectable()
 export class WordService {
   constructor(
@@ -84,6 +89,7 @@ export class WordService {
     @Inject(forwardRef(() => ChangeService))
     private changeService: ChangeService,
     private changeBuilder: ChangeBuilder,
+    private connectionManager: DbConnectionManager,
   ) {}
 
   async getById(wordId: WordId): Promise<Word> {
@@ -114,7 +120,7 @@ export class WordService {
     return words;
   }
 
-  async create(params: CreateWordParams): Promise<Word> {
+  async create(ctx: Context, params: CreateWordParams): Promise<Word> {
     await this.languageService.getById(params.languageId);
 
     const word: Word = {
@@ -135,18 +141,19 @@ export class WordService {
       this.setPropertyValues(word, properties, params.properties);
     }
 
-    await this.wordRepository.create(word);
-
-    await this.changeService.create(
-      this.changeBuilder.buildCreateWordChange(word),
-    );
+    await this.connectionManager.transactionally(async () => {
+      await this.wordRepository.create(word);
+      await this.changeService.create(
+        this.changeBuilder.buildCreateWordChange(ctx, word),
+      );
+    });
 
     await this.searchClient.indexWord(word);
 
     return word;
   }
 
-  async update(params: UpdateWordParams): Promise<Word> {
+  async update(ctx: Context, params: UpdateWordParams): Promise<Word> {
     const word = await this.getById(params.id);
     const currentWord = copy(word);
 
@@ -167,11 +174,17 @@ export class WordService {
       this.setPropertyValues(word, properties, params.properties);
     }
 
-    const change = this.changeBuilder.buildUpdateWordChange(word, currentWord);
+    const change = this.changeBuilder.buildUpdateWordChange(
+      ctx,
+      word,
+      currentWord,
+    );
 
     if (change) {
-      await this.wordRepository.update(word);
-      await this.changeService.create(change);
+      await this.connectionManager.transactionally(async () => {
+        await this.wordRepository.update(word);
+        await this.changeService.create(change);
+      });
     }
 
     await this.searchClient.indexWord(word);
@@ -179,16 +192,14 @@ export class WordService {
     return word;
   }
 
-  async delete(id: WordId): Promise<Word> {
+  async delete(ctx: Context, { id }: DeleteWordParams): Promise<Word> {
     const word = await this.getById(id);
 
-    await this.wordRepository.delete(id);
-
-    await this.changeService.create({
-      id: word.id,
-      type: ChangeType.DeleteWord,
-      changedAt: DateTime.utc(),
-      deleted: word.id,
+    await this.connectionManager.transactionally(async () => {
+      await this.wordRepository.delete(id);
+      await this.changeService.create(
+        this.changeBuilder.buildDeleteWordChange(ctx, word),
+      );
     });
 
     await this.searchClient.deleteWord(id);

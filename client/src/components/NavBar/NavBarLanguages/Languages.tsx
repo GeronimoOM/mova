@@ -174,7 +174,9 @@ export const Languages: Component<NavBarLanguagesProps> = (props) => {
   const executeDelete = async () => {
     await deleteLanguage({
       variables: {
-        id: actionLanguageId()!,
+        input: {
+          id: actionLanguageId()!,
+        },
       },
     });
 

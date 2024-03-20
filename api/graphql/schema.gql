@@ -312,21 +312,22 @@ type Query {
   languages: [Language!]!
   language(id: ID!): Language
   property(id: ID!): Property
-  changes(cursor: String, limit: Int, syncType: SyncType, changedAt: Timestamp, clientId: String): ChangePage!
+  changes(cursor: String, limit: Int, syncType: SyncType, changedAt: Timestamp): ChangePage!
   word(id: ID!): Word
 }
 
 type Mutation {
   createLanguage(input: CreateLanguageInput!): Language!
   updateLanguage(input: UpdateLanguageInput!): Language!
-  deleteLanguage(id: ID!): Language!
+  deleteLanguage(input: DeleteLanguageInput!): Language!
   createProperty(input: CreatePropertyInput!): Property!
   updateProperty(input: UpdatePropertyInput!): Property!
   reorderProperties(input: ReorderPropertiesInput!): [Property!]!
-  deleteProperty(id: ID!): Property!
+  deleteProperty(input: DeletePropertyInput!): Property!
+  applyChanges(changes: [ApplyChangeInput!]!): Boolean!
   createWord(input: CreateWordInput!): Word!
   updateWord(input: UpdateWordInput!): Word!
-  deleteWord(id: ID!): Word!
+  deleteWord(input: DeleteWordInput!): Word!
   createTopic(input: CreateTopicInput!): Topic!
   deleteTopic(id: ID!): Topic!
   addTopicWord(topicId: ID!, wordId: ID!): Topic!
@@ -342,6 +343,10 @@ input CreateLanguageInput {
 input UpdateLanguageInput {
   id: ID!
   name: String!
+}
+
+input DeleteLanguageInput {
+  id: ID!
 }
 
 input CreatePropertyInput {
@@ -371,6 +376,23 @@ input ReorderPropertiesInput {
   propertyIds: [ID!]!
 }
 
+input DeletePropertyInput {
+  id: ID!
+}
+
+input ApplyChangeInput {
+  createLanguage: CreateLanguageInput
+  updateLanguage: UpdateLanguageInput
+  deleteLanguage: DeleteLanguageInput
+  createProperty: CreatePropertyInput
+  updateProperty: UpdatePropertyInput
+  reorderProperties: ReorderPropertiesInput
+  deleteProperty: DeletePropertyInput
+  createWord: CreateWordInput
+  updateWord: UpdateWordInput
+  deleteWord: DeleteWordInput
+}
+
 input CreateWordInput {
   id: ID
   original: String!
@@ -392,6 +414,10 @@ input UpdateWordInput {
   original: String
   translation: String
   properties: [UpdatePropertyValueInput!]
+}
+
+input DeleteWordInput {
+  id: ID!
 }
 
 input CreateTopicInput {

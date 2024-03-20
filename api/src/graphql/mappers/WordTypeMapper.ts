@@ -5,7 +5,12 @@ import {
   isTextPropertyValue,
   PropertyValue,
 } from 'models/PropertyValue';
-import { WordType } from '../types/WordType';
+import {
+  CreateWordInput,
+  UpdatePropertyValueInput,
+  UpdateWordInput,
+  WordType,
+} from '../types/WordType';
 import { PropertyTypeMapper } from './PropertyTypeMapper';
 import {
   OptionPropertyValueType,
@@ -13,6 +18,12 @@ import {
   TextPropertyValueType,
 } from '../types/PropertyValueType';
 import { WordCreateType, WordUpdateType } from 'graphql/types/ChangeType';
+import {
+  CreateWordParams,
+  UpdatePropertyValueParams,
+  UpdateWordParams,
+} from 'services/WordService';
+import { PropertyId } from 'models/Property';
 
 @Injectable()
 export class WordTypeMapper {
@@ -55,6 +66,20 @@ export class WordTypeMapper {
     };
   }
 
+  mapFromCreateInput(input: CreateWordInput): CreateWordParams {
+    return {
+      ...input,
+      properties: this.mapFromUpdateValuesInput(input.properties),
+    };
+  }
+
+  mapFromUpdateInput(input: UpdateWordInput): UpdateWordParams {
+    return {
+      ...input,
+      properties: this.mapFromUpdateValuesInput(input.properties),
+    };
+  }
+
   private mapPropertyValue(
     propertyValue: PropertyValue,
   ): typeof PropertyValueUnionType {
@@ -74,5 +99,28 @@ export class WordTypeMapper {
         },
       } as OptionPropertyValueType;
     }
+  }
+
+  private mapFromUpdateValuesInput(
+    input?: UpdatePropertyValueInput[],
+  ): Record<PropertyId, UpdatePropertyValueParams> | undefined {
+    if (!input) {
+      return;
+    }
+    return Object.fromEntries(
+      input.map((propertyInput) => [
+        propertyInput.id,
+        this.mapFromUpdateValueInput(propertyInput),
+      ]),
+    );
+  }
+
+  private mapFromUpdateValueInput(
+    input: UpdatePropertyValueInput,
+  ): UpdatePropertyValueParams {
+    return {
+      ...(input.text && { text: input.text }),
+      ...(input.option && { option: input.option }),
+    };
   }
 }

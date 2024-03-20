@@ -1,32 +1,35 @@
-import { ServiceWorkerMessageHandler } from './sw/messages';
+import { setClientId } from './api/client';
+import { ServiceWorkerMessage, ServiceWorkerMessageType } from './sw/messages';
 
 const PERIODIC_SYNC_INTERVAL_MS = 60 * 1000;
 const PERIODIC_BACKGROUND_SYNC_INTERVAL_MS = 30 * 60 * 1000;
 
-export type RegisterServiceWorkerOptions = {
-  onMessage: ServiceWorkerMessageHandler;
-};
+export async function registerServiceWorker(): Promise<void> {
+  return new Promise((resolve) => {
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', async () => {
+        await navigator.serviceWorker.register(
+          import.meta.env.MODE === 'production'
+            ? '/sw.js'
+            : '/dev-sw.js?dev-sw',
+          { scope: '/', type: 'module' },
+        );
 
-export async function registerServiceWorker({
-  onMessage,
-}: RegisterServiceWorkerOptions) {
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', async () => {
-      await navigator.serviceWorker.register(
-        import.meta.env.MODE === 'production' ? '/sw.js' : '/dev-sw.js?dev-sw',
-        { scope: '/', type: 'module' },
-      );
+        registerMessageListener();
+        await sendMessageToServiceWorker('init');
+        resolve();
 
-      registerMessageListener(onMessage);
+        await sendMessageToServiceWorker('sync');
+        setInterval(() => {
+          sendMessageToServiceWorker('sync');
+        }, PERIODIC_SYNC_INTERVAL_MS);
 
-      sendMessageToServiceWorker('sync');
-      setInterval(() => {
-        sendMessageToServiceWorker('sync');
-      }, PERIODIC_SYNC_INTERVAL_MS);
-
-      await registerBackgroundSync();
-    });
-  }
+        await registerBackgroundSync();
+      });
+    } else {
+      resolve();
+    }
+  });
 }
 
 async function registerBackgroundSync() {
@@ -46,8 +49,15 @@ async function registerBackgroundSync() {
   }
 }
 
-async function registerMessageListener(onMessage: ServiceWorkerMessageHandler) {
-  navigator.serviceWorker.addEventListener('message', (e) => onMessage(e.data));
+async function registerMessageListener() {
+  navigator.serviceWorker.addEventListener('message', (e) => {
+    const message: ServiceWorkerMessage = e.data;
+    console.log('Message received from service worker', message);
+
+    if (message.type === ServiceWorkerMessageType.InitMessage) {
+      setClientId(message.clientId);
+    }
+  });
 }
 
 export async function sendMessageToServiceWorker(message: string) {

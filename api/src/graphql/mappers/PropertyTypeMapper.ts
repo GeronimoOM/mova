@@ -11,12 +11,14 @@ import {
   OptionType,
   PropertyUnionType,
   TextPropertyType,
+  UpdatePropertyInput,
 } from '../types/PropertyType';
 import {
   OptionPropertyUpdateType,
   PropertyUpdateUnionType,
   TextPropertyUpdateType,
 } from 'graphql/types/ChangeType';
+import { UpdatePropertyParams } from 'services/PropertyService';
 
 @Injectable()
 export class PropertyTypeMapper {
@@ -42,6 +44,17 @@ export class PropertyTypeMapper {
         }),
       } as OptionPropertyUpdateType;
     }
+  }
+
+  mapFromUpdateInput(input: UpdatePropertyInput): UpdatePropertyParams {
+    return {
+      ...input,
+      ...(input.options && {
+        options: Object.fromEntries(
+          input.options.map(({ id, value }) => [id, value]),
+        ),
+      }),
+    };
   }
 
   private mapOptions(options: Record<OptionId, string>): OptionType[] {

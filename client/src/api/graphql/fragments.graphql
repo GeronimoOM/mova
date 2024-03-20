@@ -89,11 +89,10 @@ fragment OptionPropertyFields on OptionProperty {
 }
 
 fragment ChangeFields on Change {
-  ...on IChange {
+  ... on IChange {
     id
     changedAt
     type
-
   }
   ...CreateLanguageChangeFields
   ...UpdateLanguageChangeFields
@@ -111,9 +110,7 @@ fragment ChangeFields on Change {
 
 fragment CreateLanguageChangeFields on CreateLanguageChange {
   createdLanguage: created {
-    id
-    name
-    addedAt
+    ...LanguageFields
   }
 }
 
@@ -136,9 +133,10 @@ fragment CreatePropertyChangeFields on CreatePropertyChange {
 
 fragment UpdatePropertyChangeFields on UpdatePropertyChange {
   updatedProperty: updated {
-    ...on IPropertyUpdate {
+    ... on IPropertyUpdate {
       id
       name
+      type
     }
   }
 }
@@ -159,6 +157,8 @@ fragment CreateWordChangeFields on CreateWordChange {
     original
     translation
     partOfSpeech
+    addedAt
+    languageId
     properties {
       ...PropertyValueSaveFields
     }
@@ -181,14 +181,14 @@ fragment DeleteWordChangeFields on DeleteWordChange {
 }
 
 fragment PropertyValueSaveFields on PropertyValueSave {
-  ...on IPropertyValueSave {
+  ... on IPropertyValueSave {
     propertyId
     type
   }
-  ...on TextPropertyValueSave {
+  ... on TextPropertyValueSave {
     text
   }
-  ...on OptionPropertyValueSave {
+  ... on OptionPropertyValueSave {
     optionId
   }
 }

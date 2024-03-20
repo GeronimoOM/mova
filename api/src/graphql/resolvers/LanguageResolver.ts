@@ -6,9 +6,8 @@ import {
   ResolveField,
   Parent,
   Mutation,
-  InputType,
-  Field,
   Int,
+  Context as ContextDec,
 } from '@nestjs/graphql';
 import { LanguageId } from 'models/Language';
 import { Direction, encodePageCursor, mapPage, Page } from 'models/Page';
@@ -18,7 +17,12 @@ import { PropertyService } from 'services/PropertyService';
 import { WordService } from 'services/WordService';
 import { PropertyTypeMapper } from '../mappers/PropertyTypeMapper';
 import { WordTypeMapper } from '../mappers/WordTypeMapper';
-import { LanguageType } from '../types/LanguageType';
+import {
+  CreateLanguageInput,
+  DeleteLanguageInput,
+  LanguageType,
+  UpdateLanguageInput,
+} from '../types/LanguageType';
 import { PageArgsType } from '../types/PageType';
 import { PropertyUnionType } from '../types/PropertyType';
 import { WordPageType, WordType } from '../types/WordType';
@@ -28,29 +32,8 @@ import { TopicCursor, TopicId } from 'models/Topic';
 import { WordsStatsType } from 'graphql/types/WordsDateStatsType';
 import { DateTime } from 'luxon';
 import { DATE_FORMAT } from 'utils/constants';
-import { TimestampScalar } from 'graphql/scalars/Timestamp';
 import { decodeCursor } from 'utils/cursors';
-
-@InputType()
-export class CreateLanguageInput {
-  @Field((type) => ID, { nullable: true })
-  id?: LanguageId;
-
-  @Field()
-  name: string;
-
-  @Field((type) => TimestampScalar, { nullable: true })
-  addedAt?: DateTime;
-}
-
-@InputType()
-export class UpdateLanguageInput {
-  @Field((type) => ID)
-  id: LanguageId;
-
-  @Field()
-  name: string;
-}
+import { Context } from 'models/Context';
 
 @Resolver((of) => LanguageType)
 export class LanguageResolver {
@@ -77,25 +60,28 @@ export class LanguageResolver {
 
   @Mutation((returns) => LanguageType)
   async createLanguage(
+    @ContextDec('ctx') ctx: Context,
     @Args('input') input: CreateLanguageInput,
   ): Promise<LanguageType> {
-    const createdLanguage = await this.languageService.create(input);
+    const createdLanguage = await this.languageService.create(ctx, input);
     return createdLanguage;
   }
 
   @Mutation((returns) => LanguageType)
   async updateLanguage(
+    @ContextDec('ctx') ctx: Context,
     @Args('input') input: UpdateLanguageInput,
   ): Promise<LanguageType> {
-    const updatedLanguage = await this.languageService.update(input);
+    const updatedLanguage = await this.languageService.update(ctx, input);
     return updatedLanguage;
   }
 
   @Mutation((returns) => LanguageType)
   async deleteLanguage(
-    @Args('id', { type: () => ID }) id: LanguageId,
+    @ContextDec('ctx') ctx: Context,
+    @Args('input') input: DeleteLanguageInput,
   ): Promise<LanguageType> {
-    const deletedLanguage = await this.languageService.delete(id);
+    const deletedLanguage = await this.languageService.delete(ctx, input);
     return deletedLanguage;
   }
 

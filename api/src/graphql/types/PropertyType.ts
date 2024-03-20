@@ -2,6 +2,7 @@ import {
   createUnionType,
   Field,
   ID,
+  InputType,
   Int,
   InterfaceType,
   ObjectType,
@@ -11,6 +12,7 @@ import { TimestampScalar } from 'graphql/scalars/Timestamp';
 import { DateTime } from 'luxon';
 import { LanguageId } from 'models/Language';
 import {
+  OptionId,
   Property,
   PropertyId,
   PropertyType,
@@ -80,3 +82,66 @@ export const PropertyUnionType = createUnionType({
     }
   },
 });
+
+@InputType()
+export class CreatePropertyInput {
+  @Field((type) => ID, { nullable: true })
+  id?: PropertyId;
+
+  @Field()
+  name: string;
+
+  @Field((type) => PropertyType)
+  type: PropertyType;
+
+  @Field((type) => ID)
+  languageId: LanguageId;
+
+  @Field((type) => PartOfSpeech)
+  partOfSpeech: PartOfSpeech;
+
+  @Field((type) => TimestampScalar, { nullable: true })
+  addedAt?: DateTime;
+
+  @Field((type) => [String], { nullable: true })
+  options: string[];
+}
+
+@InputType()
+export class UpdatePropertyInput {
+  @Field((type) => ID)
+  id: PropertyId;
+
+  @Field({ nullable: true })
+  name: string;
+
+  @Field((type) => [UpdateOptionInput], { nullable: true })
+  options: UpdateOptionInput[];
+}
+
+@InputType()
+export class ReorderPropertiesInput {
+  @Field((type) => ID)
+  languageId: LanguageId;
+
+  @Field((type) => PartOfSpeech)
+  partOfSpeech: PartOfSpeech;
+
+  @Field((type) => [ID])
+  propertyIds: PropertyId[];
+}
+
+@InputType()
+export class UpdateOptionInput {
+  @Field((type) => ID)
+  id: OptionId;
+
+  @Field()
+  value: string;
+}
+
+@InputType()
+export class DeletePropertyInput {
+  @Field((type) => ID)
+  id: PropertyId;
+}

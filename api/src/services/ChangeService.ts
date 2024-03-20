@@ -2,12 +2,30 @@ import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { DateTime } from 'luxon';
 import { Change, ChangeCursor, ChangePage, SyncType } from 'models/Change';
 import { ChangeRepository } from 'repositories/ChangeRepository';
-import { PropertyService } from './PropertyService';
-import { WordService } from './WordService';
-import { LanguageService } from './LanguageService';
+import {
+  CreatePropertyParams,
+  DeletePropertyParams,
+  PropertyService,
+  ReorderPropertiesParams,
+  UpdatePropertyParams,
+} from './PropertyService';
+import {
+  CreateWordParams,
+  DeleteWordParams,
+  UpdateWordParams,
+  WordService,
+} from './WordService';
+import {
+  CreateLanguageParams,
+  DeleteLanguageParams,
+  LanguageService,
+  UpdateLanguageParams,
+} from './LanguageService';
 import { ChronologicalCursor, WordOrder } from 'models/Word';
 import { Direction, mapCursor, mapPage } from 'models/Page';
 import { ChangeBuilder } from './ChangeBuilder';
+import { DbConnectionManager } from 'repositories/DbConnectionManager';
+import { Context, emptyContext } from 'models/Context';
 
 const DEFAULT_LIMIT = 100;
 
@@ -18,6 +36,19 @@ export interface GetChangePageParams {
   limit?: number;
   excludeClientId?: string;
 }
+
+export type ApplyChangesParams = Array<{
+  createLanguage?: CreateLanguageParams;
+  updateLanguage?: UpdateLanguageParams;
+  deleteLanguage?: DeleteLanguageParams;
+  createProperty?: CreatePropertyParams;
+  updateProperty?: UpdatePropertyParams;
+  reorderProperties?: ReorderPropertiesParams;
+  deleteProperty?: DeletePropertyParams;
+  createWord?: CreateWordParams;
+  updateWord?: UpdateWordParams;
+  deleteWord?: DeleteWordParams;
+}>;
 
 @Injectable()
 export class ChangeService {
@@ -30,6 +61,7 @@ export class ChangeService {
     @Inject(forwardRef(() => WordService))
     private wordService: WordService,
     private changeBuilder: ChangeBuilder,
+    private connectionManager: DbConnectionManager,
   ) {}
 
   async getPage(params: GetChangePageParams): Promise<ChangePage> {
@@ -45,6 +77,34 @@ export class ChangeService {
 
   async create(change: Change): Promise<void> {
     await this.changeRepository.create(change);
+  }
+
+  async apply(ctx: Context, changes: ApplyChangesParams): Promise<void> {
+    await this.connectionManager.transactionally(async () => {
+      for (const change of changes) {
+        if (change.createLanguage) {
+          await this.languageService.create(ctx, change.createLanguage);
+        } else if (change.updateLanguage) {
+          await this.languageService.update(ctx, change.updateLanguage);
+        } else if (change.deleteLanguage) {
+          await this.languageService.delete(ctx, change.deleteLanguage);
+        } else if (change.createProperty) {
+          await this.propertyService.create(ctx, change.createProperty);
+        } else if (change.updateProperty) {
+          await this.propertyService.update(ctx, change.updateProperty);
+        } else if (change.reorderProperties) {
+          await this.propertyService.reorder(ctx, change.reorderProperties);
+        } else if (change.deleteProperty) {
+          await this.propertyService.delete(ctx, change.deleteProperty);
+        } else if (change.createWord) {
+          await this.wordService.create(ctx, change.createWord);
+        } else if (change.updateWord) {
+          await this.wordService.update(ctx, change.updateWord);
+        } else if (change.deleteWord) {
+          await this.wordService.delete(ctx, change.deleteWord);
+        }
+      }
+    });
   }
 
   private async determineSyncType(
@@ -80,7 +140,7 @@ export class ChangeService {
     const changes: ChangePage = {
       ...mapCursor(
         mapPage(wordsPage, (word) =>
-          this.changeBuilder.buildCreateWordChange(word),
+          this.changeBuilder.buildCreateWordChange(emptyContext(), word),
         ),
         (cursor: ChronologicalCursor) => ({
           changedAt: cursor.addedAt,
@@ -98,10 +158,16 @@ export class ChangeService {
 
       changes.items = [
         ...languages.map((language) =>
-          this.changeBuilder.buildCreateLanguageChange(language),
+          this.changeBuilder.buildCreateLanguageChange(
+            emptyContext(),
+            language,
+          ),
         ),
         ...properties.map((property) =>
-          this.changeBuilder.buildCreatePropertyChange(property),
+          this.changeBuilder.buildCreatePropertyChange(
+            emptyContext(),
+            property,
+          ),
         ),
         ...changes.items,
       ];

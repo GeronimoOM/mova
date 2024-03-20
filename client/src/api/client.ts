@@ -3,11 +3,19 @@ import { cache } from './cache';
 
 export const GRAPHQL_URI = `/api/graphql`;
 
+let clientId: string | undefined;
+
+export function setClientId(id: string): void {
+  clientId = id;
+}
+
 export const client = new ApolloClient({
   uri: GRAPHQL_URI,
   cache,
   connectToDevTools: true,
   headers: {
-    // 'Sync-Client-ID': '',
+    ...(clientId && {
+      'Sync-Client-ID': clientId,
+    }),
   },
 });

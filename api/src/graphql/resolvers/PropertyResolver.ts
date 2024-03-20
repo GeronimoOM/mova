@@ -1,77 +1,22 @@
 import {
   Args,
-  Field,
   ID,
-  InputType,
   Mutation,
   Resolver,
   Query,
+  Context as ContextDec,
 } from '@nestjs/graphql';
-import { LanguageId } from 'models/Language';
-import { OptionId, PropertyId, PropertyType } from 'models/Property';
-import { PartOfSpeech } from 'models/Word';
+import { PropertyId } from 'models/Property';
 import { PropertyService } from 'services/PropertyService';
 import { PropertyTypeMapper } from '../mappers/PropertyTypeMapper';
-import { PropertyUnionType } from '../types/PropertyType';
-import { TimestampScalar } from 'graphql/scalars/Timestamp';
-import { DateTime } from 'luxon';
-
-@InputType()
-export class CreatePropertyInput {
-  @Field((type) => ID, { nullable: true })
-  id?: PropertyId;
-
-  @Field()
-  name: string;
-
-  @Field((type) => PropertyType)
-  type: PropertyType;
-
-  @Field((type) => ID)
-  languageId: LanguageId;
-
-  @Field((type) => PartOfSpeech)
-  partOfSpeech: PartOfSpeech;
-
-  @Field((type) => TimestampScalar, { nullable: true })
-  addedAt?: DateTime;
-
-  @Field((type) => [String], { nullable: true })
-  options: string[];
-}
-
-@InputType()
-export class UpdatePropertyInput {
-  @Field((type) => ID)
-  id: PropertyId;
-
-  @Field({ nullable: true })
-  name: string;
-
-  @Field((type) => [UpdateOptionInput], { nullable: true })
-  options: UpdateOptionInput[];
-}
-
-@InputType()
-export class ReorderPropertiesInput {
-  @Field((type) => ID)
-  languageId: LanguageId;
-
-  @Field((type) => PartOfSpeech)
-  partOfSpeech: PartOfSpeech;
-
-  @Field((type) => [ID])
-  propertyIds: PropertyId[];
-}
-
-@InputType()
-export class UpdateOptionInput {
-  @Field((type) => ID)
-  id: OptionId;
-
-  @Field()
-  value: string;
-}
+import {
+  CreatePropertyInput,
+  DeletePropertyInput,
+  PropertyUnionType,
+  ReorderPropertiesInput,
+  UpdatePropertyInput,
+} from '../types/PropertyType';
+import { Context } from 'models/Context';
 
 @Resolver((of) => PropertyUnionType)
 export class PropertyResolver {
@@ -90,32 +35,31 @@ export class PropertyResolver {
 
   @Mutation((returns) => PropertyUnionType)
   async createProperty(
+    @ContextDec('ctx') ctx: Context,
     @Args('input') input: CreatePropertyInput,
   ): Promise<typeof PropertyUnionType> {
-    const createdProperty = await this.propertyService.create(input);
+    const createdProperty = await this.propertyService.create(ctx, input);
     return this.propertyTypeMapper.map(createdProperty);
   }
 
   @Mutation((returns) => PropertyUnionType)
   async updateProperty(
+    @ContextDec('ctx') ctx: Context,
     @Args('input') input: UpdatePropertyInput,
   ): Promise<typeof PropertyUnionType> {
-    const updatedProperty = await this.propertyService.update({
-      ...input,
-      ...(input.options && {
-        options: Object.fromEntries(
-          input.options.map(({ id, value }) => [id, value]),
-        ),
-      }),
-    });
+    const updatedProperty = await this.propertyService.update(
+      ctx,
+      this.propertyTypeMapper.mapFromUpdateInput(input),
+    );
     return this.propertyTypeMapper.map(updatedProperty);
   }
 
   @Mutation((returns) => [PropertyUnionType])
   async reorderProperties(
+    @ContextDec('ctx') ctx: Context,
     @Args('input') input: ReorderPropertiesInput,
   ): Promise<Array<typeof PropertyUnionType>> {
-    await this.propertyService.reorder(input);
+    await this.propertyService.reorder(ctx, input);
 
     const properties = await this.propertyService.getByLanguageId(
       input.languageId,
@@ -126,9 +70,10 @@ export class PropertyResolver {
 
   @Mutation((returns) => PropertyUnionType)
   async deleteProperty(
-    @Args('id', { type: () => ID }) id: PropertyId,
+    @ContextDec('ctx') ctx: Context,
+    @Args('input') input: DeletePropertyInput,
   ): Promise<typeof PropertyUnionType> {
-    const deletedProperty = await this.propertyService.delete(id);
+    const deletedProperty = await this.propertyService.delete(ctx, input);
     return this.propertyTypeMapper.map(deletedProperty);
   }
 }

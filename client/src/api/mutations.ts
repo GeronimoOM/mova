@@ -68,7 +68,7 @@ export function deleteLanguageMutation(): CreateMutationResult<
   typeof DeleteLanguageDocument
 > {
   return createMutation(DeleteLanguageDocument, {
-    optimisticResponse: ({ id }) => ({
+    optimisticResponse: ({ input: { id } }) => ({
       deleteLanguage: {
         id,
       },
@@ -98,13 +98,14 @@ export function createPropertyMutation(): CreateMutationResult<
         input.languageId,
         input.partOfSpeech,
       );
+      const order = properties.length + 1;
 
       return {
         createProperty: {
           ...input,
           id: input.id!,
           addedAt: input.addedAt!,
-          order: properties.length,
+          order,
           __typename: 'TextProperty',
         },
       };
@@ -171,7 +172,9 @@ export function deletePropertyMutation(): CreateMutationResult<
   typeof DeletePropertyDocument
 > {
   return createMutation(DeletePropertyDocument, {
-    optimisticResponse: ({ id }) => ({ deleteProperty: readProperty(id)! }),
+    optimisticResponse: ({ input: { id } }) => ({
+      deleteProperty: readProperty(id)!,
+    }),
     update: (cache, { data }) => {
       cache.updateFragment(
         {
@@ -235,23 +238,33 @@ export function updateWordMutation(): CreateMutationResult<
   typeof UpdateWordDocument
 > {
   return createMutation(UpdateWordDocument, {
-    optimisticResponse: ({ input }) => ({
-      updateWord: {
-        ...readWordFull(input.id)!,
-        ...(input.original && { name: input.original }),
-        ...(input.translation && { name: input.translation }),
-        ...(input.properties && {
-          properties: input.properties.map(({ id, text }) => ({
-            property: {
-              id,
-              __typename: 'TextProperty',
-            },
-            text: text!,
-            __typename: 'TextPropertyValue',
-          })),
-        }),
-      },
-    }),
+    optimisticResponse: ({ input }) => {
+      const word = readWordFull(input.id)!;
+
+      return {
+        updateWord: {
+          ...word,
+          ...(input.original && { name: input.original }),
+          ...(input.translation && { name: input.translation }),
+          ...(input.properties && {
+            properties: input.properties.reduce((props, { id, text }) => {
+              props = props.filter((prop) => prop.property.id !== id);
+              if (text) {
+                props.push({
+                  property: {
+                    id,
+                    __typename: 'TextProperty',
+                  },
+                  text: text!,
+                  __typename: 'TextPropertyValue',
+                });
+              }
+              return props;
+            }, word.properties),
+          }),
+        },
+      };
+    },
   });
 }
 
@@ -259,7 +272,7 @@ export function deleteWordMutation(): CreateMutationResult<
   typeof DeleteWordDocument
 > {
   return createMutation(DeleteWordDocument, {
-    optimisticResponse: ({ id }) => ({
+    optimisticResponse: ({ input: { id } }) => ({
       deleteWord: {
         id,
         languageId: readWordFull(id)!.languageId,

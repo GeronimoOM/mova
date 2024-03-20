@@ -1,30 +1,32 @@
 import { GraphQLClient } from 'graphql-request';
 import {
+  ApplyChangeInput,
+  ApplyChangesDocument,
   ChangeFieldsFragment,
   ChangeType,
   CreateLanguageChangeFieldsFragment,
+  CreatePropertyChangeFieldsFragment,
+  CreateWordChangeFieldsFragment,
   DeleteLanguageChangeFieldsFragment,
+  DeletePropertyChangeFieldsFragment,
+  DeleteWordChangeFieldsFragment,
   GetChangesDocument,
   GetChangesQuery,
+  ReorderPropertiesChangeFieldsFragment,
   SyncType,
   UpdateLanguageChangeFieldsFragment,
+  UpdatePropertyChangeFieldsFragment,
+  UpdateWordChangeFieldsFragment,
 } from '../api/types/graphql';
-import {
-  deleteLanguage,
-  deleteLanguages,
-  deleteProperties,
-  deleteWords,
-  fetchState,
-  saveLanguage,
-  transactionally,
-  updateLanguage,
-  updateState,
-} from './cache';
+import * as cache from './cache';
 import { ServiceWorkerMessageType, produceMessage } from './messages';
 import { DateTime } from 'luxon';
 import { DATETIME_FORMAT } from '../utils/constants';
 
+export const SYNC_CLIENT_ID_HEADER = 'Sync-Client-ID';
+
 const SYNC_STALE_THRESHOLD = 2 * 24 * 60 * 60; // 2 days
+const PUSH_CHANGES_BATCH = 20;
 
 export type SyncState = {
   id: 1;
@@ -45,7 +47,7 @@ let isSyncing = false;
 const gqlClient = new GraphQLClient('/api/graphql', { fetch });
 
 export async function getSyncStatus(state?: SyncState): Promise<SyncStatus> {
-  const { lastSyncedAt } = state ?? (await fetchState());
+  const { lastSyncedAt } = state ?? (await cache.getState());
   if (!lastSyncedAt) {
     return SyncStatus.Empty;
   } else if (isSyncStale(lastSyncedAt)) {
@@ -78,20 +80,40 @@ export async function sync(): Promise<void> {
     return;
   }
 
+  await reserveSyncing();
   try {
-    await downloadChanges();
-    console.log('sync succeeded');
+    await pushChanges();
+    await pullChanges();
+    console.log('Sync success');
   } catch (err) {
-    console.error('sync failed', err);
+    console.error('Sync failure');
   } finally {
     await releaseSyncing();
   }
 }
 
-// async function uploadChanges(): Promise<void> {}
+async function pushChanges(): Promise<void> {
+  const { clientId } = await cache.getState();
+  let changes: Array<ApplyChangeInput & { id: number }>;
+  let nChanges = 0;
+  do {
+    changes = await cache.getChanges(PUSH_CHANGES_BATCH);
+    nChanges += changes.length;
+    if (changes.length) {
+      await reserveSyncing();
+      await pushApplyChanges(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        changes.map(({ id, ...change }) => change),
+        clientId,
+      );
+      await cache.deleteChanges(changes.map((change) => change.id));
+    }
+  } while (changes.length);
+  console.log(`Pushed changes: ${nChanges}`);
+}
 
-async function downloadChanges(): Promise<void> {
-  const state = await fetchState();
+async function pullChanges(): Promise<void> {
+  const state = await cache.getState();
   const syncStatus = await getSyncStatus(state);
   const { clientId, lastSyncedAt } = state;
   let { currentSyncCursor, currentSyncStartedAt } = state;
@@ -99,9 +121,10 @@ async function downloadChanges(): Promise<void> {
 
   if (!currentSyncCursor) {
     currentSyncStartedAt = DateTime.utc().toSeconds();
-    await updateState({ currentSyncStartedAt });
+    await cache.updateState({ currentSyncStartedAt });
   }
 
+  let nChanges = 0;
   do {
     await reserveSyncing();
     const changesPage = await fetchChangesPage(
@@ -119,15 +142,18 @@ async function downloadChanges(): Promise<void> {
 
     const isSyncStart = !currentSyncCursor;
     await applyChanges(items, syncType, isSyncStart);
+    nChanges += items.length;
 
     currentSyncCursor = nextCursor ?? null;
-    await updateState({ currentSyncCursor });
+    await cache.updateState({ currentSyncCursor });
   } while (currentSyncCursor);
 
-  await updateState({
+  await cache.updateState({
     lastSyncedAt: currentSyncStartedAt,
     currentSyncStartedAt: null,
   });
+
+  console.log(`Pulled changes: ${nChanges} (${syncType} sync)`);
 }
 
 async function applyChanges(
@@ -139,31 +165,66 @@ async function applyChanges(
     return;
   }
 
-  console.log(syncType, changes.length);
-
-  await transactionally(async () => {
+  await cache.transactionally(async () => {
     if (syncType === SyncType.Full && isSyncStart) {
       // TODO improve logic
-      await deleteLanguages();
-      await deleteProperties();
-      await deleteWords();
+      await cache.deleteLanguages();
+      await cache.deleteProperties();
+      await cache.deleteWords();
     }
 
     for (const change of changes) {
       switch (change.type) {
         case ChangeType.CreateLanguage:
-          await saveLanguage(
+          await cache.saveLanguage(
             (change as CreateLanguageChangeFieldsFragment).createdLanguage,
           );
           break;
         case ChangeType.UpdateLanguage:
-          await updateLanguage(
+          await cache.updateLanguage(
             (change as UpdateLanguageChangeFieldsFragment).updatedLanguage,
           );
           break;
         case ChangeType.DeleteLanguage:
-          await deleteLanguage(
+          await cache.deleteLanguage(
             (change as DeleteLanguageChangeFieldsFragment).deletedLanguage,
+          );
+          break;
+        case ChangeType.CreateProperty:
+          await cache.saveProperty(
+            (change as CreatePropertyChangeFieldsFragment).createdProperty,
+          );
+          break;
+        case ChangeType.UpdateProperty:
+          await cache.updateProperty(
+            (change as UpdatePropertyChangeFieldsFragment).updatedProperty,
+          );
+          break;
+        case ChangeType.ReorderProperties:
+          await cache.reorderProperties(
+            (change as ReorderPropertiesChangeFieldsFragment)
+              .reorderedProperties.propertyIds,
+          );
+          break;
+        case ChangeType.DeleteProperty:
+          await cache.deleteProperty(
+            (change as DeletePropertyChangeFieldsFragment).deletedProperty,
+          );
+          break;
+        case ChangeType.CreateWord: {
+          await cache.saveWord(
+            (change as CreateWordChangeFieldsFragment).createdWord,
+          );
+          break;
+        }
+        case ChangeType.UpdateWord:
+          await cache.updateWord(
+            (change as UpdateWordChangeFieldsFragment).updatedWord,
+          );
+          break;
+        case ChangeType.DeleteWord:
+          await cache.deleteWord(
+            (change as DeleteWordChangeFieldsFragment).deletedWord,
           );
           break;
       }
@@ -189,7 +250,22 @@ async function fetchChangesPage(
         : null,
     },
     requestHeaders: {
-      'Sync-Client-ID': clientId,
+      [SYNC_CLIENT_ID_HEADER]: clientId,
+    },
+  });
+}
+
+async function pushApplyChanges(
+  changes: ApplyChangeInput[],
+  clientId: string,
+): Promise<void> {
+  await gqlClient.request({
+    document: ApplyChangesDocument,
+    variables: {
+      changes,
+    },
+    requestHeaders: {
+      [SYNC_CLIENT_ID_HEADER]: clientId,
     },
   });
 }

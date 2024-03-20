@@ -263,7 +263,9 @@ export const WordDetails: Component<WordDetailsProps> = (props) => {
   const executeDelete = async () => {
     await deleteWord({
       variables: {
-        id: props.selectedWordId!,
+        input: {
+          id: props.selectedWordId!,
+        },
       },
     });
 

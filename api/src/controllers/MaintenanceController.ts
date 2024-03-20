@@ -11,7 +11,6 @@ import {
   Req,
   Query,
   Put,
-  Body,
   Delete,
 } from '@nestjs/common';
 import { LanguageId } from 'models/Language';
@@ -53,13 +52,5 @@ export class MaintenanceController {
   async reindexLanguage(@Query('id') languageId: LanguageId) {
     const language = await this.maintenanceService.reindexLanguage(languageId);
     return language;
-  }
-
-  @Post('/generate')
-  async generateTestData(@Body('name') name: string) {
-    const generatedLanguage =
-      await this.maintenanceService.generateLanguage(name);
-
-    return generatedLanguage;
   }
 }

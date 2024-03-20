@@ -1,7 +1,5 @@
 import {
   Args,
-  Field,
-  InputType,
   Mutation,
   Resolver,
   ID,
@@ -10,24 +8,14 @@ import {
 } from '@nestjs/graphql';
 import { WordTypeMapper } from 'graphql/mappers/WordTypeMapper';
 import { PageArgsType } from 'graphql/types/PageType';
-import { TopicType } from 'graphql/types/TopicType';
+import { CreateTopicInput, TopicType } from 'graphql/types/TopicType';
 import { WordPageType, WordType } from 'graphql/types/WordType';
-import { LanguageId } from 'models/Language';
 import { Direction, Page, encodePageCursor, mapPage } from 'models/Page';
 import { TopicId } from 'models/Topic';
 import { PartOfSpeech, WordCursor, WordId, WordOrder } from 'models/Word';
 import { TopicService } from 'services/TopicService';
 import { WordService } from 'services/WordService';
 import { decodeCursor } from 'utils/cursors';
-
-@InputType()
-export class CreateTopicInput {
-  @Field()
-  name: string;
-
-  @Field((type) => ID)
-  languageId: LanguageId;
-}
 
 @Resolver((of) => TopicType)
 export class TopicResolver {

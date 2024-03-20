@@ -8,8 +8,8 @@
 - [x] Intercept queries: saving to client DB, serving from client DB
 - [x] Sync API: download changes
 - [x] Syncing: client handling, saving to client DB, sending to client
-- [ ] Sync API: upload changes
-- [ ] Intercept mutations: saving changes to client DB, upload
+- [x] Sync API: upload changes
+- [x] Intercept mutations: saving changes to client DB, upload
 - [ ] Online/offline/syncing UI indicator
 
 ## Docker, Testing, CI/CD

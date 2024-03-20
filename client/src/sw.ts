@@ -3,6 +3,7 @@ import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
 import { matchGraphqlRequest, handleGraphQlRequest } from './sw/graphql-route';
 import { sync } from './sw/sync';
+import { init } from './sw/init';
 //import { ServiceWorkerMessage, ServiceWorkerMessageType } from './sw/messages';
 
 declare let self: ServiceWorkerGlobalScope;
@@ -19,7 +20,11 @@ registerRoute(
 );
 
 self.addEventListener('message', (event) => {
-  console.log('message', event.data);
+  console.log('Service Worker received message:', event.data);
+  if (event.data === 'init') {
+    event.waitUntil(init());
+  }
+
   if (event.data === 'sync') {
     event.waitUntil(sync());
   }
@@ -28,7 +33,7 @@ self.addEventListener('message', (event) => {
 self.addEventListener('periodicsync', (e) => {
   const event = e as ExtendableEvent & { tag: string };
   if (event.tag === 'sync-mova-data') {
-    console.log('periodic data sync');
+    console.log('Periodic data sync...');
     //event.waitUntil(syncMovaData());
   }
 });

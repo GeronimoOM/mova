@@ -5,15 +5,13 @@ import './index.css';
 import { ApolloProvider } from '@merged/solid-apollo';
 import { client } from './api/client';
 import { Router } from '@solidjs/router';
-import { registerServiceWorker } from './register-sw';
 import App from './components/App';
 import { LanguageProvider } from './components/LanguageContext';
+import { registerServiceWorker } from './register-sw';
 
 const root = document.getElementById('root')!;
 
-registerServiceWorker({
-  onMessage: (message) => console.log(message),
-});
+registerServiceWorker();
 
 render(
   () => (

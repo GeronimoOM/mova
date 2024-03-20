@@ -11,8 +11,8 @@ mutation UpdateLanguage($input: UpdateLanguageInput!) {
   }
 }
 
-mutation DeleteLanguage($id: ID!) {
-  deleteLanguage(id: $id) {
+mutation DeleteLanguage($input: DeleteLanguageInput!) {
+  deleteLanguage(input: $input) {
     id
   }
 }
@@ -29,21 +29,21 @@ mutation UpdateProperty($input: UpdatePropertyInput!) {
   }
 }
 
-mutation DeleteProperty($id: ID!) {
-  deleteProperty(id: $id) {
-    ... on IProperty {
-      id
-      languageId
-      partOfSpeech
-    }
-  }
-}
-
 mutation ReorderProperties($input: ReorderPropertiesInput!) {
   reorderProperties(input: $input) {
     ... on IProperty {
       id
       order
+    }
+  }
+}
+
+mutation DeleteProperty($input: DeletePropertyInput!) {
+  deleteProperty(input: $input) {
+    ... on IProperty {
+      id
+      languageId
+      partOfSpeech
     }
   }
 }
@@ -60,8 +60,8 @@ mutation UpdateWord($input: UpdateWordInput!) {
   }
 }
 
-mutation DeleteWord($id: ID!) {
-  deleteWord(id: $id) {
+mutation DeleteWord($input: DeleteWordInput!) {
+  deleteWord(input: $input) {
     id
     languageId
   }
@@ -78,4 +78,8 @@ mutation DeleteTopic($id: ID!) {
   deleteTopic(id: $id) {
     id
   }
+}
+
+mutation ApplyChanges($changes: [ApplyChangeInput!]!) {
+  applyChanges(changes: $changes)
 }

@@ -9,6 +9,8 @@ import { DateTime } from 'luxon';
 import { ChangeService } from './ChangeService';
 import { copy } from 'utils/copy';
 import { ChangeBuilder } from './ChangeBuilder';
+import { Context } from 'models/Context';
+import { DbConnectionManager } from 'repositories/DbConnectionManager';
 
 const LANGUAGE_DELETION_WORDS_THRESHOLD = 50;
 
@@ -21,6 +23,10 @@ export interface CreateLanguageParams {
 export interface UpdateLanguageParams {
   id: LanguageId;
   name: string;
+}
+
+export interface DeleteLanguageParams {
+  id: LanguageId;
 }
 
 @Injectable()
@@ -36,6 +42,7 @@ export class LanguageService {
     @Inject(forwardRef(() => ChangeService))
     private changeService: ChangeService,
     private changeBuilder: ChangeBuilder,
+    private connectionManager: DbConnectionManager,
   ) {}
 
   async getAll(): Promise<Language[]> {
@@ -50,38 +57,46 @@ export class LanguageService {
     return language;
   }
 
-  async create(params: CreateLanguageParams): Promise<Language> {
+  async create(ctx: Context, params: CreateLanguageParams): Promise<Language> {
     const language: Language = {
       id: params.id ?? uuid(),
       name: params.name.trim(),
       addedAt: params.addedAt ?? DateTime.utc(),
     };
-    await this.languageRepository.create(language);
-    await this.changeService.create(
-      this.changeBuilder.buildCreateLanguageChange(language),
-    );
+
+    await this.connectionManager.transactionally(async () => {
+      await this.languageRepository.create(language);
+      await this.changeService.create(
+        this.changeBuilder.buildCreateLanguageChange(ctx, language),
+      );
+    });
+
     return language;
   }
 
-  async update(params: UpdateLanguageParams): Promise<Language> {
+  async update(ctx: Context, params: UpdateLanguageParams): Promise<Language> {
     const language = await this.getById(params.id);
     const currentLanguage = copy(language);
 
     language.name = params.name.trim();
 
     const change = this.changeBuilder.buildUpdateLanguageChange(
+      ctx,
       language,
       currentLanguage,
     );
+
     if (change) {
-      await this.languageRepository.update(language);
-      await this.changeService.create(change);
+      await this.connectionManager.transactionally(async () => {
+        await this.languageRepository.update(language);
+        await this.changeService.create(change);
+      });
     }
 
     return language;
   }
 
-  async delete(id: LanguageId): Promise<Language> {
+  async delete(ctx: Context, { id }: DeleteLanguageParams): Promise<Language> {
     const language = await this.getById(id);
 
     const wordCount = await this.wordService.getCount(language.id);
@@ -89,13 +104,16 @@ export class LanguageService {
       throw new Error('Language has too many words');
     }
 
-    await this.wordService.deleteForLanguage(id);
-    await this.topicService.deleteForLanguage(id);
-    await this.propertyService.deleteForLanguage(id);
-    await this.languageRepository.delete(id);
-    await this.changeService.create(
-      this.changeBuilder.buildDeleteLanguageChange(language),
-    );
+    await this.connectionManager.transactionally(async () => {
+      await this.wordService.deleteForLanguage(id);
+      await this.topicService.deleteForLanguage(id);
+      await this.propertyService.deleteForLanguage(id);
+      await this.languageRepository.delete(id);
+      await this.changeService.create(
+        this.changeBuilder.buildDeleteLanguageChange(ctx, language),
+      );
+    });
+
     return language;
   }
 }

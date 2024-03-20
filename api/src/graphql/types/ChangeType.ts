@@ -1,6 +1,7 @@
 import {
   Field,
   ID,
+  InputType,
   InterfaceType,
   ObjectType,
   createUnionType,
@@ -16,16 +17,29 @@ import {
   SyncType,
 } from 'models/Change';
 import { LanguageId } from 'models/Language';
-import { LanguageType } from './LanguageType';
+import {
+  CreateLanguageInput,
+  DeleteLanguageInput,
+  LanguageType,
+  UpdateLanguageInput,
+} from './LanguageType';
 import {
   OptionId,
   PropertyId,
   PropertyType,
   PropertyUpdate,
 } from 'models/Property';
-import { OptionType, PropertyUnionType } from './PropertyType';
+import {
+  CreatePropertyInput,
+  DeletePropertyInput,
+  OptionType,
+  PropertyUnionType,
+  ReorderPropertiesInput,
+  UpdatePropertyInput,
+} from './PropertyType';
 import { PartOfSpeech, WordId } from 'models/Word';
 import { PropertyValueSave } from 'models/PropertyValue';
+import { CreateWordInput, DeleteWordInput, UpdateWordInput } from './WordType';
 
 registerEnumType(ChangeTypeEnum, {
   name: 'ChangeType',
@@ -315,4 +329,37 @@ export class ChangePageType {
 
   @Field((type) => SyncType)
   syncType: SyncType;
+}
+
+@InputType()
+export class ApplyChangeInput {
+  @Field((type) => CreateLanguageInput, { nullable: true })
+  createLanguage: CreateLanguageInput;
+
+  @Field((type) => UpdateLanguageInput, { nullable: true })
+  updateLanguage: UpdateLanguageInput;
+
+  @Field((type) => DeleteLanguageInput, { nullable: true })
+  deleteLanguage: DeleteLanguageInput;
+
+  @Field((type) => CreatePropertyInput, { nullable: true })
+  createProperty: CreatePropertyInput;
+
+  @Field((type) => UpdatePropertyInput, { nullable: true })
+  updateProperty: UpdatePropertyInput;
+
+  @Field((type) => ReorderPropertiesInput, { nullable: true })
+  reorderProperties: ReorderPropertiesInput;
+
+  @Field((type) => DeletePropertyInput, { nullable: true })
+  deleteProperty: DeletePropertyInput;
+
+  @Field((type) => CreateWordInput, { nullable: true })
+  createWord: CreateWordInput;
+
+  @Field((type) => UpdateWordInput, { nullable: true })
+  updateWord: UpdateWordInput;
+
+  @Field((type) => DeleteWordInput, { nullable: true })
+  deleteWord: DeleteWordInput;
 }

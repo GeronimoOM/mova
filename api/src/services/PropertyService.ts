@@ -19,6 +19,8 @@ import { DateTime } from 'luxon';
 import { ChangeService } from './ChangeService';
 import { ChangeBuilder } from './ChangeBuilder';
 import { copy } from 'utils/copy';
+import { Context } from 'models/Context';
+import { DbConnectionManager } from 'repositories/DbConnectionManager';
 
 export interface CreateBasePropertyParams {
   id?: PropertyId;
@@ -54,6 +56,10 @@ export interface ReorderPropertiesParams {
   propertyIds: PropertyId[];
 }
 
+export interface DeletePropertyParams {
+  id: PropertyId;
+}
+
 @Injectable()
 export class PropertyService {
   constructor(
@@ -63,6 +69,7 @@ export class PropertyService {
     @Inject(forwardRef(() => ChangeService))
     private changeService: ChangeService,
     private changeBuilder: ChangeBuilder,
+    private connectionManager: DbConnectionManager,
   ) {}
 
   async getByLanguageId(
@@ -91,7 +98,7 @@ export class PropertyService {
     return await this.propertyRepository.getAll();
   }
 
-  async create(params: CreatePropertyParams): Promise<Property> {
+  async create(ctx: Context, params: CreatePropertyParams): Promise<Property> {
     await this.languageService.getById(params.languageId);
 
     const order =
@@ -129,14 +136,17 @@ export class PropertyService {
         break;
     }
 
-    await this.propertyRepository.create(property);
-    await this.changeService.create(
-      this.changeBuilder.buildCreatePropertyChange(property),
-    );
+    await this.connectionManager.transactionally(async () => {
+      await this.propertyRepository.create(property);
+      await this.changeService.create(
+        this.changeBuilder.buildCreatePropertyChange(ctx, property),
+      );
+    });
+
     return property;
   }
 
-  async update(params: UpdatePropertyParams): Promise<Property> {
+  async update(ctx: Context, params: UpdatePropertyParams): Promise<Property> {
     const property = await this.getById(params.id);
     const currentProperty = copy(property);
 
@@ -159,22 +169,25 @@ export class PropertyService {
     }
 
     const change = this.changeBuilder.buildUpdatePropertyChange(
+      ctx,
       property,
       currentProperty,
     );
+
     if (change) {
-      await this.propertyRepository.update(property);
-      await this.changeService.create(change);
+      await this.connectionManager.transactionally(async () => {
+        await this.propertyRepository.update(property);
+        await this.changeService.create(change);
+      });
     }
 
     return property;
   }
 
-  async reorder({
-    languageId,
-    partOfSpeech,
-    propertyIds,
-  }: ReorderPropertiesParams): Promise<void> {
+  async reorder(
+    ctx: Context,
+    { languageId, partOfSpeech, propertyIds }: ReorderPropertiesParams,
+  ): Promise<void> {
     await this.languageService.getById(languageId);
 
     const properties = await this.propertyRepository.getByLanguageId(
@@ -187,6 +200,7 @@ export class PropertyService {
     }
 
     const change = this.changeBuilder.buildReorderPropertiesChange(
+      ctx,
       languageId,
       partOfSpeech,
       propertyIds,
@@ -194,18 +208,23 @@ export class PropertyService {
     );
 
     if (change) {
-      await this.propertyRepository.updateOrder(propertyIds);
-      await this.changeService.create(change);
+      await this.connectionManager.transactionally(async () => {
+        await this.propertyRepository.updateOrder(propertyIds);
+        await this.changeService.create(change);
+      });
     }
   }
 
-  async delete(id: PropertyId): Promise<Property> {
+  async delete(ctx: Context, { id }: DeletePropertyParams): Promise<Property> {
     const property = await this.propertyRepository.getById(id);
 
-    await this.propertyRepository.delete(id);
-    await this.changeService.create(
-      this.changeBuilder.buildDeletePropertyChange(property),
-    );
+    await this.connectionManager.transactionally(async () => {
+      await this.propertyRepository.delete(id);
+      await this.changeService.create(
+        this.changeBuilder.buildDeletePropertyChange(ctx, property),
+      );
+    });
+
     return property;
   }
 

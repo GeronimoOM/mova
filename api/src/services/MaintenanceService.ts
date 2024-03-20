@@ -20,9 +20,6 @@ import { Language, LanguageId } from 'models/Language';
 import { LanguageService } from './LanguageService';
 import { WordService } from './WordService';
 import { TopicService } from './TopicService';
-import { PropertyType, OptionProperty } from 'models/Property';
-import { PartOfSpeech } from 'models/Word';
-import { PropertyService } from './PropertyService';
 import { SearchClient } from 'clients/SearchClient';
 
 const RECORDS_BATCH = 1000;
@@ -31,7 +28,6 @@ const RECORDS_BATCH = 1000;
 export class MaintenanceService {
   constructor(
     private languageService: LanguageService,
-    private propertyService: PropertyService,
     private wordService: WordService,
     private topicService: TopicService,
 
@@ -72,13 +68,6 @@ export class MaintenanceService {
       this.wordService.indexLanguage(languageId),
       this.topicService.indexLanguage(languageId),
     ]);
-
-    return language;
-  }
-
-  async generateLanguage(name: string): Promise<Language> {
-    const language = await this.languageService.create({ name });
-    await this.generateLanguageData(language);
 
     return language;
   }
@@ -166,129 +155,5 @@ export class MaintenanceService {
     if (batch.length) {
       yield [type, batch];
     }
-  }
-
-  private async generateLanguageData(language: Language): Promise<void> {
-    const [nounTextProp, nounOptionProp, adjTextProp] = await Promise.all([
-      this.propertyService.create({
-        name: `Noun Text Property (${name})`,
-        type: PropertyType.Text,
-        partOfSpeech: PartOfSpeech.Noun,
-        languageId: language.id,
-      }),
-      this.propertyService.create({
-        name: `Noun Option Property (${name})`,
-        type: PropertyType.Option,
-        partOfSpeech: PartOfSpeech.Noun,
-        languageId: language.id,
-        options: ['Red', 'Blue', 'Green'],
-      }),
-      this.propertyService.create({
-        name: `Adjective Text Property (${name})`,
-        type: PropertyType.Text,
-        partOfSpeech: PartOfSpeech.Adj,
-        languageId: language.id,
-      }),
-    ]);
-
-    await Promise.all(
-      Object.values(PartOfSpeech).flatMap((pos) =>
-        Array.from(Array(5).keys()).map((i) =>
-          this.propertyService.create({
-            name: `${pos} property ${i + 1}`,
-            type: PropertyType.Text,
-            partOfSpeech: pos,
-            languageId: language.id,
-          }),
-        ),
-      ),
-    );
-
-    const [animals, sports] = await Promise.all([
-      this.topicService.create({
-        name: 'Animals',
-        languageId: language.id,
-      }),
-      this.topicService.create({
-        name: 'Sports',
-        languageId: language.id,
-      }),
-    ]);
-
-    const [dog, swim, run] = await Promise.all([
-      this.wordService.create({
-        original: `koer (${name})`,
-        translation: 'dog',
-        partOfSpeech: PartOfSpeech.Noun,
-        languageId: language.id,
-        properties: {
-          [nounTextProp.id]: {
-            text: 'koera',
-          },
-          [nounOptionProp.id]: {
-            option: Object.values(
-              (nounOptionProp as OptionProperty).options,
-            )[0],
-          },
-        },
-      }),
-
-      this.wordService.create({
-        original: `ujuma (${name})`,
-        translation: 'to swim',
-        partOfSpeech: PartOfSpeech.Verb,
-        languageId: language.id,
-      }),
-
-      this.wordService.create({
-        original: `jooskma (${name})`,
-        translation: 'to run',
-        partOfSpeech: PartOfSpeech.Verb,
-        languageId: language.id,
-      }),
-
-      this.wordService.create({
-        original: `väike (${name})`,
-        translation: 'small',
-        partOfSpeech: PartOfSpeech.Adj,
-        languageId: language.id,
-        properties: {
-          [adjTextProp.id]: {
-            text: 'väikse',
-          },
-        },
-      }),
-
-      this.wordService.create({
-        original: `suur (${name})`,
-        translation: 'big',
-        partOfSpeech: PartOfSpeech.Adj,
-        languageId: language.id,
-      }),
-
-      this.wordService.create({
-        original: `isegi (${name})`,
-        translation: 'even',
-        partOfSpeech: PartOfSpeech.Misc,
-        languageId: language.id,
-      }),
-    ]);
-
-    await Promise.all(
-      Array.from(Array(30).keys()).map((i) =>
-        this.wordService.create({
-          original: `word ${i + 1}`,
-          translation: `translation ${i + 1}`,
-          partOfSpeech: PartOfSpeech.Noun,
-          languageId: language.id,
-        }),
-      ),
-    );
-
-    await Promise.all([
-      this.topicService.addWord(animals.id, dog.id),
-      this.topicService.addWord(sports.id, swim.id),
-      this.topicService.addWord(sports.id, run.id),
-    ]);
   }
 }
