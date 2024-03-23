@@ -1,4 +1,4 @@
-import { Inject, Injectable, forwardRef } from '@nestjs/common';
+import { Inject, Injectable, Logger, forwardRef } from '@nestjs/common';
 import { DateTime } from 'luxon';
 import { Change, ChangeCursor, ChangePage, SyncType } from 'models/Change';
 import { ChangeRepository } from 'repositories/ChangeRepository';
@@ -26,6 +26,7 @@ import { Direction, mapCursor, mapPage } from 'models/Page';
 import { ChangeBuilder } from './ChangeBuilder';
 import { DbConnectionManager } from 'repositories/DbConnectionManager';
 import { Context, emptyContext } from 'models/Context';
+import { Cron } from '@nestjs/schedule';
 
 const DEFAULT_LIMIT = 100;
 
@@ -105,6 +106,15 @@ export class ChangeService {
         }
       }
     });
+  }
+
+  // every day a 1am
+  @Cron('0 0 1 * * *', {
+    utcOffset: 0,
+  })
+  async cleanupChanges() {
+    Logger.log('Cleaning up old changes...');
+    await this.changeRepository.deleteOlder(DateTime.utc().minus({ weeks: 3 }));
   }
 
   private async determineSyncType(

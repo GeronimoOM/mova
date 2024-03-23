@@ -106,6 +106,13 @@ export class ChangeRepository {
       .insert(changeRow);
   }
 
+  async deleteOlder(changeAt: DateTime): Promise<void> {
+    await this.connectionManager
+      .getConnection()(TABLE_CHANGES)
+      .where('changed_at', '<', changeAt.toFormat(DATETIME_FORMAT))
+      .delete();
+  }
+
   private mapToChange(row: ChangeTable): Change {
     const baseChange: BaseChange = {
       id: row.id,

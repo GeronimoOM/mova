@@ -26,10 +26,11 @@ import { ChangeService } from 'services/ChangeService';
 import { ChangeTypeMapper } from 'graphql/mappers/ChangeTypeMapper';
 import { ChangeResolver } from 'graphql/resolvers/ChangeResolver';
 import { ChangeBuilder } from 'services/ChangeBuilder';
+import { ScheduleModule } from '@nestjs/schedule';
 import { AsyncLocalStorage } from 'node:async_hooks';
 
 @Module({
-  imports: [GraphQlModule, ElasticClientModule],
+  imports: [GraphQlModule, ElasticClientModule, ScheduleModule.forRoot()],
   providers: [
     LanguageResolver,
     PropertyResolver,
