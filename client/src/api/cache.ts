@@ -1,4 +1,4 @@
-import { TypePolicy } from '@apollo/client';
+import { TypePolicy } from '@apollo/client/cache';
 import { InMemoryCache } from '@merged/solid-apollo';
 import { LanguageWordsArgs, WordPage } from './types/graphql';
 

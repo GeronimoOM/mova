@@ -1,7 +1,7 @@
 import { clientsClaim } from 'workbox-core';
 import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
-import { matchGraphqlRequest, handleGraphQlRequest } from './sw/graphql-route';
+import { isGraphqlRequest, handleGraphQlRequest } from './sw/graphql';
 import { sync } from './sw/sync';
 import { init } from './sw/init';
 //import { ServiceWorkerMessage, ServiceWorkerMessageType } from './sw/messages';
@@ -14,7 +14,7 @@ self.skipWaiting();
 clientsClaim();
 
 registerRoute(
-  ({ url }) => matchGraphqlRequest(url),
+  ({ url }) => isGraphqlRequest(url),
   ({ event }) => handleGraphQlRequest(event as FetchEvent),
   'POST',
 );

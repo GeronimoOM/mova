@@ -44,6 +44,11 @@ db.on('ready', () => {
 });
 
 export async function getState(): Promise<SyncState> {
+  const state = await db.state.get(1);
+  if (!state) {
+    await initState();
+  }
+
   return (await db.state.get(1))!;
 }
 
