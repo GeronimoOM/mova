@@ -189,9 +189,13 @@ export async function searchWords(
   limit: number,
   start?: number,
 ): Promise<WordFieldsFragment[]> {
+  const queryUpperBound = `${query.slice(
+    0,
+    query.length - 1,
+  )}${String.fromCharCode(query.charCodeAt(query.length - 1) + 1)}`;
   const words = db.words
     .where('[languageId+original+id]')
-    .aboveOrEqual([languageId, query])
+    .between([languageId, query], [languageId, queryUpperBound])
     .limit(limit);
   if (start) {
     words.offset(start);

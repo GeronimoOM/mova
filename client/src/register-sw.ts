@@ -4,6 +4,8 @@ import { ServiceWorkerMessage, ServiceWorkerMessageType } from './sw/messages';
 const PERIODIC_SYNC_INTERVAL_MS = 60 * 1000;
 const PERIODIC_BACKGROUND_SYNC_INTERVAL_MS = 30 * 60 * 1000;
 
+let periodicSyncInterval: ReturnType<typeof setInterval> | undefined;
+
 export async function registerServiceWorker(): Promise<void> {
   return new Promise((resolve) => {
     if ('serviceWorker' in navigator) {
@@ -19,10 +21,7 @@ export async function registerServiceWorker(): Promise<void> {
         await sendMessageToServiceWorker('init');
         resolve();
 
-        await sendMessageToServiceWorker('sync');
-        setInterval(() => {
-          sendMessageToServiceWorker('sync');
-        }, PERIODIC_SYNC_INTERVAL_MS);
+        startPeriodicSync();
 
         await registerBackgroundSync();
       });
@@ -30,6 +29,25 @@ export async function registerServiceWorker(): Promise<void> {
       resolve();
     }
   });
+}
+
+export function startPeriodicSync() {
+  if (periodicSyncInterval) {
+    return;
+  }
+
+  sendMessageToServiceWorker('sync');
+  periodicSyncInterval = setInterval(() => {
+    sendMessageToServiceWorker('sync');
+  }, PERIODIC_SYNC_INTERVAL_MS);
+}
+
+export function stopPeriodicSync() {
+  if (!periodicSyncInterval) {
+    return;
+  }
+
+  clearInterval(periodicSyncInterval);
 }
 
 async function registerBackgroundSync() {
@@ -52,7 +70,6 @@ async function registerBackgroundSync() {
 async function registerMessageListener() {
   navigator.serviceWorker.addEventListener('message', (e) => {
     const message: ServiceWorkerMessage = e.data;
-    console.log('Message received from service worker', message);
 
     if (message.type === ServiceWorkerMessageType.InitMessage) {
       setClientId(message.clientId);

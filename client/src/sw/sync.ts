@@ -58,7 +58,7 @@ export async function getSyncStatus(state?: SyncState): Promise<SyncStatus> {
 }
 
 function isSyncStale(timestamp: number): boolean {
-  return DateTime.utc().toSeconds() > timestamp + SYNC_STALE_THRESHOLD;
+  return DateTime.utc().toUnixInteger() > timestamp + SYNC_STALE_THRESHOLD;
 }
 
 async function reserveSyncing(): Promise<void> {
@@ -120,7 +120,7 @@ async function pullChanges(): Promise<void> {
   let syncType = lastSyncedAt ? SyncType.Delta : SyncType.Full;
 
   if (!currentSyncCursor) {
-    currentSyncStartedAt = DateTime.utc().toSeconds();
+    currentSyncStartedAt = DateTime.utc().toUnixInteger();
     await cache.updateState({ currentSyncStartedAt });
   }
 

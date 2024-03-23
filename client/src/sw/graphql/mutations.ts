@@ -53,7 +53,7 @@ export async function handleGraphQlMutation(
 
     return response;
   } catch (err) {
-    console.log('Failed to upload mutation. Saving to cache.');
+    console.log('Mutation request failed. Saving to cache.');
 
     await cache.saveChange(buildChange(request));
     const response = await handleGraphQlMutationOptimistically(request);
@@ -157,6 +157,7 @@ async function handleCreateLanguageMutation(
       ...input,
       id: input.id!,
       addedAt: input.addedAt!,
+      __typename: 'Language',
     },
   });
 }
@@ -167,7 +168,10 @@ async function handleUpdateLanguageMutation(
   const { input } = request.variables as UpdateLanguageMutationVariables;
 
   return response<UpdateLanguageMutation>({
-    updateLanguage: input,
+    updateLanguage: {
+      ...input,
+      __typename: 'Language',
+    },
   });
 }
 
@@ -177,7 +181,10 @@ async function handleDeleteLanguageMutation(
   const { input } = request.variables as DeleteLanguageMutationVariables;
 
   return response<DeleteLanguageMutation>({
-    deleteLanguage: input,
+    deleteLanguage: {
+      ...input,
+      __typename: 'Language',
+    },
   });
 }
 
@@ -212,6 +219,7 @@ async function handleUpdatePropertyMutation(
     updateProperty: {
       ...property,
       ...(input.name && { name: input.name }),
+      __typename: 'TextProperty',
     },
   });
 }
@@ -243,6 +251,7 @@ async function handleDeletePropertyMutation(
       id: property.id,
       languageId: property.languageId,
       partOfSpeech: property.partOfSpeech,
+      __typename: 'TextProperty',
     },
   });
 }
@@ -266,6 +275,7 @@ async function handleCreateWordMutation(
           text: text!,
           __typename: 'TextPropertyValue',
         })) ?? [],
+      __typename: 'Word',
     },
   });
 }
@@ -297,6 +307,7 @@ async function handleUpdateWordMutation(
           return props;
         }, word.properties),
       }),
+      __typename: 'Word',
     },
   });
 }
@@ -311,6 +322,7 @@ async function handleDeleteWordMutation(
     deleteWord: {
       id: word.id,
       languageId: word.languageId,
+      __typename: 'Word',
     },
   });
 }
