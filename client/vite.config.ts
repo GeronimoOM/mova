@@ -13,25 +13,22 @@ const manifest: Partial<ManifestOptions> = {
   orientation: 'portrait',
   icons: [
     {
-      src: './src/assets/manifest-icon-192.maskable.png',
-      sizes: '192x192',
+      src: 'images/pwa-64x64.png',
+      sizes: '64x64',
       type: 'image/png',
-      purpose: 'any',
     },
     {
-      src: './src/assets/manifest-icon-192.maskable.png',
+      src: 'images/pwa-192x192.png',
       sizes: '192x192',
       type: 'image/png',
-      purpose: 'maskable',
     },
     {
-      src: './src/assets/manifest-icon-512.maskable.png',
+      src: 'images/pwa-512x512.png',
       sizes: '512x512',
       type: 'image/png',
-      purpose: 'any',
     },
     {
-      src: './src/assets/manifest-icon-512.maskable.png',
+      src: 'images/maskable-icon-512x512.png',
       sizes: '512x512',
       type: 'image/png',
       purpose: 'maskable',
@@ -47,9 +44,7 @@ const pwaOptions: Partial<VitePWAOptions> = {
   srcDir: 'src',
   filename: 'sw.ts',
   injectRegister: null,
-  injectManifest: {
-    globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
-  },
+  includeAssets: ['fonts/*.ttf', 'images/*.svg'],
   devOptions: {
     enabled: true,
     type: 'module',

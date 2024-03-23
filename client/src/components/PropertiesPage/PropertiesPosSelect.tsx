@@ -12,7 +12,7 @@ export const PropertiesPosSelect: Component<PropertiesPosSelectProps> = (
   props,
 ) => {
   return (
-    <div class="m-2 flex cursor-pointer flex-col items-center bg-spacecadet-300 font-bold text-white">
+    <div class="m-2 flex cursor-pointer flex-col items-center bg-spacecadet-300 text-white">
       <div class="flex flex-row justify-center ">
         <For each={Object.entries(partsOfSpeechProps)}>
           {([partOfSpeech, posProps]) => (

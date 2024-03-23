@@ -187,7 +187,7 @@ export const PropertyListItemOverlay: Component<
       class={`flex flex-row p-2 ${baseColors?.textColor} ${baseColors?.backgroundColor}`}
     >
       <PropertyTypeIcon type={props.property.type} />
-      <div class="flex-1 p-3 font-bold">{props.property.name}</div>
+      <div class="flex-1 p-3">{props.property.name}</div>
       <Icon
         icon={FaSolidGripLines}
         class={`${selectedColors?.textColor} ${selectedColors?.backgroundColor} cursor-move`}

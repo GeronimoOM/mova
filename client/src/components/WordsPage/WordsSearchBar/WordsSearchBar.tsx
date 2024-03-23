@@ -44,7 +44,7 @@ export const WordsSearchBar: Component<WordsSearchBarProps> = (props) => {
   const { base: baseColors } = useColorContext()!;
 
   return (
-    <div class="flex w-full max-w-2xl flex-row font-bold">
+    <div class="flex w-full max-w-2xl flex-row">
       <div
         class={`relative flex w-full flex-row items-center ${baseColors?.textColor} ${baseColors?.backgroundColor}`}
       >

@@ -43,7 +43,7 @@ export const NavBar: Component = () => {
       <nav
         class={`fixed bottom-0 flex w-full flex-row items-center overflow-hidden
         md:static md:h-full md:min-w-[14rem] md:max-w-[14rem] md:flex-col md:items-stretch
-        ${colorContext.base?.textColor} ${colorContext.base?.backgroundColor} font-bold`}
+        ${colorContext.base?.textColor} ${colorContext.base?.backgroundColor} font-semibold`}
       >
         <Show when={!isLanguagesActive() || isVertical()}>
           <NavBarItem href={AppRoute.Words} icon={BsTranslate} text="Words" />
