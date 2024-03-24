@@ -1,15 +1,6 @@
 import { Component } from 'solid-js';
 import { Main } from './Main';
 import { NavBar } from './NavBar/NavBar';
-import { startPeriodicSync, stopPeriodicSync } from '../register-sw';
-
-window.addEventListener('offline', () => {
-  stopPeriodicSync();
-});
-
-window.addEventListener('online', () => {
-  startPeriodicSync();
-});
 
 const App: Component = () => {
   return (

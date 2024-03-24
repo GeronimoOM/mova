@@ -1,12 +1,12 @@
-import { setClientId } from './api/client';
-import { ServiceWorkerMessage, ServiceWorkerMessageType } from './sw/messages';
+import { SwWorkerMessageHandler } from '../worker/messages';
+import { SwClientMessageType, sendMessageToServiceWorker } from './messages';
 
 const PERIODIC_SYNC_INTERVAL_MS = 60 * 1000;
 const PERIODIC_BACKGROUND_SYNC_INTERVAL_MS = 30 * 60 * 1000;
 
-let periodicSyncInterval: ReturnType<typeof setInterval> | undefined;
-
-export async function registerServiceWorker(): Promise<void> {
+export async function registerServiceWorker(
+  messageHandler: SwWorkerMessageHandler,
+): Promise<void> {
   return new Promise((resolve) => {
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', async () => {
@@ -17,8 +17,10 @@ export async function registerServiceWorker(): Promise<void> {
           { scope: '/', type: 'module' },
         );
 
-        registerMessageListener();
-        await sendMessageToServiceWorker('init');
+        registerMessageHandler(messageHandler);
+        await sendMessageToServiceWorker({
+          type: SwClientMessageType.Initialize,
+        });
         resolve();
 
         startPeriodicSync();
@@ -31,23 +33,21 @@ export async function registerServiceWorker(): Promise<void> {
   });
 }
 
-export function startPeriodicSync() {
-  if (periodicSyncInterval) {
-    return;
-  }
-
-  sendMessageToServiceWorker('sync');
-  periodicSyncInterval = setInterval(() => {
-    sendMessageToServiceWorker('sync');
+function startPeriodicSync() {
+  sendMessageToServiceWorker({
+    type: SwClientMessageType.Sync,
+  });
+  setInterval(() => {
+    sendMessageToServiceWorker({
+      type: SwClientMessageType.Sync,
+    });
   }, PERIODIC_SYNC_INTERVAL_MS);
-}
 
-export function stopPeriodicSync() {
-  if (!periodicSyncInterval) {
-    return;
-  }
-
-  clearInterval(periodicSyncInterval);
+  window.addEventListener('online', () => {
+    sendMessageToServiceWorker({
+      type: SwClientMessageType.Sync,
+    });
+  });
 }
 
 async function registerBackgroundSync() {
@@ -67,22 +67,8 @@ async function registerBackgroundSync() {
   }
 }
 
-async function registerMessageListener() {
+async function registerMessageHandler(messageHandler: SwWorkerMessageHandler) {
   navigator.serviceWorker.addEventListener('message', (e) => {
-    const message: ServiceWorkerMessage = e.data;
-
-    if (message.type === ServiceWorkerMessageType.InitMessage) {
-      setClientId(message.clientId);
-    }
+    messageHandler(e.data);
   });
-}
-
-export async function sendMessageToServiceWorker(message: string) {
-  const serviceWorker = await getServiceWorker();
-  serviceWorker?.postMessage(message);
-}
-
-export async function getServiceWorker(): Promise<ServiceWorker | null> {
-  const registration = await navigator.serviceWorker?.ready;
-  return registration?.active;
 }

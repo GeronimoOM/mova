@@ -7,7 +7,7 @@ import {
   GetWordsQuery,
   GetWordQueryVariables,
   GetWordQuery,
-} from '../../api/types/graphql';
+} from '../../../api/types/graphql';
 import { getSyncStatus, SyncStatus } from '../sync';
 import * as cache from '../cache';
 import { GraphQlRequest, response, tryFetch } from './common';

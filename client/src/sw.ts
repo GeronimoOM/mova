@@ -1,10 +1,9 @@
 import { clientsClaim } from 'workbox-core';
 import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
-import { isGraphqlRequest, handleGraphQlRequest } from './sw/graphql';
-import { sync } from './sw/sync';
-import { init } from './sw/init';
-//import { ServiceWorkerMessage, ServiceWorkerMessageType } from './sw/messages';
+import { isGraphqlRequest, handleGraphQlRequest } from './sw/worker/graphql';
+import { sync } from './sw/worker/sync';
+import { init } from './sw/worker/init';
 
 declare let self: ServiceWorkerGlobalScope;
 
@@ -34,6 +33,6 @@ self.addEventListener('periodicsync', (e) => {
   const event = e as ExtendableEvent & { tag: string };
   if (event.tag === 'sync-mova-data') {
     console.log('Periodic data sync...');
-    //event.waitUntil(syncMovaData());
+    event.waitUntil(sync());
   }
 });

@@ -20,7 +20,7 @@ import {
   CreateWordMutation,
   UpdateWordMutation,
   DeleteWordMutation,
-} from '../../api/types/graphql';
+} from '../../../api/types/graphql';
 import { GraphQlRequest, response, tryFetch } from './common';
 import * as cache from '../cache';
 
@@ -72,7 +72,7 @@ function buildChange(request: GraphQlRequest): ApplyChangeInput {
       };
     case GraphQlMutation.UpdateLanguage:
       return {
-        createLanguage: (request.variables as UpdateLanguageMutationVariables)
+        updateLanguage: (request.variables as UpdateLanguageMutationVariables)
           .input,
       };
     case GraphQlMutation.DeleteLanguage:
@@ -196,7 +196,11 @@ async function handleCreatePropertyMutation(
     input.languageId,
     input.partOfSpeech,
   );
-  const order = properties.length + 1;
+  const order =
+    properties.reduce(
+      (maxOrder, { order }) => (order > maxOrder ? order : maxOrder),
+      0,
+    ) + 1;
 
   return response<CreatePropertyMutation>({
     createProperty: {

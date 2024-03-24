@@ -17,11 +17,11 @@ import {
   UpdateLanguageChangeFieldsFragment,
   UpdatePropertyChangeFieldsFragment,
   UpdateWordChangeFieldsFragment,
-} from '../api/types/graphql';
+} from '../../api/types/graphql';
 import * as cache from './cache';
-import { ServiceWorkerMessageType, produceMessage } from './messages';
+import { SwWorkerMessageType, sendMessageToClient } from './messages';
 import { DateTime } from 'luxon';
-import { DATETIME_FORMAT } from '../utils/constants';
+import { DATETIME_FORMAT } from '../../utils/constants';
 
 export const SYNC_CLIENT_ID_HEADER = 'Sync-Client-ID';
 
@@ -63,15 +63,15 @@ function isSyncStale(timestamp: number): boolean {
 
 async function reserveSyncing(): Promise<void> {
   isSyncing = true;
-  await produceMessage({
-    type: ServiceWorkerMessageType.Syncing,
+  await sendMessageToClient({
+    type: SwWorkerMessageType.Syncing,
   });
 }
 
 async function releaseSyncing(): Promise<void> {
   isSyncing = false;
-  await produceMessage({
-    type: ServiceWorkerMessageType.SyncingOver,
+  await sendMessageToClient({
+    type: SwWorkerMessageType.SyncOver,
   });
 }
 

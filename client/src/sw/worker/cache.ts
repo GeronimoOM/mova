@@ -17,7 +17,7 @@ import type {
   WordFieldsFragment,
   WordFieldsFullFragment,
   WordUpdate,
-} from '../api/types/graphql';
+} from '../../api/types/graphql';
 import { SyncState } from './sync';
 
 export class MovaDb extends Dexie {

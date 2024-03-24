@@ -98,7 +98,11 @@ export function createPropertyMutation(): CreateMutationResult<
         input.languageId,
         input.partOfSpeech,
       );
-      const order = properties.length + 1;
+      const order =
+        properties.reduce(
+          (maxOrder, { order }) => (order > maxOrder ? order : maxOrder),
+          0,
+        ) + 1;
 
       return {
         createProperty: {
@@ -310,7 +314,7 @@ function readProperty(id: string): PropertyFieldsFragment | null {
 function readPartOfSpeechProperties(
   languageId: string,
   partOfSpeech: PartOfSpeech,
-): { id: string }[] {
+): PropertyFieldsFragment[] {
   return cache.readFragment({
     id: `Language:${languageId}`,
     variables: { partOfSpeech },
