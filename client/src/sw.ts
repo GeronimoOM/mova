@@ -4,6 +4,7 @@ import { registerRoute } from 'workbox-routing';
 import { isGraphqlRequest, handleGraphQlRequest } from './sw/worker/graphql';
 import { sync } from './sw/worker/sync';
 import { init } from './sw/worker/init';
+import { SwClientMessage, SwClientMessageType } from './sw/client/messages';
 
 declare let self: ServiceWorkerGlobalScope;
 
@@ -19,12 +20,10 @@ registerRoute(
 );
 
 self.addEventListener('message', (event) => {
-  console.log('Service Worker received message:', event.data);
-  if (event.data === 'init') {
+  const message = event.data as SwClientMessage;
+  if (message.type === SwClientMessageType.Initialize) {
     event.waitUntil(init());
-  }
-
-  if (event.data === 'sync') {
+  } else if (message.type === SwClientMessageType.Sync) {
     event.waitUntil(sync());
   }
 });
