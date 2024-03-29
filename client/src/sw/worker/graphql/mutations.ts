@@ -294,7 +294,7 @@ async function handleUpdateWordMutation(
     updateWord: {
       ...word,
       ...(input.original && { original: input.original }),
-      ...(input.translation && { original: input.translation }),
+      ...(input.translation && { translation: input.translation }),
       ...(input.properties && {
         properties: input.properties.reduce((props, { id, text }) => {
           props = props.filter((prop) => prop.property.id !== id);
