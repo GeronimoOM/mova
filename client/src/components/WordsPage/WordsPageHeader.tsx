@@ -5,6 +5,7 @@ import {
   WordsSearchBarProps,
 } from './WordsSearchBar/WordsSearchBar';
 import { ColorContextType, ColorProvider } from '../common/ColorContext';
+import { SyncStatusButton } from './SyncStatus/SyncStatusButton';
 
 type WordsPageHeader = WordsSearchBarProps & {
   isOpenCreateWord: boolean;
@@ -37,6 +38,7 @@ export const WordsPageHeader: Component<WordsPageHeader> = (props) => {
           onActionSelect={props.onOpenCreateWord}
           isDisabled={props.isOpenCreateWord}
         />
+        <SyncStatusButton />
       </div>
     </ColorProvider>
   );

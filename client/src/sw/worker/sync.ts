@@ -61,17 +61,18 @@ function isSyncStale(timestamp: number): boolean {
   return DateTime.utc().toUnixInteger() > timestamp + SYNC_STALE_THRESHOLD;
 }
 
-async function reserveSyncing(): Promise<void> {
+async function startSyncing(): Promise<void> {
   isSyncing = true;
   await sendMessageToClient({
     type: SwWorkerMessageType.Syncing,
   });
 }
 
-async function releaseSyncing(): Promise<void> {
+async function releaseSyncing(isSuccess = true): Promise<void> {
   isSyncing = false;
   await sendMessageToClient({
     type: SwWorkerMessageType.SyncOver,
+    isSuccess,
   });
 }
 
@@ -80,15 +81,17 @@ export async function sync(): Promise<void> {
     return;
   }
 
-  await reserveSyncing();
+  await startSyncing();
+  let isSyncSuccess = false;
   try {
     await pushChanges();
     await pullChanges();
+    isSyncSuccess = true;
     console.log('Sync success');
   } catch (err) {
     console.error('Sync failure');
   } finally {
-    await releaseSyncing();
+    await releaseSyncing(isSyncSuccess);
   }
 }
 
@@ -100,7 +103,6 @@ async function pushChanges(): Promise<void> {
     changes = await cache.getChanges(PUSH_CHANGES_BATCH);
     nChanges += changes.length;
     if (changes.length) {
-      await reserveSyncing();
       await pushApplyChanges(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         changes.map(({ id, ...change }) => change),
@@ -126,7 +128,6 @@ async function pullChanges(): Promise<void> {
 
   let nChanges = 0;
   do {
-    await reserveSyncing();
     const changesPage = await fetchChangesPage(
       syncType,
       currentSyncCursor,

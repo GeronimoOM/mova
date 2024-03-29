@@ -1,7 +1,7 @@
 import { SwWorkerMessageHandler } from '../worker/messages';
 import { SwClientMessageType, sendMessageToServiceWorker } from './messages';
 
-const PERIODIC_SYNC_INTERVAL_MS = 60 * 1000;
+const PERIODIC_SYNC_INTERVAL_MS = 20 * 1000;
 const PERIODIC_BACKGROUND_SYNC_INTERVAL_MS = 30 * 60 * 1000;
 
 export async function registerServiceWorker(

@@ -24,6 +24,7 @@ export interface WorkerSyncingMessage extends BaseSwWorkerMessage {
 
 export interface WorkerSyncOverMessage extends BaseSwWorkerMessage {
   type: SwWorkerMessageType.SyncOver;
+  isSuccess: boolean;
 }
 
 export type SwWorkerMessageHandler = (message: SwWorkerMessage) => void;

@@ -291,6 +291,10 @@ export async function getChanges(
   return await db.changes.orderBy('id').limit(limit).toArray();
 }
 
+export async function hasChanges(): Promise<boolean> {
+  return !!(await db.changes.limit(1).toArray()).length;
+}
+
 export async function saveChange(change: ApplyChangeInput): Promise<void> {
   await db.changes.put({
     id: Date.now(),
