@@ -173,11 +173,12 @@ export async function getWords(
 ): Promise<WordFieldsFragment[]> {
   return await db.words
     .where('[languageId+addedAt+id]')
-    .belowOrEqual([
-      languageId,
-      before ?? Dexie.maxKey,
-      beforeId ?? Dexie.maxKey,
-    ])
+    .between(
+      [languageId, Dexie.minKey, Dexie.minKey],
+      [languageId, before ?? Dexie.maxKey, beforeId ?? Dexie.maxKey],
+      false,
+      true,
+    )
     .reverse()
     .limit(limit)
     .toArray();

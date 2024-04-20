@@ -1,10 +1,14 @@
+const FETCH_TIMEOUT = 1000;
+
 export type GraphQlRequest<TVariables = Record<string, unknown>> = {
   operationName: string;
   variables: TVariables;
 };
 
 export async function tryFetch(event: FetchEvent): Promise<Response> {
-  const response = await fetch(event.request);
+  const response = await fetch(event.request, {
+    signal: AbortSignal.timeout(FETCH_TIMEOUT),
+  });
   if (response.status >= 500) {
     throw new Error('Server error');
   }
