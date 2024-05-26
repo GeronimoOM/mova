@@ -22,6 +22,8 @@ export class AuthService {
 
     const payload = { auth: true };
 
-    return await this.jwtService.signAsync(payload);
+    return await this.jwtService.signAsync(payload, {
+      noTimestamp: true,
+    });
   }
 }

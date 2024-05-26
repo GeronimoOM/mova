@@ -1,7 +1,7 @@
 import { ApolloClient } from '@merged/solid-apollo';
 import { ApolloLink, HttpLink } from '@apollo/client/core';
 import { cache } from './cache';
-import { LOCAL_STORAGE_JWT_TOKEN } from '../utils/constants';
+import { LOCAL_STORAGE_TOKEN_KEY } from '../components/AuthContext';
 
 export const GRAPHQL_URI = `/api/graphql`;
 
@@ -16,7 +16,7 @@ const httpLink = new HttpLink({
 });
 
 const headersLink = new ApolloLink((operation, forward) => {
-  const token = localStorage.getItem(LOCAL_STORAGE_JWT_TOKEN);
+  const token = localStorage.getItem(LOCAL_STORAGE_TOKEN_KEY);
 
   operation.setContext(() => ({
     headers: {
