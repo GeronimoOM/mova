@@ -46,7 +46,6 @@ import { AuthResolver } from 'graphql/resolvers/AuthResolver';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>(CONFIG_JWT_KEY),
-        noTimestamp: true,
       }),
     }),
   ],
