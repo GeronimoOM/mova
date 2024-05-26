@@ -10,6 +10,7 @@ import { LanguageProvider } from './components/LanguageContext';
 import { registerServiceWorker } from './sw/client/register';
 import { SwWorkerMessageType } from './sw/worker/messages';
 import { setIsSynced } from './sw/client/sync';
+import { AuthProvider } from './components/AuthContext';
 
 const root = document.getElementById('root')!;
 
@@ -32,11 +33,13 @@ registerServiceWorker((message) => {
 render(
   () => (
     <ApolloProvider client={client}>
-      <LanguageProvider>
-        <Router>
-          <App />
-        </Router>
-      </LanguageProvider>
+      <AuthProvider>
+        <LanguageProvider>
+          <Router>
+            <App />
+          </Router>
+        </LanguageProvider>
+      </AuthProvider>
     </ApolloProvider>
   ),
   root,

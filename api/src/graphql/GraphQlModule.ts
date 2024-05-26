@@ -5,7 +5,7 @@ import { MercuriusDriver, MercuriusDriverConfig } from '@nestjs/mercurius';
 import { validationPlugin } from './validation';
 import { TimestampScalar } from './scalars/Timestamp';
 import { Context } from 'models/Context';
-import { SYNC_CLIENT_ID_HEADER } from 'utils/constants';
+import { HEADER_AUTHORIZATION, HEADER_SYNC_CLIENT_ID } from 'utils/constants';
 
 export const GraphQlModule =
   NestGraphQlModule.forRootAsync<MercuriusDriverConfig>({
@@ -17,7 +17,11 @@ export const GraphQlModule =
       resolvers: {
         Timestamp: TimestampScalar,
       },
-      context: (request: FastifyRequest): { ctx: Context } => ({
+      context: (
+        request: FastifyRequest,
+      ): {
+        ctx: Context;
+      } => ({
         ctx: buildContext(request),
       }),
       graphiql: true,
@@ -25,7 +29,10 @@ export const GraphQlModule =
   });
 
 function buildContext(request: FastifyRequest): Context {
+  const [type, token] = request.headers[HEADER_AUTHORIZATION]?.split(' ') ?? [];
+
   return {
-    clientId: request.headers[SYNC_CLIENT_ID_HEADER] as string,
+    jwtToken: type === 'Bearer' ? token : undefined,
+    clientId: request.headers[HEADER_SYNC_CLIENT_ID] as string,
   };
 }

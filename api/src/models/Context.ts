@@ -1,4 +1,5 @@
 export interface Context {
+  jwtToken?: string;
   clientId?: string;
 }
 

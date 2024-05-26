@@ -23,7 +23,8 @@ import { SwWorkerMessageType, sendMessageToClient } from './messages';
 import { DateTime } from 'luxon';
 import { DATETIME_FORMAT } from '../../utils/constants';
 
-export const SYNC_CLIENT_ID_HEADER = 'Sync-Client-ID';
+export const HEADER_SYNC_CLIENT_ID = 'Sync-Client-ID';
+export const HEADER_AUTHORIZATION = 'Authorization;';
 
 const SYNC_STALE_THRESHOLD = 2 * 24 * 60 * 60; // 2 days
 const PUSH_CHANGES_BATCH = 20;
@@ -251,7 +252,8 @@ async function fetchChangesPage(
         : null,
     },
     requestHeaders: {
-      [SYNC_CLIENT_ID_HEADER]: clientId,
+      ...(await getAuthHeaders()),
+      [HEADER_SYNC_CLIENT_ID]: clientId,
     },
   });
 }
@@ -266,7 +268,16 @@ async function pushApplyChanges(
       changes,
     },
     requestHeaders: {
-      [SYNC_CLIENT_ID_HEADER]: clientId,
+      ...(await getAuthHeaders()),
+      [HEADER_SYNC_CLIENT_ID]: clientId,
     },
   });
+}
+
+async function getAuthHeaders(): Promise<Record<string, string>> {
+  const token = await cache.getToken();
+
+  return {
+    ...(token && { Authorization: `Bearer ${token}` }),
+  };
 }

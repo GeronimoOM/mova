@@ -18,19 +18,22 @@ export async function registerServiceWorker(
         );
 
         registerMessageHandler(messageHandler);
-        await sendMessageToServiceWorker({
-          type: SwClientMessageType.Initialize,
-        });
+
         resolve();
-
-        startPeriodicSync();
-
-        await registerBackgroundSync();
       });
     } else {
       resolve();
     }
   });
+}
+
+export async function initServiceWorker(token: string) {
+  sendMessageToServiceWorker({
+    type: SwClientMessageType.Initialize,
+    token,
+  });
+  startPeriodicSync();
+  registerBackgroundSync();
 }
 
 function startPeriodicSync() {

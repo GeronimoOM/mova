@@ -83,3 +83,7 @@ mutation DeleteTopic($id: ID!) {
 mutation ApplyChanges($changes: [ApplyChangeInput!]!) {
   applyChanges(changes: $changes)
 }
+
+mutation Login($input: LoginInput!) {
+  token(input: $input)
+}

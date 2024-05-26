@@ -11,6 +11,7 @@ export enum SwClientMessageType {
 
 export interface ClientInitializeMessage extends BaseSwClientMessage {
   type: SwClientMessageType.Initialize;
+  token: string;
 }
 
 export interface ClientSyncMessage extends BaseSwClientMessage {

@@ -26,6 +26,7 @@ export class MovaDb extends Dexie {
   properties!: Dexie.Table<PropertyFieldsFragment>;
   words!: Dexie.Table<WordFieldsFragment | WordFieldsFullFragment>;
   changes!: Dexie.Table<ApplyChangeInput & { id: number }>;
+  auth!: Dexie.Table<{ id: number; token: string }>;
 }
 
 const DB_VERSION = 1;
@@ -38,6 +39,7 @@ db.version(DB_VERSION).stores({
   properties: 'id,[languageId+partOfSpeech]',
   words: 'id,[languageId+addedAt+id],[languageId+original+id]',
   changes: 'id',
+  auth: 'id',
 });
 db.on('ready', () => {
   return initState();
@@ -305,6 +307,19 @@ export async function saveChange(change: ApplyChangeInput): Promise<void> {
 
 export async function deleteChanges(ids: number[]): Promise<void> {
   await db.changes.bulkDelete(ids);
+}
+
+export async function getToken(): Promise<string | null> {
+  const auth = await db.auth.get(1);
+
+  return auth?.token ?? null;
+}
+
+export async function saveToken(token: string): Promise<void> {
+  await db.auth.put({
+    id: 1,
+    token,
+  });
 }
 
 export async function transactionally<T>(fn: () => Promise<T>): Promise<T> {

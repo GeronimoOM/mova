@@ -22,7 +22,7 @@ registerRoute(
 self.addEventListener('message', (event) => {
   const message = event.data as SwClientMessage;
   if (message.type === SwClientMessageType.Initialize) {
-    event.waitUntil(init());
+    event.waitUntil(init(message.token));
   } else if (message.type === SwClientMessageType.Sync) {
     event.waitUntil(sync());
   }

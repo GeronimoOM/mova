@@ -1,4 +1,6 @@
+import { AsyncLocalStorage } from 'node:async_hooks';
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MaintenanceController } from './controllers/MaintenanceController';
 import { PropertyTypeMapper } from './graphql/mappers/PropertyTypeMapper';
 import { WordTypeMapper } from './graphql/mappers/WordTypeMapper';
@@ -27,11 +29,29 @@ import { ChangeTypeMapper } from 'graphql/mappers/ChangeTypeMapper';
 import { ChangeResolver } from 'graphql/resolvers/ChangeResolver';
 import { ChangeBuilder } from 'services/ChangeBuilder';
 import { ScheduleModule } from '@nestjs/schedule';
-import { AsyncLocalStorage } from 'node:async_hooks';
+import { JwtModule } from '@nestjs/jwt';
+import { AuthService } from 'services/AuthService';
+import { AuthGuard, CONFIG_JWT_KEY } from 'guards/AuthGuard';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthResolver } from 'graphql/resolvers/AuthResolver';
 
 @Module({
-  imports: [GraphQlModule, ElasticClientModule, ScheduleModule.forRoot()],
+  imports: [
+    GraphQlModule,
+    ElasticClientModule,
+    ScheduleModule.forRoot(),
+    ConfigModule.forRoot(),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get<string>(CONFIG_JWT_KEY),
+        noTimestamp: true,
+      }),
+    }),
+  ],
   providers: [
+    AuthResolver,
     LanguageResolver,
     PropertyResolver,
     ChangeResolver,
@@ -40,6 +60,7 @@ import { AsyncLocalStorage } from 'node:async_hooks';
     PropertyTypeMapper,
     WordTypeMapper,
     ChangeTypeMapper,
+    AuthService,
     LanguageService,
     PropertyService,
     WordService,
@@ -55,6 +76,10 @@ import { AsyncLocalStorage } from 'node:async_hooks';
     ChangeRepository,
     DbConnectionManager,
     Serializer,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
     {
       provide: AsyncLocalStorage,
       useValue: new AsyncLocalStorage(),
