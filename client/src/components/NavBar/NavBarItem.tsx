@@ -1,42 +1,24 @@
-import { useMatch, A } from '@solidjs/router';
-import { IconTypes } from 'solid-icons';
-import { Component } from 'solid-js';
+import React from 'react';
+import { IconType } from 'react-icons';
+import { NavLink } from 'react-router-dom';
+import * as styles from './NavBarItem.css';
 import { Icon } from '../common/Icon';
-import { asClasses, useColorContext } from '../common/ColorContext';
 
 type NavBarItemProps = {
   href: string;
-  icon: IconTypes;
+  icon: IconType;
   text: string;
 };
 
-export const NavBarItem: Component<NavBarItemProps> = (props) => {
-  const match = useMatch(() => props.href);
-
-  const { base: baseColors, selected: selectedColors } = useColorContext()!;
-  const baseClasses = asClasses(
-    baseColors?.textColor,
-    baseColors?.backgroundColor,
-    baseColors?.hoverTextColor,
-    baseColors?.hoverBackgroundColor,
-  );
-  const selectedClasses = asClasses(
-    selectedColors?.textColor,
-    selectedColors?.backgroundColor,
-  );
-
+export const NavBarItem: React.FC<NavBarItemProps> = ({ href, icon, text }) => {
   return (
-    <A href={props.href}>
-      <div
-        class="flex flex-none flex-row items-center"
-        classList={{
-          [baseClasses]: !match(),
-          [selectedClasses]: !!match(),
-        }}
-      >
-        <Icon icon={props.icon} />
-        <div class="hidden p-3 md:inline-block">{props.text}</div>
+    <NavLink to={href} className={styles.link}>
+      <div className={styles.item}>
+        <div className={styles.icon}>
+          <Icon icon={icon} />
+        </div>
+        <div className={styles.label}>{text}</div>
       </div>
-    </A>
+    </NavLink>
   );
 };

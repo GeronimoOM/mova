@@ -1,75 +1,60 @@
-import { Component, Show, createEffect, createSignal, on } from 'solid-js';
-import { WordsList } from './WordsList';
-import { createStore } from 'solid-js/store';
-import {
-  WordsSearchParams,
-  defaultWordsSearchParams,
-} from './WordsSearchBar/wordsSearchParams';
-import { WordDetails } from './WordDetails';
+import React, { useEffect, useState } from 'react';
+import { clearWordsSearch } from '../../api/cache';
 import { useLanguageContext } from '../LanguageContext';
-import { WordsPageHeader } from './WordsPageHeader';
+import { WordDetails } from './WordDetails/WordDetails';
+import { WordsList } from './WordsList/WordsList';
+import * as styles from './WordsPage.css';
+import { WordsSearchBar } from './WordsSearchBar/WordsSearchBar';
 
-export const WordsPage: Component = () => {
+export const WordsPage: React.FC = () => {
   const [selectedLanguageId] = useLanguageContext();
 
-  const [searchParams, setSearchParams] = createStore<WordsSearchParams>(
-    defaultWordsSearchParams(),
-  );
-  const [selectedWordId, setSelectedWordId] = createSignal<string | null>(null);
-  const [isWordDetailsOpen, setIsWordDetailsOpen] = createSignal(false);
-  const isOpenCreateWord = () => isWordDetailsOpen() && !selectedWordId();
+  const [selectedWordId, setSelectedWordId] = useState<string | null>(null);
+  const [isWordDetailsOpen, setIsWordDetailsOpen] = useState(false);
+  const [wordsSearchQuery, setWordsSearchQuery] = useState<string>('');
 
-  const onOpenCreateWord = (isOpen: boolean) => {
-    setSelectedWordId(null);
-    setIsWordDetailsOpen(isOpen);
-    setSearchParams(defaultWordsSearchParams());
-  };
-
-  const onWordSelect = (selectedWordId: string | null) => {
+  const handleWordSelect = (selectedWordId: string | null) => {
     setSelectedWordId(selectedWordId);
-    setIsWordDetailsOpen(!!selectedWordId);
+    setIsWordDetailsOpen(Boolean(selectedWordId));
   };
 
-  createEffect(
-    on(selectedLanguageId, () => {
+  const handleCreateNew = () => {
+    setSelectedWordId(null);
+    setIsWordDetailsOpen(true);
+  };
+
+  useEffect(() => {
+    if (selectedLanguageId) {
       setSelectedWordId(null);
-    }),
-  );
+    }
+  }, [selectedLanguageId]);
+
+  useEffect(() => {
+    if (selectedLanguageId) {
+      clearWordsSearch(selectedLanguageId);
+    }
+  }, [selectedLanguageId, wordsSearchQuery]);
 
   return (
-    <div class="flex h-full w-full flex-col items-stretch">
-      <div class="flex-none">
-        <WordsPageHeader
-          searchParams={searchParams}
-          onSearchParamsChange={setSearchParams}
-          onOpenCreateWord={() => onOpenCreateWord(true)}
-          isOpenCreateWord={isOpenCreateWord()}
+    <div className={styles.wrapper}>
+      <WordsSearchBar
+        query={wordsSearchQuery}
+        onQueryChange={setWordsSearchQuery}
+        onCreateNew={handleCreateNew}
+      />
+      {isWordDetailsOpen ? (
+        <WordDetails
+          wordId={selectedWordId}
+          onSelectWord={setSelectedWordId}
+          onClose={() => setIsWordDetailsOpen(false)}
         />
-      </div>
-      <div class="flex min-h-0 flex-1 flex-col gap-2 xl:flex-row">
-        <div
-          class="min-h-0 w-full flex-none overflow-y-scroll"
-          classList={{
-            'basis-full': !isWordDetailsOpen(),
-            'basis-1/2': isWordDetailsOpen(),
-          }}
-        >
-          <WordsList
-            searchParams={searchParams}
-            selectedWord={selectedWordId()}
-            onSelectWord={onWordSelect}
-            onOpenDetails={() => setIsWordDetailsOpen(true)}
-          />
-        </div>
-        <Show when={isWordDetailsOpen()}>
-          <div class="min-h-0 flex-none basis-1/2 overflow-y-scroll">
-            <WordDetails
-              selectedWordId={selectedWordId()}
-              onWordSelect={onWordSelect}
-            />
-          </div>
-        </Show>
-      </div>
+      ) : (
+        <WordsList
+          onSelectWord={handleWordSelect}
+          onOpenDetails={() => setIsWordDetailsOpen(true)}
+          wordsSearchQuery={wordsSearchQuery}
+        />
+      )}
     </div>
   );
 };

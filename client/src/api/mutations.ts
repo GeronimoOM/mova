@@ -1,5 +1,4 @@
-import { TypedDocumentNode } from '@apollo/client';
-import { createMutation } from '@merged/solid-apollo';
+import { TypedDocumentNode, useMutation } from '@apollo/client';
 import {
   CreateLanguageDocument,
   CreatePropertyDocument,
@@ -22,17 +21,15 @@ import {
 } from './types/graphql';
 import { cache } from './cache';
 
-type CreateMutationResult<MDocument> = MDocument extends TypedDocumentNode<
-  infer MResult,
-  infer MVariables
->
-  ? ReturnType<typeof createMutation<MResult, MVariables>>
-  : never;
+type UseMutationResult<MDocument> =
+  MDocument extends TypedDocumentNode<infer MData, infer MVariables>
+    ? ReturnType<typeof useMutation<MData, MVariables>>
+    : never;
 
-export function createLanguageMutation(): CreateMutationResult<
+export function useCreateLanguage(): UseMutationResult<
   typeof CreateLanguageDocument
 > {
-  return createMutation(CreateLanguageDocument, {
+  return useMutation(CreateLanguageDocument, {
     optimisticResponse: ({ input }) => ({
       createLanguage: {
         ...input,
@@ -54,20 +51,20 @@ export function createLanguageMutation(): CreateMutationResult<
   });
 }
 
-export function updateLanguageMutation(): CreateMutationResult<
+export function useUpdateLanguage(): UseMutationResult<
   typeof UpdateLanguageDocument
 > {
-  return createMutation(UpdateLanguageDocument, {
+  return useMutation(UpdateLanguageDocument, {
     optimisticResponse: ({ input }) => ({
       updateLanguage: input,
     }),
   });
 }
 
-export function deleteLanguageMutation(): CreateMutationResult<
+export function useDeleteLanguage(): UseMutationResult<
   typeof DeleteLanguageDocument
 > {
-  return createMutation(DeleteLanguageDocument, {
+  return useMutation(DeleteLanguageDocument, {
     optimisticResponse: ({ input: { id } }) => ({
       deleteLanguage: {
         id,
@@ -89,10 +86,10 @@ export function deleteLanguageMutation(): CreateMutationResult<
   });
 }
 
-export function createPropertyMutation(): CreateMutationResult<
+export function useCreateProperty(): UseMutationResult<
   typeof CreatePropertyDocument
 > {
-  return createMutation(CreatePropertyDocument, {
+  return useMutation(CreatePropertyDocument, {
     optimisticResponse: ({ input }) => {
       const properties = readPartOfSpeechProperties(
         input.languageId,
@@ -131,10 +128,10 @@ export function createPropertyMutation(): CreateMutationResult<
   });
 }
 
-export function updatePropertyMutation(): CreateMutationResult<
+export function useUpdateProperty(): UseMutationResult<
   typeof UpdatePropertyDocument
 > {
-  return createMutation(UpdatePropertyDocument, {
+  return useMutation(UpdatePropertyDocument, {
     optimisticResponse: ({ input }) => ({
       updateProperty: {
         ...readProperty(input.id)!,
@@ -144,10 +141,10 @@ export function updatePropertyMutation(): CreateMutationResult<
   });
 }
 
-export function reorderPropertiesMutation(): CreateMutationResult<
+export function useReorderProperties(): UseMutationResult<
   typeof ReorderPropertiesDocument
 > {
-  return createMutation(ReorderPropertiesDocument, {
+  return useMutation(ReorderPropertiesDocument, {
     optimisticResponse: ({ input }) => ({
       reorderProperties: input.propertyIds.map(
         (propertyId) => readProperty(propertyId)!,
@@ -172,10 +169,10 @@ export function reorderPropertiesMutation(): CreateMutationResult<
   });
 }
 
-export function deletePropertyMutation(): CreateMutationResult<
+export function useDeleteProperty(): UseMutationResult<
   typeof DeletePropertyDocument
 > {
-  return createMutation(DeletePropertyDocument, {
+  return useMutation(DeletePropertyDocument, {
     optimisticResponse: ({ input: { id } }) => ({
       deleteProperty: readProperty(id)!,
     }),
@@ -198,10 +195,8 @@ export function deletePropertyMutation(): CreateMutationResult<
   });
 }
 
-export function createWordMutation(): CreateMutationResult<
-  typeof CreateWordDocument
-> {
-  return createMutation(CreateWordDocument, {
+export function useCreateWord(): UseMutationResult<typeof CreateWordDocument> {
+  return useMutation(CreateWordDocument, {
     optimisticResponse: ({ input }) => ({
       createWord: {
         ...input,
@@ -238,10 +233,8 @@ export function createWordMutation(): CreateMutationResult<
   });
 }
 
-export function updateWordMutation(): CreateMutationResult<
-  typeof UpdateWordDocument
-> {
-  return createMutation(UpdateWordDocument, {
+export function useUpdateWord(): UseMutationResult<typeof UpdateWordDocument> {
+  return useMutation(UpdateWordDocument, {
     optimisticResponse: ({ input }) => {
       const word = readWordFull(input.id)!;
 
@@ -272,10 +265,8 @@ export function updateWordMutation(): CreateMutationResult<
   });
 }
 
-export function deleteWordMutation(): CreateMutationResult<
-  typeof DeleteWordDocument
-> {
-  return createMutation(DeleteWordDocument, {
+export function useDeleteWord(): UseMutationResult<typeof DeleteWordDocument> {
+  return useMutation(DeleteWordDocument, {
     optimisticResponse: ({ input: { id } }) => ({
       deleteWord: {
         id,

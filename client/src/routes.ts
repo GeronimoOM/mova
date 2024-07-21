@@ -3,6 +3,7 @@ export enum AppRoute {
   Properties = '/properties',
   Exercises = '/exercises',
   Statistics = '/statistics',
+  Languages = '/languages',
 }
 
 export const getAppRouteMatch = (location: string): AppRoute | null => {

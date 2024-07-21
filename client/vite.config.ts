@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
-import solidPlugin from 'vite-plugin-solid';
+import react from '@vitejs/plugin-react';
+import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin';
 import { VitePWA, VitePWAOptions, ManifestOptions } from 'vite-plugin-pwa';
 
 const manifest: Partial<ManifestOptions> = {
@@ -53,7 +54,7 @@ const pwaOptions: Partial<VitePWAOptions> = {
 };
 
 export default defineConfig({
-  plugins: [solidPlugin(), VitePWA(pwaOptions)],
+  plugins: [react(), vanillaExtractPlugin(), VitePWA(pwaOptions)],
   server: {
     host: true,
     port: 4000,

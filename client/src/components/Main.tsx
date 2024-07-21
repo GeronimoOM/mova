@@ -1,40 +1,31 @@
-import { Routes, Route } from '@solidjs/router';
-import { FaSolidEarthEurope } from 'solid-icons/fa';
+import React from 'react';
+import { Route, Routes } from 'react-router-dom';
 import { AppRoute } from '../routes';
-import { Component, Show } from 'solid-js';
-import { useLanguageContext } from './LanguageContext';
-import { Icon } from './common/Icon';
-import { WordsPage } from './WordsPage/WordsPage';
-import { PropertiesPage } from './PropertiesPage/PropertiesPage';
 import { ExercisesPage } from './ExercisesPage/ExercisesPage';
-import { CardsExercise } from './ExercisesPage/CardsExercise';
+import { useLanguageContext } from './LanguageContext';
+import { LanguagesPage } from './LanguagesPage/LanguagesPage';
+import * as styles from './Main.css';
+import { NoLanguagePage } from './NoLanguagePage';
+import { PropertiesPage } from './PropertiesPage/PropertiesPage';
 import { StatisticsPage } from './StatisticsPage/StatisticsPage';
+import { WordsPage } from './WordsPage/WordsPage';
 
-export const Main: Component = () => {
+export const Main: React.FC = () => {
   const [selectedLanguage] = useLanguageContext();
 
   return (
-    <main class="w-full max-w-[72rem] overflow-hidden bg-alabaster pb-12 md:pb-0">
-      <Show when={selectedLanguage()} fallback={<NoLanguagePage />}>
+    <main className={styles.main}>
+      {selectedLanguage ? (
         <Routes>
-          <Route path={AppRoute.Words} component={WordsPage} />
-          <Route path={AppRoute.Properties} component={PropertiesPage} />
-          <Route path={AppRoute.Exercises}>
-            <Route path="/" component={ExercisesPage} />
-            <Route path="/cards" component={CardsExercise} />
-          </Route>
-          <Route path={AppRoute.Statistics} component={StatisticsPage} />
+          <Route path={AppRoute.Words} Component={WordsPage} />
+          <Route path={AppRoute.Properties} Component={PropertiesPage} />
+          <Route path={AppRoute.Exercises} Component={ExercisesPage} />
+          <Route path={AppRoute.Statistics} Component={StatisticsPage} />
+          <Route path={AppRoute.Languages} Component={LanguagesPage} />
         </Routes>
-      </Show>
+      ) : (
+        <NoLanguagePage />
+      )}
     </main>
-  );
-};
-
-const NoLanguagePage: Component = () => {
-  return (
-    <div class="flex h-full w-full flex-col items-center justify-center text-spacecadet-300">
-      <Icon icon={FaSolidEarthEurope} />
-      <p class="text-lg">Select or Create Language</p>
-    </div>
   );
 };

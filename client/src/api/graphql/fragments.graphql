@@ -31,12 +31,16 @@ fragment WordFields on Word {
 fragment WordFieldsFull on Word {
   ...WordFields
   properties {
-    ... on TextPropertyValue {
-      ...TextPropertyValueFields
-    }
-    ... on OptionPropertyValue {
-      ...OptionPropertyValueFields
-    }
+    ...PropertyValueFields
+  }
+}
+
+fragment PropertyValueFields on PropertyValue {
+  ... on TextPropertyValue {
+    ...TextPropertyValueFields
+  }
+  ... on OptionPropertyValue {
+    ...OptionPropertyValueFields
   }
 }
 

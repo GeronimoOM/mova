@@ -1,62 +1,56 @@
-import { createMutation } from '@merged/solid-apollo';
-import { Component, createEffect, createSignal } from 'solid-js';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useMutation } from '@apollo/client';
+
 import { LoginDocument } from '../api/types/graphql';
 import { useAuthContext } from './AuthContext';
 
-export const LoginForm: Component = () => {
-  const [name, setName] = createSignal('');
-  const [password, setPassword] = createSignal('');
+export const LoginForm: React.FC = () => {
+  const [name, setName] = useState('');
+  const [password, setPassword] = useState('');
 
-  const [loginMutation, loginResult] = createMutation(LoginDocument);
+  const [loginMutation, { data: loginResult }] = useMutation(LoginDocument);
 
   const [, setToken] = useAuthContext();
 
-  const login = () => {
+  const login = useCallback(async () => {
     loginMutation({
       variables: {
         input: {
-          name: name(),
-          password: password(),
+          name,
+          password,
         },
       },
     });
-  };
+  }, [name, password, loginMutation]);
 
-  createEffect(() => {
-    if (loginResult()) {
-      setToken(loginResult()?.token as string);
+  useEffect(() => {
+    if (loginResult) {
+      setToken(loginResult.token);
     }
   });
 
   return (
-    <div class="mx-auto flex h-full max-w-[72rem] flex-col justify-center text-spacecadet-300">
-      <div class="flex flex-row justify-center p-2">
+    <div>
+      <div>
         <input
-          class="p-2"
           type="text"
           placeholder={'Name'}
-          value={name()}
+          value={name}
           onChange={(e) => setName(e.currentTarget.value)}
         />
       </div>
 
-      <div class="flex flex-row justify-center p-2">
+      <div>
         <input
-          class="p-2"
           type="password"
           placeholder={'Password'}
-          value={password()}
+          value={password}
           onChange={(e) => setPassword(e.currentTarget.value)}
         />
       </div>
 
-      <div class="flex flex-row justify-center p-2">
-        <button
-          class="rounded bg-spacecadet-300 p-2 text-white hover:bg-spacecadet-200"
-          onClick={() => login()}
-        >
-          Login
-        </button>
+      <div>
+        <button onClick={() => login()}>Login</button>
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import { GraphQLClient } from 'graphql-request';
+import { DateTime } from 'luxon';
 import {
   ApplyChangeInput,
   ApplyChangesDocument,
@@ -18,10 +19,9 @@ import {
   UpdatePropertyChangeFieldsFragment,
   UpdateWordChangeFieldsFragment,
 } from '../../api/types/graphql';
+import { DATETIME_FORMAT } from '../../utils/constants';
 import * as cache from './cache';
 import { SwWorkerMessageType, sendMessageToClient } from './messages';
-import { DateTime } from 'luxon';
-import { DATETIME_FORMAT } from '../../utils/constants';
 
 export const HEADER_SYNC_CLIENT_ID = 'Sync-Client-ID';
 export const HEADER_AUTHORIZATION = 'Authorization;';
@@ -45,7 +45,10 @@ export enum SyncStatus {
 
 let isSyncing = false;
 
-const gqlClient = new GraphQLClient('/api/graphql', { fetch });
+console.log(location);
+const gqlClient = new GraphQLClient(`${location.origin}/api/graphql`, {
+  fetch,
+});
 
 export async function getSyncStatus(state?: SyncState): Promise<SyncStatus> {
   const { lastSyncedAt } = state ?? (await cache.getState());
@@ -90,7 +93,7 @@ export async function sync(): Promise<void> {
     isSyncSuccess = true;
     console.log('Sync success');
   } catch (err) {
-    console.error('Sync failure');
+    console.error('Sync failure', err);
   } finally {
     await releaseSyncing(isSyncSuccess);
   }

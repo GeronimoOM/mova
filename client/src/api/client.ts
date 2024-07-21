@@ -1,7 +1,6 @@
-import { ApolloClient } from '@merged/solid-apollo';
-import { ApolloLink, HttpLink } from '@apollo/client/core';
-import { cache } from './cache';
+import { ApolloClient, ApolloLink, HttpLink } from '@apollo/client';
 import { LOCAL_STORAGE_TOKEN_KEY } from '../components/AuthContext';
+import { cache } from './cache';
 
 export const GRAPHQL_URI = `/api/graphql`;
 
