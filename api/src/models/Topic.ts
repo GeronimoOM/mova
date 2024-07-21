@@ -1,8 +1,8 @@
+import { Static, Type } from '@sinclair/typebox';
+import { DATETIME_FORMAT_REGEX } from 'utils/constants';
 import { Flavor } from 'utils/flavor';
 import { LanguageId } from './Language';
-import { Static, Type } from '@sinclair/typebox';
 import { StartCursor } from './Page';
-import { DATETIME_FORMAT_REGEX } from 'utils/constants';
 
 export type TopicId = Flavor<string, 'Topic'>;
 

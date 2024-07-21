@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { WordTable } from 'knex/types/tables';
+import { DateTime } from 'luxon';
 import { LanguageId } from 'models/Language';
 import { Direction, Page, toPage } from 'models/Page';
+import { Property, PropertyId } from 'models/Property';
+import { PropertyValue } from 'models/PropertyValue';
+import { TopicId } from 'models/Topic';
 import {
   AlphabeticalCursor,
   ChronologicalCursor,
@@ -9,24 +13,20 @@ import {
   Word,
   WordId,
   WordOrder,
-  WordsDateStats,
   WordSortedCursor,
+  WordsDateStats,
 } from 'models/Word';
-import { DbConnectionManager } from './DbConnectionManager';
-import { TopicId } from 'models/Topic';
-import { TABLE_TOPICS_WORDS } from './TopicRepository';
-import { DateTime } from 'luxon';
+import { PropertyService } from 'services/PropertyService';
 import {
-  DATE_FORMAT,
   DATETIME_FORMAT,
+  DATE_FORMAT,
   DEFAULT_LIMIT,
   MAX_LIMIT,
 } from 'utils/constants';
-import { Property, PropertyId } from 'models/Property';
-import { PropertyValue } from 'models/PropertyValue';
-import { PropertyService } from 'services/PropertyService';
 import * as records from 'utils/records';
+import { DbConnectionManager } from './DbConnectionManager';
 import { Serializer } from './Serializer';
+import { TABLE_TOPICS_WORDS } from './TopicRepository';
 
 const TABLE_WORDS = 'words';
 

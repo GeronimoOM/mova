@@ -1,12 +1,12 @@
+import { Static, Type } from '@sinclair/typebox';
+import { DateTime } from 'luxon';
+import { DATETIME_FORMAT_REGEX } from 'utils/constants';
 import { Flavor } from 'utils/flavor';
 import { LanguageId } from './Language';
+import { StartCursor } from './Page';
 import { PropertyId } from './Property';
 import { PropertyValue, PropertyValueSave } from './PropertyValue';
 import { Topic } from './Topic';
-import { DateTime } from 'luxon';
-import { Static, Type } from '@sinclair/typebox';
-import { StartCursor } from './Page';
-import { DATETIME_FORMAT_REGEX } from 'utils/constants';
 
 export type WordId = Flavor<string, 'Word'>;
 

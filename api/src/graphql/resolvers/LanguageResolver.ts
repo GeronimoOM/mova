@@ -1,20 +1,28 @@
 import {
-  Query,
-  Resolver,
-  ID,
   Args,
-  ResolveField,
-  Parent,
-  Mutation,
-  Int,
   Context as ContextDec,
+  ID,
+  Int,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
 } from '@nestjs/graphql';
+import { TopicPageType, TopicType } from 'graphql/types/TopicType';
+import { WordsStatsType } from 'graphql/types/WordsDateStatsType';
+import { DateTime } from 'luxon';
+import { Context } from 'models/Context';
 import { LanguageId } from 'models/Language';
-import { Direction, encodePageCursor, mapPage, Page } from 'models/Page';
+import { Direction, Page, encodePageCursor, mapPage } from 'models/Page';
+import { TopicCursor, TopicId } from 'models/Topic';
 import { PartOfSpeech, WordCursor, WordOrder } from 'models/Word';
 import { LanguageService } from 'services/LanguageService';
 import { PropertyService } from 'services/PropertyService';
+import { TopicService } from 'services/TopicService';
 import { WordService } from 'services/WordService';
+import { DATE_FORMAT } from 'utils/constants';
+import { decodeCursor } from 'utils/cursors';
 import { PropertyTypeMapper } from '../mappers/PropertyTypeMapper';
 import { WordTypeMapper } from '../mappers/WordTypeMapper';
 import {
@@ -26,14 +34,6 @@ import {
 import { PageArgsType } from '../types/PageType';
 import { PropertyUnionType } from '../types/PropertyType';
 import { WordPageType, WordType } from '../types/WordType';
-import { TopicPageType, TopicType } from 'graphql/types/TopicType';
-import { TopicService } from 'services/TopicService';
-import { TopicCursor, TopicId } from 'models/Topic';
-import { WordsStatsType } from 'graphql/types/WordsDateStatsType';
-import { DateTime } from 'luxon';
-import { DATE_FORMAT } from 'utils/constants';
-import { decodeCursor } from 'utils/cursors';
-import { Context } from 'models/Context';
 
 @Resolver((of) => LanguageType)
 export class LanguageResolver {

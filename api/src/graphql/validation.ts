@@ -1,6 +1,7 @@
 import { MercuriusPlugin } from '@nestjs/mercurius';
-import { MercuriusValidationOptions } from 'mercurius-validation';
-import mercuriusValidationPlugin from 'mercurius-validation';
+import mercuriusValidationPlugin, {
+  MercuriusValidationOptions,
+} from 'mercurius-validation';
 
 export const validationPlugin: MercuriusPlugin<MercuriusValidationOptions> = {
   plugin: mercuriusValidationPlugin,

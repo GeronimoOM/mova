@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PropertyTable } from 'knex/types/tables';
+import { DateTime } from 'luxon';
 import { LanguageId } from 'models/Language';
 import {
   BaseProperty,
@@ -11,10 +12,9 @@ import {
   PropertyType,
   TextProperty,
 } from 'models/Property';
-import { DbConnectionManager } from './DbConnectionManager';
 import { PartOfSpeech } from 'models/Word';
 import { DATETIME_FORMAT } from 'utils/constants';
-import { DateTime } from 'luxon';
+import { DbConnectionManager } from './DbConnectionManager';
 import { Serializer } from './Serializer';
 
 const TABLE_PROPERTIES = 'properties';

@@ -2,7 +2,7 @@ import { ChangeId } from 'models/Change';
 import { LanguageId } from 'models/Language';
 import { PropertyId, PropertyType } from 'models/Property';
 import { TopicId } from 'models/Topic';
-import { WordId, PartOfSpeech } from 'models/Word';
+import { PartOfSpeech, WordId } from 'models/Word';
 
 declare module 'knex/types/tables' {
   interface LanguageTable {

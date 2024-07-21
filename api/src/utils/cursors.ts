@@ -1,7 +1,7 @@
 import { Logger } from '@nestjs/common';
 import { Static, TSchema } from '@sinclair/typebox';
-import { Value } from '@sinclair/typebox/value';
 import { TypeCompiler } from '@sinclair/typebox/compiler';
+import { Value } from '@sinclair/typebox/value';
 
 export function encodeCursor<T>(cursorValue: T) {
   return Buffer.from(JSON.stringify(cursorValue)).toString('base64');

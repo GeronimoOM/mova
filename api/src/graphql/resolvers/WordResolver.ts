@@ -1,21 +1,21 @@
 import {
   Args,
+  Context as ContextDec,
   ID,
   Mutation,
-  Resolver,
   Query,
-  Context as ContextDec,
+  Resolver,
 } from '@nestjs/graphql';
+import { Context } from 'models/Context';
+import { WordId } from 'models/Word';
+import { WordService } from 'services/WordService';
+import { WordTypeMapper } from '../mappers/WordTypeMapper';
 import {
   CreateWordInput,
   DeleteWordInput,
   UpdateWordInput,
   WordType,
 } from '../types/WordType';
-import { WordService } from 'services/WordService';
-import { WordTypeMapper } from '../mappers/WordTypeMapper';
-import { WordId } from 'models/Word';
-import { Context } from 'models/Context';
 
 @Resolver((of) => WordType)
 export class WordResolver {

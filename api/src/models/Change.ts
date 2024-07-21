@@ -1,5 +1,8 @@
+import { Static, Type } from '@sinclair/typebox';
 import { DateTime } from 'luxon';
+import { DATETIME_FORMAT_REGEX } from 'utils/constants';
 import { Language, LanguageId, LanguageUpdate } from './Language';
+import { Page } from './Page';
 import {
   PropertiesReorder,
   Property,
@@ -7,9 +10,6 @@ import {
   PropertyUpdate,
 } from './Property';
 import { WordCreate, WordId, WordUpdate } from './Word';
-import { Static, Type } from '@sinclair/typebox';
-import { Page } from './Page';
-import { DATETIME_FORMAT_REGEX } from 'utils/constants';
 
 export type ChangeId = LanguageId | PropertyId | WordId;
 

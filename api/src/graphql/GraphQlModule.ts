@@ -1,11 +1,11 @@
-import { join } from 'path';
 import { GraphQLModule as NestGraphQlModule } from '@nestjs/graphql';
-import { FastifyRequest } from 'fastify';
 import { MercuriusDriver, MercuriusDriverConfig } from '@nestjs/mercurius';
-import { validationPlugin } from './validation';
-import { TimestampScalar } from './scalars/Timestamp';
+import { FastifyRequest } from 'fastify';
 import { Context } from 'models/Context';
+import { join } from 'path';
 import { HEADER_AUTHORIZATION, HEADER_SYNC_CLIENT_ID } from 'utils/constants';
+import { TimestampScalar } from './scalars/Timestamp';
+import { validationPlugin } from './validation';
 
 export const GraphQlModule =
   NestGraphQlModule.forRootAsync<MercuriusDriverConfig>({

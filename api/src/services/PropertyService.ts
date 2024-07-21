@@ -1,5 +1,6 @@
-import { v1 as uuid } from 'uuid';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { DateTime } from 'luxon';
+import { Context } from 'models/Context';
 import { LanguageId } from 'models/Language';
 import {
   BaseProperty,
@@ -11,16 +12,15 @@ import {
   PropertyType,
   TextProperty,
 } from 'models/Property';
-import { PropertyRepository } from 'repositories/PropertyRepository';
-import { LanguageService } from './LanguageService';
 import { PartOfSpeech } from 'models/Word';
-import * as arrays from 'utils/arrays';
-import { DateTime } from 'luxon';
-import { ChangeService } from './ChangeService';
-import { ChangeBuilder } from './ChangeBuilder';
-import { copy } from 'utils/copy';
-import { Context } from 'models/Context';
 import { DbConnectionManager } from 'repositories/DbConnectionManager';
+import { PropertyRepository } from 'repositories/PropertyRepository';
+import * as arrays from 'utils/arrays';
+import { copy } from 'utils/copy';
+import { v1 as uuid } from 'uuid';
+import { ChangeBuilder } from './ChangeBuilder';
+import { ChangeService } from './ChangeService';
+import { LanguageService } from './LanguageService';
 
 export interface CreateBasePropertyParams {
   id?: PropertyId;

@@ -107,37 +107,6 @@ type WordPage {
   nextCursor: String
 }
 
-type Topic {
-  id: ID!
-  name: String!
-  words(cursor: String, limit: Int, query: String, partOfSpeech: [PartOfSpeech!], order: WordOrder, direction: Direction): WordPage!
-}
-
-type TopicPage {
-  items: [Topic!]!
-  nextCursor: String
-}
-
-type WordsTotalStats {
-  words: Int!
-}
-
-type WordsDateStats {
-  date: String!
-  words: Int!
-}
-
-type WordsByDateStats {
-  from: String!
-  until: String!
-  dates: [WordsDateStats!]!
-}
-
-type WordsStats {
-  total: WordsTotalStats!
-  byDate: WordsByDateStats!
-}
-
 type LanguageUpdate {
   id: ID!
   name: String!
@@ -306,6 +275,37 @@ type DeleteWordChange implements IChange {
 enum SyncType {
   Full
   Delta
+}
+
+type Topic {
+  id: ID!
+  name: String!
+  words(cursor: String, limit: Int, query: String, partOfSpeech: [PartOfSpeech!], order: WordOrder, direction: Direction): WordPage!
+}
+
+type TopicPage {
+  items: [Topic!]!
+  nextCursor: String
+}
+
+type WordsTotalStats {
+  words: Int!
+}
+
+type WordsDateStats {
+  date: String!
+  words: Int!
+}
+
+type WordsByDateStats {
+  from: String!
+  until: String!
+  dates: [WordsDateStats!]!
+}
+
+type WordsStats {
+  total: WordsTotalStats!
+  byDate: WordsByDateStats!
 }
 
 type Query {

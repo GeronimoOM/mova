@@ -1,17 +1,17 @@
-import { v1 as uuid } from 'uuid';
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
-import {
-  TopicRepository,
-  GetTopicPageParams as RepoGetTopicPageParams,
-} from 'repositories/TopicRepository';
-import { Page, mapPage } from 'models/Page';
-import { LanguageId } from 'models/Language';
-import { Topic, TopicCursor, TopicId } from 'models/Topic';
 import { SearchClient, SearchTopicsParams } from 'clients/SearchClient';
+import { LanguageId } from 'models/Language';
+import { Page, mapPage } from 'models/Page';
+import { Topic, TopicCursor, TopicId } from 'models/Topic';
 import { WordId } from 'models/Word';
-import { WordService } from './WordService';
+import {
+  GetTopicPageParams as RepoGetTopicPageParams,
+  TopicRepository,
+} from 'repositories/TopicRepository';
 import { QUERY_MIN_LENGTH } from 'utils/constants';
 import * as records from 'utils/records';
+import { v1 as uuid } from 'uuid';
+import { WordService } from './WordService';
 
 export interface GetTopicPageParms {
   languageId: LanguageId;

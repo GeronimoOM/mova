@@ -1,7 +1,7 @@
 import { Field, ID, InputType, ObjectType } from '@nestjs/graphql';
-import { pageType } from './PageType';
-import { TopicId } from 'models/Topic';
 import { LanguageId } from 'models/Language';
+import { TopicId } from 'models/Topic';
+import { pageType } from './PageType';
 
 @ObjectType('Topic')
 export class TopicType {

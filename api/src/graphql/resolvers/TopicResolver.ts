@@ -1,10 +1,10 @@
 import {
   Args,
-  Mutation,
-  Resolver,
   ID,
+  Mutation,
   Parent,
   ResolveField,
+  Resolver,
 } from '@nestjs/graphql';
 import { WordTypeMapper } from 'graphql/mappers/WordTypeMapper';
 import { PageArgsType } from 'graphql/types/PageType';

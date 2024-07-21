@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { Language, LanguageId } from 'models/Language';
-import { DbConnectionManager } from './DbConnectionManager';
 import { LanguageTable } from 'knex/types/tables';
 import { DateTime } from 'luxon';
+import { Language, LanguageId } from 'models/Language';
 import { DATETIME_FORMAT } from 'utils/constants';
+import { DbConnectionManager } from './DbConnectionManager';
 
 const TABLE_LANGUAGES = 'languages';
 

@@ -18,17 +18,19 @@ import {
 } from 'models/Change';
 import { LanguageId } from 'models/Language';
 import {
-  CreateLanguageInput,
-  DeleteLanguageInput,
-  LanguageType,
-  UpdateLanguageInput,
-} from './LanguageType';
-import {
   OptionId,
   PropertyId,
   PropertyType,
   PropertyUpdate,
 } from 'models/Property';
+import { PropertyValueSave } from 'models/PropertyValue';
+import { PartOfSpeech, WordId } from 'models/Word';
+import {
+  CreateLanguageInput,
+  DeleteLanguageInput,
+  LanguageType,
+  UpdateLanguageInput,
+} from './LanguageType';
 import {
   CreatePropertyInput,
   DeletePropertyInput,
@@ -37,8 +39,6 @@ import {
   ReorderPropertiesInput,
   UpdatePropertyInput,
 } from './PropertyType';
-import { PartOfSpeech, WordId } from 'models/Word';
-import { PropertyValueSave } from 'models/PropertyValue';
 import { CreateWordInput, DeleteWordInput, UpdateWordInput } from './WordType';
 
 registerEnumType(ChangeTypeEnum, {

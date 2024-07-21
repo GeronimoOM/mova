@@ -1,14 +1,5 @@
-import { Readable } from 'stream';
 import { Injectable } from '@nestjs/common';
-import {
-  MigrationRecordType,
-  MigrationRecord,
-  MigrationRecordTypes,
-} from 'models/Migration';
-import { LanguageRepository } from 'repositories/LanguageRepository';
-import { PropertyRepository } from 'repositories/PropertyRepository';
-import { TopicRepository } from 'repositories/TopicRepository';
-import { WordRepository } from 'repositories/WordRepository';
+import { SearchClient } from 'clients/SearchClient';
 import {
   LanguageTable,
   PropertyTable,
@@ -17,10 +8,19 @@ import {
   WordTable,
 } from 'knex/types/tables';
 import { Language, LanguageId } from 'models/Language';
+import {
+  MigrationRecord,
+  MigrationRecordType,
+  MigrationRecordTypes,
+} from 'models/Migration';
+import { LanguageRepository } from 'repositories/LanguageRepository';
+import { PropertyRepository } from 'repositories/PropertyRepository';
+import { TopicRepository } from 'repositories/TopicRepository';
+import { WordRepository } from 'repositories/WordRepository';
+import { Readable } from 'stream';
 import { LanguageService } from './LanguageService';
-import { WordService } from './WordService';
 import { TopicService } from './TopicService';
-import { SearchClient } from 'clients/SearchClient';
+import { WordService } from './WordService';
 
 const RECORDS_BATCH = 1000;
 

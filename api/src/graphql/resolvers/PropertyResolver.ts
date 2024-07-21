@@ -1,11 +1,12 @@
 import {
   Args,
+  Context as ContextDec,
   ID,
   Mutation,
-  Resolver,
   Query,
-  Context as ContextDec,
+  Resolver,
 } from '@nestjs/graphql';
+import { Context } from 'models/Context';
 import { PropertyId } from 'models/Property';
 import { PropertyService } from 'services/PropertyService';
 import { PropertyTypeMapper } from '../mappers/PropertyTypeMapper';
@@ -16,7 +17,6 @@ import {
   ReorderPropertiesInput,
   UpdatePropertyInput,
 } from '../types/PropertyType';
-import { Context } from 'models/Context';
 
 @Resolver((of) => PropertyUnionType)
 export class PropertyResolver {

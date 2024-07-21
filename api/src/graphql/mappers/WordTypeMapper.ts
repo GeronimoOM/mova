@@ -1,10 +1,22 @@
 import { Injectable } from '@nestjs/common';
-import { Word, WordCreate, WordUpdate } from 'models/Word';
+import { WordCreateType, WordUpdateType } from 'graphql/types/ChangeType';
+import { PropertyId } from 'models/Property';
 import {
+  PropertyValue,
   isOptionPropertyValue,
   isTextPropertyValue,
-  PropertyValue,
 } from 'models/PropertyValue';
+import { Word, WordCreate, WordUpdate } from 'models/Word';
+import {
+  CreateWordParams,
+  UpdatePropertyValueParams,
+  UpdateWordParams,
+} from 'services/WordService';
+import {
+  OptionPropertyValueType,
+  PropertyValueUnionType,
+  TextPropertyValueType,
+} from '../types/PropertyValueType';
 import {
   CreateWordInput,
   UpdatePropertyValueInput,
@@ -12,18 +24,6 @@ import {
   WordType,
 } from '../types/WordType';
 import { PropertyTypeMapper } from './PropertyTypeMapper';
-import {
-  OptionPropertyValueType,
-  PropertyValueUnionType,
-  TextPropertyValueType,
-} from '../types/PropertyValueType';
-import { WordCreateType, WordUpdateType } from 'graphql/types/ChangeType';
-import {
-  CreateWordParams,
-  UpdatePropertyValueParams,
-  UpdateWordParams,
-} from 'services/WordService';
-import { PropertyId } from 'models/Property';
 
 @Injectable()
 export class WordTypeMapper {

@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { DbConnectionManager } from './DbConnectionManager';
+import { TopicTable, TopicWordTable } from 'knex/types/tables';
+import { LanguageId } from 'models/Language';
+import { Page, mapPage, toPage } from 'models/Page';
+import { Topic, TopicId, TopicSortedCursor } from 'models/Topic';
 import { WordId } from 'models/Word';
 import * as records from 'utils/records';
-import { Topic, TopicId, TopicSortedCursor } from 'models/Topic';
-import { TopicTable, TopicWordTable } from 'knex/types/tables';
-import { Page, mapPage, toPage } from 'models/Page';
-import { LanguageId } from 'models/Language';
+import { DbConnectionManager } from './DbConnectionManager';
 
 const TABLE_TOPICS = 'topics';
 export const TABLE_TOPICS_WORDS = 'topics_words';

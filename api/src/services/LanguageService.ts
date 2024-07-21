@@ -1,16 +1,16 @@
-import { v1 as uuid } from 'uuid';
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
+import { DateTime } from 'luxon';
+import { Context } from 'models/Context';
 import { Language, LanguageId } from 'models/Language';
+import { DbConnectionManager } from 'repositories/DbConnectionManager';
 import { LanguageRepository } from 'repositories/LanguageRepository';
+import { copy } from 'utils/copy';
+import { v1 as uuid } from 'uuid';
+import { ChangeBuilder } from './ChangeBuilder';
+import { ChangeService } from './ChangeService';
 import { PropertyService } from './PropertyService';
 import { TopicService } from './TopicService';
 import { WordService } from './WordService';
-import { DateTime } from 'luxon';
-import { ChangeService } from './ChangeService';
-import { copy } from 'utils/copy';
-import { ChangeBuilder } from './ChangeBuilder';
-import { Context } from 'models/Context';
-import { DbConnectionManager } from 'repositories/DbConnectionManager';
 
 const LANGUAGE_DELETION_WORDS_THRESHOLD = 50;
 

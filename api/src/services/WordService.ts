@@ -1,7 +1,17 @@
-import { v1 as uuid } from 'uuid';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { SearchClient, SearchWordsParams } from 'clients/SearchClient';
+import { DateTime } from 'luxon';
+import { Context } from 'models/Context';
 import { LanguageId } from 'models/Language';
 import { Direction, mapPage, Page } from 'models/Page';
+import {
+  isOptionProperty,
+  isTextProperty,
+  OptionId,
+  Property,
+  PropertyId,
+} from 'models/Property';
+import { TopicId } from 'models/Topic';
 import {
   PartOfSpeech,
   Word,
@@ -10,30 +20,20 @@ import {
   WordOrder,
   WordsStats,
 } from 'models/Word';
-import {
-  WordRepository,
-  GetWordPageParams as RepoGetWordPageParams,
-} from 'repositories/WordRepository';
-import {
-  isOptionProperty,
-  isTextProperty,
-  OptionId,
-  Property,
-  PropertyId,
-} from 'models/Property';
-import { PropertyService } from './PropertyService';
-import { LanguageService } from './LanguageService';
-import { SearchClient, SearchWordsParams } from 'clients/SearchClient';
-import { TopicService } from './TopicService';
-import { TopicId } from 'models/Topic';
-import { DateTime } from 'luxon';
-import { QUERY_MIN_LENGTH } from 'utils/constants';
-import * as records from 'utils/records';
-import { ChangeService } from './ChangeService';
-import { ChangeBuilder } from './ChangeBuilder';
-import { copy } from 'utils/copy';
-import { Context } from 'models/Context';
 import { DbConnectionManager } from 'repositories/DbConnectionManager';
+import {
+  GetWordPageParams as RepoGetWordPageParams,
+  WordRepository,
+} from 'repositories/WordRepository';
+import { QUERY_MIN_LENGTH } from 'utils/constants';
+import { copy } from 'utils/copy';
+import * as records from 'utils/records';
+import { v1 as uuid } from 'uuid';
+import { ChangeBuilder } from './ChangeBuilder';
+import { ChangeService } from './ChangeService';
+import { LanguageService } from './LanguageService';
+import { PropertyService } from './PropertyService';
+import { TopicService } from './TopicService';
 
 export interface GetWordPageParams {
   languageId?: LanguageId;

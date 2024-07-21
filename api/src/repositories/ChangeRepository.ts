@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { DbConnectionManager } from './DbConnectionManager';
 import { ChangeTable } from 'knex/types/tables';
 import { DateTime } from 'luxon';
-import { DATETIME_FORMAT } from 'utils/constants';
 import {
   BaseChange,
   Change,
@@ -12,7 +10,9 @@ import {
   SyncType,
 } from 'models/Change';
 import { mapPage, toPage } from 'models/Page';
+import { DATETIME_FORMAT } from 'utils/constants';
 import { toTimestamp } from 'utils/datetime';
+import { DbConnectionManager } from './DbConnectionManager';
 import { Serializer } from './Serializer';
 
 const TABLE_CHANGES = 'changes';

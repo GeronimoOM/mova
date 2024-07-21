@@ -1,7 +1,11 @@
+import {
+  QueryDslQueryContainer,
+  SearchResponse,
+} from '@elastic/elasticsearch/lib/api/types';
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { LanguageId } from 'models/Language';
 import { Page, StartCursor, emptyPage } from 'models/Page';
-import { isTextPropertyValue, TextPropertyValue } from 'models/PropertyValue';
+import { TextPropertyValue, isTextPropertyValue } from 'models/PropertyValue';
 import { Topic, TopicId } from 'models/Topic';
 import { PartOfSpeech, Word, WordId } from 'models/Word';
 import { ElasticClientManager } from './ElasticClientManager';
@@ -12,10 +16,6 @@ import {
   INDEX_WORDS,
   IndexType,
 } from './elasticConfig';
-import {
-  QueryDslQueryContainer,
-  SearchResponse,
-} from '@elastic/elasticsearch/lib/api/types';
 
 export type WordDocument = Omit<Word, 'addedAt' | 'properties' | 'topics'> & {
   properties?: string[];

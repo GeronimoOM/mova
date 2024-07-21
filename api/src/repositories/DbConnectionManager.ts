@@ -1,6 +1,6 @@
-import { AsyncLocalStorage } from 'node:async_hooks';
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import knex, { Knex } from 'knex';
+import { AsyncLocalStorage } from 'node:async_hooks';
 
 interface TransactionContext {
   transaction: Knex.Transaction;
