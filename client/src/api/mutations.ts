@@ -1,4 +1,5 @@
 import { TypedDocumentNode, useMutation } from '@apollo/client';
+import { cache } from './cache';
 import {
   CreateLanguageDocument,
   CreatePropertyDocument,
@@ -19,7 +20,6 @@ import {
   WordFieldsFullFragment,
   WordFieldsFullFragmentDoc,
 } from './types/graphql';
-import { cache } from './cache';
 
 type UseMutationResult<MDocument> =
   MDocument extends TypedDocumentNode<infer MData, infer MVariables>

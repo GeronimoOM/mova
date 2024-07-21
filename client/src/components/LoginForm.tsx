@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react';
 import { useMutation } from '@apollo/client';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { LoginDocument } from '../api/types/graphql';
 import { useAuthContext } from './AuthContext';

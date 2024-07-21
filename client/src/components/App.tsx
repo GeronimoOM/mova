@@ -3,9 +3,9 @@ import { Main } from './Main';
 import { NavBar } from './NavBar/NavBar';
 
 import { useAuthContext } from '../components/AuthContext';
-import { LoginForm } from './LoginForm';
 import { initServiceWorker } from '../sw/client/register';
 import * as styles from './App.css';
+import { LoginForm } from './LoginForm';
 
 export const App: React.FC = () => {
   const [authToken] = useAuthContext();

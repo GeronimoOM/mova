@@ -85,7 +85,7 @@ query GetWordsStats($languageId: ID!) {
 
 query GetChanges($syncType: SyncType!, $cursor: String, $changedAt: Timestamp) {
   changes(syncType: $syncType, cursor: $cursor, changedAt: $changedAt) {
-   	items {
+    items {
       ...ChangeFields
     }
     syncType

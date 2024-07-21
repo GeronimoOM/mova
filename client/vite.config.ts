@@ -1,7 +1,7 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
 import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin';
-import { VitePWA, VitePWAOptions, ManifestOptions } from 'vite-plugin-pwa';
+import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
+import { ManifestOptions, VitePWA, VitePWAOptions } from 'vite-plugin-pwa';
 
 const manifest: Partial<ManifestOptions> = {
   name: 'Mova',

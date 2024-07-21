@@ -1,8 +1,8 @@
 import React from 'react';
 import { IconType } from 'react-icons';
 import { NavLink } from 'react-router-dom';
-import * as styles from './NavBarItem.css';
 import { Icon } from '../common/Icon';
+import * as styles from './NavBarItem.css';
 
 type NavBarItemProps = {
   href: string;
