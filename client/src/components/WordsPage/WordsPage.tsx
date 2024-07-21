@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { clearWordsSearch } from '../../api/cache';
 import { useLanguageContext } from '../LanguageContext';
 import { WordDetails } from './WordDetails/WordDetails';
 import { WordsList } from './WordsList/WordsList';
@@ -28,12 +27,6 @@ export const WordsPage: React.FC = () => {
       setSelectedWordId(null);
     }
   }, [selectedLanguageId]);
-
-  useEffect(() => {
-    if (selectedLanguageId) {
-      clearWordsSearch(selectedLanguageId);
-    }
-  }, [selectedLanguageId, wordsSearchQuery]);
 
   return (
     <div className={styles.wrapper}>

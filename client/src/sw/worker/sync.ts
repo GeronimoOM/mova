@@ -45,7 +45,6 @@ export enum SyncStatus {
 
 let isSyncing = false;
 
-console.log(location);
 const gqlClient = new GraphQLClient(`${location.origin}/api/graphql`, {
   fetch,
 });

@@ -18,7 +18,6 @@ export function useInfiniteScroll<H extends HTMLElement>({
 
     const observer = new IntersectionObserver(([target]) => {
       if (target.isIntersecting) {
-        console.log('fetch');
         fetchNextPage();
       }
     });

@@ -1,8 +1,8 @@
 import React, { useRef, useState } from 'react';
 import { PiGraphBold } from 'react-icons/pi';
 import { PartOfSpeech } from '../../../api/types/graphql';
+import { useClickOutsideHandler } from '../../../utils/useClickOutsideHandler';
 import { Icon } from '../../common/Icon';
-import { useClickOutsideHandler } from '../../common/useClickOutsideHandler';
 import * as styles from './PartOfSpeechSelect.css';
 
 const partsOfSpeech: PartOfSpeech[] = [
