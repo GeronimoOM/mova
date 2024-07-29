@@ -1,18 +1,10 @@
 import React, { useRef, useState } from 'react';
 import { PiGraphBold } from 'react-icons/pi';
 import { PartOfSpeech } from '../../../api/types/graphql';
+import { partsOfSpeech } from '../../../utils/partsOfSpeech';
 import { useClickOutsideHandler } from '../../../utils/useClickOutsideHandler';
 import { Icon } from '../../common/Icon';
 import * as styles from './PartOfSpeechSelect.css';
-
-const partsOfSpeech: PartOfSpeech[] = [
-  PartOfSpeech.Noun,
-  PartOfSpeech.Verb,
-  PartOfSpeech.Adj,
-  PartOfSpeech.Adv,
-  PartOfSpeech.Pron,
-  PartOfSpeech.Misc,
-];
 
 export type PartOfSpeechSelectProps = {
   partOfSpeech: PartOfSpeech | null;

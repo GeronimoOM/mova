@@ -49,6 +49,12 @@ export const button = recipe({
       },
     },
 
+    hidden: {
+      true: {
+        opacity: 0,
+      },
+    },
+
     loading: {
       true: {
         animationName: animations.rotate,

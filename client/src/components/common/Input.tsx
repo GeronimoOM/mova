@@ -6,7 +6,8 @@ export type InputProps = {
   onChange: (value: string) => void;
   text?: 'original' | 'translation';
   size?: 'medium' | 'large';
-  icon?: boolean;
+  disabled?: boolean;
+  padding?: boolean;
   loading?: boolean;
 };
 
@@ -15,12 +16,13 @@ export const Input: React.FC<InputProps> = ({
   onChange,
   text,
   size,
-  icon,
+  disabled,
+  padding,
   loading,
 }) => {
   return (
     <input
-      className={styles.input({ text, size, icon, loading })}
+      className={styles.input({ text, size, disabled, padding, loading })}
       type="text"
       spellCheck={false}
       autoCapitalize={'off'}

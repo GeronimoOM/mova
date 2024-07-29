@@ -44,7 +44,13 @@ export const input = recipe({
       large: { fontSize: '1.25rem', height: '2rem' },
     },
 
-    icon: {
+    disabled: {
+      true: {
+        pointerEvents: 'none',
+      },
+    },
+
+    padding: {
       true: {
         paddingLeft: 50,
       },

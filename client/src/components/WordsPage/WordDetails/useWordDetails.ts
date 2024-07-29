@@ -38,17 +38,17 @@ type WordDetailsReturn = {
   propertiesLoading: boolean;
 
   canCreateWord: boolean;
-  createWord: () => Promise<void>;
+  createWord: () => void;
   wordCreating: boolean;
   createdWord: WordFieldsFullFragment | undefined;
 
   canUpdateWord: boolean;
-  updateWord: () => Promise<void>;
+  updateWord: () => void;
   wordUpdating: boolean;
   updatedWord: WordFieldsFullFragment | undefined;
 
   wordDeleting: boolean;
-  deleteWord: () => Promise<void>;
+  deleteWord: () => void;
   canDeleteWord: boolean;
   deletedWord: { id: string } | undefined;
 };
@@ -158,9 +158,9 @@ export function useWordDetails(wordId: string | null): WordDetailsReturn {
     [],
   );
 
-  const createWord = useCallback(async () => {
+  const createWord = useCallback(() => {
     if (canCreateWord) {
-      await createWordMutate({
+      createWordMutate({
         variables: {
           input: {
             id: uuid(),
@@ -176,9 +176,9 @@ export function useWordDetails(wordId: string | null): WordDetailsReturn {
     }
   }, [canCreateWord, selectedLanguageId, wordInput, createWordMutate]);
 
-  const updateWord = useCallback(async () => {
+  const updateWord = useCallback(() => {
     if (canUpdateWord) {
-      await updateWordMutate({
+      updateWordMutate({
         variables: {
           input: {
             id: wordId!,
@@ -194,9 +194,9 @@ export function useWordDetails(wordId: string | null): WordDetailsReturn {
     }
   }, [canUpdateWord, wordId, wordInput, updateWordMutate]);
 
-  const deleteWord = useCallback(async () => {
+  const deleteWord = useCallback(() => {
     if (canDeleteWord) {
-      await deleteWordMutate({
+      deleteWordMutate({
         variables: { input: { id: wordId! } },
       });
     }

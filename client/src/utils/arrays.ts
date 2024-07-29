@@ -16,3 +16,11 @@ export function toRecord<T, K extends string>(
     {} as Record<string, T>,
   );
 }
+
+export function areEqual<T>(arr1: T[], arr2: T[]): boolean {
+  if (arr1.length !== arr2.length) {
+    return false;
+  }
+
+  return arr1.every((item, idx) => item === arr2[idx]);
+}

@@ -7,15 +7,15 @@ export const wrapper = style({
   alignItems: 'center',
   backgroundColor: themeVars.color.background,
   position: 'relative',
-  padding: '10px 0',
+  paddingBottom: 10,
   gap: 10,
 });
 
-export const icon = style({
+export const iconLeft = style({
   position: 'absolute',
   left: 10,
   top: 0,
-  bottom: 0,
+  bottom: 10,
   marginTop: 'auto',
   marginBottom: 'auto',
   display: 'flex',
@@ -23,6 +23,17 @@ export const icon = style({
   color: themeVars.color.muted,
 });
 
-globalStyle(`${wrapper} input`, {
+globalStyle(`${wrapper} > input`, {
   flex: '1 1 0%',
+});
+
+export const buttonRight = style({
+  position: 'absolute',
+  right: 5,
+  top: 0,
+  bottom: 10,
+  marginTop: 'auto',
+  marginBottom: 'auto',
+  display: 'flex',
+  alignItems: 'center',
 });

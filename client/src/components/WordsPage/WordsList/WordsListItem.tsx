@@ -7,7 +7,7 @@ import * as styles from './WordsListItem.css';
 
 export type WordsListItemProps = {
   word: WordFieldsFragment;
-  setSelectedWord: (selectedWord: string | null) => void;
+  setSelectedWord: (selectedWord: string) => void;
 };
 
 export const WordsListItem: React.FC<WordsListItemProps> = ({
@@ -21,7 +21,7 @@ export const WordsListItem: React.FC<WordsListItemProps> = ({
       <div>
         <WordProgress progress={2} />
       </div>
-      <PartOfSpeechPill partOfSpeech={word.partOfSpeech} />
+      <PartOfSpeechPill partOfSpeech={word.partOfSpeech} disabled />
     </div>
   );
 };

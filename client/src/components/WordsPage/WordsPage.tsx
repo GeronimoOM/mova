@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useLanguageContext } from '../LanguageContext';
 import { WordDetails } from './WordDetails/WordDetails';
 import { WordsList } from './WordsList/WordsList';
@@ -12,15 +12,15 @@ export const WordsPage: React.FC = () => {
   const [isWordDetailsOpen, setIsWordDetailsOpen] = useState(false);
   const [wordsSearchQuery, setWordsSearchQuery] = useState<string>('');
 
-  const handleWordSelect = (selectedWordId: string | null) => {
+  const handleWordSelect = useCallback((selectedWordId: string) => {
     setSelectedWordId(selectedWordId);
-    setIsWordDetailsOpen(Boolean(selectedWordId));
-  };
+    setIsWordDetailsOpen(true);
+  }, []);
 
-  const handleCreateNew = () => {
+  const handleCreateNew = useCallback(() => {
     setSelectedWordId(null);
     setIsWordDetailsOpen(true);
-  };
+  }, []);
 
   useEffect(() => {
     if (selectedLanguageId) {
@@ -33,7 +33,7 @@ export const WordsPage: React.FC = () => {
       <WordsSearchBar
         query={wordsSearchQuery}
         onQueryChange={setWordsSearchQuery}
-        onCreateNew={handleCreateNew}
+        onClear={() => setWordsSearchQuery('')}
       />
       {isWordDetailsOpen ? (
         <WordDetails
@@ -44,6 +44,7 @@ export const WordsPage: React.FC = () => {
       ) : (
         <WordsList
           onSelectWord={handleWordSelect}
+          onCreateNew={handleCreateNew}
           onOpenDetails={() => setIsWordDetailsOpen(true)}
           wordsSearchQuery={wordsSearchQuery}
         />

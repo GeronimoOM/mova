@@ -9,6 +9,7 @@ export type ButtonIconProps = IconProps & {
   onClick: () => void;
   type?: 'primary' | 'secondary' | 'default';
   disabled?: boolean;
+  hidden?: boolean;
   loading?: boolean;
 };
 
@@ -17,11 +18,12 @@ export const ButtonIcon: React.FC<ButtonIconProps> = ({
   onClick,
   type,
   disabled,
+  hidden,
   loading,
 }) => {
   return (
     <div
-      className={styles.button({ type, disabled, loading })}
+      className={styles.button({ type, disabled, hidden, loading })}
       onClick={onClick}
     >
       <Icon icon={!loading ? icon : FaSyncAlt} />
