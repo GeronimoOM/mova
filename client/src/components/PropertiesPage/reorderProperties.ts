@@ -1,5 +1,13 @@
+import { useLazyQuery } from '@apollo/client';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDrag, useDragLayer, useDrop } from 'react-dnd';
-import { PropertyFieldsFragment } from '../../api/types/graphql';
+import { useReorderProperties } from '../../api/mutations';
+import {
+  GetPropertiesDocument,
+  PartOfSpeech,
+  PropertyFieldsFragment,
+} from '../../api/types/graphql';
+import { areEqual, toRecord } from '../../utils/arrays';
 
 export const PropertyDndType = 'property';
 
@@ -54,7 +62,7 @@ export type PropertyDropCollected = {
 
 export const usePropertyDrop = (
   propertyId: string | null,
-  onReorderPreview: (property1Id: string, property2Id: string) => void,
+  onSwapPreview: (property1Id: string, property2Id: string) => void,
   onReorder: () => void,
 ) =>
   useDrop<PropertyDragObject, PropertyDragObject, PropertyDropCollected>({
@@ -71,7 +79,7 @@ export const usePropertyDrop = (
         return;
       }
 
-      onReorderPreview(item.property.id!, propertyId!);
+      onSwapPreview(item.property.id!, propertyId!);
     },
     drop: (item) => {
       onReorder();
@@ -104,3 +112,104 @@ export const usePropertyDragLayer = () =>
       position,
     };
   });
+
+export const useOrderedProperties = (
+  languageId: string | null,
+  partOfSpeech: PartOfSpeech,
+) => {
+  const [
+    fetchProperties,
+    { data: propertiesQuery, loading: propertiesLoading },
+  ] = useLazyQuery(GetPropertiesDocument);
+  const properties = propertiesQuery?.language?.properties;
+
+  const [orderedPropertyIds, setOrderedPropertyIds] = useState<string[]>([]);
+  const propertiesById = useMemo(
+    () =>
+      properties ? toRecord(properties, (property) => property.id) : undefined,
+    [properties],
+  );
+
+  const orderedProperties = useMemo(() => {
+    if (!propertiesById) {
+      return undefined;
+    }
+
+    return orderedPropertyIds.map((id) => propertiesById[id]);
+  }, [propertiesById, orderedPropertyIds]);
+
+  const [reorderPropertiesMutate] = useReorderProperties();
+
+  const swapPropertiesPreview = useCallback(
+    (property1Id: string, property2Id: string) => {
+      const property1Index = orderedPropertyIds.indexOf(property1Id);
+      const property2Index = orderedPropertyIds.indexOf(property2Id);
+
+      const reorderedPropertyIds = [...orderedPropertyIds];
+      reorderedPropertyIds[property1Index] = property2Id;
+      reorderedPropertyIds[property2Index] = property1Id;
+
+      setOrderedPropertyIds(reorderedPropertyIds);
+    },
+    [orderedPropertyIds],
+  );
+
+  const reorderProperties = useCallback(() => {
+    const propertyIds = properties?.map((property) => property.id);
+    if (!languageId || !propertyIds || !orderedPropertyIds) {
+      return;
+    }
+
+    if (areEqual(propertyIds, orderedPropertyIds)) {
+      return;
+    }
+
+    reorderPropertiesMutate({
+      variables: {
+        input: {
+          languageId,
+          partOfSpeech,
+          propertyIds: orderedPropertyIds,
+        },
+      },
+    });
+  }, [
+    languageId,
+    partOfSpeech,
+    orderedPropertyIds,
+    properties,
+    reorderPropertiesMutate,
+  ]);
+
+  useEffect(() => {
+    if (languageId) {
+      fetchProperties({
+        variables: {
+          languageId,
+          partOfSpeech,
+        },
+      });
+    }
+  }, [languageId, partOfSpeech, fetchProperties]);
+
+  useEffect(() => {
+    if (properties) {
+      setOrderedPropertyIds(properties.map((property) => property.id));
+    }
+  }, [properties]);
+
+  return useMemo(
+    () => ({
+      propertiesLoading,
+      orderedProperties,
+      swapPropertiesPreview,
+      reorderProperties,
+    }),
+    [
+      propertiesLoading,
+      orderedProperties,
+      reorderProperties,
+      swapPropertiesPreview,
+    ],
+  );
+};

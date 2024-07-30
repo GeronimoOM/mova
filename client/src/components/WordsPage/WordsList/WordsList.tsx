@@ -65,13 +65,11 @@ export const WordsList: React.FC<WordsListProps> = ({
       </div>
 
       <div className={styles.buttons}>
-        <div className={styles.buttonWrapper}>
-          <ButtonIcon
-            icon={TbHexagonPlusFilled}
-            type="primary"
-            onClick={onCreateNew}
-          />
-        </div>
+        <ButtonIcon
+          icon={TbHexagonPlusFilled}
+          type="primary"
+          onClick={onCreateNew}
+        />
       </div>
     </div>
   );

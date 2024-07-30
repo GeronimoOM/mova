@@ -1,3 +1,4 @@
+import { style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
 import { animations, themeVars } from '../../index.css';
 
@@ -69,4 +70,11 @@ export const button = recipe({
   defaultVariants: {
     type: 'default',
   },
+});
+
+export const wrapper = style({
+  border: `2px solid ${themeVars.color.text}`,
+  backgroundColor: themeVars.color.background,
+  padding: 5,
+  borderRadius: 30,
 });

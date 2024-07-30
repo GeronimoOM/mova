@@ -9,8 +9,9 @@ export type ButtonIconProps = IconProps & {
   onClick: () => void;
   type?: 'primary' | 'secondary' | 'default';
   disabled?: boolean;
-  hidden?: boolean;
   loading?: boolean;
+  hidden?: boolean;
+  wrapped?: boolean;
 };
 
 export const ButtonIcon: React.FC<ButtonIconProps> = ({
@@ -18,10 +19,11 @@ export const ButtonIcon: React.FC<ButtonIconProps> = ({
   onClick,
   type,
   disabled,
-  hidden,
   loading,
+  hidden,
+  wrapped,
 }) => {
-  return (
+  const button = (
     <div
       className={styles.button({ type, disabled, hidden, loading })}
       onClick={onClick}
@@ -29,4 +31,6 @@ export const ButtonIcon: React.FC<ButtonIconProps> = ({
       <Icon icon={!loading ? icon : FaSyncAlt} />
     </div>
   );
+
+  return wrapped ? <div className={styles.wrapper}>{button}</div> : button;
 };

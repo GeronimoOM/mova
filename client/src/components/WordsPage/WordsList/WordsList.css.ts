@@ -27,10 +27,3 @@ export const buttons = style({
   bottom: 10,
   right: 10,
 });
-
-export const buttonWrapper = style({
-  border: `2px solid ${themeVars.color.text}`,
-  backgroundColor: themeVars.color.background,
-  padding: 5,
-  borderRadius: 30,
-});

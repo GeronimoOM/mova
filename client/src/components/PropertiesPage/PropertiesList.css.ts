@@ -24,16 +24,5 @@ export const listEnd = style({
 export const buttons = style({
   position: 'absolute',
   bottom: 10,
-  left: 0,
-  right: 0,
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-});
-
-export const buttonWrapper = style({
-  border: `2px solid ${themeVars.color.text}`,
-  backgroundColor: themeVars.color.background,
-  padding: 5,
-  borderRadius: 30,
+  right: 10,
 });

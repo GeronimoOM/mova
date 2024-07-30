@@ -28,7 +28,7 @@ export type PropertyListItemProps = {
   selected: boolean;
   onSelect: () => void;
   onPropertyCreated?: () => void;
-  onReorderPreview: (property1Id: string, property2Id: string) => void;
+  onSwapPreview: (property1Id: string, property2Id: string) => void;
   onReorder: () => void;
 };
 
@@ -43,7 +43,7 @@ export const PropertyListItem: React.FC<PropertyListItemProps> = ({
   selected,
   onSelect,
   onPropertyCreated,
-  onReorderPreview,
+  onSwapPreview,
   onReorder,
 }) => {
   const {
@@ -69,7 +69,7 @@ export const PropertyListItem: React.FC<PropertyListItemProps> = ({
 
   const [{ canDrop }, dropRef] = usePropertyDrop(
     property.id ?? null,
-    onReorderPreview,
+    onSwapPreview,
     onReorder,
   );
 

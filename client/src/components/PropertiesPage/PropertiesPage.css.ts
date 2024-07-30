@@ -8,5 +8,3 @@ export const wrapper = style({
   gridTemplateColumns: 'minmax(0, auto)',
   backgroundColor: themeVars.color.backgroundLight,
 });
-
-export const header = style({});
