@@ -11,7 +11,6 @@ import {
   Property,
   PropertyId,
 } from 'models/Property';
-import { TopicId } from 'models/Topic';
 import {
   PartOfSpeech,
   Word,
@@ -33,12 +32,10 @@ import { ChangeBuilder } from './ChangeBuilder';
 import { ChangeService } from './ChangeService';
 import { LanguageService } from './LanguageService';
 import { PropertyService } from './PropertyService';
-import { TopicService } from './TopicService';
 
 export interface GetWordPageParams {
   languageId?: LanguageId;
   partsOfSpeech?: PartOfSpeech[];
-  topics?: TopicId[];
   query?: string;
   order?: WordOrder;
   direction?: Direction;
@@ -82,8 +79,6 @@ export class WordService {
     private searchClient: SearchClient,
     @Inject(forwardRef(() => PropertyService))
     private propertyService: PropertyService,
-    @Inject(forwardRef(() => TopicService))
-    private topicService: TopicService,
     @Inject(forwardRef(() => LanguageService))
     private languageService: LanguageService,
     @Inject(forwardRef(() => ChangeService))
@@ -129,6 +124,7 @@ export class WordService {
       translation: params.translation,
       languageId: params.languageId,
       partOfSpeech: params.partOfSpeech,
+      mastery: 0,
       addedAt: params.addedAt ?? DateTime.utc(),
     };
 
@@ -210,8 +206,6 @@ export class WordService {
   async index(wordId: WordId): Promise<void> {
     const word = await this.getById(wordId);
 
-    word.topics = await this.topicService.getForWord(word.id);
-
     await this.searchClient.indexWord(word);
   }
 
@@ -219,16 +213,7 @@ export class WordService {
     await this.searchClient.deleteLanguageWords(languageId);
 
     for await (const wordsBatch of this.wordRepository.getBatches(languageId)) {
-      const topicsByWords = await this.topicService.getForWords(
-        wordsBatch.map((word) => word.id),
-      );
-
-      const words = wordsBatch.map((word) => ({
-        ...word,
-        topics: topicsByWords[word.id],
-      }));
-
-      await this.searchClient.indexWords(words);
+      await this.searchClient.indexWords(wordsBatch);
     }
   }
 

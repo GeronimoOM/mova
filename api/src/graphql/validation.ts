@@ -24,9 +24,6 @@ export const validationPlugin: MercuriusPlugin<MercuriusValidationOptions> = {
       UpdatePropertyInput: {
         name: { type: 'string', minLength: 3, maxLength: 30 },
       },
-      CreateTopicInput: {
-        name: { type: 'string', minLength: 3, maxLength: 20 },
-      },
     },
   },
 };

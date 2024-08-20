@@ -5,11 +5,12 @@ import {
   GetWordsDocument,
   WordFieldsFragment,
 } from '../../../api/types/graphql';
-import { DATETIME_FORMAT } from '../../../utils/constants';
+import {
+  DATETIME_FORMAT,
+  MIN_QUERY_LENGTH,
+  WORDS_PAGE_SIZE,
+} from '../../../utils/constants';
 import { useLanguageContext } from '../../LanguageContext';
-
-const WORDS_PAGE_SIZE = 15;
-const MIN_QUERY_LENGTH = 3;
 
 export type WordsListReturn = {
   words: Array<WordFieldsFragment | WordDateDivider> | undefined;

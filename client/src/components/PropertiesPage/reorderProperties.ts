@@ -182,6 +182,8 @@ export const useOrderedProperties = (
   ]);
 
   useEffect(() => {
+    setOrderedPropertyIds([]);
+
     if (languageId) {
       fetchProperties({
         variables: {

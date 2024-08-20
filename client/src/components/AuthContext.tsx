@@ -5,12 +5,11 @@ import React, {
   useMemo,
   useState,
 } from 'react';
+import { LOCAL_STORAGE_TOKEN_KEY } from '../utils/constants';
 
 export type AuthContextType = [string | null, (token: string) => void];
 
 export const AuthContext = createContext<AuthContextType>([null, () => {}]);
-
-export const LOCAL_STORAGE_TOKEN_KEY = 'jwtToken';
 
 type AuthProviderProps = {
   children?: React.ReactNode;

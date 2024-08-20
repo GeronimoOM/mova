@@ -211,7 +211,8 @@ export class ChangeBuilder {
     if (
       word.original === currentWord.original &&
       word.translation === currentWord.translation &&
-      !propertiesDiff
+      !propertiesDiff &&
+      word.mastery === currentWord.mastery
     ) {
       return null;
     }
@@ -240,6 +241,9 @@ export class ChangeBuilder {
               this.toPropertValueSave(propertyValue, true),
             ),
           },
+        }),
+        ...(word.mastery !== currentWord.mastery && {
+          mastery: word.mastery,
         }),
       },
       clientId: ctx.clientId,

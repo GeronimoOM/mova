@@ -6,7 +6,6 @@ import { LanguageId } from './Language';
 import { StartCursor } from './Page';
 import { PropertyId } from './Property';
 import { PropertyValue, PropertyValueSave } from './PropertyValue';
-import { Topic } from './Topic';
 
 export type WordId = Flavor<string, 'Word'>;
 
@@ -16,9 +15,9 @@ export interface Word {
   translation: string;
   languageId: LanguageId;
   partOfSpeech: PartOfSpeech;
+  mastery: number;
   addedAt: DateTime;
   properties?: Record<PropertyId, PropertyValue>;
-  topics?: Topic[];
 }
 
 export enum PartOfSpeech {
@@ -36,7 +35,10 @@ export enum WordOrder {
   Random = 'random',
 }
 
-export interface WordCreate extends Omit<Word, 'properties' | 'topics'> {
+export const WordMasteries = [0, 1, 2, 3] as const;
+export type WordMastery = (typeof WordMasteries)[number];
+
+export interface WordCreate extends Omit<Word, 'properties'> {
   properties?: Record<PropertyId, PropertyValueSave>;
 }
 
@@ -45,6 +47,7 @@ export interface WordUpdate {
   original?: string;
   translation?: string;
   properties?: Record<PropertyId, PropertyValueSave>;
+  mastery?: number;
 }
 
 export type WordsStats = {

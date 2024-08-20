@@ -9,17 +9,14 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql';
-import { TopicPageType, TopicType } from 'graphql/types/TopicType';
 import { WordsStatsType } from 'graphql/types/WordsDateStatsType';
 import { DateTime } from 'luxon';
 import { Context } from 'models/Context';
 import { LanguageId } from 'models/Language';
 import { Direction, Page, encodePageCursor, mapPage } from 'models/Page';
-import { TopicCursor, TopicId } from 'models/Topic';
 import { PartOfSpeech, WordCursor, WordOrder } from 'models/Word';
 import { LanguageService } from 'services/LanguageService';
 import { PropertyService } from 'services/PropertyService';
-import { TopicService } from 'services/TopicService';
 import { WordService } from 'services/WordService';
 import { DATE_FORMAT } from 'utils/constants';
 import { decodeCursor } from 'utils/cursors';
@@ -41,7 +38,6 @@ export class LanguageResolver {
     private languageService: LanguageService,
     private propertyService: PropertyService,
     private wordService: WordService,
-    private topicService: TopicService,
     private propertyTypeMapper: PropertyTypeMapper,
     private wordTypeMapper: WordTypeMapper,
   ) {}
@@ -99,24 +95,6 @@ export class LanguageResolver {
     return properties.map((property) => this.propertyTypeMapper.map(property));
   }
 
-  @ResolveField((type) => TopicPageType)
-  async topics(
-    @Parent() language: LanguageType,
-    @Args() pageArgs: PageArgsType,
-    @Args('query', { nullable: true }) query?: string,
-  ): Promise<Page<TopicType, string>> {
-    const topicPage = await this.topicService.getPage({
-      languageId: language.id,
-      query,
-      cursor: pageArgs.cursor
-        ? decodeCursor(pageArgs.cursor, TopicCursor)
-        : null,
-      limit: pageArgs.limit,
-    });
-
-    return encodePageCursor(topicPage);
-  }
-
   @ResolveField((type) => WordPageType)
   async words(
     @Parent() language: LanguageType,
@@ -124,8 +102,6 @@ export class LanguageResolver {
     @Args('query', { nullable: true }) query?: string,
     @Args('partsOfSpeech', { type: () => [PartOfSpeech], nullable: true })
     partsOfSpeech?: PartOfSpeech[],
-    @Args('topics', { type: () => [ID], nullable: true })
-    topics?: TopicId[],
     @Args('order', { type: () => WordOrder, nullable: true })
     order?: WordOrder,
     @Args('direction', { type: () => Direction, nullable: true })
@@ -135,7 +111,6 @@ export class LanguageResolver {
       languageId: language.id,
       query,
       partsOfSpeech,
-      topics,
       order,
       direction,
       cursor: pageArgs.cursor

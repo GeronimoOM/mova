@@ -10,11 +10,12 @@ export const input = recipe({
   base: {
     border: 'none',
     outline: 'none',
+    padding: '20px 10px',
+    boxSizing: 'border-box',
+    width: '100%',
     backgroundColor: themeVars.color.backgroundLight,
     color: themeVars.color.text,
-    padding: '5px 10px',
     transition: 'background-color 0.2s ease',
-    minWidth: 0,
 
     selectors: {
       '&:hover, &:focus': {

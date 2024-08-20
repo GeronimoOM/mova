@@ -6,36 +6,23 @@ import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { LanguageId } from 'models/Language';
 import { Page, StartCursor, emptyPage } from 'models/Page';
 import { TextPropertyValue, isTextPropertyValue } from 'models/PropertyValue';
-import { Topic, TopicId } from 'models/Topic';
 import { PartOfSpeech, Word, WordId } from 'models/Word';
 import { ElasticClientManager } from './ElasticClientManager';
 import {
   INDEX_SETTINGS,
-  INDEX_TOPICS,
   INDEX_TO_MAPPING,
   INDEX_WORDS,
   IndexType,
 } from './elasticConfig';
 
-export type WordDocument = Omit<Word, 'addedAt' | 'properties' | 'topics'> & {
+export type WordDocument = Omit<Word, 'addedAt' | 'properties' | 'mastery'> & {
   properties?: string[];
-  topics?: TopicId[];
 };
-
-export type TopicDocument = Topic;
 
 export interface SearchWordsParams {
   languageId: LanguageId;
   query: string;
   partsOfSpeech?: PartOfSpeech[];
-  topics?: TopicId[];
-  cursor?: StartCursor;
-  limit?: number;
-}
-
-export interface SearchTopicsParams {
-  languageId: LanguageId;
-  query: string;
   cursor?: StartCursor;
   limit?: number;
 }
@@ -48,7 +35,6 @@ export class SearchClient implements OnApplicationBootstrap {
     languageId,
     query,
     partsOfSpeech,
-    topics,
     cursor,
     limit,
   }: SearchWordsParams): Promise<Page<WordId, StartCursor>> {
@@ -65,16 +51,6 @@ export class SearchClient implements OnApplicationBootstrap {
         bool: {
           should: partsOfSpeech.map((partOfSpeech) => ({
             term: { partOfSpeech },
-          })),
-        },
-      });
-    }
-
-    if (topics?.length) {
-      queryFilters.push({
-        bool: {
-          should: topics.map((topic) => ({
-            term: { topics: topic },
           })),
         },
       });
@@ -98,46 +74,6 @@ export class SearchClient implements OnApplicationBootstrap {
           filter: queryFilters,
           should: queryShould,
           minimum_should_match: 1,
-        },
-      },
-      from: start,
-      size: limit,
-    });
-
-    return this.toPage(searchResponse, start, limit);
-  }
-
-  async searchTopics({
-    languageId,
-    query,
-    cursor,
-    limit,
-  }: SearchTopicsParams): Promise<Page<TopicId, StartCursor>> {
-    const indexExists = await this.indexExists(INDEX_TOPICS);
-    if (!indexExists) {
-      return emptyPage();
-    }
-
-    const start = cursor?.start ?? 0;
-    const filterQuery: QueryDslQueryContainer = {
-      match: {
-        languageId,
-      },
-    };
-    const searchQuery: QueryDslQueryContainer = {
-      match: {
-        name: {
-          query,
-          fuzziness: 'AUTO',
-        },
-      },
-    };
-
-    const searchResponse = await this.getClient().search<TopicDocument>({
-      index: INDEX_TOPICS,
-      query: {
-        bool: {
-          must: [filterQuery, searchQuery],
         },
       },
       from: start,
@@ -180,49 +116,8 @@ export class SearchClient implements OnApplicationBootstrap {
     });
   }
 
-  async indexTopic(topic: Topic): Promise<void> {
-    await this.getClient().index<TopicDocument>({
-      index: INDEX_TOPICS,
-      id: topic.id,
-      document: {
-        id: topic.id,
-        name: topic.name.toLowerCase(),
-        languageId: topic.languageId,
-      },
-    });
-  }
-
-  async indexTopics(topics: Topic[]): Promise<void> {
-    if (!topics.length) {
-      return;
-    }
-
-    await this.getClient().bulk<TopicDocument>({
-      operations: topics.flatMap((topic) => [
-        {
-          index: {
-            _index: INDEX_TOPICS,
-            _id: topic.id,
-          },
-        },
-        topic,
-      ]),
-    });
-  }
-
-  async deleteTopic(id: TopicId): Promise<void> {
-    await this.getClient().delete({
-      id,
-      index: INDEX_TOPICS,
-    });
-  }
-
   async deleteLanguageWords(languageId: LanguageId): Promise<void> {
     await this.deleteLanguageInIndex(INDEX_WORDS, languageId);
-  }
-
-  async deleteLanguageTopics(languageId: LanguageId): Promise<void> {
-    await this.deleteLanguageInIndex(INDEX_TOPICS, languageId);
   }
 
   async onApplicationBootstrap() {
@@ -250,7 +145,7 @@ export class SearchClient implements OnApplicationBootstrap {
 
   async deleteIndices(): Promise<void> {
     await this.getClient().indices.delete({
-      index: [INDEX_WORDS, INDEX_TOPICS],
+      index: [INDEX_WORDS],
     });
   }
 
@@ -291,9 +186,6 @@ export class SearchClient implements OnApplicationBootstrap {
             )
             .map((value) => value.text.toLowerCase())
         : undefined,
-      ...(word.topics && {
-        topics: word.topics.map((topic) => topic.id),
-      }),
     };
   }
 

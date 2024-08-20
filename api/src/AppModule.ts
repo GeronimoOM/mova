@@ -7,6 +7,7 @@ import { TestController } from 'controllers/TestController';
 import { ChangeTypeMapper } from 'graphql/mappers/ChangeTypeMapper';
 import { AuthResolver } from 'graphql/resolvers/AuthResolver';
 import { ChangeResolver } from 'graphql/resolvers/ChangeResolver';
+import { ExerciseResolver } from 'graphql/resolvers/ExerciseResolver';
 import { AuthGuard, CONFIG_JWT_KEY } from 'guards/AuthGuard';
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { ChangeRepository } from 'repositories/ChangeRepository';
@@ -14,6 +15,7 @@ import { Serializer } from 'repositories/Serializer';
 import { AuthService } from 'services/AuthService';
 import { ChangeBuilder } from 'services/ChangeBuilder';
 import { ChangeService } from 'services/ChangeService';
+import { ExerciseService } from 'services/ExerciseService';
 import { ElasticClientModule } from './clients/ElasticClientModule';
 import { SearchClient } from './clients/SearchClient';
 import { MaintenanceController } from './controllers/MaintenanceController';
@@ -22,17 +24,14 @@ import { PropertyTypeMapper } from './graphql/mappers/PropertyTypeMapper';
 import { WordTypeMapper } from './graphql/mappers/WordTypeMapper';
 import { LanguageResolver } from './graphql/resolvers/LanguageResolver';
 import { PropertyResolver } from './graphql/resolvers/PropertyResolver';
-import { TopicResolver } from './graphql/resolvers/TopicResolver';
 import { WordResolver } from './graphql/resolvers/WordResolver';
 import { DbConnectionManager } from './repositories/DbConnectionManager';
 import { LanguageRepository } from './repositories/LanguageRepository';
 import { PropertyRepository } from './repositories/PropertyRepository';
-import { TopicRepository } from './repositories/TopicRepository';
 import { WordRepository } from './repositories/WordRepository';
 import { LanguageService } from './services/LanguageService';
 import { MaintenanceService } from './services/MaintenanceService';
 import { PropertyService } from './services/PropertyService';
-import { TopicService } from './services/TopicService';
 import { WordService } from './services/WordService';
 
 @Module({
@@ -55,15 +54,15 @@ import { WordService } from './services/WordService';
     PropertyResolver,
     ChangeResolver,
     WordResolver,
-    TopicResolver,
+    ExerciseResolver,
     PropertyTypeMapper,
     WordTypeMapper,
     ChangeTypeMapper,
     AuthService,
+    ExerciseService,
     LanguageService,
     PropertyService,
     WordService,
-    TopicService,
     ChangeService,
     MaintenanceService,
     SearchClient,
@@ -71,7 +70,6 @@ import { WordService } from './services/WordService';
     LanguageRepository,
     PropertyRepository,
     WordRepository,
-    TopicRepository,
     ChangeRepository,
     DbConnectionManager,
     Serializer,

@@ -7,11 +7,12 @@ export const nav = style({
   display: 'flex',
   flexDirection: 'row',
   padding: 10,
-  gap: 20,
+  gap: 10,
 
   '@media': {
     [breakpoints.small]: {
       flexDirection: 'column',
+      gap: 20,
     },
   },
 });
@@ -33,4 +34,11 @@ export const title = style({
 
 globalStyle(`${nav} > *:last-child`, {
   marginLeft: 'auto',
+
+  '@media': {
+    [breakpoints.small]: {
+      marginLeft: 0,
+      marginTop: 'auto',
+    },
+  },
 });

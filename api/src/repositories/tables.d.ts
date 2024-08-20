@@ -1,7 +1,6 @@
 import { ChangeId } from 'models/Change';
 import { LanguageId } from 'models/Language';
 import { PropertyId, PropertyType } from 'models/Property';
-import { TopicId } from 'models/Topic';
 import { PartOfSpeech, WordId } from 'models/Word';
 
 declare module 'knex/types/tables' {
@@ -28,20 +27,9 @@ declare module 'knex/types/tables' {
     translation: string;
     language_id: LanguageId;
     part_of_speech: PartOfSpeech;
+    mastery: number;
     added_at: string;
     properties?: string;
-  }
-
-  interface TopicTable {
-    id: TopicId;
-    name: string;
-    language_id: LanguageId;
-    added_at: string;
-  }
-
-  interface TopicWordTable {
-    topic_id: TopicId;
-    word_id: WordId;
   }
 
   interface ChangeTable {
@@ -56,7 +44,5 @@ declare module 'knex/types/tables' {
     languages: LanguageTable;
     properties: PropertyTable;
     words: WordTable;
-    topics: TopicTable;
-    topics_words: TopicWordTable;
   }
 }

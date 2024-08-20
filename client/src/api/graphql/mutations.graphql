@@ -67,16 +67,9 @@ mutation DeleteWord($input: DeleteWordInput!) {
   }
 }
 
-mutation CreateTopic($input: CreateTopicInput!) {
-  createTopic(input: $input) {
-    id
-    name
-  }
-}
-
-mutation DeleteTopic($id: ID!) {
-  deleteTopic(id: $id) {
-    id
+mutation IncreaseWordMastery($wordId: ID!) {
+  increaseMastery(wordId: $wordId) {
+    ...WordFields
   }
 }
 

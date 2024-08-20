@@ -2,6 +2,7 @@ import {
   Field,
   ID,
   InputType,
+  Int,
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
@@ -30,6 +31,9 @@ export class WordType {
 
   @Field((type) => PartOfSpeech)
   partOfSpeech: PartOfSpeech;
+
+  @Field((type) => Int)
+  mastery: number;
 
   @Field((type) => TimestampScalar)
   addedAt: DateTime;

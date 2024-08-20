@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { TbHexagonPlusFilled } from 'react-icons/tb';
 import { clearWordsSearch } from '../../../api/cache';
+import { MIN_QUERY_LENGTH } from '../../../utils/constants';
 import { useDebouncedValue } from '../../../utils/useDebouncedValue';
 import { useInfiniteScroll } from '../../../utils/useInfiniteScroll';
 import { useLanguageContext } from '../../LanguageContext';
@@ -24,20 +25,19 @@ export const WordsList: React.FC<WordsListProps> = ({
   wordsSearchQuery,
 }) => {
   const [selectedLanguageId] = useLanguageContext();
+  const isSearch = wordsSearchQuery.length >= MIN_QUERY_LENGTH;
 
   const debouncedWordsSearchQuery = useDebouncedValue(
     wordsSearchQuery,
     SEARCH_DELAY_MS,
   );
 
-  const {
-    words,
-    wordsLoading: loading,
-    fetchNextWordsPage,
-  } = useWordsList(debouncedWordsSearchQuery);
+  const { words, wordsLoading, fetchNextWordsPage } = useWordsList(
+    debouncedWordsSearchQuery,
+  );
 
   const listEndRef = useInfiniteScroll<HTMLDivElement>({
-    isFetching: loading,
+    isFetching: wordsLoading,
     fetchNextPage: fetchNextWordsPage,
   });
 
@@ -52,7 +52,12 @@ export const WordsList: React.FC<WordsListProps> = ({
       <div className={styles.list}>
         {words?.map((word) =>
           isDivider(word) ? (
-            <WordsListItemDivider date={word.date} key={word.date.toString()} />
+            !isSearch && (
+              <WordsListItemDivider
+                date={word.date}
+                key={word.date.toString()}
+              />
+            )
           ) : (
             <WordsListItem
               key={word.id}
@@ -69,6 +74,7 @@ export const WordsList: React.FC<WordsListProps> = ({
           icon={TbHexagonPlusFilled}
           type="primary"
           onClick={onCreateNew}
+          wrapped
         />
       </div>
     </div>

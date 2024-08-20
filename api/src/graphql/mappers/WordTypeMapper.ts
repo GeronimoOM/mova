@@ -40,6 +40,7 @@ export class WordTypeMapper {
       properties: Object.values(word.properties ?? {}).map((value) =>
         this.mapPropertyValue(value),
       ),
+      mastery: word.mastery,
     };
   }
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import { BsTranslate } from 'react-icons/bs';
+import { FaUser } from 'react-icons/fa';
 import { FaBrain, FaEarthEurope } from 'react-icons/fa6';
 import { IoStatsChart } from 'react-icons/io5';
 import { PiGraphBold } from 'react-icons/pi';
@@ -30,6 +31,8 @@ export const NavBar: React.FC = () => {
         icon={FaEarthEurope}
         text="Language"
       />
+
+      <NavBarItem href={'/login'} icon={FaUser} text="Log out" />
     </nav>
   );
 };

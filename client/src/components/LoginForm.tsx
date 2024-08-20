@@ -24,7 +24,7 @@ export const LoginForm: React.FC = () => {
   }, [name, password, loginMutation]);
 
   useEffect(() => {
-    if (loginResult) {
+    if (loginResult?.token) {
       setToken(loginResult.token);
     }
   });

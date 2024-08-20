@@ -7,9 +7,9 @@ type Language {
   name: String!
   addedAt: Timestamp!
   properties(partOfSpeech: PartOfSpeech): [Property!]!
-  topics(cursor: String, limit: Int, query: String): TopicPage!
-  words(cursor: String, limit: Int, query: String, partsOfSpeech: [PartOfSpeech!], topics: [ID!], order: WordOrder, direction: Direction): WordPage!
+  words(cursor: String, limit: Int, query: String, partsOfSpeech: [PartOfSpeech!], order: WordOrder, direction: Direction): WordPage!
   wordsStats(days: Int, from: String): WordsStats!
+  exerciseWords(total: Int): [Word!]!
 }
 
 """
@@ -85,6 +85,7 @@ type Word {
   original: String!
   translation: String!
   partOfSpeech: PartOfSpeech!
+  mastery: Int!
   addedAt: Timestamp!
   languageId: ID!
   properties: [PropertyValue!]!
@@ -277,17 +278,6 @@ enum SyncType {
   Delta
 }
 
-type Topic {
-  id: ID!
-  name: String!
-  words(cursor: String, limit: Int, query: String, partOfSpeech: [PartOfSpeech!], order: WordOrder, direction: Direction): WordPage!
-}
-
-type TopicPage {
-  items: [Topic!]!
-  nextCursor: String
-}
-
 type WordsTotalStats {
   words: Int!
 }
@@ -329,10 +319,7 @@ type Mutation {
   createWord(input: CreateWordInput!): Word!
   updateWord(input: UpdateWordInput!): Word!
   deleteWord(input: DeleteWordInput!): Word!
-  createTopic(input: CreateTopicInput!): Topic!
-  deleteTopic(id: ID!): Topic!
-  addTopicWord(topicId: ID!, wordId: ID!): Topic!
-  removeTopicWord(topicId: ID!, wordId: ID!): Topic!
+  increaseMastery(wordId: ID!): Word!
 }
 
 input LoginInput {
@@ -424,9 +411,4 @@ input UpdateWordInput {
 
 input DeleteWordInput {
   id: ID!
-}
-
-input CreateTopicInput {
-  name: String!
-  languageId: ID!
 }

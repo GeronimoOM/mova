@@ -8,7 +8,6 @@ query GetWords(
   $languageId: ID!
   $query: String
   $partsOfSpeech: [PartOfSpeech!]
-  $topics: [ID!]
   $cursor: String
   $limit: Int
   $order: WordOrder
@@ -20,7 +19,6 @@ query GetWords(
       limit: $limit
       partsOfSpeech: $partsOfSpeech
       query: $query
-      topics: $topics
       order: $order
     ) {
       items {
@@ -46,20 +44,11 @@ query GetProperties($languageId: ID!, $partOfSpeech: PartOfSpeech) {
   }
 }
 
-query GetTopics(
-  $languageId: ID!
-  $cursor: String
-  $limit: Int
-  $query: String
-) {
+query GetExerciseWords($languageId: ID!) {
   language(id: $languageId) {
     id
-    topics(cursor: $cursor, limit: $limit, query: $query) {
-      items {
-        id
-        name
-      }
-      nextCursor
+    exerciseWords {
+      ...WordFields
     }
   }
 }

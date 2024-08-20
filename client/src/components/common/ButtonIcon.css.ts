@@ -1,4 +1,4 @@
-import { style } from '@vanilla-extract/css';
+import { globalStyle, style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
 import { animations, themeVars } from '../../index.css';
 
@@ -77,4 +77,8 @@ export const wrapper = style({
   backgroundColor: themeVars.color.background,
   padding: 5,
   borderRadius: 30,
+});
+
+globalStyle(`${button}.empty svg`, {
+  opacity: 0,
 });

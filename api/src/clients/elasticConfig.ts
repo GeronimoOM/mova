@@ -1,9 +1,8 @@
 import * as elastic from '@elastic/elasticsearch/lib/api/types';
 
 export const INDEX_WORDS = 'words';
-export const INDEX_TOPICS = 'topics';
 
-export const INDICES = [INDEX_WORDS, INDEX_TOPICS];
+export const INDICES = [INDEX_WORDS];
 
 export type IndexType = (typeof INDICES)[number];
 
@@ -24,17 +23,6 @@ export const INDEX_TO_MAPPING: Record<IndexType, elastic.MappingTypeMapping> = {
       },
       partOfSpeech: {
         type: 'keyword',
-      },
-      topics: {
-        type: 'keyword',
-      },
-    },
-  },
-
-  [INDEX_TOPICS]: {
-    properties: {
-      name: {
-        type: 'text',
       },
     },
   },

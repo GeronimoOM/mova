@@ -1,11 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { WordTable } from 'knex/types/tables';
-import { DateTime } from 'luxon';
+import { DateTime, Duration } from 'luxon';
 import { LanguageId } from 'models/Language';
 import { Direction, Page, toPage } from 'models/Page';
 import { Property, PropertyId } from 'models/Property';
 import { PropertyValue } from 'models/PropertyValue';
-import { TopicId } from 'models/Topic';
 import {
   AlphabeticalCursor,
   ChronologicalCursor,
@@ -26,7 +25,6 @@ import {
 import * as records from 'utils/records';
 import { DbConnectionManager } from './DbConnectionManager';
 import { Serializer } from './Serializer';
-import { TABLE_TOPICS_WORDS } from './TopicRepository';
 
 const TABLE_WORDS = 'words';
 
@@ -37,9 +35,8 @@ export interface GetWordPageParams {
   order?: WordOrder;
   direction?: Direction;
   partsOfSpeech?: PartOfSpeech[];
-  topics?: TopicId[];
-  from?: DateTime;
-  until?: DateTime;
+  mastery?: number;
+  addedAtOlderThan?: Duration;
   cursor?: WordSortedCursor;
   limit?: number;
 }
@@ -72,17 +69,16 @@ export class WordRepository {
   async getPage({
     languageId,
     partsOfSpeech,
-    topics,
     order = WordOrder.Chronological,
     direction = Direction.Desc,
     cursor,
     limit = DEFAULT_LIMIT,
-    from,
-    until,
+    mastery,
+    addedAtOlderThan,
   }: GetWordPageParams): Promise<Page<Word, WordSortedCursor>> {
     const connection = this.connectionManager.getConnection();
 
-    let query = connection(TABLE_WORDS);
+    const query = connection(TABLE_WORDS);
     if (languageId) {
       query.where({ language_id: languageId });
     }
@@ -131,29 +127,14 @@ export class WordRepository {
       query.whereIn('part_of_speech', partsOfSpeech);
     }
 
-    if (topics?.length) {
-      query = query.whereExists((query) =>
-        query
-          .from(TABLE_TOPICS_WORDS)
-          .where({ word_id: connection.ref(`${TABLE_WORDS}.id`) })
-          .whereIn('topic_id', topics),
-      );
+    if (mastery !== undefined) {
+      query.where({ mastery });
     }
 
-    if (from) {
-      query.where(
-        connection.raw('date(added_at)'),
-        '>=',
-        from.toFormat(DATE_FORMAT),
-      );
-    }
-
-    if (until) {
-      query.where(
-        connection.raw('date(added_at)'),
-        '<',
-        until.toFormat(DATE_FORMAT),
-      );
+    if (addedAtOlderThan) {
+      query.whereRaw(`date_add(added_at, interval ? day) <= now()`, [
+        addedAtOlderThan.days,
+      ]);
     }
 
     const wordRows = await query;
@@ -235,6 +216,7 @@ export class WordRepository {
       .update({
         original: word.original,
         translation: word.translation,
+        mastery: word.mastery,
         properties: this.mapFromWordProperties(word.properties),
       })
       .where({ id: word.id });
@@ -326,6 +308,7 @@ export class WordRepository {
       translation: row.translation,
       languageId: row.language_id,
       partOfSpeech: row.part_of_speech,
+      mastery: row.mastery,
       addedAt: DateTime.fromFormat(row.added_at, DATETIME_FORMAT),
       ...(row.properties && {
         properties: this.serializer.deserialize(row.properties),
