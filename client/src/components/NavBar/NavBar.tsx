@@ -15,16 +15,16 @@ export const NavBar: React.FC = () => {
         <p>Mova</p>
       </div>
       <NavBarItem href={AppRoute.Words} icon={BsTranslate} text="Words" />
-      <NavBarItem
-        href={AppRoute.Properties}
-        icon={PiGraphBold}
-        text="Properties"
-      />
       <NavBarItem href={AppRoute.Exercises} icon={FaBrain} text="Exercises" />
       <NavBarItem
         href={AppRoute.Statistics}
         icon={IoStatsChart}
         text="Statistics"
+      />
+      <NavBarItem
+        href={AppRoute.Properties}
+        icon={PiGraphBold}
+        text="Properties"
       />
       <NavBarItem
         href={AppRoute.Languages}

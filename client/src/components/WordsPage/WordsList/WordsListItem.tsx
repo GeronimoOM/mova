@@ -2,7 +2,7 @@ import { DateTime } from 'luxon';
 import React from 'react';
 import { WordFieldsFragment } from '../../../api/types/graphql';
 import { PartOfSpeechPill } from '../../common/PartOfSpeechPill';
-import { WordProgress } from './WordProgress';
+import { WordMastery } from './WordMastery';
 import * as styles from './WordsListItem.css';
 
 export type WordsListItemProps = {
@@ -19,7 +19,7 @@ export const WordsListItem: React.FC<WordsListItemProps> = ({
       <div className={styles.original}>{word.original}</div>
       <div className={styles.translation}>{word.translation}</div>
       <div>
-        <WordProgress progress={2} />
+        <WordMastery mastery={word.mastery} size="small" />
       </div>
       <PartOfSpeechPill partOfSpeech={word.partOfSpeech} disabled />
     </div>

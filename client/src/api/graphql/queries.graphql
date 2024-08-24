@@ -48,7 +48,7 @@ query GetExerciseWords($languageId: ID!) {
   language(id: $languageId) {
     id
     exerciseWords {
-      ...WordFields
+      ...WordFieldsFull
     }
   }
 }

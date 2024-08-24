@@ -12,6 +12,7 @@ import {
   DeletePropertyMutationVariables,
   DeleteWordMutation,
   DeleteWordMutationVariables,
+  IncreaseWordMasteryMutation,
   ReorderPropertiesMutation,
   ReorderPropertiesMutationVariables,
   UpdateLanguageMutation,
@@ -35,6 +36,7 @@ enum GraphQlMutation {
   CreateWord = 'CreateWord',
   UpdateWord = 'UpdateWord',
   DeleteWord = 'DeleteWord',
+  IncreaseMastery = 'IncreaseMastery',
 }
 
 export function isGraphQlMutation(request: GraphQlRequest): boolean {
@@ -270,6 +272,7 @@ async function handleCreateWordMutation(
       ...input,
       id: input.id!,
       addedAt: input.addedAt!,
+      mastery: 0,
       properties:
         input.properties?.map(({ id, text }) => ({
           property: {
@@ -388,6 +391,11 @@ async function cacheGraphQlMutationResponse(
       case GraphQlMutation.DeleteWord: {
         const { deleteWord } = responseData as DeleteWordMutation;
         await cache.deleteWord(deleteWord.id);
+        break;
+      }
+      case GraphQlMutation.IncreaseMastery: {
+        const { increaseMastery } = responseData as IncreaseWordMasteryMutation;
+        await cache.updateWord(increaseMastery);
         break;
       }
     }

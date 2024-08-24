@@ -4,7 +4,6 @@ import { animations, themeVars } from '../../../index.css';
 
 export const label = style({
   color: themeVars.color.muted,
-  fontSize: '0.8rem',
   fontWeight: 'bold',
   textTransform: 'lowercase',
 });

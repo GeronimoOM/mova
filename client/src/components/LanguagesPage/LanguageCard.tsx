@@ -68,7 +68,7 @@ export const LanguageCard: React.FC<LanguageCardProps> = ({
         <ButtonIcon
           icon={FaFire}
           onClick={deleteLanguage}
-          type="secondary"
+          type="negative"
           disabled={!canDeleteLanguage}
           loading={languageDeleting}
         />

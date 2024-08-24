@@ -124,6 +124,7 @@ type WordCreate {
   original: String!
   translation: String!
   partOfSpeech: PartOfSpeech!
+  mastery: Int!
   addedAt: Timestamp!
   languageId: ID!
   properties: [PropertyValueSave!]!
@@ -153,6 +154,7 @@ type WordUpdate {
   original: String
   translation: String
   properties: [PropertyValueSave!]
+  mastery: Int
 }
 
 type ChangePage {

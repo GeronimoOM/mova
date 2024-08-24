@@ -121,7 +121,7 @@ export const PropertyListItem: React.FC<PropertyListItemProps> = ({
         <ButtonIcon
           icon={FaFire}
           onClick={deleteProperty}
-          type="secondary"
+          type="negative"
           disabled={!canDeleteProperty}
           loading={propertyDeleting}
           hidden={!selected}
@@ -179,7 +179,7 @@ export const PropertyListItemOverlay: React.FC = () => {
         <ButtonIcon
           icon={FaFire}
           onClick={() => {}}
-          type="secondary"
+          type="negative"
           disabled={true}
         />
       </div>

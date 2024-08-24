@@ -67,6 +67,13 @@ export const input = recipe({
         animationIterationCount: 'infinite',
       },
     },
+
+    obscured: {
+      true: {
+        color: 'transparent',
+        backgroundColor: themeVars.color.backgroundLightest,
+      },
+    },
   },
 
   defaultVariants: {

@@ -38,4 +38,10 @@ export const label = style({
       padding: 10,
     },
   },
+
+  selectors: {
+    [`${link}:hover:not(.active) &`]: {
+      textDecoration: 'underline',
+    },
+  },
 });

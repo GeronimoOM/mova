@@ -81,8 +81,8 @@ export class ExerciseService {
       sum += masteryDistributionExtra;
     }
 
-    const words = Object.entries(totalByMastery).flatMap(([mastery, count]) =>
-      wordsByMastery[Number(mastery)].slice(0, count),
+    const words: Word[] = Object.entries(totalByMastery).flatMap(
+      ([mastery, count]) => wordsByMastery[Number(mastery)].slice(0, count),
     );
 
     return shuffle(words);
@@ -99,7 +99,7 @@ export class ExerciseService {
     }
 
     if (
-      currentWord.addedAt.plus(MASTERY_GAIN_DELAY[currentWord.mastery]) <
+      currentWord.addedAt.plus(MASTERY_GAIN_DELAY[currentWord.mastery]) >
       DateTime.utc()
     ) {
       throw new Error('Word mastery cannot be increased yet');

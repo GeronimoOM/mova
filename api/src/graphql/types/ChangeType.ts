@@ -2,6 +2,7 @@ import {
   Field,
   ID,
   InputType,
+  Int,
   InterfaceType,
   ObjectType,
   createUnionType,
@@ -229,6 +230,9 @@ export class WordCreateType {
   @Field((type) => PartOfSpeech)
   partOfSpeech: PartOfSpeech;
 
+  @Field((type) => Int)
+  mastery: number;
+
   @Field((type) => TimestampScalar)
   addedAt: DateTime;
 
@@ -260,6 +264,9 @@ export class WordUpdateType {
 
   @Field((type) => [PropertyValueSaveUnionType], { nullable: true })
   properties?: Array<typeof PropertyValueSaveUnionType>;
+
+  @Field((type) => Int, { nullable: true })
+  mastery?: number;
 }
 
 @ObjectType('UpdateWordChange', {

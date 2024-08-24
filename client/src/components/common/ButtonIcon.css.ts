@@ -1,6 +1,6 @@
-import { globalStyle, style } from '@vanilla-extract/css';
+import { globalStyle, style, StyleRule } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
-import { animations, themeVars } from '../../index.css';
+import { animations, Color, Colors, themeVars } from '../../index.css';
 
 export const button = recipe({
   base: {
@@ -22,6 +22,19 @@ export const button = recipe({
   variants: {
     type: {
       default: {},
+      ...(Object.fromEntries(
+        Colors.map((color) => [
+          color as Color,
+          {
+            selectors: {
+              '&:hover': {
+                color: themeVars.color[color],
+                border: `2px solid ${themeVars.color[color]}`,
+              },
+            },
+          },
+        ]),
+      ) as unknown as Record<Color, StyleRule>),
       primary: {
         color: themeVars.color.primary,
         border: `2px solid ${themeVars.color.primary}`,
@@ -30,13 +43,6 @@ export const button = recipe({
           '&:hover': {
             backgroundColor: themeVars.color.primary,
             color: themeVars.color.background,
-          },
-        },
-      },
-      secondary: {
-        selectors: {
-          '&:hover': {
-            color: themeVars.color.secondary,
           },
         },
       },

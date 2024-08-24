@@ -35,7 +35,6 @@ export const translationLabel = style({
   alignItems: 'center',
   gap: 5,
   color: themeVars.color.muted,
-  fontSize: '0.8rem',
   fontWeight: 'bold',
 });
 

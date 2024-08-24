@@ -2,13 +2,14 @@ import classNames from 'classnames';
 import React from 'react';
 import { IconType } from 'react-icons';
 import { FaSyncAlt } from 'react-icons/fa';
+import { Color } from '../../index.css';
 import * as styles from './ButtonIcon.css';
 import { Icon, IconProps } from './Icon';
 
 export type ButtonIconProps = IconProps & {
   icon?: IconType;
   onClick: () => void;
-  type?: 'primary' | 'secondary' | 'default';
+  type?: 'default' | Color;
   disabled?: boolean;
   loading?: boolean;
   hidden?: boolean;

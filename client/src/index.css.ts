@@ -23,7 +23,9 @@ export const [theme, themeVars] = createTheme({
   color: {
     text: '#f1e4f3',
     primary: '#64a6e1',
-    secondary: '#dc5794',
+    secondary1: '#dc5794',
+    secondary2: '#8d77f0',
+    negative: '#ef8354',
     muted: '#929eb2',
     background: '#212a3b',
     backgroundLight: '#2c3546',
@@ -31,6 +33,14 @@ export const [theme, themeVars] = createTheme({
     backgroundLightest: '#555f73',
   },
 });
+
+export const Colors = [
+  'primary',
+  'secondary1',
+  'secondary2',
+  'negative',
+] as const;
+export type Color = (typeof Colors)[number];
 
 globalStyle('html, body, #root', {
   fontFamily: jostFontFace,

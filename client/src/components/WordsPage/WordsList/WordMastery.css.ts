@@ -6,5 +6,5 @@ export const progress = style({
   flexDirection: 'row',
   gap: 2,
   alignItems: 'center',
-  color: themeVars.color.primary,
+  color: themeVars.color.secondary1,
 });

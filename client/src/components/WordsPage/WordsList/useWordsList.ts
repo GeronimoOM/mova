@@ -96,7 +96,11 @@ export function divideByDate(
 
     if (!currentDate || !wordDate.hasSame(currentDate, 'day')) {
       currentDate = wordDate;
-      dividedWords.push({ type: 'divider', date: currentDate });
+
+      dividedWords.push({
+        type: 'divider',
+        date: currentDate,
+      });
     }
 
     dividedWords.push(word);

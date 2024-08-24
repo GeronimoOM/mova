@@ -50,6 +50,7 @@ export class WordTypeMapper {
       original: wordCreate.original,
       translation: wordCreate.translation,
       partOfSpeech: wordCreate.partOfSpeech,
+      mastery: wordCreate.mastery,
       addedAt: wordCreate.addedAt,
       languageId: wordCreate.languageId,
       properties: Object.values(wordCreate.properties ?? {}),
@@ -61,6 +62,7 @@ export class WordTypeMapper {
       id: wordUpdate.id,
       original: wordUpdate.original,
       translation: wordUpdate.translation,
+      mastery: wordUpdate.mastery,
       ...(wordUpdate.properties && {
         properties: Object.values(wordUpdate.properties),
       }),

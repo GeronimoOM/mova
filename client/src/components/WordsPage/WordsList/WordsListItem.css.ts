@@ -8,7 +8,7 @@ export const item = style({
   gridTemplateRows: 'auto auto',
   alignItems: 'center',
   gap: '2px 10px',
-  padding: '5px',
+  padding: '5px 10px',
   cursor: 'pointer',
   transition: 'background-color 0.2s ease',
 
@@ -38,9 +38,10 @@ export const translation = style({
 
 export const divider = style({
   gridColumn: '1 / 3',
-  padding: 3,
+  padding: 5,
   backgroundColor: themeVars.color.background,
   margin: 5,
-  color: themeVars.color.muted,
   fontSize: '0.8rem',
+  display: 'flex',
+  color: themeVars.color.muted,
 });

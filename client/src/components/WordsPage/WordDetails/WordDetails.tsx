@@ -8,7 +8,7 @@ import { HiMiniXMark } from 'react-icons/hi2';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { Icon } from '../../common/Icon';
 import { Input } from '../../common/Input';
-import { WordProgress } from '../WordsList/WordProgress';
+import { WordMastery } from '../WordsList/WordMastery';
 import { PartOfSpeechSelect } from './PartOfSpeechSelect';
 import * as styles from './WordDetails.css';
 import {
@@ -79,7 +79,7 @@ export const WordDetails: React.FC<WordDetailsProps> = ({
           <ButtonIcon
             icon={FaFire}
             onClick={deleteWord}
-            type="secondary"
+            type="negative"
             disabled={!canDeleteWord}
             loading={wordDeleting}
           />
@@ -92,7 +92,7 @@ export const WordDetails: React.FC<WordDetailsProps> = ({
               onPartOfSpeechSelect={setPartOfSpeech}
               disabled={!isNewWord}
             />
-            <WordProgress progress={2} />
+            <WordMastery mastery={word.mastery ?? 0} />
           </div>
 
           <Input

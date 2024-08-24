@@ -9,6 +9,7 @@ export type InputProps = {
   disabled?: boolean;
   padding?: boolean;
   loading?: boolean;
+  obscured?: boolean;
 };
 
 export const Input: React.FC<InputProps> = ({
@@ -19,10 +20,18 @@ export const Input: React.FC<InputProps> = ({
   disabled,
   padding,
   loading,
+  obscured,
 }) => {
   return (
     <input
-      className={styles.input({ text, size, disabled, padding, loading })}
+      className={styles.input({
+        text,
+        size,
+        disabled,
+        padding,
+        loading,
+        obscured,
+      })}
       type="text"
       spellCheck={false}
       autoCapitalize={'off'}

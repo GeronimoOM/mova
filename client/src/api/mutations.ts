@@ -8,6 +8,7 @@ import {
   DeletePropertyDocument,
   DeleteWordDocument,
   GetLanguagesDocument,
+  IncreaseWordMasteryDocument,
   LanguagePropertiesFragmentDoc,
   LanguageWordsFragmentDoc,
   PartOfSpeech,
@@ -202,6 +203,7 @@ export function useCreateWord(): UseMutationResult<typeof CreateWordDocument> {
         ...input,
         id: input.id!,
         addedAt: input.addedAt!,
+        mastery: 0,
         properties:
           input.properties?.map(({ id, text }) => ({
             property: {
@@ -290,6 +292,23 @@ export function useDeleteWord(): UseMutationResult<typeof DeleteWordDocument> {
           },
         }),
       );
+    },
+  });
+}
+
+export function useIncreaseWordMastery(): UseMutationResult<
+  typeof IncreaseWordMasteryDocument
+> {
+  return useMutation(IncreaseWordMasteryDocument, {
+    optimisticResponse: ({ wordId }) => {
+      const word = readWordFull(wordId)!;
+
+      return {
+        increaseMastery: {
+          ...word,
+          mastery: word.mastery + 1,
+        },
+      };
     },
   });
 }
