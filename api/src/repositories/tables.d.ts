@@ -32,6 +32,20 @@ declare module 'knex/types/tables' {
     properties?: string;
   }
 
+  interface ProgressTable {
+    date: string;
+    type: ProgressType;
+    points: number;
+    language_id: LanguageId;
+  }
+
+  interface GoalsTable {
+    type: ProgressType;
+    cadence: ProgressCadence;
+    points: number;
+    language_id: LanguageId;
+  }
+
   interface ChangeTable {
     id: ChangeId;
     changed_at: string;
@@ -44,5 +58,8 @@ declare module 'knex/types/tables' {
     languages: LanguageTable;
     properties: PropertyTable;
     words: WordTable;
+    progress: ProgressTable;
+    goals: GoalsTable;
+    changes: ChangeTable;
   }
 }

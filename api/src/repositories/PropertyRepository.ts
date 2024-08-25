@@ -97,7 +97,9 @@ export class PropertyRepository {
 
     await this.connectionManager
       .getConnection()(TABLE_PROPERTIES)
-      .insert(propertyRow);
+      .insert(propertyRow)
+      .onConflict()
+      .ignore();
   }
 
   async update(property: Property): Promise<void> {

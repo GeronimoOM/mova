@@ -1,5 +1,7 @@
 import React from 'react';
-import { HiMiniXMark } from 'react-icons/hi2';
+// import { HiMiniXMark } from 'react-icons/hi2';
+import { BsEraserFill } from 'react-icons/bs';
+
 import { PiMagnifyingGlassBold } from 'react-icons/pi';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { Icon } from '../../common/Icon';
@@ -29,9 +31,7 @@ export const WordsSearchBar: React.FC<WordsSearchBarProps> = ({
         size="large"
         padding
       />
-      {/* <div className={styles.buttonRight}> */}
-      <ButtonIcon icon={HiMiniXMark} onClick={onClear} disabled={!query} />
-      {/* </div> */}
+      <ButtonIcon icon={BsEraserFill} onClick={onClear} disabled={!query} />
     </div>
   );
 };

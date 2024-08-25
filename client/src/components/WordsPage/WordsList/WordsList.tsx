@@ -54,8 +54,10 @@ export const WordsList: React.FC<WordsListProps> = ({
           isDivider(word) ? (
             !isSearch && (
               <WordsListItemDivider
-                date={word.date}
                 key={word.date.toString()}
+                date={word.date}
+                total={word.total}
+                isTotalComplete={word.isTotalComplete}
               />
             )
           ) : (

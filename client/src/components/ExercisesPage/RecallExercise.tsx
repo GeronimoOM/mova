@@ -38,7 +38,7 @@ export const RecallExercise: React.FC<RecallExerciseProps> = ({
 
   return (
     <div className={styles.wrapper}>
-      <div className={styles.title}>recall the translation</div>
+      <div className={styles.title}>Recall the translation</div>
 
       <Input value={word.original} size="large" onChange={() => {}} disabled />
 

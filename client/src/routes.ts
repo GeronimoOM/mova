@@ -2,7 +2,7 @@ export enum AppRoute {
   Words = '/',
   Properties = '/properties',
   Exercises = '/exercises',
-  Statistics = '/statistics',
+  Progress = '/progress',
   Languages = '/languages',
 }
 

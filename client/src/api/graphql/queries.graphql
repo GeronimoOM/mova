@@ -53,21 +53,11 @@ query GetExerciseWords($languageId: ID!) {
   }
 }
 
-query GetWordsStats($languageId: ID!) {
+query GetGoals($languageId: ID!) {
   language(id: $languageId) {
     id
-    wordsStats {
-      total {
-        words
-      }
-      byDate {
-        from
-        until
-        dates {
-          date
-          words
-        }
-      }
+    goals {
+      ...GoalFields
     }
   }
 }

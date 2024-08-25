@@ -8,8 +8,8 @@ type Language {
   addedAt: Timestamp!
   properties(partOfSpeech: PartOfSpeech): [Property!]!
   words(cursor: String, limit: Int, query: String, partsOfSpeech: [PartOfSpeech!], order: WordOrder, direction: Direction): WordPage!
-  wordsStats(days: Int, from: String): WordsStats!
   exerciseWords(total: Int): [Word!]!
+  goals: [Goal!]!
 }
 
 """
@@ -280,24 +280,20 @@ enum SyncType {
   Delta
 }
 
-type WordsTotalStats {
-  words: Int!
+type Goal {
+  type: ProgressType!
+  cadence: ProgressCadence!
+  points: Int!
 }
 
-type WordsDateStats {
-  date: String!
-  words: Int!
+enum ProgressType {
+  Mastery
+  Words
 }
 
-type WordsByDateStats {
-  from: String!
-  until: String!
-  dates: [WordsDateStats!]!
-}
-
-type WordsStats {
-  total: WordsTotalStats!
-  byDate: WordsByDateStats!
+enum ProgressCadence {
+  Daily
+  Weekly
 }
 
 type Query {
@@ -322,6 +318,7 @@ type Mutation {
   updateWord(input: UpdateWordInput!): Word!
   deleteWord(input: DeleteWordInput!): Word!
   increaseMastery(wordId: ID!): Word!
+  setGoals(input: SetGoalsInput!): [Goal!]!
 }
 
 input LoginInput {
@@ -413,4 +410,15 @@ input UpdateWordInput {
 
 input DeleteWordInput {
   id: ID!
+}
+
+input SetGoalsInput {
+  languageId: ID!
+  goals: [SetGoalInput!]!
+}
+
+input SetGoalInput {
+  type: ProgressType!
+  cadence: ProgressCadence!
+  points: Int!
 }

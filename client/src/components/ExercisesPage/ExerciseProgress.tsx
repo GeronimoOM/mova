@@ -1,21 +1,37 @@
 import React from 'react';
-import { FaBrain } from 'react-icons/fa';
+import { ProgressType } from '../../api/types/graphql';
+import {
+  progressTypeToColor,
+  progressTypeToIcon,
+} from '../ProgressPage/progress';
 import { Icon } from '../common/Icon';
 import { ProgressBar } from '../common/ProgressBar';
 import * as styles from './ExerciseProgress.css';
 
 export const ExerciseProgress: React.FC = () => {
   // TODO
-  const progress = 3;
+  const current = 3;
   const goal = 10;
+
+  const progress = Math.min(current / goal, 1) * 100;
 
   return (
     <div className={styles.wrapper}>
-      <Icon icon={FaBrain} size="small" />
-      <div className={styles.bar}>
-        <ProgressBar progress={(progress / goal) * 100} type="secondary1" />
+      <div
+        className={styles.icon({
+          color: progressTypeToColor[ProgressType.Mastery],
+        })}
+      >
+        <Icon icon={progressTypeToIcon[ProgressType.Mastery]} />
       </div>
-      <span className={styles.label}>{`${progress} / ${goal}`}</span>
+
+      <div className={styles.bar}>
+        <ProgressBar
+          progress={progress}
+          type={progressTypeToColor[ProgressType.Mastery]}
+        />
+      </div>
+      <span className={styles.label}>{`${current} / ${goal}`}</span>
     </div>
   );
 };

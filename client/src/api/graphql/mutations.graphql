@@ -73,6 +73,12 @@ mutation IncreaseWordMastery($wordId: ID!) {
   }
 }
 
+mutation SetGoals($input: SetGoalsInput!) {
+  setGoals(input: $input) {
+    ...GoalFields
+  }
+}
+
 mutation ApplyChanges($changes: [ApplyChangeInput!]!) {
   applyChanges(changes: $changes)
 }

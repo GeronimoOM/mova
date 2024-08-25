@@ -207,7 +207,9 @@ export class WordRepository {
         part_of_speech: word.partOfSpeech,
         added_at: word.addedAt.toFormat(DATETIME_FORMAT),
         properties: this.mapFromWordProperties(word.properties),
-      });
+      })
+      .onConflict()
+      .ignore();
   }
 
   async update(word: Word): Promise<void> {

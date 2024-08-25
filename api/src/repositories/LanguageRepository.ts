@@ -37,7 +37,9 @@ export class LanguageRepository {
 
     await this.connectionManager
       .getConnection()(TABLE_LANGUAGES)
-      .insert(languageRow);
+      .insert(languageRow)
+      .onConflict()
+      .ignore();
   }
 
   async update(language: Language): Promise<void> {

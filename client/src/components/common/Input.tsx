@@ -1,10 +1,12 @@
 import React from 'react';
+import { Color } from '../../index.css';
 import * as styles from './Input.css';
 
 export type InputProps = {
   value: string;
   onChange: (value: string) => void;
   text?: 'original' | 'translation';
+  textColor?: Color;
   size?: 'medium' | 'large';
   disabled?: boolean;
   padding?: boolean;
@@ -16,6 +18,7 @@ export const Input: React.FC<InputProps> = ({
   value,
   onChange,
   text,
+  textColor,
   size,
   disabled,
   padding,
@@ -26,6 +29,7 @@ export const Input: React.FC<InputProps> = ({
     <input
       className={styles.input({
         text,
+        textColor,
         size,
         disabled,
         padding,

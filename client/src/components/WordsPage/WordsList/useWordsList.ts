@@ -28,8 +28,8 @@ export function useWordsList(wordsSearchQuery: string): WordsListReturn {
   const words = wordsQuery?.language?.words.items;
   const nextCursor = wordsQuery?.language?.words.nextCursor ?? null;
   const dividedWords = useMemo(
-    () => (words ? divideByDate(words) : undefined),
-    [words],
+    () => (words ? divideByDate(words, Boolean(nextCursor)) : undefined),
+    [words, nextCursor],
   );
   const isSearch = wordsSearchQuery.length >= MIN_QUERY_LENGTH;
 
@@ -83,13 +83,17 @@ export function useWordsList(wordsSearchQuery: string): WordsListReturn {
 export type WordDateDivider = {
   type: 'divider';
   date: DateTime;
+  total: number;
+  isTotalComplete: boolean;
 };
 
 export function divideByDate(
   words: WordFieldsFragment[],
+  hasMore: boolean,
 ): Array<WordFieldsFragment | WordDateDivider> {
   const dividedWords: Array<WordFieldsFragment | WordDateDivider> = [];
   let currentDate: DateTime | null = null;
+  let lastDivider: WordDateDivider | null = null;
 
   for (const word of words) {
     const wordDate = DateTime.fromFormat(word.addedAt, DATETIME_FORMAT);
@@ -97,13 +101,29 @@ export function divideByDate(
     if (!currentDate || !wordDate.hasSame(currentDate, 'day')) {
       currentDate = wordDate;
 
-      dividedWords.push({
+      if (lastDivider) {
+        lastDivider.isTotalComplete = true;
+      }
+
+      lastDivider = {
         type: 'divider',
         date: currentDate,
-      });
+        total: 0,
+        isTotalComplete: false,
+      };
+
+      dividedWords.push(lastDivider);
+    }
+
+    if (lastDivider) {
+      lastDivider.total++;
     }
 
     dividedWords.push(word);
+  }
+
+  if (!hasMore && lastDivider) {
+    lastDivider.isTotalComplete = true;
   }
 
   return dividedWords;

@@ -17,9 +17,14 @@ const languageTypePolicy: TypePolicy = {
   },
 };
 
+const goalTypePolicy: TypePolicy = {
+  keyFields: ['type'],
+};
+
 export const cache = new InMemoryCache({
   typePolicies: {
     Language: languageTypePolicy,
+    Goal: goalTypePolicy,
   },
   possibleTypes: {
     IProperty: ['TextProperty', 'OptionProperty'],

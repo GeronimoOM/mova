@@ -121,22 +121,21 @@ export const useOrderedProperties = (
     fetchProperties,
     { data: propertiesQuery, loading: propertiesLoading },
   ] = useLazyQuery(GetPropertiesDocument);
-  const properties = propertiesQuery?.language?.properties;
+  const properties = propertiesLoading
+    ? undefined
+    : propertiesQuery?.language?.properties;
 
   const [orderedPropertyIds, setOrderedPropertyIds] = useState<string[]>([]);
-  const propertiesById = useMemo(
-    () =>
-      properties ? toRecord(properties, (property) => property.id) : undefined,
-    [properties],
-  );
 
   const orderedProperties = useMemo(() => {
-    if (!propertiesById) {
+    if (!properties) {
       return undefined;
     }
 
+    const propertiesById = toRecord(properties, (property) => property.id);
+
     return orderedPropertyIds.map((id) => propertiesById[id]);
-  }, [propertiesById, orderedPropertyIds]);
+  }, [properties, orderedPropertyIds]);
 
   const [reorderPropertiesMutate] = useReorderProperties();
 

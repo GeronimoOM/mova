@@ -15,6 +15,7 @@ import {
   PropertyFieldsFragment,
   PropertyFieldsFragmentDoc,
   ReorderPropertiesDocument,
+  SetGoalsDocument,
   UpdateLanguageDocument,
   UpdatePropertyDocument,
   UpdateWordDocument,
@@ -308,6 +309,19 @@ export function useIncreaseWordMastery(): UseMutationResult<
           ...word,
           mastery: word.mastery + 1,
         },
+      };
+    },
+  });
+}
+
+export function useSetGoals(): UseMutationResult<typeof SetGoalsDocument> {
+  return useMutation(SetGoalsDocument, {
+    optimisticResponse: ({ input }) => {
+      return {
+        setGoals: input.goals.map((goal) => ({
+          languageId: input.languageId,
+          ...goal,
+        })),
       };
     },
   });

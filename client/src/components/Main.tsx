@@ -6,8 +6,8 @@ import { useLanguageContext } from './LanguageContext';
 import { LanguagesPage } from './LanguagesPage/LanguagesPage';
 import * as styles from './Main.css';
 import { NoLanguagePage } from './NoLanguagePage';
+import { ProgressPage } from './ProgressPage/ProgressPage';
 import { PropertiesPage } from './PropertiesPage/PropertiesPage';
-import { StatisticsPage } from './StatisticsPage/StatisticsPage';
 import { WordsPage } from './WordsPage/WordsPage';
 
 export const Main: React.FC = () => {
@@ -20,7 +20,7 @@ export const Main: React.FC = () => {
           <Route path={AppRoute.Words} Component={WordsPage} />
           <Route path={AppRoute.Properties} Component={PropertiesPage} />
           <Route path={AppRoute.Exercises} Component={ExercisesPage} />
-          <Route path={AppRoute.Statistics} Component={StatisticsPage} />
+          <Route path={AppRoute.Progress} Component={ProgressPage} />
           <Route path={AppRoute.Languages} Component={LanguagesPage} />
         </Routes>
       ) : (

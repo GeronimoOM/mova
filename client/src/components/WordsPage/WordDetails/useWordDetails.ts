@@ -108,6 +108,7 @@ export function useWordDetails(wordId: string | null): WordDetailsReturn {
       translation: wordInput?.translation ?? currentWord?.translation ?? '',
       partOfSpeech: wordInput?.partOfSpeech ?? currentWord?.partOfSpeech,
       properties: { ...currentWordProperties, ...wordInput.properties },
+      mastery: currentWord?.mastery,
     }),
     [currentWord, currentWordProperties, wordInput],
   );

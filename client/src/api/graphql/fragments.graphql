@@ -197,3 +197,9 @@ fragment PropertyValueSaveFields on PropertyValueSave {
     optionId
   }
 }
+
+fragment GoalFields on Goal {
+  type
+  cadence
+  points
+}

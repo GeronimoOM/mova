@@ -43,5 +43,19 @@ export const divider = style({
   margin: 5,
   fontSize: '0.8rem',
   display: 'flex',
+  alignItems: 'center',
   color: themeVars.color.muted,
+});
+
+export const dividerTotal = style({
+  marginLeft: 'auto',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  borderRadius: 30,
+  width: '1.5rem',
+  height: '1.5rem',
+  fontWeight: 'bold',
+  color: themeVars.color.background,
+  backgroundColor: themeVars.color.secondary2,
 });

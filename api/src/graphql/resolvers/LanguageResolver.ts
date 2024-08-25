@@ -2,15 +2,12 @@ import {
   Args,
   Context as ContextDec,
   ID,
-  Int,
   Mutation,
   Parent,
   Query,
   ResolveField,
   Resolver,
 } from '@nestjs/graphql';
-import { WordsStatsType } from 'graphql/types/WordsDateStatsType';
-import { DateTime } from 'luxon';
 import { Context } from 'models/Context';
 import { LanguageId } from 'models/Language';
 import { Direction, Page, encodePageCursor, mapPage } from 'models/Page';
@@ -18,7 +15,6 @@ import { PartOfSpeech, WordCursor, WordOrder } from 'models/Word';
 import { LanguageService } from 'services/LanguageService';
 import { PropertyService } from 'services/PropertyService';
 import { WordService } from 'services/WordService';
-import { DATE_FORMAT } from 'utils/constants';
 import { decodeCursor } from 'utils/cursors';
 import { PropertyTypeMapper } from '../mappers/PropertyTypeMapper';
 import { WordTypeMapper } from '../mappers/WordTypeMapper';
@@ -122,32 +118,5 @@ export class LanguageResolver {
     return encodePageCursor(
       mapPage(wordPage, (word) => this.wordTypeMapper.map(word)),
     );
-  }
-
-  @ResolveField((type) => WordsStatsType)
-  async wordsStats(
-    @Parent() language: LanguageType,
-    @Args('days', { type: () => Int, nullable: true })
-    days?: number,
-    @Args('from', { type: () => String, nullable: true })
-    from?: string,
-  ): Promise<WordsStatsType> {
-    const stats = await this.wordService.getStats(
-      language.id,
-      days,
-      from ? DateTime.fromFormat(from, DATE_FORMAT) : undefined,
-    );
-
-    return {
-      total: stats.total,
-      byDate: {
-        from: stats.byDate.from.toFormat(DATE_FORMAT),
-        until: stats.byDate.until.toFormat(DATE_FORMAT),
-        dates: stats.byDate.dates.map(({ date, words }) => ({
-          date: date.toFormat(DATE_FORMAT),
-          words,
-        })),
-      },
-    };
   }
 }

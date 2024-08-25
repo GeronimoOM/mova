@@ -28,14 +28,23 @@ export const WordsListItem: React.FC<WordsListItemProps> = ({
 
 export type WordsListItemDividerProps = {
   date: DateTime;
+  total: number;
+  isTotalComplete: boolean;
 };
+
+const MAX_DIVIDER_TOTAL = 99;
 
 export const WordsListItemDivider: React.FC<WordsListItemDividerProps> = ({
   date,
+  total,
+  isTotalComplete,
 }) => {
   return (
     <div className={styles.divider}>
-      {date.toLocaleString({ month: 'long', day: 'numeric' })}
+      <div>{date.toLocaleString({ month: 'long', day: 'numeric' })}</div>
+      <div
+        className={styles.dividerTotal}
+      >{`${Math.min(total, MAX_DIVIDER_TOTAL)}${isTotalComplete ? '' : '+'}`}</div>
     </div>
   );
 };
