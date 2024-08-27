@@ -11,14 +11,7 @@ import {
   Property,
   PropertyId,
 } from 'models/Property';
-import {
-  PartOfSpeech,
-  Word,
-  WordCursor,
-  WordId,
-  WordOrder,
-  WordsStats,
-} from 'models/Word';
+import { PartOfSpeech, Word, WordCursor, WordId, WordOrder } from 'models/Word';
 import { DbConnectionManager } from 'repositories/DbConnectionManager';
 import {
   GetWordPageParams as RepoGetWordPageParams,
@@ -224,32 +217,6 @@ export class WordService {
 
   async getCount(languageId: LanguageId): Promise<number> {
     return await this.wordRepository.getCount(languageId);
-  }
-
-  async getStats(
-    languageId: LanguageId,
-    days: number = DateTime.utc().diff(
-      DateTime.utc().minus({ months: 3 }),
-      'days',
-    ).days,
-    from: DateTime = DateTime.utc().minus({ days }).plus({ day: 1 }),
-  ): Promise<WordsStats> {
-    const until = from.plus({ days });
-    const [count, dates] = await Promise.all([
-      this.wordRepository.getCount(languageId),
-      this.wordRepository.getDateStats(languageId, from, until),
-    ]);
-
-    return {
-      total: {
-        words: count,
-      },
-      byDate: {
-        from,
-        until,
-        dates,
-      },
-    };
   }
 
   private setPropertyValues(

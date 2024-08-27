@@ -1,5 +1,4 @@
 import { DateTime } from 'luxon';
-import { LanguageId } from './Language';
 
 export enum ProgressType {
   Mastery = 'mastery',
@@ -7,25 +6,18 @@ export enum ProgressType {
 }
 
 export const ProgressTypes = [
-  ProgressType.Mastery,
   ProgressType.Words,
+  ProgressType.Mastery,
 ] as const;
 
 export interface Progress {
   date: DateTime;
   type: ProgressType;
+  cadence: ProgressCadence;
   points: number;
-  languageId: LanguageId;
 }
 
 export enum ProgressCadence {
   Daily = 'daily',
   Weekly = 'weekly',
-}
-
-export interface Goal {
-  type: ProgressType;
-  cadence: ProgressCadence;
-  points: number;
-  languageId: LanguageId;
 }

@@ -50,26 +50,6 @@ export interface WordUpdate {
   mastery?: number;
 }
 
-export type WordsStats = {
-  total: WordsTotalStats;
-  byDate: WordsByDateStats;
-};
-
-export interface WordsTotalStats {
-  words: number;
-}
-
-export interface WordsByDateStats {
-  from: DateTime;
-  until: DateTime;
-  dates: WordsDateStats[];
-}
-
-export interface WordsDateStats {
-  date: DateTime;
-  words: number;
-}
-
 export type ChronologicalCursor = Static<typeof ChronologicalCursor>;
 export const ChronologicalCursor = Type.Object({
   addedAt: Type.RegExp(DATETIME_FORMAT_REGEX),

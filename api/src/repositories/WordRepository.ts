@@ -11,17 +11,12 @@ import {
   PartOfSpeech,
   Word,
   WordId,
+  WordMastery,
   WordOrder,
   WordSortedCursor,
-  WordsDateStats,
 } from 'models/Word';
 import { PropertyService } from 'services/PropertyService';
-import {
-  DATETIME_FORMAT,
-  DATE_FORMAT,
-  DEFAULT_LIMIT,
-  MAX_LIMIT,
-} from 'utils/constants';
+import { DATETIME_FORMAT, DEFAULT_LIMIT, MAX_LIMIT } from 'utils/constants';
 import * as records from 'utils/records';
 import { DbConnectionManager } from './DbConnectionManager';
 import { Serializer } from './Serializer';
@@ -247,29 +242,36 @@ export class WordRepository {
     return Number(count);
   }
 
-  async getDateStats(
+  async getCountByMastery(
     languageId: LanguageId,
-    from: DateTime,
-    until: DateTime,
-  ): Promise<WordsDateStats[]> {
-    const fromFormatted = from.toFormat(DATE_FORMAT);
-    const untilFormatted = until.toFormat(DATE_FORMAT);
-
+  ): Promise<Record<WordMastery, number>> {
     const connection = this.connectionManager.getConnection();
-    const countsByDates = await connection(TABLE_WORDS)
-      .select({
-        date: connection.raw('date(added_at)'),
-        words: connection.raw('count(id)'),
-      })
-      .where('language_id', languageId)
-      .andWhere(connection.raw('date(added_at)'), '>=', fromFormatted)
-      .andWhere(connection.raw('date(added_at)'), '<', untilFormatted)
-      .groupByRaw('date(added_at)');
 
-    return countsByDates.map(({ date, words }) => ({
-      date: DateTime.fromFormat(date, DATE_FORMAT),
-      words,
-    }));
+    const counts: Array<{ count: number; mastery: WordMastery }> =
+      await connection(TABLE_WORDS)
+        .where({ language_id: languageId })
+        .select(connection.raw('count(id) as count'), 'mastery')
+        .groupBy('mastery');
+
+    return Object.fromEntries(
+      counts.map((count) => [count.mastery, count.count]),
+    ) as Record<WordMastery, number>;
+  }
+
+  async getCountByPartOfSpeech(
+    languageId: LanguageId,
+  ): Promise<Record<PartOfSpeech, number>> {
+    const connection = this.connectionManager.getConnection();
+
+    const counts: Array<{ count: number; part_of_speech: PartOfSpeech }> =
+      await connection(TABLE_WORDS)
+        .where({ language_id: languageId })
+        .select(connection.raw('count(id) as count'), 'part_of_speech')
+        .groupBy('part_of_speech');
+
+    return Object.fromEntries(
+      counts.map((count) => [count.part_of_speech, count.count]),
+    ) as Record<PartOfSpeech, number>;
   }
 
   streamRecords(): AsyncIterable<WordTable> {

@@ -5,7 +5,7 @@ import { fromTimestamp, toTimestamp } from 'utils/datetime';
 export const TimestampScalar = new GraphQLScalarType<DateTime, string>({
   name: 'Timestamp',
   description:
-    'The `Timestamp` scalar type represents a timepoint as a string in the format YYYY-MM-DD hh:mm:ss.',
+    'The `Timestamp` scalar type represents a timepoint as a string in the format `YYYY-MM-DD hh:mm:ss` .',
   serialize: (value: DateTime) => toTimestamp(value),
   parseValue: (value: string) => fromTimestamp(value),
   parseLiteral: (ast) => {

@@ -8,11 +8,20 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql';
+import { GoalType } from 'graphql/types/GoalType';
+import { ProgressType } from 'graphql/types/ProgressType';
+import { WordsStatsType } from 'graphql/types/WordsStatsType';
+import { DateTime } from 'luxon';
 import { Context } from 'models/Context';
 import { LanguageId } from 'models/Language';
 import { Direction, Page, encodePageCursor, mapPage } from 'models/Page';
+import {
+  ProgressCadence,
+  ProgressType as ProgressTypeEnum,
+} from 'models/Progress';
 import { PartOfSpeech, WordCursor, WordOrder } from 'models/Word';
 import { LanguageService } from 'services/LanguageService';
+import { ProgressService } from 'services/ProgressService';
 import { PropertyService } from 'services/PropertyService';
 import { WordService } from 'services/WordService';
 import { decodeCursor } from 'utils/cursors';
@@ -34,6 +43,7 @@ export class LanguageResolver {
     private languageService: LanguageService,
     private propertyService: PropertyService,
     private wordService: WordService,
+    private progressService: ProgressService,
     private propertyTypeMapper: PropertyTypeMapper,
     private wordTypeMapper: WordTypeMapper,
   ) {}
@@ -118,5 +128,52 @@ export class LanguageResolver {
     return encodePageCursor(
       mapPage(wordPage, (word) => this.wordTypeMapper.map(word)),
     );
+  }
+
+  @ResolveField((type) => WordsStatsType)
+  async stats(@Parent() language: LanguageType): Promise<WordsStatsType> {
+    const wordsStats = await this.progressService.getStats(language.id);
+
+    return {
+      total: wordsStats.total,
+      mastery: Object.entries(wordsStats.mastery).map(([mastery, total]) => ({
+        mastery: Number(mastery),
+        total,
+      })),
+      partsOfSpeech: Object.entries(wordsStats.partsOfSpeech).map(
+        ([partOfSpeech, total]) => ({
+          partOfSpeech: partOfSpeech as PartOfSpeech,
+          total,
+        }),
+      ),
+    };
+  }
+
+  @ResolveField((type) => [GoalType])
+  async goals(@Parent() language: LanguageType): Promise<GoalType[]> {
+    return await this.progressService.getGoals(language.id);
+  }
+
+  @ResolveField((type) => ProgressType)
+  async progress(
+    @ContextDec('ctx') ctx: Context,
+    @Parent() language: LanguageType,
+    @Args('type', { type: () => ProgressTypeEnum })
+    type: ProgressTypeEnum,
+    @Args('cadence', { type: () => ProgressCadence, nullable: true })
+    cadence?: ProgressCadence,
+  ): Promise<ProgressType> {
+    const currentProgress = await this.progressService.getCurrentProgress(
+      ctx,
+      language.id,
+      type,
+      cadence,
+    );
+
+    return {
+      type,
+      cadence: currentProgress.cadence,
+      current: currentProgress,
+    };
   }
 }
