@@ -53,11 +53,47 @@ query GetExerciseWords($languageId: ID!) {
   }
 }
 
+query GetAllProgress($languageId: ID!) {
+  language(id: $languageId) {
+    id
+    wordsProgress: progress(type: Words) {
+      ...ProgressFields
+    }
+    masteryProgress: progress(type: Mastery) {
+      ...ProgressFields
+    }
+  }
+}
+
+query GetProgressHistory($languageId: ID!, $type: ProgressType!) {
+  language(id: $languageId) {
+    id
+    progress(type: $type) {
+      dailyHistory: history(cadence: Daily) {
+        ...ProgressHistoryFields
+      }
+
+      weeklyHistory: history(cadence: Weekly) {
+        ...ProgressHistoryFields
+      }
+    }
+  }
+}
+
 query GetGoals($languageId: ID!) {
   language(id: $languageId) {
     id
     goals {
       ...GoalFields
+    }
+  }
+}
+
+query GetStats($languageId: ID!) {
+  language(id: $languageId) {
+    id
+    stats {
+      ...WordsStatsFields
     }
   }
 }

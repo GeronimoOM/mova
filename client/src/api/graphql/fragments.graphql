@@ -204,3 +204,41 @@ fragment GoalFields on Goal {
   cadence
   points
 }
+
+fragment ProgressInstanceFields on ProgressInstance {
+  date
+  points
+}
+
+fragment ProgressFields on Progress {
+  type
+  cadence
+  goal {
+    ...GoalFields
+  }
+  current {
+    ...ProgressInstanceFields
+  }
+  streak
+}
+
+fragment ProgressHistoryFields on ProgressHistory {
+  cadence
+  from
+  until
+  instances {
+    ...ProgressInstanceFields
+  }
+}
+
+fragment WordsStatsFields on WordsStats {
+  total
+  mastery {
+    total
+    mastery
+  }
+  partsOfSpeech {
+    total
+    partOfSpeech
+  }
+}

@@ -299,7 +299,7 @@ enum ProgressCadence {
 }
 
 type ProgressInstance {
-  date: Timestamp
+  date: Timestamp!
   points: Int!
 }
 

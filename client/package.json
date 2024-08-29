@@ -58,11 +58,5 @@
     "workbox-core": "7.1.0",
     "workbox-precaching": "7.1.0",
     "workbox-routing": "7.1.0"
-  },
-  "lint-staged": {
-    "**/*.{js,ts,tsx}": [
-      "prettier --write",
-      "eslint --fix"
-    ]
   }
 }

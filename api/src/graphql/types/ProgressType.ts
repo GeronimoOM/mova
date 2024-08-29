@@ -11,7 +11,7 @@ import { GoalType } from './GoalType';
 
 @ObjectType('ProgressInstance')
 export class ProgressInstanceType {
-  @Field((type) => TimestampScalar, { nullable: true })
+  @Field((type) => TimestampScalar)
   date: DateTime;
 
   @Field((type) => Int)

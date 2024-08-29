@@ -42,3 +42,7 @@ export function areEqual<T>(arr1: T[], arr2: T[]): boolean {
 
   return arr1.every((item, idx) => item === arr2[idx]);
 }
+
+export function sequence(n: number) {
+  return Array.from({ length: n }, (_, i) => i);
+}

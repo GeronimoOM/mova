@@ -83,8 +83,13 @@ export class ProgressService {
     ctx: Context,
     languageId: LanguageId,
     type: ProgressType,
-    cadence: ProgressCadence,
+    cadence?: ProgressCadence,
   ): Promise<ProgressHistory> {
+    if (!cadence) {
+      const goal = await this.getGoal(languageId, type);
+      cadence = goal.cadence;
+    }
+
     const isDailyCadence = cadence === ProgressCadence.Daily;
     const today = DateTime.utc().setZone(ctx.timezone);
     const from = today

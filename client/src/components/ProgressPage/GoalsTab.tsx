@@ -16,7 +16,7 @@ import { useLanguageContext } from '../LanguageContext';
 import { ButtonIcon } from '../common/ButtonIcon';
 import { Icon } from '../common/Icon';
 import { Input } from '../common/Input';
-import * as styles from './ProgressGoals.css';
+import * as styles from './GoalsTab.css';
 import {
   ProgressCadences,
   ProgressTypes,
@@ -24,78 +24,9 @@ import {
   progressTypeToIcon,
 } from './progress';
 
-type ProgressGoalProps = {
-  type: ProgressType;
-  goal: GoalFieldsFragment | null;
-  onGoalChange: (goal: GoalFieldsFragment) => void;
-};
-
 const MAX_POINTS = 1000;
 
-const ProgressGoal: React.FC<ProgressGoalProps> = ({
-  type,
-  goal,
-  onGoalChange,
-}) => {
-  const color = progressTypeToColor[type];
-  const icon = progressTypeToIcon[type];
-
-  const handleCadenceChange = (cadence: ProgressCadence) => {
-    if (!goal) {
-      return;
-    }
-
-    onGoalChange({ ...goal, cadence });
-  };
-
-  const handlePointsChange = (value: string) => {
-    if (!goal) {
-      return;
-    }
-
-    const number = value === '' ? 0 : Number(value);
-
-    if (isNaN(number) || number < 0 || number > MAX_POINTS) {
-      return;
-    }
-
-    onGoalChange({ ...goal, points: Number(value) });
-  };
-
-  return (
-    <div className={styles.goal}>
-      <div className={styles.goalIcon({ color })}>
-        <Icon icon={icon} />
-      </div>
-
-      <div className={styles.goalCadences}>
-        {ProgressCadences.map((cadence) => (
-          <div
-            className={classNames(styles.goalCadence({ color }), {
-              selected: goal?.cadence === cadence,
-            })}
-            key={cadence}
-            onClick={() => handleCadenceChange(cadence)}
-          >
-            {cadence}
-          </div>
-        ))}
-      </div>
-
-      <div className={styles.goalInput}>
-        <Input
-          text="translation"
-          textColor={color}
-          value={String(goal?.points ?? '0')}
-          onChange={handlePointsChange}
-          disabled={!goal}
-        />
-      </div>
-    </div>
-  );
-};
-
-export const ProgressGoals: React.FC = () => {
+export const GoalsTab: React.FC = () => {
   const [selectedLanguageId] = useLanguageContext();
   const [goals, setGoals] = useState<Goal[] | null>(null);
 
@@ -178,6 +109,75 @@ export const ProgressGoals: React.FC = () => {
           icon={BsEraserFill}
           onClick={handleResetGoals}
           disabled={!canSetGoals}
+        />
+      </div>
+    </div>
+  );
+};
+
+type ProgressGoalProps = {
+  type: ProgressType;
+  goal: GoalFieldsFragment | null;
+  onGoalChange: (goal: GoalFieldsFragment) => void;
+};
+
+const ProgressGoal: React.FC<ProgressGoalProps> = ({
+  type,
+  goal,
+  onGoalChange,
+}) => {
+  const color = progressTypeToColor[type];
+  const icon = progressTypeToIcon[type];
+
+  const handleCadenceChange = (cadence: ProgressCadence) => {
+    if (!goal) {
+      return;
+    }
+
+    onGoalChange({ ...goal, cadence });
+  };
+
+  const handlePointsChange = (value: string) => {
+    if (!goal) {
+      return;
+    }
+
+    const number = value === '' ? 0 : Number(value);
+
+    if (isNaN(number) || number < 0 || number > MAX_POINTS) {
+      return;
+    }
+
+    onGoalChange({ ...goal, points: Number(value) });
+  };
+
+  return (
+    <div className={styles.goal}>
+      <div className={styles.goalIcon({ color })}>
+        <Icon icon={icon} />
+      </div>
+
+      <div className={styles.goalCadences}>
+        {ProgressCadences.map((cadence) => (
+          <div
+            className={classNames(styles.goalCadence({ color }), {
+              selected: goal?.cadence === cadence,
+            })}
+            key={cadence}
+            onClick={() => handleCadenceChange(cadence)}
+          >
+            {cadence}
+          </div>
+        ))}
+      </div>
+
+      <div className={styles.goalInput}>
+        <Input
+          text="translation"
+          textColor={color}
+          value={String(goal?.points ?? '0')}
+          onChange={handlePointsChange}
+          disabled={!goal}
         />
       </div>
     </div>

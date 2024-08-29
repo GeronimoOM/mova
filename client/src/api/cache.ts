@@ -14,6 +14,16 @@ const languageTypePolicy: TypePolicy = {
         };
       },
     },
+    stats: {
+      merge(_, incoming) {
+        return incoming;
+      },
+    },
+    progress: {
+      merge(_, incoming) {
+        return incoming;
+      },
+    },
   },
 };
 
