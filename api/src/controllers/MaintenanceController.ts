@@ -53,4 +53,10 @@ export class MaintenanceController {
     const language = await this.maintenanceService.reindexLanguage(languageId);
     return language;
   }
+
+  @Put('/resync/progress')
+  async resyncProgress(@Query('id') languageId: LanguageId) {
+    const language = await this.maintenanceService.resyncProgress(languageId);
+    return language;
+  }
 }

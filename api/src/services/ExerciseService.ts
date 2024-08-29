@@ -2,12 +2,15 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { DateTime, Duration } from 'luxon';
 import { Context } from 'models/Context';
 import { LanguageId } from 'models/Language';
+import { ProgressType } from 'models/Progress';
 import { Word, WordMasteries, WordMastery, WordOrder } from 'models/Word';
 import { DbConnectionManager } from 'repositories/DbConnectionManager';
 import { WordRepository } from 'repositories/WordRepository';
 import { shuffle } from 'utils/arrays';
+import { v1 as uuid } from 'uuid';
 import { ChangeBuilder } from './ChangeBuilder';
 import { ChangeService } from './ChangeService';
+import { ProgressService } from './ProgressService';
 
 const DEFAULT_EXERCISE_WORDS_TOTAL = 20;
 
@@ -19,10 +22,10 @@ const MASTERY_DISTRIBUTION: Record<WordMastery, number> = {
 };
 
 const MASTERY_GAIN_DELAY: Record<WordMastery, Duration> = {
-  0: Duration.fromObject({ days: 0 }),
-  1: Duration.fromObject({ days: 1 }),
+  0: Duration.fromObject({ days: 1 }),
+  1: Duration.fromObject({ days: 2 }),
   2: Duration.fromObject({ days: 2 }),
-  3: Duration.fromObject({ days: 5 }),
+  3: Duration.fromObject({ days: 0 }),
 };
 
 export type GetExerciseWordsParams = {
@@ -36,6 +39,7 @@ export class ExerciseService {
     private wordRepository: WordRepository,
     @Inject(forwardRef(() => ChangeService))
     private changeService: ChangeService,
+    private progressService: ProgressService,
     private changeBuilder: ChangeBuilder,
     private connectionManager: DbConnectionManager,
   ) {}
@@ -99,13 +103,16 @@ export class ExerciseService {
     }
 
     if (
-      currentWord.addedAt.plus(MASTERY_GAIN_DELAY[currentWord.mastery]) >
+      currentWord.masteryIncAt?.plus(MASTERY_GAIN_DELAY[currentWord.mastery]) >
       DateTime.utc()
     ) {
       throw new Error('Word mastery cannot be increased yet');
     }
 
-    const word = { ...currentWord, mastery: currentWord.mastery + 1 };
+    const word = {
+      ...currentWord,
+      mastery: currentWord.mastery + 1,
+    };
 
     const change = this.changeBuilder.buildUpdateWordChange(
       ctx,
@@ -114,9 +121,16 @@ export class ExerciseService {
     );
 
     if (change) {
+      word.masteryIncAt = change.changedAt;
+
       await this.connectionManager.transactionally(async () => {
         await this.wordRepository.update(word);
         await this.changeService.create(change);
+        await this.progressService.saveProgress(word.languageId, {
+          id: uuid(),
+          type: ProgressType.Mastery,
+          date: change.changedAt,
+        });
       });
     }
 
@@ -134,7 +148,7 @@ export class ExerciseService {
         limit: total,
         order: WordOrder.Random,
         mastery,
-        addedAtOlderThan: MASTERY_GAIN_DELAY[mastery],
+        masteryIncOlderThan: MASTERY_GAIN_DELAY[mastery],
       })
     ).items;
   }

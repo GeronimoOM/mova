@@ -7,36 +7,64 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql';
-import { TimestampScalar } from 'graphql/scalars/Timestamp';
 import { GoalType, SetGoalsInput } from 'graphql/types/GoalType';
 
-import { ProgressHistoryType, ProgressType } from 'graphql/types/ProgressType';
-import { DateTime } from 'luxon';
+import {
+  ProgressHistoryType,
+  ProgressInstanceType,
+  ProgressType,
+} from 'graphql/types/ProgressType';
 import { Context } from 'models/Context';
+import { ProgressCadence } from 'models/Progress';
 import { ProgressService } from 'services/ProgressService';
 
 @Resolver((of) => ProgressType)
 export class ProgressResolver {
   constructor(private progressService: ProgressService) {}
 
+  @ResolveField((type) => ProgressInstanceType)
+  async current(
+    @ContextDec('ctx') ctx: Context,
+    @Parent()
+    progress: ProgressType,
+    @Args('cadence', { type: () => ProgressCadence, nullable: true })
+    cadence?: ProgressCadence,
+  ): Promise<ProgressInstanceType> {
+    return await this.progressService.getCurrentProgress(
+      ctx,
+      progress.languageId,
+      progress.type,
+      cadence ?? progress.cadence,
+    );
+  }
+
   @ResolveField((type) => Int)
   async streak(
+    @ContextDec('ctx') ctx: Context,
     @Parent()
     progress: ProgressType,
   ): Promise<number> {
-    throw new Error('not implemented');
+    return await this.progressService.getProgressStreak(
+      ctx,
+      progress.languageId,
+      progress.type,
+    );
   }
 
   @ResolveField((type) => ProgressHistoryType)
   async history(
+    @ContextDec('ctx') ctx: Context,
     @Parent()
     progress: ProgressType,
-    @Args('until', { type: () => TimestampScalar, nullable: true })
-    from?: DateTime,
-    @Args('until', { type: () => TimestampScalar, nullable: true })
-    until?: DateTime,
+    @Args('cadence', { type: () => ProgressCadence })
+    cadence: ProgressCadence,
   ): Promise<ProgressHistoryType> {
-    throw new Error('not implemented');
+    return await this.progressService.getProgressHistory(
+      ctx,
+      progress.languageId,
+      progress.type,
+      cadence,
+    );
   }
 
   @Mutation((returns) => [GoalType])

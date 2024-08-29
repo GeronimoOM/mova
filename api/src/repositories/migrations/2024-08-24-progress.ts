@@ -2,15 +2,14 @@ import { Knex } from 'knex';
 
 export async function up(knex: Knex) {
   await knex.schema.createTable('progress', (table) => {
+    table.uuid('id').notNullable().primary();
     table.timestamp('date').notNullable();
     table.string('type').notNullable();
-    table.integer('points').notNullable().defaultTo(0);
     table
       .uuid('language_id')
       .notNullable()
       .references('id')
       .inTable('languages');
-    table.primary(['language_id', 'type', 'date']);
   });
 
   await knex.schema.createTable('goals', (table) => {

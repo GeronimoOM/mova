@@ -5,7 +5,7 @@ import { ProgressBar } from '../../common/ProgressBar';
 import * as styles from './WordsProgress.css';
 
 export const WordsProgress: React.FC = () => {
-  // TODO
+  // TODO use this
   const progress = 3;
   const goal = 10;
 

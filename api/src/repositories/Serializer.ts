@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DateTime } from 'luxon';
-import { DATETIME_FORMAT } from 'utils/constants';
+import { fromTimestamp, toTimestamp } from 'utils/datetime';
 
 const DATETIME_KEYS = ['addedAt', 'changedAt'];
 
@@ -9,7 +9,7 @@ export class Serializer {
   serialize<T>(obj: T): string {
     return JSON.stringify(obj, (key, value) => {
       if (this.isDateTimeKey(key)) {
-        return DateTime.fromISO(value).toFormat(DATETIME_FORMAT);
+        return toTimestamp(DateTime.fromISO(value));
       }
       return value;
     });
@@ -18,7 +18,7 @@ export class Serializer {
   deserialize<T>(json: string): T {
     return JSON.parse(json, (key, value) => {
       if (this.isDateTimeKey(key)) {
-        return DateTime.fromFormat(value, DATETIME_FORMAT);
+        return fromTimestamp(value);
       }
       return value;
     });

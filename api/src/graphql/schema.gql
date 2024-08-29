@@ -10,7 +10,7 @@ type Language {
   words(cursor: String, limit: Int, query: String, partsOfSpeech: [PartOfSpeech!], order: WordOrder, direction: Direction): WordPage!
   stats: WordsStats!
   goals: [Goal!]!
-  progress(type: ProgressType!, cadence: ProgressCadence): Progress!
+  progress(type: ProgressType!): Progress!
   exerciseWords(total: Int): [Word!]!
 }
 
@@ -44,11 +44,6 @@ enum Direction {
 enum ProgressType {
   Mastery
   Words
-}
-
-enum ProgressCadence {
-  Daily
-  Weekly
 }
 
 type TextProperty implements IProperty {
@@ -298,6 +293,11 @@ type Goal {
   points: Int!
 }
 
+enum ProgressCadence {
+  Daily
+  Weekly
+}
+
 type ProgressInstance {
   date: Timestamp
   points: Int!
@@ -306,12 +306,14 @@ type ProgressInstance {
 type Progress {
   type: ProgressType!
   cadence: ProgressCadence!
-  current: ProgressInstance!
+  goal: Goal!
+  current(cadence: ProgressCadence): ProgressInstance!
   streak: Int!
-  history(until: Timestamp): ProgressHistory!
+  history(cadence: ProgressCadence!): ProgressHistory!
 }
 
 type ProgressHistory {
+  cadence: ProgressCadence!
   from: Timestamp!
   until: Timestamp!
   instances: [ProgressInstance!]!

@@ -7,6 +7,13 @@ export const card = style({
   flex: 1,
   display: 'flex',
   flexDirection: 'column',
+  alignItems: 'center',
+});
+
+export const exercise = style({
+  boxSizing: 'border-box',
+  width: '100%',
+  maxWidth: 500,
 });
 
 export const centered = style({
@@ -15,4 +22,13 @@ export const centered = style({
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
+});
+
+export const bottom = style({
+  marginTop: 'auto',
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'end',
+  boxSizing: 'border-box',
+  width: '100%',
 });

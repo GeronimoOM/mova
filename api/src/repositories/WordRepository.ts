@@ -16,7 +16,8 @@ import {
   WordSortedCursor,
 } from 'models/Word';
 import { PropertyService } from 'services/PropertyService';
-import { DATETIME_FORMAT, DEFAULT_LIMIT, MAX_LIMIT } from 'utils/constants';
+import { DATE_FORMAT, DEFAULT_LIMIT, MAX_LIMIT } from 'utils/constants';
+import { fromTimestamp, toTimestamp } from 'utils/datetime';
 import * as records from 'utils/records';
 import { DbConnectionManager } from './DbConnectionManager';
 import { Serializer } from './Serializer';
@@ -31,7 +32,8 @@ export interface GetWordPageParams {
   direction?: Direction;
   partsOfSpeech?: PartOfSpeech[];
   mastery?: number;
-  addedAtOlderThan?: Duration;
+  addedAtDate?: DateTime;
+  masteryIncOlderThan?: Duration;
   cursor?: WordSortedCursor;
   limit?: number;
 }
@@ -69,7 +71,8 @@ export class WordRepository {
     cursor,
     limit = DEFAULT_LIMIT,
     mastery,
-    addedAtOlderThan,
+    addedAtDate,
+    masteryIncOlderThan,
   }: GetWordPageParams): Promise<Page<Word, WordSortedCursor>> {
     const connection = this.connectionManager.getConnection();
 
@@ -126,10 +129,15 @@ export class WordRepository {
       query.where({ mastery });
     }
 
-    if (addedAtOlderThan) {
-      query.whereRaw(`date_add(added_at, interval ? day) <= now()`, [
-        addedAtOlderThan.days,
-      ]);
+    if (addedAtDate) {
+      query.whereRaw(`date(added_at) = ?`, [addedAtDate.toFormat(DATE_FORMAT)]);
+    }
+
+    if (masteryIncOlderThan) {
+      query.whereRaw(
+        `date_add(ifnull(mastery_inc_at, added_at), interval ? day) <= now()`,
+        [masteryIncOlderThan.days],
+      );
     }
 
     const wordRows = await query;
@@ -170,14 +178,15 @@ export class WordRepository {
     languageId: LanguageId,
     batchSize: number = BATCH_SIZE,
   ): AsyncGenerator<Word[]> {
+    const connection = this.connectionManager.getConnection();
     let offset = 0;
 
     do {
-      const wordRows = await this.connectionManager
-        .getConnection()(TABLE_WORDS)
+      const wordRows = await connection(TABLE_WORDS)
         .where({
           language_id: languageId,
         })
+        .orderBy('id')
         .offset(offset)
         .limit(batchSize + 1);
 
@@ -200,7 +209,7 @@ export class WordRepository {
         translation: word.translation,
         language_id: word.languageId,
         part_of_speech: word.partOfSpeech,
-        added_at: word.addedAt.toFormat(DATETIME_FORMAT),
+        added_at: toTimestamp(word.addedAt),
         properties: this.mapFromWordProperties(word.properties),
       })
       .onConflict()
@@ -214,6 +223,9 @@ export class WordRepository {
         original: word.original,
         translation: word.translation,
         mastery: word.mastery,
+        ...(word.masteryIncAt && {
+          mastery_inc_at: toTimestamp(word.masteryIncAt),
+        }),
         properties: this.mapFromWordProperties(word.properties),
       })
       .where({ id: word.id });
@@ -312,8 +324,11 @@ export class WordRepository {
       translation: row.translation,
       languageId: row.language_id,
       partOfSpeech: row.part_of_speech,
+      addedAt: fromTimestamp(row.added_at),
       mastery: row.mastery,
-      addedAt: DateTime.fromFormat(row.added_at, DATETIME_FORMAT),
+      ...(row.mastery_inc_at && {
+        masteryIncAt: fromTimestamp(row.mastery_inc_at),
+      }),
       ...(row.properties && {
         properties: this.serializer.deserialize(row.properties),
       }),

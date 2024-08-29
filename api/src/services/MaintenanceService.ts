@@ -12,6 +12,7 @@ import { PropertyRepository } from 'repositories/PropertyRepository';
 import { WordRepository } from 'repositories/WordRepository';
 import { Readable } from 'stream';
 import { LanguageService } from './LanguageService';
+import { ProgressService } from './ProgressService';
 import { WordService } from './WordService';
 
 const RECORDS_BATCH = 1000;
@@ -21,6 +22,7 @@ export class MaintenanceService {
   constructor(
     private languageService: LanguageService,
     private wordService: WordService,
+    private progressService: ProgressService,
 
     private languageRepository: LanguageRepository,
     private propertyRepository: PropertyRepository,
@@ -56,6 +58,10 @@ export class MaintenanceService {
     await this.wordService.indexLanguage(languageId);
 
     return language;
+  }
+
+  async resyncProgress(languageId: LanguageId): Promise<void> {
+    await this.progressService.syncAllWordsProgress(languageId);
   }
 
   private async *exportRecords(): AsyncGenerator<MigrationRecord> {

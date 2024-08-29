@@ -10,8 +10,7 @@ import {
   SyncType,
 } from 'models/Change';
 import { mapPage, toPage } from 'models/Page';
-import { DATETIME_FORMAT } from 'utils/constants';
-import { toTimestamp } from 'utils/datetime';
+import { fromTimestamp, toTimestamp } from 'utils/datetime';
 import { DbConnectionManager } from './DbConnectionManager';
 import { Serializer } from './Serializer';
 
@@ -87,17 +86,15 @@ export class ChangeRepository {
       .orderBy('changed_at', 'asc')
       .first();
 
-    return change
-      ? DateTime.fromFormat(change.changed_at, DATETIME_FORMAT)
-      : null;
+    return change ? fromTimestamp(change.changed_at) : null;
   }
 
   async create(change: Change): Promise<void> {
     const changeRow: ChangeTable = {
       id: change.id,
-      changed_at: change.changedAt.toFormat(DATETIME_FORMAT),
+      changed_at: toTimestamp(change.changedAt),
       type: change.type,
-      client_id: change.clientId,
+      ...(change.clientId && { client_id: change.clientId }),
       data: this.mapDataFromChange(change),
     };
 
@@ -109,14 +106,14 @@ export class ChangeRepository {
   async deleteOlder(changeAt: DateTime): Promise<void> {
     await this.connectionManager
       .getConnection()(TABLE_CHANGES)
-      .where('changed_at', '<', changeAt.toFormat(DATETIME_FORMAT))
+      .where('changed_at', '<', toTimestamp(changeAt))
       .delete();
   }
 
   private mapToChange(row: ChangeTable): Change {
     const baseChange: BaseChange = {
       id: row.id,
-      changedAt: DateTime.fromFormat(row.changed_at, DATETIME_FORMAT),
+      changedAt: fromTimestamp(row.changed_at),
       type: row.type as ChangeType,
       clientId: row.client_id,
     };

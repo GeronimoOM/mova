@@ -1,5 +1,6 @@
 import { useLazyQuery, useQuery } from '@apollo/client';
 import React, { useMemo, useState } from 'react';
+import { HiMiniXMark } from 'react-icons/hi2';
 import { IoPlay } from 'react-icons/io5';
 import { useIncreaseWordMastery } from '../../api/mutations';
 import {
@@ -140,14 +141,28 @@ export const ExerciseCard: React.FC = () => {
         loading ? (
           <Loader />
         ) : (
-          <Exercise
-            key={currentWord!.id}
-            word={currentWord!}
-            properties={propertiesByPartOfSpeech![currentWord!.partOfSpeech]}
-            onSuccess={handleSuccess}
-            onFailure={handleFailure}
-            onNext={handleNext}
-          />
+          <>
+            <div className={styles.exercise}>
+              <Exercise
+                key={currentWord!.id}
+                word={currentWord!}
+                properties={
+                  propertiesByPartOfSpeech![currentWord!.partOfSpeech]
+                }
+                onSuccess={handleSuccess}
+                onFailure={handleFailure}
+                onNext={handleNext}
+              />
+            </div>
+
+            <div className={styles.bottom}>
+              <ButtonIcon
+                icon={HiMiniXMark}
+                type="negative"
+                onClick={() => setIsStarted(false)}
+              />
+            </div>
+          </>
         )
       ) : (
         <div className={styles.centered}>

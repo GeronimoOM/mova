@@ -9,6 +9,7 @@ import { ProgressGoals } from './ProgressGoals';
 import { ProgressStats } from './ProgressStats';
 
 export enum ProgressTab {
+  Progress = 'progress', // TODO progress tab for progress, streak and history
   Stats = 'stats',
   Goals = 'goals',
 }

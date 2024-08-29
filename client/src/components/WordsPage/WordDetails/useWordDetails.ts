@@ -17,7 +17,7 @@ import {
   WordFieldsFullFragment,
 } from '../../../api/types/graphql';
 import { toRecord } from '../../../utils/arrays';
-import { DATETIME_FORMAT } from '../../../utils/constants';
+import { toTimestamp } from '../../../utils/datetime';
 import { useLanguageContext } from '../../LanguageContext';
 
 type WordDetails = Omit<Partial<WordFieldsFullFragment>, 'properties'> & {
@@ -167,7 +167,7 @@ export function useWordDetails(wordId: string | null): WordDetailsReturn {
             id: uuid(),
             original: wordInput.original!,
             translation: wordInput.translation!,
-            addedAt: DateTime.utc().toFormat(DATETIME_FORMAT),
+            addedAt: toTimestamp(DateTime.utc()),
             languageId: selectedLanguageId!,
             partOfSpeech: wordInput.partOfSpeech!,
             properties: Object.values(wordInput.properties ?? {}),

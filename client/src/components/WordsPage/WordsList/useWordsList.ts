@@ -5,11 +5,8 @@ import {
   GetWordsDocument,
   WordFieldsFragment,
 } from '../../../api/types/graphql';
-import {
-  DATETIME_FORMAT,
-  MIN_QUERY_LENGTH,
-  WORDS_PAGE_SIZE,
-} from '../../../utils/constants';
+import { MIN_QUERY_LENGTH, WORDS_PAGE_SIZE } from '../../../utils/constants';
+import { fromTimestamp } from '../../../utils/datetime';
 import { useLanguageContext } from '../../LanguageContext';
 
 export type WordsListReturn = {
@@ -96,7 +93,7 @@ export function divideByDate(
   let lastDivider: WordDateDivider | null = null;
 
   for (const word of words) {
-    const wordDate = DateTime.fromFormat(word.addedAt, DATETIME_FORMAT);
+    const wordDate = fromTimestamp(word.addedAt)!.setZone('local');
 
     if (!currentDate || !wordDate.hasSame(currentDate, 'day')) {
       currentDate = wordDate;

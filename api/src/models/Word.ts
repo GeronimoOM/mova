@@ -15,8 +15,9 @@ export interface Word {
   translation: string;
   languageId: LanguageId;
   partOfSpeech: PartOfSpeech;
-  mastery: number;
   addedAt: DateTime;
+  mastery: number;
+  masteryIncAt?: DateTime;
   properties?: Record<PropertyId, PropertyValue>;
 }
 

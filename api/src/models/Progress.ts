@@ -1,4 +1,8 @@
 import { DateTime } from 'luxon';
+import { Flavor } from 'utils/flavor';
+import { WordId } from './Word';
+
+export type ProgressId = Flavor<string, 'Progress'> | WordId;
 
 export enum ProgressType {
   Mastery = 'mastery',
@@ -15,6 +19,19 @@ export interface Progress {
   type: ProgressType;
   cadence: ProgressCadence;
   points: number;
+}
+
+export interface ProgressInstance {
+  id: ProgressId;
+  date: DateTime;
+  type: ProgressType;
+}
+
+export interface ProgressHistory {
+  cadence: ProgressCadence;
+  from: DateTime;
+  until: DateTime;
+  instances: Progress[];
 }
 
 export enum ProgressCadence {

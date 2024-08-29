@@ -11,7 +11,7 @@ import {
   PropertyFieldsFragment,
   PropertyType,
 } from '../../api/types/graphql';
-import { DATETIME_FORMAT } from '../../utils/constants';
+import { toTimestamp } from '../../utils/datetime';
 import { useLanguageContext } from '../LanguageContext';
 
 const MIN_PROPERTY_NAME_LENGTH = 3;
@@ -86,7 +86,7 @@ export function useProperty(
             name: nameInput,
             type: PropertyType.Text, // TODO add support for other types
             partOfSpeech,
-            addedAt: DateTime.utc().toFormat(DATETIME_FORMAT),
+            addedAt: toTimestamp(DateTime.utc()),
           },
         },
       });

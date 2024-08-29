@@ -1,5 +1,6 @@
 import { ChangeId } from 'models/Change';
 import { LanguageId } from 'models/Language';
+import { ProgressId } from 'models/Progress';
 import { PropertyId, PropertyType } from 'models/Property';
 import { PartOfSpeech, WordId } from 'models/Word';
 
@@ -27,15 +28,16 @@ declare module 'knex/types/tables' {
     translation: string;
     language_id: LanguageId;
     part_of_speech: PartOfSpeech;
-    mastery: number;
     added_at: string;
+    mastery: number;
+    mastery_inc_at?: string;
     properties?: string;
   }
 
   interface ProgressTable {
+    id: ProgressId;
     date: string;
     type: ProgressType;
-    points: number;
     language_id: LanguageId;
   }
 

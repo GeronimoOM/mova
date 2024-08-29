@@ -6,6 +6,10 @@ export const wrapper = style({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
+  boxSizing: 'border-box',
+  width: '100%',
+  maxWidth: 500,
+  margin: '0 auto',
   gap: 10,
 });
 

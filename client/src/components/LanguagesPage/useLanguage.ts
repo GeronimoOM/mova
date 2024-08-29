@@ -7,7 +7,7 @@ import {
   useUpdateLanguage,
 } from '../../api/mutations';
 import { LanguageFieldsFragment } from '../../api/types/graphql';
-import { DATETIME_FORMAT } from '../../utils/constants';
+import { toTimestamp } from '../../utils/datetime';
 import { useLanguageContext } from '../LanguageContext';
 
 const MIN_LANGUAGE_NAME_LENGTH = 3;
@@ -77,7 +77,7 @@ export function useLanguage(
           input: {
             id: uuid(),
             name: nameInput,
-            addedAt: DateTime.utc().toFormat(DATETIME_FORMAT),
+            addedAt: toTimestamp(DateTime.utc()),
           },
         },
       });

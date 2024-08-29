@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { LanguageTable } from 'knex/types/tables';
-import { DateTime } from 'luxon';
 import { Language, LanguageId } from 'models/Language';
-import { DATETIME_FORMAT } from 'utils/constants';
+import { fromTimestamp, toTimestamp } from 'utils/datetime';
 import { DbConnectionManager } from './DbConnectionManager';
 
 const TABLE_LANGUAGES = 'languages';
@@ -32,7 +31,7 @@ export class LanguageRepository {
     const languageRow: LanguageTable = {
       id: language.id,
       name: language.name,
-      added_at: language.addedAt.toFormat(DATETIME_FORMAT),
+      added_at: toTimestamp(language.addedAt),
     };
 
     await this.connectionManager
@@ -76,7 +75,7 @@ export class LanguageRepository {
     return {
       id: row.id,
       name: row.name,
-      addedAt: DateTime.fromFormat(row.added_at, DATETIME_FORMAT),
+      addedAt: fromTimestamp(row.added_at),
     };
   }
 }

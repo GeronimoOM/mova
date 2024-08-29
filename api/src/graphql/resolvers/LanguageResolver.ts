@@ -11,14 +11,10 @@ import {
 import { GoalType } from 'graphql/types/GoalType';
 import { ProgressType } from 'graphql/types/ProgressType';
 import { WordsStatsType } from 'graphql/types/WordsStatsType';
-import { DateTime } from 'luxon';
 import { Context } from 'models/Context';
 import { LanguageId } from 'models/Language';
 import { Direction, Page, encodePageCursor, mapPage } from 'models/Page';
-import {
-  ProgressCadence,
-  ProgressType as ProgressTypeEnum,
-} from 'models/Progress';
+import { ProgressType as ProgressTypeEnum } from 'models/Progress';
 import { PartOfSpeech, WordCursor, WordOrder } from 'models/Word';
 import { LanguageService } from 'services/LanguageService';
 import { ProgressService } from 'services/ProgressService';
@@ -160,20 +156,15 @@ export class LanguageResolver {
     @Parent() language: LanguageType,
     @Args('type', { type: () => ProgressTypeEnum })
     type: ProgressTypeEnum,
-    @Args('cadence', { type: () => ProgressCadence, nullable: true })
-    cadence?: ProgressCadence,
   ): Promise<ProgressType> {
-    const currentProgress = await this.progressService.getCurrentProgress(
-      ctx,
-      language.id,
-      type,
-      cadence,
-    );
+    const goal = await this.progressService.getGoal(language.id, type);
+    const { cadence } = goal;
 
     return {
       type,
-      cadence: currentProgress.cadence,
-      current: currentProgress,
+      cadence,
+      goal,
+      languageId: language.id,
     };
   }
 }

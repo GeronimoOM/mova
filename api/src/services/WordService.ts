@@ -4,6 +4,7 @@ import { DateTime } from 'luxon';
 import { Context } from 'models/Context';
 import { LanguageId } from 'models/Language';
 import { Direction, mapPage, Page } from 'models/Page';
+import { ProgressType } from 'models/Progress';
 import {
   isOptionProperty,
   isTextProperty,
@@ -24,6 +25,7 @@ import { v1 as uuid } from 'uuid';
 import { ChangeBuilder } from './ChangeBuilder';
 import { ChangeService } from './ChangeService';
 import { LanguageService } from './LanguageService';
+import { ProgressService } from './ProgressService';
 import { PropertyService } from './PropertyService';
 
 export interface GetWordPageParams {
@@ -76,6 +78,7 @@ export class WordService {
     private languageService: LanguageService,
     @Inject(forwardRef(() => ChangeService))
     private changeService: ChangeService,
+    private progressService: ProgressService,
     private changeBuilder: ChangeBuilder,
     private connectionManager: DbConnectionManager,
   ) {}
@@ -135,6 +138,11 @@ export class WordService {
       await this.changeService.create(
         this.changeBuilder.buildCreateWordChange(ctx, word),
       );
+      await this.progressService.saveProgress(word.languageId, {
+        id: word.id,
+        type: ProgressType.Words,
+        date: word.addedAt,
+      });
     });
 
     await this.searchClient.indexWord(word);
@@ -189,6 +197,7 @@ export class WordService {
       await this.changeService.create(
         this.changeBuilder.buildDeleteWordChange(ctx, word),
       );
+      await this.progressService.deleteProgress(word.id);
     });
 
     await this.searchClient.deleteWord(id);

@@ -162,6 +162,7 @@ fragment CreateWordChangeFields on CreateWordChange {
     original
     translation
     partOfSpeech
+    mastery
     addedAt
     languageId
     properties {
