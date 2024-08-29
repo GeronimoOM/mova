@@ -21,6 +21,9 @@ import { v1 as uuid } from 'uuid';
 import { ChangeBuilder } from './ChangeBuilder';
 import { ChangeService } from './ChangeService';
 import { LanguageService } from './LanguageService';
+import { WordService } from './WordService';
+
+const PROPERTY_DELETION_WORDS_THRESHOLD = 50;
 
 export interface CreateBasePropertyParams {
   id?: PropertyId;
@@ -66,6 +69,8 @@ export class PropertyService {
     private propertyRepository: PropertyRepository,
     @Inject(forwardRef(() => LanguageService))
     private languageService: LanguageService,
+    @Inject(forwardRef(() => WordService))
+    private wordService: WordService,
     @Inject(forwardRef(() => ChangeService))
     private changeService: ChangeService,
     private changeBuilder: ChangeBuilder,
@@ -217,6 +222,15 @@ export class PropertyService {
 
   async delete(ctx: Context, { id }: DeletePropertyParams): Promise<Property> {
     const property = await this.propertyRepository.getById(id);
+
+    const wordCount = await this.wordService.getCountByProperty(
+      property.languageId,
+      property.id,
+      property.partOfSpeech,
+    );
+    if (wordCount > PROPERTY_DELETION_WORDS_THRESHOLD) {
+      throw new Error('Property has too many words');
+    }
 
     await this.connectionManager.transactionally(async () => {
       await this.propertyRepository.delete(id);

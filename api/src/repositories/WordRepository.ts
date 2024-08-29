@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { WordTable } from 'knex/types/tables';
 import { DateTime, Duration } from 'luxon';
 import { LanguageId } from 'models/Language';
@@ -48,6 +48,7 @@ type WordPropertiesLite = Record<PropertyId, Omit<PropertyValue, 'property'>>;
 export class WordRepository {
   constructor(
     private connectionManager: DbConnectionManager,
+    @Inject(forwardRef(() => PropertyService))
     private propertyService: PropertyService,
     private serializer: Serializer,
   ) {}
@@ -284,6 +285,20 @@ export class WordRepository {
     return Object.fromEntries(
       counts.map((count) => [count.part_of_speech, count.count]),
     ) as Record<PartOfSpeech, number>;
+  }
+
+  async getCountByProperty(
+    languageId: LanguageId,
+    propertyId: PropertyId,
+    partOfSpeech: PartOfSpeech,
+  ): Promise<number> {
+    const [{ count }] = await this.connectionManager
+      .getConnection()(TABLE_WORDS)
+      .where({ language_id: languageId, part_of_speech: partOfSpeech })
+      .whereRaw(`properties->'$."${propertyId}"' is not null`)
+      .count('id', { as: 'count' });
+
+    return Number(count);
   }
 
   streamRecords(): AsyncIterable<WordTable> {

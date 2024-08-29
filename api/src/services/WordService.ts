@@ -228,6 +228,18 @@ export class WordService {
     return await this.wordRepository.getCount(languageId);
   }
 
+  async getCountByProperty(
+    languageId: LanguageId,
+    propertyId: PropertyId,
+    partOfSpeech: PartOfSpeech,
+  ): Promise<number> {
+    return await this.wordRepository.getCountByProperty(
+      languageId,
+      propertyId,
+      partOfSpeech,
+    );
+  }
+
   private setPropertyValues(
     word: Word,
     properties: Property[],
