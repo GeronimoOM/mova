@@ -8,7 +8,8 @@ export const Loader: React.FC = () => {
     <div className={styles.centered}>
       <ButtonIcon
         icon={FaSyncAlt}
-        type="primary"
+        color="primary"
+        highlighted={true}
         onClick={() => {}}
         loading={true}
       />

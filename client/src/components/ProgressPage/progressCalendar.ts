@@ -1,4 +1,4 @@
-import { DateTime } from 'luxon';
+import { DateTime, Duration } from 'luxon';
 import {
   ProgressCadence,
   ProgressHistoryFieldsFragment,
@@ -6,12 +6,14 @@ import {
 import { sequence } from '../../utils/arrays';
 import { fromTimestamp } from '../../utils/datetime';
 
+const DEFAULT_HISTORY_SPAN = Duration.fromObject({ months: 3 });
+
 export type ProgressCalendarInstance = {
   date: DateTime;
   points: number;
 };
 
-export function parseHistoryToCalendarData(
+export function parseCalendarData(
   history: ProgressHistoryFieldsFragment,
 ): Array<ProgressCalendarInstance | undefined> {
   const isDailyCadence = history.cadence === ProgressCadence.Daily;
@@ -46,6 +48,36 @@ export function parseHistoryToCalendarData(
         points: 0,
       },
   );
+
+  if (isDailyCadence) {
+    const dailyOffset = from.weekday - 1;
+    instances = [...sequence(dailyOffset).map(() => undefined), ...instances];
+  }
+
+  return instances;
+}
+
+export function emptyCalendarData(
+  cadence: ProgressCadence,
+): Array<ProgressCalendarInstance | undefined> {
+  const isDailyCadence = cadence === ProgressCadence.Daily;
+  const today = DateTime.local();
+  const from = today
+    .minus(DEFAULT_HISTORY_SPAN)
+    .startOf(isDailyCadence ? 'day' : 'week');
+  const until = today
+    .plus(isDailyCadence ? { days: 1 } : { week: 1 })
+    .startOf(isDailyCadence ? 'day' : 'week');
+  const total = until.diff(from, isDailyCadence ? 'days' : 'weeks')[
+    isDailyCadence ? 'days' : 'weeks'
+  ];
+
+  let instances: Array<ProgressCalendarInstance | undefined> = sequence(
+    total,
+  ).map((offset) => ({
+    date: from.plus({ [isDailyCadence ? 'days' : 'weeks']: offset }),
+    points: 0,
+  }));
 
   if (isDailyCadence) {
     const dailyOffset = from.weekday - 1;

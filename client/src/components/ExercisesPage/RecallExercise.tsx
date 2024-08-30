@@ -70,9 +70,14 @@ export const RecallExercise: React.FC<RecallExerciseProps> = ({
       </div>
 
       <div className={styles.result}>
-        <ButtonIcon icon={FaCheck} onClick={handleSuccess} type="primary" />
+        <ButtonIcon
+          icon={FaCheck}
+          onClick={handleSuccess}
+          color="primary"
+          highlighted={true}
+        />
 
-        <ButtonIcon icon={FaMinus} onClick={handleFailure} type="negative" />
+        <ButtonIcon icon={FaMinus} onClick={handleFailure} color="negative" />
       </div>
     </div>
   );

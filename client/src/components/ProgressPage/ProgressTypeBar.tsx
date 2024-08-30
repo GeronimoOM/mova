@@ -43,7 +43,7 @@ export const ProgressTypeBar: React.FC<ProgressBarProps> = ({
       <div className={styles.bar}>
         <ProgressBar
           progress={progressPercent}
-          type={progressTypeToColor[type]}
+          color={progressTypeToColor[type]}
         />
       </div>
       <div className={styles.label({ color: progressTypeToColor[type] })}>

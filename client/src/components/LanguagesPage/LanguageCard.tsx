@@ -61,14 +61,15 @@ export const LanguageCard: React.FC<LanguageCardProps> = ({
         <ButtonIcon
           icon={FaFeatherPointed}
           onClick={isNewLanguage ? createLanguage : updateLanguage}
-          type="primary"
+          color="primary"
+          highlighted={true}
           disabled={!canCreateLanguage && !canUpdateLanguage}
           loading={isNewLanguage ? languageCreating : languageUpdating}
         />
         <ButtonIcon
           icon={FaFire}
           onClick={deleteLanguage}
-          type="negative"
+          color="negative"
           disabled={!canDeleteLanguage}
           loading={languageDeleting}
         />

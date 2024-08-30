@@ -13,19 +13,17 @@ export const bar = recipe({
   },
 
   variants: {
-    type: {
-      ...Object.fromEntries(
-        Colors.map((color) => [
-          color,
-          {
-            backgroundColor: themeVars.color[color],
-          },
-        ]),
-      ),
-    },
+    color: Object.fromEntries(
+      Colors.map((color) => [
+        color,
+        {
+          backgroundColor: themeVars.color[color],
+        },
+      ]),
+    ),
   },
 
   defaultVariants: {
-    type: 'primary',
+    color: 'primary',
   },
 });

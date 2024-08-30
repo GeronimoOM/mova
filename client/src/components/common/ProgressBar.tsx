@@ -4,13 +4,19 @@ import * as styles from './ProgressBar.css';
 
 export type ProgressBarProps = {
   progress: number;
-  type?: Color;
+  color?: Color;
 };
 
-export const ProgressBar: React.FC<ProgressBarProps> = ({ progress, type }) => {
+export const ProgressBar: React.FC<ProgressBarProps> = ({
+  progress,
+  color,
+}) => {
   return (
     <div className={styles.container}>
-      <div className={styles.bar({ type })} style={{ width: `${progress}%` }} />
+      <div
+        className={styles.bar({ color })}
+        style={{ width: `${progress}%` }}
+      />
     </div>
   );
 };

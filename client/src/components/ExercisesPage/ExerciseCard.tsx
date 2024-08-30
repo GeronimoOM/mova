@@ -12,6 +12,7 @@ import {
 import { toGroupedRecord } from '../../utils/arrays';
 import { useLanguageContext } from '../LanguageContext';
 import { ButtonIcon } from '../common/ButtonIcon';
+import { Loader } from '../common/Loader';
 import * as styles from './ExerciseCard.css';
 import { RecallExercise } from './RecallExercise';
 import { SpellExercise } from './SpellExercise';
@@ -56,19 +57,6 @@ const Exercise: React.FC<ExerciseProps> = ({
         />
       );
   }
-};
-
-const Loader: React.FC = () => {
-  return (
-    <div className={styles.centered}>
-      <ButtonIcon
-        icon={IoPlay}
-        type="primary"
-        onClick={() => {}}
-        loading={true}
-      />
-    </div>
-  );
 };
 
 export const ExerciseCard: React.FC = () => {
@@ -158,7 +146,7 @@ export const ExerciseCard: React.FC = () => {
             <div className={styles.bottom}>
               <ButtonIcon
                 icon={HiMiniXMark}
-                type="negative"
+                color="negative"
                 onClick={() => setIsStarted(false)}
               />
             </div>
@@ -166,7 +154,12 @@ export const ExerciseCard: React.FC = () => {
         )
       ) : (
         <div className={styles.centered}>
-          <ButtonIcon icon={IoPlay} type="primary" onClick={handleStart} />
+          <ButtonIcon
+            icon={IoPlay}
+            color="primary"
+            highlighted={true}
+            onClick={handleStart}
+          />
         </div>
       )}
     </div>

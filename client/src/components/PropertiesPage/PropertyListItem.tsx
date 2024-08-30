@@ -110,22 +110,25 @@ export const PropertyListItem: React.FC<PropertyListItemProps> = ({
             </>
           )}
         </div>
-        <ButtonIcon
-          icon={FaFeatherPointed}
-          onClick={isNewProperty ? createProperty : updateProperty}
-          type="primary"
-          disabled={!canCreateProperty && !canUpdateProperty}
-          loading={isNewProperty ? propertyCreating : propertyUpdating}
-          hidden={!selected}
-        />
-        <ButtonIcon
-          icon={FaFire}
-          onClick={deleteProperty}
-          type="negative"
-          disabled={!canDeleteProperty}
-          loading={propertyDeleting}
-          hidden={!selected}
-        />
+        <div className={classNames(styles.button, { hidden: !selected })}>
+          <ButtonIcon
+            icon={FaFeatherPointed}
+            onClick={isNewProperty ? createProperty : updateProperty}
+            color="primary"
+            highlighted={true}
+            disabled={!canCreateProperty && !canUpdateProperty}
+            loading={isNewProperty ? propertyCreating : propertyUpdating}
+          />
+        </div>
+        <div className={classNames(styles.button, { hidden: !selected })}>
+          <ButtonIcon
+            icon={FaFire}
+            onClick={deleteProperty}
+            color="negative"
+            disabled={!canDeleteProperty}
+            loading={propertyDeleting}
+          />
+        </div>
       </div>
 
       <div className={styles.content}>
@@ -136,12 +139,14 @@ export const PropertyListItem: React.FC<PropertyListItemProps> = ({
           size={'large'}
         />
 
-        <div ref={dragRef}>
+        <div
+          ref={dragRef}
+          className={classNames(styles.button, { hidden: !selected })}
+        >
           <ButtonIcon
             icon={IoReorderThree}
             onClick={() => {}}
             disabled={!canDragProperty}
-            hidden={!selected}
           />
         </div>
       </div>
@@ -173,15 +178,9 @@ export const PropertyListItemOverlay: React.FC = () => {
         <ButtonIcon
           icon={FaFeatherPointed}
           onClick={() => {}}
-          type="primary"
           disabled={true}
         />
-        <ButtonIcon
-          icon={FaFire}
-          onClick={() => {}}
-          type="negative"
-          disabled={true}
-        />
+        <ButtonIcon icon={FaFire} onClick={() => {}} disabled={true} />
       </div>
 
       <div className={styles.content}>

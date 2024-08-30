@@ -28,7 +28,7 @@ export const ExerciseProgress: React.FC = () => {
       <div className={styles.bar}>
         <ProgressBar
           progress={progress}
-          type={progressTypeToColor[ProgressType.Mastery]}
+          color={progressTypeToColor[ProgressType.Mastery]}
         />
       </div>
       <span className={styles.label}>{`${current} / ${goal}`}</span>

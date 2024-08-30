@@ -120,14 +120,14 @@ export const SpellExercise: React.FC<SpellExerciseProps> = ({
       <div className={styles.result}>
         <ButtonIcon
           icon={!isSubmitted || result ? FaCheck : FaMinus}
-          type={!isSubmitted || result ? 'primary' : 'negative'}
+          color={!isSubmitted || result ? 'primary' : 'negative'}
           onClick={handleSubmit}
           disabled={!canSubmit}
         />
 
         <ButtonIcon
           icon={FaAngleDoubleRight}
-          type={isSubmitted ? 'default' : 'negative'}
+          {...(!isSubmitted && { color: 'negative' })}
           onClick={handleNext}
         />
       </div>

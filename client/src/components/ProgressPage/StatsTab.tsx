@@ -9,6 +9,7 @@ export const StatsTab: React.FC = () => {
 
   const { data: statsQuery } = useQuery(GetStatsDocument, {
     variables: { languageId: selectedLanguageId! },
+    fetchPolicy: 'network-only',
   });
   const stats = statsQuery?.language?.stats;
   const total = stats?.total;

@@ -84,7 +84,8 @@ export const PropertiesList: React.FC<PropertiesListProps> = ({
           <div className={styles.buttons}>
             <ButtonIcon
               icon={TbHexagonPlusFilled}
-              type="primary"
+              color="primary"
+              highlighted={true}
               onClick={handleCreateNew}
               wrapped
             />

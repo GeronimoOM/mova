@@ -13,7 +13,7 @@ export const WordsProgress: React.FC = () => {
     <div className={styles.wrapper}>
       <Icon icon={FaBrain} size="small" />
       <div className={styles.bar}>
-        <ProgressBar progress={(progress / goal) * 100} type="secondary2" />
+        <ProgressBar progress={(progress / goal) * 100} color="secondary2" />
       </div>
       <span className={styles.label}>{`${progress} / ${goal}`}</span>
     </div>

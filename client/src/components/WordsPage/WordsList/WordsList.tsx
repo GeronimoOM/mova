@@ -74,7 +74,8 @@ export const WordsList: React.FC<WordsListProps> = ({
       <div className={styles.buttons}>
         <ButtonIcon
           icon={TbHexagonPlusFilled}
-          type="primary"
+          color="primary"
+          highlighted={true}
           onClick={onCreateNew}
           wrapped
         />

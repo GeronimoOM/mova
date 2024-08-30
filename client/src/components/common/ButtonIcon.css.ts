@@ -1,6 +1,6 @@
-import { globalStyle, style, StyleRule } from '@vanilla-extract/css';
+import { globalStyle, style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
-import { animations, Color, Colors, themeVars } from '../../index.css';
+import { Colors, animations, themeVars } from '../../index.css';
 
 export const button = recipe({
   base: {
@@ -10,7 +10,7 @@ export const button = recipe({
     borderRadius: 30,
     backgroundColor: themeVars.color.background,
     border: `2px solid ${themeVars.color.text}`,
-    transition: 'color 0.2s ease, background-color 0.2s ease',
+    transition: 'color 0.2s ease, background-color 0.2s ease, border 0.2s ease',
 
     selectors: {
       '&:hover': {
@@ -20,45 +20,35 @@ export const button = recipe({
   },
 
   variants: {
-    type: {
-      default: {},
-      ...(Object.fromEntries(
-        Colors.map((color) => [
-          color as Color,
-          {
-            selectors: {
-              '&:hover': {
-                color: themeVars.color[color],
-                border: `2px solid ${themeVars.color[color]}`,
-              },
+    color: Object.fromEntries(
+      Colors.map((color) => [
+        color,
+        {
+          selectors: {
+            '&:hover': {
+              color: themeVars.color[color],
+              border: `2px solid ${themeVars.color[color]}`,
+              backgroundColor: themeVars.color.background,
+            },
+            '&.highlighted': {
+              color: themeVars.color[color],
+              border: `2px solid ${themeVars.color[color]}`,
+            },
+            '&.highlighted:hover, &.toggled': {
+              backgroundColor: themeVars.color[color],
+              color: themeVars.color.background,
+              border: `2px solid ${themeVars.color[color]}`,
             },
           },
-        ]),
-      ) as unknown as Record<Color, StyleRule>),
-      primary: {
-        color: themeVars.color.primary,
-        border: `2px solid ${themeVars.color.primary}`,
-
-        selectors: {
-          '&:hover': {
-            backgroundColor: themeVars.color.primary,
-            color: themeVars.color.background,
-          },
         },
-      },
-    },
+      ]),
+    ),
 
     disabled: {
       true: {
-        color: themeVars.color.muted,
-        border: `2px solid ${themeVars.color.muted}`,
+        color: `${themeVars.color.muted} !important`,
+        border: `2px solid ${themeVars.color.muted} !important`,
         pointerEvents: 'none',
-      },
-    },
-
-    hidden: {
-      true: {
-        opacity: 0,
       },
     },
 
@@ -71,10 +61,6 @@ export const button = recipe({
         pointerEvents: 'none',
       },
     },
-  },
-
-  defaultVariants: {
-    type: 'default',
   },
 });
 

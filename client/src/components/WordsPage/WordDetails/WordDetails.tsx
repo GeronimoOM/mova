@@ -72,14 +72,15 @@ export const WordDetails: React.FC<WordDetailsProps> = ({
           <ButtonIcon
             icon={FaFeatherPointed}
             onClick={isNewWord ? createWord : updateWord}
-            type="primary"
+            color="primary"
+            highlighted={true}
             disabled={!canCreateWord && !canUpdateWord}
             loading={isNewWord ? wordCreating : wordUpdating}
           />
           <ButtonIcon
             icon={FaFire}
             onClick={deleteWord}
-            type="negative"
+            color="negative"
             disabled={!canDeleteWord}
             loading={wordDeleting}
           />

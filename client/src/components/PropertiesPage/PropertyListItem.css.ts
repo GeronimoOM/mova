@@ -65,6 +65,14 @@ export const typeIcon = style({
   color: themeVars.color.muted,
 });
 
+export const button = style({
+  selectors: {
+    ['&.hidden']: {
+      opacity: 0,
+    },
+  },
+});
+
 export const typeLabel = style({
   textTransform: 'lowercase',
 });

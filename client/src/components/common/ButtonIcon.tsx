@@ -9,10 +9,11 @@ import { Icon, IconProps } from './Icon';
 export type ButtonIconProps = IconProps & {
   icon?: IconType;
   onClick: () => void;
-  type?: 'default' | Color;
+  color?: Color;
+  highlighted?: boolean;
   disabled?: boolean;
   loading?: boolean;
-  hidden?: boolean;
+  toggled?: boolean;
   empty?: boolean;
   wrapped?: boolean;
 };
@@ -20,19 +21,21 @@ export type ButtonIconProps = IconProps & {
 export const ButtonIcon: React.FC<ButtonIconProps> = ({
   icon,
   onClick,
-  type,
+  color,
+  highlighted,
   disabled,
   loading,
-  hidden,
+  toggled,
   empty,
   wrapped,
 }) => {
   const button = (
     <div
-      className={classNames(
-        styles.button({ type, disabled, hidden, loading }),
-        { empty },
-      )}
+      className={classNames(styles.button({ color, disabled, loading }), {
+        highlighted,
+        toggled,
+        empty,
+      })}
       onClick={onClick}
     >
       <Icon icon={!loading ? icon : FaSyncAlt} />

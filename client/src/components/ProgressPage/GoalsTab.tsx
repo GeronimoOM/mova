@@ -99,7 +99,8 @@ export const GoalsTab: React.FC = () => {
       <div key="buttons" className={styles.buttons}>
         <ButtonIcon
           icon={FaFeatherPointed}
-          type="primary"
+          color="primary"
+          highlighted={true}
           onClick={handleSetGoals}
           disabled={!canSetGoals}
           loading={goalsSetting}
