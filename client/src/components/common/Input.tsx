@@ -5,6 +5,7 @@ import * as styles from './Input.css';
 export type InputProps = {
   value: string;
   onChange: (value: string) => void;
+  type?: 'text' | 'password';
   text?: 'original' | 'translation';
   textColor?: Color;
   size?: 'medium' | 'large';
@@ -17,6 +18,7 @@ export type InputProps = {
 export const Input: React.FC<InputProps> = ({
   value,
   onChange,
+  type,
   text,
   textColor,
   size,
@@ -36,7 +38,7 @@ export const Input: React.FC<InputProps> = ({
         loading,
         obscured,
       })}
-      type="text"
+      type={type ?? 'text'}
       spellCheck={false}
       autoCapitalize={'off'}
       value={value}

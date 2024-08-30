@@ -4,6 +4,13 @@ import { breakpoints, themeVars } from '../../index.css';
 export const link = style({
   color: 'inherit',
   textDecoration: 'inherit',
+
+  selectors: {
+    '&.disabled': {
+      pointerEvents: 'none',
+      color: themeVars.color.muted,
+    },
+  },
 });
 
 export const item = style({
