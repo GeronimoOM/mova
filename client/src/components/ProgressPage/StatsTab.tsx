@@ -121,7 +121,7 @@ const ChartLegend: React.FC<ChartLegendProps> = ({ data }) => {
   return (
     <div className={styles.legend}>
       {data.map(({ color, title, value }) => (
-        <div className={styles.legendRow}>
+        <div key={title} className={styles.legendRow}>
           <div
             className={styles.legendIcon}
             style={{ backgroundColor: color }}
