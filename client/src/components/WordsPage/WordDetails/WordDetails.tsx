@@ -21,12 +21,14 @@ export type WordDetailsProps = {
   wordId: string | null;
   onSelectWord: (wordId: string | null) => void;
   onClose: () => void;
+  simplified?: boolean;
 };
 
 export const WordDetails: React.FC<WordDetailsProps> = ({
   wordId,
   onSelectWord,
   onClose,
+  simplified,
 }) => {
   const {
     isNewWord,
@@ -69,21 +71,27 @@ export const WordDetails: React.FC<WordDetailsProps> = ({
       <div className={styles.innerWrapper}>
         <div className={styles.buttons}>
           <ButtonIcon icon={HiMiniXMark} onClick={onClose} />
-          <ButtonIcon
-            icon={FaFeatherPointed}
-            onClick={isNewWord ? createWord : updateWord}
-            color="primary"
-            highlighted={true}
-            disabled={!canCreateWord && !canUpdateWord}
-            loading={isNewWord ? wordCreating : wordUpdating}
-          />
-          <ButtonIcon
-            icon={FaFire}
-            onClick={deleteWord}
-            color="negative"
-            disabled={!canDeleteWord}
-            loading={wordDeleting}
-          />
+          {!simplified && (
+            <ButtonIcon
+              icon={FaFeatherPointed}
+              onClick={isNewWord ? createWord : updateWord}
+              color="primary"
+              highlighted={true}
+              disabled={!canCreateWord && !canUpdateWord}
+              loading={isNewWord ? wordCreating : wordUpdating}
+            />
+          )}
+          {!simplified && (
+            <div className={styles.bottomButton}>
+              <ButtonIcon
+                icon={FaFire}
+                onClick={deleteWord}
+                color="negative"
+                disabled={!canDeleteWord}
+                loading={wordDeleting}
+              />
+            </div>
+          )}
         </div>
 
         <div className={styles.details}>
@@ -102,6 +110,7 @@ export const WordDetails: React.FC<WordDetailsProps> = ({
             value={word?.original ?? ''}
             onChange={setOriginal}
             loading={wordLoading}
+            disabled={simplified}
           />
 
           <div className={styles.translationLabel}>
@@ -115,6 +124,7 @@ export const WordDetails: React.FC<WordDetailsProps> = ({
             value={word?.translation ?? ''}
             onChange={setTranslation}
             loading={wordLoading}
+            disabled={simplified}
           />
           {!propertiesLoading ? (
             properties?.map((property) => (
@@ -123,6 +133,7 @@ export const WordDetails: React.FC<WordDetailsProps> = ({
                 property={property}
                 wordProperty={word.properties?.[property.id] ?? null}
                 onChange={setPropertyValue}
+                simplified={simplified}
               />
             ))
           ) : (

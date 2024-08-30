@@ -1,10 +1,12 @@
-import { globalStyle, style } from '@vanilla-extract/css';
+import { style } from '@vanilla-extract/css';
 import { themeVars } from '../../../index.css';
 
 export const wrapper = style({
   position: 'relative',
   display: 'flex',
   flexDirection: 'column',
+  boxSizing: 'border-box',
+  height: '100%',
 });
 
 export const innerWrapper = style({
@@ -51,6 +53,6 @@ export const buttons = style({
   zIndex: 10,
 });
 
-globalStyle(`${buttons} > *:last-child`, {
+export const bottomButton = style({
   marginTop: 'auto',
 });

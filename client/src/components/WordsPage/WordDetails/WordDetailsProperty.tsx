@@ -10,12 +10,14 @@ export type WordDetailsPropertyProps = {
   property: PropertyFieldsFragment;
   wordProperty: UpdatePropertyValueInput | null;
   onChange: (value: UpdatePropertyValueInput) => void;
+  simplified?: boolean;
 };
 
 export const WordDetailsProperty: React.FC<WordDetailsPropertyProps> = ({
   property,
   wordProperty,
   onChange,
+  simplified,
 }) => {
   return (
     <>
@@ -28,6 +30,7 @@ export const WordDetailsProperty: React.FC<WordDetailsPropertyProps> = ({
             text,
           })
         }
+        disabled={simplified}
       />
     </>
   );

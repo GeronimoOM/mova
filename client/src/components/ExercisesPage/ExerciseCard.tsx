@@ -1,6 +1,8 @@
 import { useLazyQuery, useQuery } from '@apollo/client';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
+import { FaInfo } from 'react-icons/fa';
 import { HiMiniXMark } from 'react-icons/hi2';
+
 import { IoPlay } from 'react-icons/io5';
 import { useIncreaseWordMastery } from '../../api/mutations';
 import {
@@ -10,7 +12,9 @@ import {
   WordFieldsFullFragment,
 } from '../../api/types/graphql';
 import { toGroupedRecord } from '../../utils/arrays';
+import { useClickOutsideHandler } from '../../utils/useClickOutsideHandler';
 import { useLanguageContext } from '../LanguageContext';
+import { WordDetails } from '../WordsPage/WordDetails/WordDetails';
 import { ButtonIcon } from '../common/ButtonIcon';
 import { Loader } from '../common/Loader';
 import * as styles from './ExerciseCard.css';
@@ -23,6 +27,7 @@ export const ExerciseCard: React.FC = () => {
 
   const [isStarted, setIsStarted] = useState(false);
   const [wordIndex, setWordIndex] = useState(0);
+  const [isWordDetailsOpen, setIsWordDetailsOpen] = useState(false);
 
   const { data: propertiesQuery, loading: propertiesLoading } = useQuery(
     GetPropertiesDocument,
@@ -100,9 +105,21 @@ export const ExerciseCard: React.FC = () => {
                 onFailure={handleFailure}
                 onNext={handleNext}
               />
+
+              {isWordDetailsOpen && currentWord && (
+                <WordDetailsOverlay
+                  wordId={currentWord.id}
+                  onClose={() => setIsWordDetailsOpen(false)}
+                />
+              )}
             </div>
 
             <div className={styles.bottom}>
+              <ButtonIcon
+                icon={FaInfo}
+                onClick={() => setIsWordDetailsOpen(true)}
+              />
+
               <ButtonIcon
                 icon={HiMiniXMark}
                 color="negative"
@@ -164,4 +181,32 @@ const Exercise: React.FC<ExerciseProps> = ({
         />
       );
   }
+};
+
+type WordDetailsOverlayProps = {
+  wordId: string;
+  onClose: () => void;
+};
+
+const WordDetailsOverlay: React.FC<WordDetailsOverlayProps> = ({
+  wordId,
+  onClose,
+}) => {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useClickOutsideHandler({
+    ref,
+    onClick: onClose,
+  });
+
+  return (
+    <div className={styles.details} ref={ref}>
+      <WordDetails
+        wordId={wordId}
+        onSelectWord={() => {}}
+        onClose={onClose}
+        simplified={true}
+      />
+    </div>
+  );
 };
