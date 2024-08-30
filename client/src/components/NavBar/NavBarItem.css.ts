@@ -38,6 +38,7 @@ export const icon = style({
 
 export const label = style({
   display: 'none',
+  fontWeight: 'bold',
 
   '@media': {
     [breakpoints.medium]: {

@@ -8,7 +8,7 @@ const manifest: Partial<ManifestOptions> = {
   short_name: 'Mova',
   start_url: '/',
   theme_color: '#212a3b',
-  background_color: '#ffffff',
+  background_color: '#212a3b',
   display: 'minimal-ui',
   display_override: ['minimal-ui', 'standalone', 'fullscreen', 'browser'],
   orientation: 'portrait',

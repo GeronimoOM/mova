@@ -22,15 +22,15 @@ export const pill = recipe({
     size: {
       medium: {
         padding: '2px 5px',
-        fontSize: '0.8rem',
+        fontSize: '0.75rem',
         borderRadius: 12,
-        border: `solid 1px ${themeVars.color.text}`,
+        border: `solid 2px ${themeVars.color.text}`,
       },
 
       large: {
+        padding: '3px 8px',
         fontSize: '1rem',
         borderRadius: 20,
-        padding: '3px 8px',
         border: `solid 2px ${themeVars.color.text}`,
       },
     },
