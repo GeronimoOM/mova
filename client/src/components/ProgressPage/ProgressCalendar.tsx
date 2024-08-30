@@ -11,6 +11,12 @@ import {
   ProgressType,
 } from '../../api/types/graphql';
 import { sequence, toRecord } from '../../utils/arrays';
+import {
+  DISPLAY_DATE_FORMAT,
+  DISPLAY_MONTH_FORMAT,
+  DISPLAY_WEEKDAY_FORMAT,
+  N_WEEKDAYS,
+} from '../../utils/constants';
 import { useLanguageContext } from '../LanguageContext';
 import { ButtonIcon } from '../common/ButtonIcon';
 import { Tooltip } from '../common/Tooltip';
@@ -22,11 +28,6 @@ import {
   getGroupedMonths,
   parseCalendarData,
 } from './progressCalendar';
-
-const N_WEEKDAYS = 7;
-const WEEKDAY_FORMAT = 'ccc';
-const MONTH_FORMAT = 'LLL';
-const DATE_FORMAT = 'd LLL';
 
 export const ProgressCalendar: React.FC = () => {
   const [selectedLanguageId] = useLanguageContext();
@@ -131,7 +132,7 @@ const ProgressCalendarHeader: React.FC<ProgressCalendarHeaderProps> = ({
         {months.map(({ month, span }) => (
           <td key={month} colSpan={span} className={styles.monthLabel}>
             {span > 2
-              ? DateTime.fromObject({ month }).toFormat(MONTH_FORMAT)
+              ? DateTime.fromObject({ month }).toFormat(DISPLAY_MONTH_FORMAT)
               : ''}
           </td>
         ))}
@@ -162,7 +163,7 @@ const ProgressCalendarBody: React.FC<ProgressCalendarBodyProps> = ({
           <td className={styles.weekLabel}>
             {DateTime.fromObject({
               weekday: (weekday + 1) as WeekdayNumbers,
-            }).toFormat(WEEKDAY_FORMAT)}
+            }).toFormat(DISPLAY_WEEKDAY_FORMAT)}
           </td>
 
           {sequence(weeklyData.length).map((week) => (
@@ -287,10 +288,10 @@ const ProgressCalendarCellTooltip: React.FC<
 > = ({ type, cadence, date, points }) => {
   let dateString;
   if (cadence === ProgressCadence.Daily) {
-    dateString = date.toFormat(DATE_FORMAT);
+    dateString = date.toFormat(DISPLAY_DATE_FORMAT);
   } else {
     const until = date.plus({ weeks: 1 }).minus({ days: 1 });
-    dateString = `${date.toFormat(DATE_FORMAT)} - ${until.toFormat(DATE_FORMAT)}`;
+    dateString = `${date.toFormat(DISPLAY_DATE_FORMAT)} - ${until.toFormat(DISPLAY_DATE_FORMAT)}`;
   }
 
   let pointsString;

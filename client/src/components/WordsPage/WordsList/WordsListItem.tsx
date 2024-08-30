@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon';
 import React from 'react';
 import { WordFieldsFragment } from '../../../api/types/graphql';
+import { DISPLAY_DATE_FORMAT } from '../../../utils/constants';
 import { PartOfSpeechPill } from '../../common/PartOfSpeechPill';
 import { WordMastery } from './WordMastery';
 import * as styles from './WordsListItem.css';
@@ -41,7 +42,7 @@ export const WordsListItemDivider: React.FC<WordsListItemDividerProps> = ({
 }) => {
   return (
     <div className={styles.divider}>
-      <div>{date.toLocaleString({ month: 'long', day: 'numeric' })}</div>
+      <div>{date.toFormat(DISPLAY_DATE_FORMAT)}</div>
       <div
         className={styles.dividerTotal}
       >{`${Math.min(total, MAX_DIVIDER_TOTAL)}${isTotalComplete ? '' : '+'}`}</div>
