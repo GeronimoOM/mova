@@ -1,20 +1,26 @@
 import {
-  Query,
-  Resolver,
-  ID,
   Args,
-  ResolveField,
-  Parent,
-  Mutation,
-  Int,
   Context as ContextDec,
+  ID,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
 } from '@nestjs/graphql';
+import { GoalType } from 'graphql/types/GoalType';
+import { ProgressType } from 'graphql/types/ProgressType';
+import { WordsStatsType } from 'graphql/types/WordsStatsType';
+import { Context } from 'models/Context';
 import { LanguageId } from 'models/Language';
-import { Direction, encodePageCursor, mapPage, Page } from 'models/Page';
+import { Direction, Page, encodePageCursor, mapPage } from 'models/Page';
+import { ProgressType as ProgressTypeEnum } from 'models/Progress';
 import { PartOfSpeech, WordCursor, WordOrder } from 'models/Word';
 import { LanguageService } from 'services/LanguageService';
+import { ProgressService } from 'services/ProgressService';
 import { PropertyService } from 'services/PropertyService';
 import { WordService } from 'services/WordService';
+import { decodeCursor } from 'utils/cursors';
 import { PropertyTypeMapper } from '../mappers/PropertyTypeMapper';
 import { WordTypeMapper } from '../mappers/WordTypeMapper';
 import {
@@ -26,14 +32,6 @@ import {
 import { PageArgsType } from '../types/PageType';
 import { PropertyUnionType } from '../types/PropertyType';
 import { WordPageType, WordType } from '../types/WordType';
-import { TopicPageType, TopicType } from 'graphql/types/TopicType';
-import { TopicService } from 'services/TopicService';
-import { TopicCursor, TopicId } from 'models/Topic';
-import { WordsStatsType } from 'graphql/types/WordsDateStatsType';
-import { DateTime } from 'luxon';
-import { DATE_FORMAT } from 'utils/constants';
-import { decodeCursor } from 'utils/cursors';
-import { Context } from 'models/Context';
 
 @Resolver((of) => LanguageType)
 export class LanguageResolver {
@@ -41,7 +39,7 @@ export class LanguageResolver {
     private languageService: LanguageService,
     private propertyService: PropertyService,
     private wordService: WordService,
-    private topicService: TopicService,
+    private progressService: ProgressService,
     private propertyTypeMapper: PropertyTypeMapper,
     private wordTypeMapper: WordTypeMapper,
   ) {}
@@ -99,24 +97,6 @@ export class LanguageResolver {
     return properties.map((property) => this.propertyTypeMapper.map(property));
   }
 
-  @ResolveField((type) => TopicPageType)
-  async topics(
-    @Parent() language: LanguageType,
-    @Args() pageArgs: PageArgsType,
-    @Args('query', { nullable: true }) query?: string,
-  ): Promise<Page<TopicType, string>> {
-    const topicPage = await this.topicService.getPage({
-      languageId: language.id,
-      query,
-      cursor: pageArgs.cursor
-        ? decodeCursor(pageArgs.cursor, TopicCursor)
-        : null,
-      limit: pageArgs.limit,
-    });
-
-    return encodePageCursor(topicPage);
-  }
-
   @ResolveField((type) => WordPageType)
   async words(
     @Parent() language: LanguageType,
@@ -124,8 +104,6 @@ export class LanguageResolver {
     @Args('query', { nullable: true }) query?: string,
     @Args('partsOfSpeech', { type: () => [PartOfSpeech], nullable: true })
     partsOfSpeech?: PartOfSpeech[],
-    @Args('topics', { type: () => [ID], nullable: true })
-    topics?: TopicId[],
     @Args('order', { type: () => WordOrder, nullable: true })
     order?: WordOrder,
     @Args('direction', { type: () => Direction, nullable: true })
@@ -135,7 +113,6 @@ export class LanguageResolver {
       languageId: language.id,
       query,
       partsOfSpeech,
-      topics,
       order,
       direction,
       cursor: pageArgs.cursor
@@ -150,29 +127,44 @@ export class LanguageResolver {
   }
 
   @ResolveField((type) => WordsStatsType)
-  async wordsStats(
-    @Parent() language: LanguageType,
-    @Args('days', { type: () => Int, nullable: true })
-    days?: number,
-    @Args('from', { type: () => String, nullable: true })
-    from?: string,
-  ): Promise<WordsStatsType> {
-    const stats = await this.wordService.getStats(
-      language.id,
-      days,
-      from ? DateTime.fromFormat(from, DATE_FORMAT) : undefined,
-    );
+  async stats(@Parent() language: LanguageType): Promise<WordsStatsType> {
+    const wordsStats = await this.progressService.getStats(language.id);
 
     return {
-      total: stats.total,
-      byDate: {
-        from: stats.byDate.from.toFormat(DATE_FORMAT),
-        until: stats.byDate.until.toFormat(DATE_FORMAT),
-        dates: stats.byDate.dates.map(({ date, words }) => ({
-          date: date.toFormat(DATE_FORMAT),
-          words,
-        })),
-      },
+      total: wordsStats.total,
+      mastery: Object.entries(wordsStats.mastery).map(([mastery, total]) => ({
+        mastery: Number(mastery),
+        total,
+      })),
+      partsOfSpeech: Object.entries(wordsStats.partsOfSpeech).map(
+        ([partOfSpeech, total]) => ({
+          partOfSpeech: partOfSpeech as PartOfSpeech,
+          total,
+        }),
+      ),
+    };
+  }
+
+  @ResolveField((type) => [GoalType])
+  async goals(@Parent() language: LanguageType): Promise<GoalType[]> {
+    return await this.progressService.getGoals(language.id);
+  }
+
+  @ResolveField((type) => ProgressType)
+  async progress(
+    @ContextDec('ctx') ctx: Context,
+    @Parent() language: LanguageType,
+    @Args('type', { type: () => ProgressTypeEnum })
+    type: ProgressTypeEnum,
+  ): Promise<ProgressType> {
+    const goal = await this.progressService.getGoal(language.id, type);
+    const { cadence } = goal;
+
+    return {
+      type,
+      cadence,
+      goal,
+      languageId: language.id,
     };
   }
 }

@@ -11,10 +11,9 @@ import {
   PropertyType,
   TextProperty,
 } from 'models/Property';
-import { DbConnectionManager } from './DbConnectionManager';
 import { PartOfSpeech } from 'models/Word';
-import { DATETIME_FORMAT } from 'utils/constants';
-import { DateTime } from 'luxon';
+import { fromTimestamp, toTimestamp } from 'utils/datetime';
+import { DbConnectionManager } from './DbConnectionManager';
 import { Serializer } from './Serializer';
 
 const TABLE_PROPERTIES = 'properties';
@@ -85,7 +84,7 @@ export class PropertyRepository {
       type: property.type,
       language_id: property.languageId,
       part_of_speech: property.partOfSpeech,
-      added_at: property.addedAt.toFormat(DATETIME_FORMAT),
+      added_at: toTimestamp(property.addedAt),
       order: property.order,
     };
 
@@ -97,7 +96,9 @@ export class PropertyRepository {
 
     await this.connectionManager
       .getConnection()(TABLE_PROPERTIES)
-      .insert(propertyRow);
+      .insert(propertyRow)
+      .onConflict()
+      .ignore();
   }
 
   async update(property: Property): Promise<void> {
@@ -166,7 +167,7 @@ export class PropertyRepository {
       type: row.type,
       languageId: row.language_id,
       partOfSpeech: row.part_of_speech,
-      addedAt: DateTime.fromFormat(row.added_at, DATETIME_FORMAT),
+      addedAt: fromTimestamp(row.added_at),
       order: row.order,
     };
 

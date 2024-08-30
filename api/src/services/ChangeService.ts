@@ -1,7 +1,19 @@
 import { Inject, Injectable, Logger, forwardRef } from '@nestjs/common';
+import { Cron } from '@nestjs/schedule';
 import { DateTime } from 'luxon';
 import { Change, ChangeCursor, ChangePage, SyncType } from 'models/Change';
+import { Context, emptyContext } from 'models/Context';
+import { Direction, mapCursor, mapPage } from 'models/Page';
+import { ChronologicalCursor, WordOrder } from 'models/Word';
 import { ChangeRepository } from 'repositories/ChangeRepository';
+import { DbConnectionManager } from 'repositories/DbConnectionManager';
+import { ChangeBuilder } from './ChangeBuilder';
+import {
+  CreateLanguageParams,
+  DeleteLanguageParams,
+  LanguageService,
+  UpdateLanguageParams,
+} from './LanguageService';
 import {
   CreatePropertyParams,
   DeletePropertyParams,
@@ -15,18 +27,6 @@ import {
   UpdateWordParams,
   WordService,
 } from './WordService';
-import {
-  CreateLanguageParams,
-  DeleteLanguageParams,
-  LanguageService,
-  UpdateLanguageParams,
-} from './LanguageService';
-import { ChronologicalCursor, WordOrder } from 'models/Word';
-import { Direction, mapCursor, mapPage } from 'models/Page';
-import { ChangeBuilder } from './ChangeBuilder';
-import { DbConnectionManager } from 'repositories/DbConnectionManager';
-import { Context, emptyContext } from 'models/Context';
-import { Cron } from '@nestjs/schedule';
 
 const DEFAULT_LIMIT = 100;
 

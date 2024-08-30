@@ -2,16 +2,17 @@ import {
   Field,
   ID,
   InputType,
+  Int,
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
+import { TimestampScalar } from 'graphql/scalars/Timestamp';
+import { DateTime } from 'luxon';
+import { LanguageId } from 'models/Language';
+import { OptionId, PropertyId } from 'models/Property';
 import { PartOfSpeech, WordId, WordOrder } from 'models/Word';
 import { pageType } from './PageType';
 import { PropertyValueUnionType } from './PropertyValueType';
-import { LanguageId } from 'models/Language';
-import { TimestampScalar } from 'graphql/scalars/Timestamp';
-import { DateTime } from 'luxon';
-import { PropertyId, OptionId } from 'models/Property';
 
 registerEnumType(PartOfSpeech, {
   name: 'PartOfSpeech',
@@ -30,6 +31,9 @@ export class WordType {
 
   @Field((type) => PartOfSpeech)
   partOfSpeech: PartOfSpeech;
+
+  @Field((type) => Int)
+  mastery: number;
 
   @Field((type) => TimestampScalar)
   addedAt: DateTime;

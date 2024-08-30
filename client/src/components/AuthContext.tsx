@@ -1,40 +1,37 @@
-import {
-  Accessor,
-  Component,
-  ParentProps,
-  Setter,
+import React, {
   createContext,
-  createSignal,
+  useCallback,
   useContext,
-  createEffect,
-} from 'solid-js';
+  useMemo,
+  useState,
+} from 'react';
+import { LOCAL_STORAGE_TOKEN_KEY } from '../utils/constants';
 
-export type AuthContextReturn = [
-  Accessor<string | null>,
-  Setter<string | null>,
-];
+export type AuthContextType = [string | null, (token: string) => void];
 
-export const AuthContext = createContext<AuthContextReturn>();
+export const AuthContext = createContext<AuthContextType>([null, () => {}]);
 
-export const LOCAL_STORAGE_TOKEN_KEY = 'jwtToken';
+type AuthProviderProps = {
+  children?: React.ReactNode;
+};
 
-export const AuthProvider: Component<ParentProps> = (props) => {
-  const [token, setToken] = createSignal<string | null>(
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [token, setToken] = useState<string | null>(() =>
     localStorage.getItem(LOCAL_STORAGE_TOKEN_KEY),
   );
 
-  createEffect(() => {
-    if (token()) {
-      localStorage.setItem(LOCAL_STORAGE_TOKEN_KEY, token()!);
-    }
-  });
+  const setTokenAndSave = useCallback((language: string) => {
+    localStorage.setItem(LOCAL_STORAGE_TOKEN_KEY, language);
+    setToken(language);
+  }, []);
 
-  const contextValue: AuthContextReturn = [token, setToken];
+  const contextValue = useMemo<AuthContextType>(
+    () => [token, setTokenAndSave],
+    [token, setTokenAndSave],
+  );
 
   return (
-    <AuthContext.Provider value={contextValue}>
-      {props.children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 };
 

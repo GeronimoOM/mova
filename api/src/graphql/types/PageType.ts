@@ -1,11 +1,11 @@
+import { Type } from '@nestjs/common';
 import {
-  Field,
-  ObjectType,
-  Int,
   ArgsType,
+  Field,
+  Int,
+  ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
-import { Type } from '@nestjs/common';
 import { Direction, Page } from 'models/Page';
 
 registerEnumType(Direction, {

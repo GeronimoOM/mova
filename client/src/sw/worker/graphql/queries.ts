@@ -1,15 +1,15 @@
 import {
-  GetWordsQueryVariables,
   GetLanguagesQuery,
-  GetPropertiesQueryVariables,
   GetPropertiesQuery,
-  WordFieldsFragment,
-  GetWordsQuery,
-  GetWordQueryVariables,
+  GetPropertiesQueryVariables,
   GetWordQuery,
+  GetWordQueryVariables,
+  GetWordsQuery,
+  GetWordsQueryVariables,
+  WordFieldsFragment,
 } from '../../../api/types/graphql';
-import { getSyncStatus, SyncStatus } from '../sync';
 import * as cache from '../cache';
+import { SyncStatus, getSyncStatus } from '../sync';
 import { GraphQlRequest, response, tryFetch } from './common';
 
 enum GraphQlQueryPolicy {

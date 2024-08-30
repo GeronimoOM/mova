@@ -1,27 +1,27 @@
-import { Component, Show, createEffect } from 'solid-js';
+import React, { useEffect } from 'react';
 import { Main } from './Main';
 import { NavBar } from './NavBar/NavBar';
-import { useAuthContext } from './AuthContext';
-import { LoginForm } from './LoginForm';
+
+import { useAuthContext } from '../components/AuthContext';
 import { initServiceWorker } from '../sw/client/register';
+import * as styles from './App.css';
+import { LoginForm } from './LoginForm';
 
-const App: Component = () => {
-  const [token] = useAuthContext();
+export const App: React.FC = () => {
+  const [authToken] = useAuthContext();
 
-  createEffect(() => {
-    if (token()) {
-      initServiceWorker(token()!);
+  useEffect(() => {
+    if (authToken) {
+      initServiceWorker(authToken);
     }
-  });
+  }, [authToken]);
 
-  return (
-    <Show when={token()} fallback={<LoginForm />}>
-      <div class="flex h-full w-full flex-row justify-center">
-        <NavBar />
-        <Main />
-      </div>
-    </Show>
+  return authToken ? (
+    <div className={styles.app}>
+      <NavBar />
+      <Main />
+    </div>
+  ) : (
+    <LoginForm />
   );
 };
-
-export default App;

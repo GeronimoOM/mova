@@ -26,17 +26,22 @@ fragment WordFields on Word {
   partOfSpeech
   addedAt
   languageId
+  mastery
 }
 
 fragment WordFieldsFull on Word {
   ...WordFields
   properties {
-    ... on TextPropertyValue {
-      ...TextPropertyValueFields
-    }
-    ... on OptionPropertyValue {
-      ...OptionPropertyValueFields
-    }
+    ...PropertyValueFields
+  }
+}
+
+fragment PropertyValueFields on PropertyValue {
+  ... on TextPropertyValue {
+    ...TextPropertyValueFields
+  }
+  ... on OptionPropertyValue {
+    ...OptionPropertyValueFields
   }
 }
 
@@ -157,6 +162,7 @@ fragment CreateWordChangeFields on CreateWordChange {
     original
     translation
     partOfSpeech
+    mastery
     addedAt
     languageId
     properties {
@@ -190,5 +196,49 @@ fragment PropertyValueSaveFields on PropertyValueSave {
   }
   ... on OptionPropertyValueSave {
     optionId
+  }
+}
+
+fragment GoalFields on Goal {
+  type
+  cadence
+  points
+}
+
+fragment ProgressInstanceFields on ProgressInstance {
+  date
+  points
+}
+
+fragment ProgressFields on Progress {
+  type
+  cadence
+  goal {
+    ...GoalFields
+  }
+  current {
+    ...ProgressInstanceFields
+  }
+  streak
+}
+
+fragment ProgressHistoryFields on ProgressHistory {
+  cadence
+  from
+  until
+  instances {
+    ...ProgressInstanceFields
+  }
+}
+
+fragment WordsStatsFields on WordsStats {
+  total
+  mastery {
+    total
+    mastery
+  }
+  partsOfSpeech {
+    total
+    partOfSpeech
   }
 }

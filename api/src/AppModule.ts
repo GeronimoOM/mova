@@ -1,7 +1,28 @@
-import { AsyncLocalStorage } from 'node:async_hooks';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtModule } from '@nestjs/jwt';
+import { ScheduleModule } from '@nestjs/schedule';
+import { TestController } from 'controllers/TestController';
+import { ChangeTypeMapper } from 'graphql/mappers/ChangeTypeMapper';
+import { AuthResolver } from 'graphql/resolvers/AuthResolver';
+import { ChangeResolver } from 'graphql/resolvers/ChangeResolver';
+import { ExerciseResolver } from 'graphql/resolvers/ExerciseResolver';
+import { ProgressResolver } from 'graphql/resolvers/ProgressResolver';
+import { AuthGuard, CONFIG_JWT_KEY } from 'guards/AuthGuard';
+import { AsyncLocalStorage } from 'node:async_hooks';
+import { ChangeRepository } from 'repositories/ChangeRepository';
+import { ProgressRepository } from 'repositories/ProgressRepository';
+import { Serializer } from 'repositories/Serializer';
+import { AuthService } from 'services/AuthService';
+import { ChangeBuilder } from 'services/ChangeBuilder';
+import { ChangeService } from 'services/ChangeService';
+import { ExerciseService } from 'services/ExerciseService';
+import { ProgressService } from 'services/ProgressService';
+import { ElasticClientModule } from './clients/ElasticClientModule';
+import { SearchClient } from './clients/SearchClient';
 import { MaintenanceController } from './controllers/MaintenanceController';
+import { GraphQlModule } from './graphql/GraphQlModule';
 import { PropertyTypeMapper } from './graphql/mappers/PropertyTypeMapper';
 import { WordTypeMapper } from './graphql/mappers/WordTypeMapper';
 import { LanguageResolver } from './graphql/resolvers/LanguageResolver';
@@ -12,28 +33,9 @@ import { LanguageRepository } from './repositories/LanguageRepository';
 import { PropertyRepository } from './repositories/PropertyRepository';
 import { WordRepository } from './repositories/WordRepository';
 import { LanguageService } from './services/LanguageService';
+import { MaintenanceService } from './services/MaintenanceService';
 import { PropertyService } from './services/PropertyService';
 import { WordService } from './services/WordService';
-import { TopicRepository } from './repositories/TopicRepository';
-import { TopicService } from './services/TopicService';
-import { SearchClient } from './clients/SearchClient';
-import { ElasticClientModule } from './clients/ElasticClientModule';
-import { TopicResolver } from './graphql/resolvers/TopicResolver';
-import { GraphQlModule } from './graphql/GraphQlModule';
-import { MaintenanceService } from './services/MaintenanceService';
-import { TestController } from 'controllers/TestController';
-import { ChangeRepository } from 'repositories/ChangeRepository';
-import { Serializer } from 'repositories/Serializer';
-import { ChangeService } from 'services/ChangeService';
-import { ChangeTypeMapper } from 'graphql/mappers/ChangeTypeMapper';
-import { ChangeResolver } from 'graphql/resolvers/ChangeResolver';
-import { ChangeBuilder } from 'services/ChangeBuilder';
-import { ScheduleModule } from '@nestjs/schedule';
-import { JwtModule } from '@nestjs/jwt';
-import { AuthService } from 'services/AuthService';
-import { AuthGuard, CONFIG_JWT_KEY } from 'guards/AuthGuard';
-import { APP_GUARD } from '@nestjs/core';
-import { AuthResolver } from 'graphql/resolvers/AuthResolver';
 
 @Module({
   imports: [
@@ -55,24 +57,26 @@ import { AuthResolver } from 'graphql/resolvers/AuthResolver';
     PropertyResolver,
     ChangeResolver,
     WordResolver,
-    TopicResolver,
+    ExerciseResolver,
+    ProgressResolver,
     PropertyTypeMapper,
     WordTypeMapper,
     ChangeTypeMapper,
     AuthService,
+    ExerciseService,
     LanguageService,
     PropertyService,
     WordService,
-    TopicService,
     ChangeService,
+    ProgressService,
     MaintenanceService,
     SearchClient,
     ChangeBuilder,
     LanguageRepository,
     PropertyRepository,
     WordRepository,
-    TopicRepository,
     ChangeRepository,
+    ProgressRepository,
     DbConnectionManager,
     Serializer,
     {

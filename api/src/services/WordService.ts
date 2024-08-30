@@ -1,19 +1,10 @@
-import { v1 as uuid } from 'uuid';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { SearchClient, SearchWordsParams } from 'clients/SearchClient';
+import { DateTime } from 'luxon';
+import { Context } from 'models/Context';
 import { LanguageId } from 'models/Language';
 import { Direction, mapPage, Page } from 'models/Page';
-import {
-  PartOfSpeech,
-  Word,
-  WordCursor,
-  WordId,
-  WordOrder,
-  WordsStats,
-} from 'models/Word';
-import {
-  WordRepository,
-  GetWordPageParams as RepoGetWordPageParams,
-} from 'repositories/WordRepository';
+import { ProgressType } from 'models/Progress';
 import {
   isOptionProperty,
   isTextProperty,
@@ -21,24 +12,25 @@ import {
   Property,
   PropertyId,
 } from 'models/Property';
-import { PropertyService } from './PropertyService';
-import { LanguageService } from './LanguageService';
-import { SearchClient, SearchWordsParams } from 'clients/SearchClient';
-import { TopicService } from './TopicService';
-import { TopicId } from 'models/Topic';
-import { DateTime } from 'luxon';
-import { QUERY_MIN_LENGTH } from 'utils/constants';
-import * as records from 'utils/records';
-import { ChangeService } from './ChangeService';
-import { ChangeBuilder } from './ChangeBuilder';
-import { copy } from 'utils/copy';
-import { Context } from 'models/Context';
+import { PartOfSpeech, Word, WordCursor, WordId, WordOrder } from 'models/Word';
 import { DbConnectionManager } from 'repositories/DbConnectionManager';
+import {
+  GetWordPageParams as RepoGetWordPageParams,
+  WordRepository,
+} from 'repositories/WordRepository';
+import { QUERY_MIN_LENGTH } from 'utils/constants';
+import { copy } from 'utils/copy';
+import * as records from 'utils/records';
+import { v1 as uuid } from 'uuid';
+import { ChangeBuilder } from './ChangeBuilder';
+import { ChangeService } from './ChangeService';
+import { LanguageService } from './LanguageService';
+import { ProgressService } from './ProgressService';
+import { PropertyService } from './PropertyService';
 
 export interface GetWordPageParams {
   languageId?: LanguageId;
   partsOfSpeech?: PartOfSpeech[];
-  topics?: TopicId[];
   query?: string;
   order?: WordOrder;
   direction?: Direction;
@@ -82,12 +74,11 @@ export class WordService {
     private searchClient: SearchClient,
     @Inject(forwardRef(() => PropertyService))
     private propertyService: PropertyService,
-    @Inject(forwardRef(() => TopicService))
-    private topicService: TopicService,
     @Inject(forwardRef(() => LanguageService))
     private languageService: LanguageService,
     @Inject(forwardRef(() => ChangeService))
     private changeService: ChangeService,
+    private progressService: ProgressService,
     private changeBuilder: ChangeBuilder,
     private connectionManager: DbConnectionManager,
   ) {}
@@ -129,6 +120,7 @@ export class WordService {
       translation: params.translation,
       languageId: params.languageId,
       partOfSpeech: params.partOfSpeech,
+      mastery: 0,
       addedAt: params.addedAt ?? DateTime.utc(),
     };
 
@@ -146,6 +138,11 @@ export class WordService {
       await this.changeService.create(
         this.changeBuilder.buildCreateWordChange(ctx, word),
       );
+      await this.progressService.saveProgress(word.languageId, {
+        id: word.id,
+        type: ProgressType.Words,
+        date: word.addedAt,
+      });
     });
 
     await this.searchClient.indexWord(word);
@@ -200,6 +197,7 @@ export class WordService {
       await this.changeService.create(
         this.changeBuilder.buildDeleteWordChange(ctx, word),
       );
+      await this.progressService.deleteProgress(word.id);
     });
 
     await this.searchClient.deleteWord(id);
@@ -210,8 +208,6 @@ export class WordService {
   async index(wordId: WordId): Promise<void> {
     const word = await this.getById(wordId);
 
-    word.topics = await this.topicService.getForWord(word.id);
-
     await this.searchClient.indexWord(word);
   }
 
@@ -219,16 +215,7 @@ export class WordService {
     await this.searchClient.deleteLanguageWords(languageId);
 
     for await (const wordsBatch of this.wordRepository.getBatches(languageId)) {
-      const topicsByWords = await this.topicService.getForWords(
-        wordsBatch.map((word) => word.id),
-      );
-
-      const words = wordsBatch.map((word) => ({
-        ...word,
-        topics: topicsByWords[word.id],
-      }));
-
-      await this.searchClient.indexWords(words);
+      await this.searchClient.indexWords(wordsBatch);
     }
   }
 
@@ -241,30 +228,16 @@ export class WordService {
     return await this.wordRepository.getCount(languageId);
   }
 
-  async getStats(
+  async getCountByProperty(
     languageId: LanguageId,
-    days: number = DateTime.utc().diff(
-      DateTime.utc().minus({ months: 3 }),
-      'days',
-    ).days,
-    from: DateTime = DateTime.utc().minus({ days }).plus({ day: 1 }),
-  ): Promise<WordsStats> {
-    const until = from.plus({ days });
-    const [count, dates] = await Promise.all([
-      this.wordRepository.getCount(languageId),
-      this.wordRepository.getDateStats(languageId, from, until),
-    ]);
-
-    return {
-      total: {
-        words: count,
-      },
-      byDate: {
-        from,
-        until,
-        dates,
-      },
-    };
+    propertyId: PropertyId,
+    partOfSpeech: PartOfSpeech,
+  ): Promise<number> {
+    return await this.wordRepository.getCountByProperty(
+      languageId,
+      propertyId,
+      partOfSpeech,
+    );
   }
 
   private setPropertyValues(

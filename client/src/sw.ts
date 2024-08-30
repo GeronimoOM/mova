@@ -1,10 +1,10 @@
 import { clientsClaim } from 'workbox-core';
 import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
-import { isGraphqlRequest, handleGraphQlRequest } from './sw/worker/graphql';
-import { sync } from './sw/worker/sync';
-import { init } from './sw/worker/init';
 import { SwClientMessage, SwClientMessageType } from './sw/client/messages';
+import { handleGraphQlRequest, isGraphqlRequest } from './sw/worker/graphql';
+import { init } from './sw/worker/init';
+import { sync } from './sw/worker/sync';
 
 declare let self: ServiceWorkerGlobalScope;
 

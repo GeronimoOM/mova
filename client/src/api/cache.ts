@@ -1,31 +1,40 @@
-import { TypePolicy } from '@apollo/client/cache';
-import { InMemoryCache } from '@merged/solid-apollo';
+import { InMemoryCache, TypePolicy } from '@apollo/client';
 import { LanguageWordsArgs, WordPage } from './types/graphql';
 
 const languageTypePolicy: TypePolicy = {
   fields: {
     words: {
       keyArgs: (args: LanguageWordsArgs | null) => {
-        return args?.query ||
-          args?.partsOfSpeech?.length ||
-          args?.topics?.length
-          ? 'search'
-          : false;
+        return args?.query ? 'search' : false;
       },
       merge(existing: WordPage | undefined, incoming: WordPage): WordPage {
-        // TODO smarter merging
         return {
           items: [...(existing?.items ?? []), ...incoming.items],
           nextCursor: incoming.nextCursor,
         };
       },
     },
+    stats: {
+      merge(_, incoming) {
+        return incoming;
+      },
+    },
+    progress: {
+      merge(_, incoming) {
+        return incoming;
+      },
+    },
   },
+};
+
+const goalTypePolicy: TypePolicy = {
+  keyFields: ['type'],
 };
 
 export const cache = new InMemoryCache({
   typePolicies: {
     Language: languageTypePolicy,
+    Goal: goalTypePolicy,
   },
   possibleTypes: {
     IProperty: ['TextProperty', 'OptionProperty'],
@@ -70,3 +79,10 @@ export const cache = new InMemoryCache({
     return obj.id ? `${context.typename}:${obj.id}` : false;
   },
 });
+
+export const clearWordsSearch = (languageId: string) => {
+  cache.evict({
+    id: `Language:${languageId}`,
+    fieldName: 'words:search',
+  });
+};

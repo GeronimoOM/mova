@@ -10,9 +10,9 @@ import { PropertyTypeMapper } from 'graphql/mappers/PropertyTypeMapper';
 import { WordTypeMapper } from 'graphql/mappers/WordTypeMapper';
 import { TimestampScalar } from 'graphql/scalars/Timestamp';
 import {
+  ApplyChangeInput,
   ChangePageType,
   ChangeUnionType,
-  ApplyChangeInput,
 } from 'graphql/types/ChangeType';
 import { PageArgsType } from 'graphql/types/PageType';
 import { DateTime } from 'luxon';

@@ -1,16 +1,12 @@
 import { MercuriusPlugin } from '@nestjs/mercurius';
-import { MercuriusValidationOptions } from 'mercurius-validation';
-import mercuriusValidationPlugin from 'mercurius-validation';
+import mercuriusValidationPlugin, {
+  MercuriusValidationOptions,
+} from 'mercurius-validation';
 
 export const validationPlugin: MercuriusPlugin<MercuriusValidationOptions> = {
   plugin: mercuriusValidationPlugin,
   options: {
     schema: {
-      Language: {
-        wordsStats: {
-          fromDate: { type: 'string', format: 'date' },
-        },
-      },
       CreateLanguageInput: {
         name: { type: 'string', minLength: 3, maxLength: 20 },
       },
@@ -22,9 +18,6 @@ export const validationPlugin: MercuriusPlugin<MercuriusValidationOptions> = {
       },
       UpdatePropertyInput: {
         name: { type: 'string', minLength: 3, maxLength: 30 },
-      },
-      CreateTopicInput: {
-        name: { type: 'string', minLength: 3, maxLength: 20 },
       },
     },
   },

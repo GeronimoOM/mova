@@ -1,5 +1,5 @@
 import { SetMetadata } from '@nestjs/common';
-import { InputType, Field, Resolver, Mutation, Args } from '@nestjs/graphql';
+import { Args, Field, InputType, Mutation, Resolver } from '@nestjs/graphql';
 import { AuthService } from 'services/AuthService';
 
 @InputType()

@@ -1,16 +1,15 @@
-import { v1 as uuid } from 'uuid';
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
-import { Language, LanguageId } from 'models/Language';
-import { LanguageRepository } from 'repositories/LanguageRepository';
-import { PropertyService } from './PropertyService';
-import { TopicService } from './TopicService';
-import { WordService } from './WordService';
 import { DateTime } from 'luxon';
-import { ChangeService } from './ChangeService';
-import { copy } from 'utils/copy';
-import { ChangeBuilder } from './ChangeBuilder';
 import { Context } from 'models/Context';
+import { Language, LanguageId } from 'models/Language';
 import { DbConnectionManager } from 'repositories/DbConnectionManager';
+import { LanguageRepository } from 'repositories/LanguageRepository';
+import { copy } from 'utils/copy';
+import { v1 as uuid } from 'uuid';
+import { ChangeBuilder } from './ChangeBuilder';
+import { ChangeService } from './ChangeService';
+import { PropertyService } from './PropertyService';
+import { WordService } from './WordService';
 
 const LANGUAGE_DELETION_WORDS_THRESHOLD = 50;
 
@@ -35,8 +34,6 @@ export class LanguageService {
     private languageRepository: LanguageRepository,
     @Inject(forwardRef(() => PropertyService))
     private propertyService: PropertyService,
-    @Inject(forwardRef(() => TopicService))
-    private topicService: TopicService,
     @Inject(forwardRef(() => WordService))
     private wordService: WordService,
     @Inject(forwardRef(() => ChangeService))
@@ -106,7 +103,6 @@ export class LanguageService {
 
     await this.connectionManager.transactionally(async () => {
       await this.wordService.deleteForLanguage(id);
-      await this.topicService.deleteForLanguage(id);
       await this.propertyService.deleteForLanguage(id);
       await this.languageRepository.delete(id);
       await this.changeService.create(

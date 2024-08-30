@@ -1,11 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import {
-  isTextProperty,
-  isTextPropertyUpdate,
+  OptionPropertyUpdateType,
+  PropertyUpdateUnionType,
+  TextPropertyUpdateType,
+} from 'graphql/types/ChangeType';
+import {
   OptionId,
   Property,
   PropertyUpdate,
+  isTextProperty,
+  isTextPropertyUpdate,
 } from 'models/Property';
+import { UpdatePropertyParams } from 'services/PropertyService';
 import {
   OptionPropertyType,
   OptionType,
@@ -13,12 +19,6 @@ import {
   TextPropertyType,
   UpdatePropertyInput,
 } from '../types/PropertyType';
-import {
-  OptionPropertyUpdateType,
-  PropertyUpdateUnionType,
-  TextPropertyUpdateType,
-} from 'graphql/types/ChangeType';
-import { UpdatePropertyParams } from 'services/PropertyService';
 
 @Injectable()
 export class PropertyTypeMapper {

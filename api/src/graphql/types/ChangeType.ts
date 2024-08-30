@@ -2,6 +2,7 @@ import {
   Field,
   ID,
   InputType,
+  Int,
   InterfaceType,
   ObjectType,
   createUnionType,
@@ -18,17 +19,19 @@ import {
 } from 'models/Change';
 import { LanguageId } from 'models/Language';
 import {
-  CreateLanguageInput,
-  DeleteLanguageInput,
-  LanguageType,
-  UpdateLanguageInput,
-} from './LanguageType';
-import {
   OptionId,
   PropertyId,
   PropertyType,
   PropertyUpdate,
 } from 'models/Property';
+import { PropertyValueSave } from 'models/PropertyValue';
+import { PartOfSpeech, WordId } from 'models/Word';
+import {
+  CreateLanguageInput,
+  DeleteLanguageInput,
+  LanguageType,
+  UpdateLanguageInput,
+} from './LanguageType';
 import {
   CreatePropertyInput,
   DeletePropertyInput,
@@ -37,8 +40,6 @@ import {
   ReorderPropertiesInput,
   UpdatePropertyInput,
 } from './PropertyType';
-import { PartOfSpeech, WordId } from 'models/Word';
-import { PropertyValueSave } from 'models/PropertyValue';
 import { CreateWordInput, DeleteWordInput, UpdateWordInput } from './WordType';
 
 registerEnumType(ChangeTypeEnum, {
@@ -229,6 +230,9 @@ export class WordCreateType {
   @Field((type) => PartOfSpeech)
   partOfSpeech: PartOfSpeech;
 
+  @Field((type) => Int)
+  mastery: number;
+
   @Field((type) => TimestampScalar)
   addedAt: DateTime;
 
@@ -260,6 +264,9 @@ export class WordUpdateType {
 
   @Field((type) => [PropertyValueSaveUnionType], { nullable: true })
   properties?: Array<typeof PropertyValueSaveUnionType>;
+
+  @Field((type) => Int, { nullable: true })
+  mastery?: number;
 }
 
 @ObjectType('UpdateWordChange', {

@@ -8,7 +8,6 @@ query GetWords(
   $languageId: ID!
   $query: String
   $partsOfSpeech: [PartOfSpeech!]
-  $topics: [ID!]
   $cursor: String
   $limit: Int
   $order: WordOrder
@@ -20,7 +19,6 @@ query GetWords(
       limit: $limit
       partsOfSpeech: $partsOfSpeech
       query: $query
-      topics: $topics
       order: $order
     ) {
       items {
@@ -46,46 +44,72 @@ query GetProperties($languageId: ID!, $partOfSpeech: PartOfSpeech) {
   }
 }
 
-query GetTopics(
-  $languageId: ID!
-  $cursor: String
-  $limit: Int
-  $query: String
-) {
+query GetExerciseWords($languageId: ID!) {
   language(id: $languageId) {
     id
-    topics(cursor: $cursor, limit: $limit, query: $query) {
-      items {
-        id
-        name
-      }
-      nextCursor
+    exerciseWords {
+      ...WordFieldsFull
     }
   }
 }
 
-query GetWordsStats($languageId: ID!) {
+query GetAllProgress($languageId: ID!) {
   language(id: $languageId) {
     id
-    wordsStats {
-      total {
-        words
+    wordsProgress: progress(type: Words) {
+      ...ProgressFields
+    }
+    masteryProgress: progress(type: Mastery) {
+      ...ProgressFields
+    }
+  }
+}
+
+query GetProgress($languageId: ID!, $type: ProgressType!) {
+  language(id: $languageId) {
+    id
+    progress(type: $type) {
+      ...ProgressFields
+    }
+  }
+}
+
+query GetProgressHistory($languageId: ID!, $type: ProgressType!) {
+  language(id: $languageId) {
+    id
+    progress(type: $type) {
+      dailyHistory: history(cadence: Daily) {
+        ...ProgressHistoryFields
       }
-      byDate {
-        from
-        until
-        dates {
-          date
-          words
-        }
+
+      weeklyHistory: history(cadence: Weekly) {
+        ...ProgressHistoryFields
       }
+    }
+  }
+}
+
+query GetGoals($languageId: ID!) {
+  language(id: $languageId) {
+    id
+    goals {
+      ...GoalFields
+    }
+  }
+}
+
+query GetStats($languageId: ID!) {
+  language(id: $languageId) {
+    id
+    stats {
+      ...WordsStatsFields
     }
   }
 }
 
 query GetChanges($syncType: SyncType!, $cursor: String, $changedAt: Timestamp) {
   changes(syncType: $syncType, cursor: $cursor, changedAt: $changedAt) {
-   	items {
+    items {
       ...ChangeFields
     }
     syncType

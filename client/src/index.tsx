@@ -1,46 +1,31 @@
-/* @refresh reload */
-import { render } from 'solid-js/web';
-
-import './index.css';
-import { ApolloProvider } from '@merged/solid-apollo';
+import { ApolloProvider } from '@apollo/client';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
 import { client, setClientId } from './api/client';
-import { Router } from '@solidjs/router';
-import App from './components/App';
-import { LanguageProvider } from './components/LanguageContext';
-import { registerServiceWorker } from './sw/client/register';
-import { SwWorkerMessageType } from './sw/worker/messages';
-import { setIsSynced } from './sw/client/sync';
+import { App } from './components/App';
 import { AuthProvider } from './components/AuthContext';
-
-const root = document.getElementById('root')!;
+import { LanguageProvider } from './components/LanguageContext';
+import './index.css.ts';
+import { registerServiceWorker } from './sw/client/register.ts';
+import { SwWorkerMessageType } from './sw/worker/messages.ts';
 
 registerServiceWorker((message) => {
   if (message.type === SwWorkerMessageType.Initialized) {
     setClientId(message.clientId);
-  } else if (message.type === SwWorkerMessageType.SyncOver) {
-    if (message.isSuccess) {
-      setIsSynced(true);
-    } else {
-      setIsSynced(false);
-    }
-
-    // client.refetchQueries({
-    //   include:
-    // })
   }
 });
 
-render(
-  () => (
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
     <ApolloProvider client={client}>
       <AuthProvider>
         <LanguageProvider>
-          <Router>
+          <BrowserRouter>
             <App />
-          </Router>
+          </BrowserRouter>
         </LanguageProvider>
       </AuthProvider>
     </ApolloProvider>
-  ),
-  root,
+  </React.StrictMode>,
 );

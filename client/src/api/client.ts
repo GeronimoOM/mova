@@ -1,7 +1,6 @@
-import { ApolloClient } from '@merged/solid-apollo';
-import { ApolloLink, HttpLink } from '@apollo/client/core';
+import { ApolloClient, ApolloLink, HttpLink } from '@apollo/client';
+import { LOCAL_STORAGE_TOKEN_KEY } from '../utils/constants';
 import { cache } from './cache';
-import { LOCAL_STORAGE_TOKEN_KEY } from '../components/AuthContext';
 
 export const GRAPHQL_URI = `/api/graphql`;
 
@@ -21,6 +20,7 @@ const headersLink = new ApolloLink((operation, forward) => {
   operation.setContext(() => ({
     headers: {
       'Sync-Client-ID': clientId,
+      'Client-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
       ...(token && { Authorization: `Bearer ${token}` }),
     },
   }));

@@ -1,20 +1,20 @@
-import { FastifyRequest } from 'fastify';
-import { chain } from 'stream-chain';
-import { stringer as jsonStringer } from 'stream-json/jsonl/Stringer';
-import { parser as jsonParser } from 'stream-json/jsonl/Parser';
-import { DateTime } from 'luxon';
 import {
   Controller,
-  Get,
-  StreamableFile,
-  Post,
-  Req,
-  Query,
-  Put,
   Delete,
+  Get,
+  Post,
+  Put,
+  Query,
+  Req,
+  StreamableFile,
 } from '@nestjs/common';
+import { FastifyRequest } from 'fastify';
+import { DateTime } from 'luxon';
 import { LanguageId } from 'models/Language';
 import { MaintenanceService } from 'services/MaintenanceService';
+import { chain } from 'stream-chain';
+import { parser as jsonParser } from 'stream-json/jsonl/Parser';
+import { stringer as jsonStringer } from 'stream-json/jsonl/Stringer';
 import { DATE_FORMAT } from 'utils/constants';
 
 @Controller('/api/tools')
@@ -27,7 +27,7 @@ export class MaintenanceController {
       this.maintenanceService.export(),
       jsonStringer(),
     ]);
-    const fileName = `mova-db:${DateTime.now().toFormat(DATE_FORMAT)}.jsonl`;
+    const fileName = `mova-db:${DateTime.utc().toFormat(DATE_FORMAT)}.jsonl`;
 
     return new StreamableFile(jsonStream, {
       type: 'application/json',
@@ -51,6 +51,12 @@ export class MaintenanceController {
   @Put('/reindex')
   async reindexLanguage(@Query('id') languageId: LanguageId) {
     const language = await this.maintenanceService.reindexLanguage(languageId);
+    return language;
+  }
+
+  @Put('/resync/progress')
+  async resyncProgress(@Query('id') languageId: LanguageId) {
+    const language = await this.maintenanceService.resyncProgress(languageId);
     return language;
   }
 }

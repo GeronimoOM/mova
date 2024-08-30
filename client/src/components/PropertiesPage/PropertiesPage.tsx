@@ -1,22 +1,20 @@
-import { Component, createSignal } from 'solid-js';
-import { PropertiesList } from './PropertiesList';
+import React, { useState } from 'react';
 import { PartOfSpeech } from '../../api/types/graphql';
-import { PropertiesPosSelect } from './PropertiesPosSelect';
+import { PropertiesList } from './PropertiesList';
+import * as styles from './PropertiesPage.css';
+import { PropertiesPartsOfSpeech } from './PropertiesPartsOfSpeech';
 
-export const PropertiesPage: Component = () => {
-  const [selectedPos, setSelectedPos] = createSignal(PartOfSpeech.Noun);
+export const PropertiesPage: React.FC = () => {
+  const [selectedPartOfSpeech, setSelectedPartOfSpeech] =
+    useState<PartOfSpeech>(PartOfSpeech.Noun);
 
   return (
-    <div class="flex h-full flex-col items-center justify-items-stretch">
-      <div class="w-full">
-        <PropertiesPosSelect
-          selectedPos={selectedPos()}
-          setSelectedPos={setSelectedPos}
-        />
-      </div>
-      <div class="w-full overflow-y-scroll">
-        <PropertiesList partOfSpeech={selectedPos()} />
-      </div>
+    <div className={styles.wrapper}>
+      <PropertiesPartsOfSpeech
+        selectedPartOfSpeech={selectedPartOfSpeech}
+        onSelectPartOfSpeech={setSelectedPartOfSpeech}
+      />
+      <PropertiesList selectedPartOfSpeech={selectedPartOfSpeech} />
     </div>
   );
 };

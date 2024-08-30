@@ -67,16 +67,15 @@ mutation DeleteWord($input: DeleteWordInput!) {
   }
 }
 
-mutation CreateTopic($input: CreateTopicInput!) {
-  createTopic(input: $input) {
-    id
-    name
+mutation IncreaseWordMastery($wordId: ID!) {
+  increaseMastery(wordId: $wordId) {
+    ...WordFields
   }
 }
 
-mutation DeleteTopic($id: ID!) {
-  deleteTopic(id: $id) {
-    id
+mutation SetGoals($input: SetGoalsInput!) {
+  setGoals(input: $input) {
+    ...GoalFields
   }
 }
 

@@ -1,8 +1,8 @@
 import { ChangeId } from 'models/Change';
 import { LanguageId } from 'models/Language';
+import { ProgressId } from 'models/Progress';
 import { PropertyId, PropertyType } from 'models/Property';
-import { TopicId } from 'models/Topic';
-import { WordId, PartOfSpeech } from 'models/Word';
+import { PartOfSpeech, WordId } from 'models/Word';
 
 declare module 'knex/types/tables' {
   interface LanguageTable {
@@ -29,19 +29,23 @@ declare module 'knex/types/tables' {
     language_id: LanguageId;
     part_of_speech: PartOfSpeech;
     added_at: string;
+    mastery: number;
+    mastery_inc_at?: string;
     properties?: string;
   }
 
-  interface TopicTable {
-    id: TopicId;
-    name: string;
+  interface ProgressTable {
+    id: ProgressId;
+    date: string;
+    type: ProgressType;
     language_id: LanguageId;
-    added_at: string;
   }
 
-  interface TopicWordTable {
-    topic_id: TopicId;
-    word_id: WordId;
+  interface GoalsTable {
+    type: ProgressType;
+    cadence: ProgressCadence;
+    points: number;
+    language_id: LanguageId;
   }
 
   interface ChangeTable {
@@ -56,7 +60,8 @@ declare module 'knex/types/tables' {
     languages: LanguageTable;
     properties: PropertyTable;
     words: WordTable;
-    topics: TopicTable;
-    topics_words: TopicWordTable;
+    progress: ProgressTable;
+    goals: GoalsTable;
+    changes: ChangeTable;
   }
 }

@@ -1,26 +1,19 @@
-import { Readable } from 'stream';
 import { Injectable } from '@nestjs/common';
+import { SearchClient } from 'clients/SearchClient';
+import { LanguageTable, PropertyTable, WordTable } from 'knex/types/tables';
+import { Language, LanguageId } from 'models/Language';
 import {
-  MigrationRecordType,
   MigrationRecord,
+  MigrationRecordType,
   MigrationRecordTypes,
 } from 'models/Migration';
 import { LanguageRepository } from 'repositories/LanguageRepository';
 import { PropertyRepository } from 'repositories/PropertyRepository';
-import { TopicRepository } from 'repositories/TopicRepository';
 import { WordRepository } from 'repositories/WordRepository';
-import {
-  LanguageTable,
-  PropertyTable,
-  TopicTable,
-  TopicWordTable,
-  WordTable,
-} from 'knex/types/tables';
-import { Language, LanguageId } from 'models/Language';
+import { Readable } from 'stream';
 import { LanguageService } from './LanguageService';
+import { ProgressService } from './ProgressService';
 import { WordService } from './WordService';
-import { TopicService } from './TopicService';
-import { SearchClient } from 'clients/SearchClient';
 
 const RECORDS_BATCH = 1000;
 
@@ -29,11 +22,10 @@ export class MaintenanceService {
   constructor(
     private languageService: LanguageService,
     private wordService: WordService,
-    private topicService: TopicService,
+    private progressService: ProgressService,
 
     private languageRepository: LanguageRepository,
     private propertyRepository: PropertyRepository,
-    private topicRepository: TopicRepository,
     private wordRepository: WordRepository,
 
     private searchClient: SearchClient,
@@ -54,7 +46,6 @@ export class MaintenanceService {
   }
 
   async destroy(): Promise<void> {
-    await this.topicRepository.deleteAll();
     await this.wordRepository.deleteAll();
     await this.propertyRepository.deleteAll();
     await this.languageRepository.deleteAll();
@@ -64,12 +55,13 @@ export class MaintenanceService {
   async reindexLanguage(languageId: LanguageId): Promise<Language> {
     const language = await this.languageService.getById(languageId);
 
-    await Promise.all([
-      this.wordService.indexLanguage(languageId),
-      this.topicService.indexLanguage(languageId),
-    ]);
+    await this.wordService.indexLanguage(languageId);
 
     return language;
+  }
+
+  async resyncProgress(languageId: LanguageId): Promise<void> {
+    await this.progressService.syncAllWordsProgress(languageId);
   }
 
   private async *exportRecords(): AsyncGenerator<MigrationRecord> {
@@ -81,16 +73,8 @@ export class MaintenanceService {
       yield { type: MigrationRecordType.Property, record: property };
     }
 
-    for await (const topic of this.topicRepository.streamRecords()) {
-      yield { type: MigrationRecordType.Topic, record: topic };
-    }
-
     for await (const word of this.wordRepository.streamRecords()) {
       yield { type: MigrationRecordType.Word, record: word };
-    }
-
-    for await (const topicWord of this.topicRepository.streamWordRecords()) {
-      yield { type: MigrationRecordType.TopicWord, record: topicWord };
     }
   }
 
@@ -110,21 +94,9 @@ export class MaintenanceService {
           );
           break;
 
-        case MigrationRecordType.Topic:
-          await this.topicRepository.insertBatch(
-            records.map(({ record }) => record) as TopicTable[],
-          );
-          break;
-
         case MigrationRecordType.Word:
           await this.wordRepository.insertBatch(
             records.map(({ record }) => record) as WordTable[],
-          );
-          break;
-
-        case MigrationRecordType.TopicWord:
-          await this.topicRepository.insertWordsBatch(
-            records.map(({ record }) => record) as TopicWordTable[],
           );
           break;
       }

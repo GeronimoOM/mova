@@ -1,198 +1,97 @@
-import {
-  Component,
-  For,
-  Show,
-  batch,
-  createEffect,
-  createSignal,
-} from 'solid-js';
-import { createLazyQuery } from '@merged/solid-apollo';
-import {
-  DragDropProvider,
-  DragDropSensors,
-  SortableProvider,
-  closestCenter,
-  DragEvent,
-  DragOverlay,
-} from '@thisbeyond/solid-dnd';
+import React, { useCallback, useEffect, useState } from 'react';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import { TbHexagonPlusFilled } from 'react-icons/tb';
+import { PartOfSpeech } from '../../api/types/graphql';
 import { useLanguageContext } from '../LanguageContext';
-import { GetPropertiesDocument, PartOfSpeech } from '../../api/types/graphql';
-import { reorderPropertiesMutation } from '../../api/mutations';
-import {
-  PropertyListItem,
-  PropertyListItemOverlay,
-} from './PropertiesListItem';
-import { ActionBar, Action } from '../common/ActionBar';
-import { ColorContextType, ColorProvider } from '../common/ColorContext';
+import { ButtonIcon } from '../common/ButtonIcon';
+import * as styles from './PropertiesList.css';
+import { PropertyListItem, PropertyListItemOverlay } from './PropertyListItem';
+import { useOrderedProperties } from './reorderProperties';
 
 export type PropertiesListProps = {
-  partOfSpeech: PartOfSpeech;
+  selectedPartOfSpeech: PartOfSpeech;
 };
 
-export const PropertiesList: Component<PropertiesListProps> = (props) => {
+export const PropertiesList: React.FC<PropertiesListProps> = ({
+  selectedPartOfSpeech,
+}) => {
   const [selectedLanguageId] = useLanguageContext();
-  const [selectedAction, setSelectedAction] = createSignal<Action | null>(null);
-  const [selectedPropertyId, setSelectedPropertyId] = createSignal<
-    string | null
-  >(null);
-  const isCreateOpen = () => selectedAction() === Action.Create;
 
-  const [fetchProperies, propertiesQuery] = createLazyQuery(
-    GetPropertiesDocument,
-  );
-  const properties = () => propertiesQuery()?.language?.properties;
-  const propertyIds = () => properties()?.map((property) => property.id) ?? [];
+  const { orderedProperties, swapPropertiesPreview, reorderProperties } =
+    useOrderedProperties(selectedLanguageId, selectedPartOfSpeech);
 
-  const [draggedPropertyId, setDraggedPropertyId] = createSignal<string | null>(
+  const [isNewPropertyOpen, setIsNewPropertyOpen] = useState(false);
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(
     null,
   );
-  const draggedProperty = () =>
-    properties()?.find((property) => property.id === draggedPropertyId());
 
-  const [reorderProperties] = reorderPropertiesMutation();
+  const handleCreateNewRef = useCallback((node: HTMLDivElement | null) => {
+    node?.scrollIntoView({ behavior: 'smooth' });
+  }, []);
 
-  createEffect(() => {
-    if (selectedLanguageId()) {
-      fetchProperies({
-        variables: {
-          languageId: selectedLanguageId()!,
-          partOfSpeech: props.partOfSpeech,
-        },
-      });
+  const handleCreateNew = useCallback(() => {
+    setIsNewPropertyOpen(true);
+    setSelectedPropertyId(null);
+  }, []);
 
-      setSelectedAction(null);
-      setSelectedPropertyId(null);
-    }
-  });
+  const handlePropertyCreated = useCallback(() => {
+    setIsNewPropertyOpen(false);
+    setSelectedPropertyId(null);
+  }, []);
 
-  const onActionSelect = (
-    newAction: Action | null,
-    newActionPropertyId: string | null = null,
-  ) => {
-    if (
-      newActionPropertyId === selectedPropertyId() &&
-      newAction === selectedAction()
-    ) {
-      batch(() => {
-        setSelectedAction(null);
-        setSelectedPropertyId(null);
-      });
-    } else {
-      batch(() => {
-        setSelectedAction(newAction);
-        setSelectedPropertyId(newActionPropertyId);
-      });
-    }
-  };
-
-  const onDragStart = ({ draggable }: DragEvent) =>
-    setDraggedPropertyId(draggable.id as string);
-
-  const onDragEnd = ({ draggable, droppable }: DragEvent) => {
-    if (draggable && droppable) {
-      const currentPropertyIds = propertyIds()!;
-      const fromIndex = currentPropertyIds.indexOf(draggable.id as string);
-      const toIndex = currentPropertyIds.indexOf(droppable.id as string);
-      if (fromIndex !== toIndex) {
-        const reorderedPropertyIds = currentPropertyIds.slice();
-        reorderedPropertyIds.splice(
-          toIndex,
-          0,
-          ...reorderedPropertyIds.splice(fromIndex, 1),
-        );
-
-        reorderProperties({
-          variables: {
-            input: {
-              languageId: selectedLanguageId()!,
-              partOfSpeech: props.partOfSpeech,
-              propertyIds: reorderedPropertyIds,
-            },
-          },
-        });
-      }
-    }
-  };
-
-  const colorContext: ColorContextType = {
-    base: {
-      textColor: 'text-spacecadet-300',
-      backgroundColor: 'bg-coolgray-300',
-      hoverBackgroundColor: 'hover:bg-coolgray-200',
-    },
-    active: {
-      textColor: 'text-spacecadet-300',
-      backgroundColor: 'bg-coolgray-200',
-    },
-    selected: {
-      textColor: 'text-coolgray-200',
-      backgroundColor: 'bg-spacecadet-300',
-      hoverTextColor: 'hover:text-spacecadet-300',
-    },
-    disabled: {
-      textColor: 'text-spacecadet-100',
-    },
-  };
+  useEffect(() => {
+    setIsNewPropertyOpen(false);
+    setSelectedPropertyId(null);
+  }, [selectedLanguageId, selectedPartOfSpeech]);
 
   return (
-    <ColorProvider colorContext={colorContext}>
-      <div class="mx-auto flex w-full max-w-[60rem] flex-col items-center gap-y-2 p-2">
-        <DragDropProvider
-          onDragStart={onDragStart}
-          onDragEnd={onDragEnd}
-          collisionDetector={closestCenter}
-        >
-          <DragDropSensors />
-          <SortableProvider ids={propertyIds()}>
-            <For each={properties()}>
-              {(property) => (
-                <PropertyListItem
-                  property={property}
-                  partOfSpeech={props.partOfSpeech}
-                  selectedAction={
-                    property.id === selectedPropertyId()
-                      ? selectedAction()
-                      : null
-                  }
-                  onActionSelect={(action) =>
-                    onActionSelect(action, property.id)
-                  }
-                  isSortable={true}
-                />
-              )}
-            </For>
-          </SortableProvider>
-          <DragOverlay>
-            <Show when={draggedProperty()}>
-              <PropertyListItemOverlay property={draggedProperty()!} />
-            </Show>
-          </DragOverlay>
-        </DragDropProvider>
-        <Show
-          when={isCreateOpen()}
-          fallback={
-            <div
-              class={`sticky bottom-0 flex w-full flex-row justify-center p-2
-            outline outline-8 outline-alabaster ${colorContext.base!
-              .backgroundColor!}`}
-            >
-              <ActionBar
-                actions={[Action.Create]}
-                selectedAction={null}
-                onActionSelect={onActionSelect}
+    <DndProvider backend={HTML5Backend}>
+      <div className={styles.wrapper}>
+        <div className={styles.list}>
+          {orderedProperties?.map((property) => (
+            <PropertyListItem
+              key={property.id}
+              partOfSpeech={selectedPartOfSpeech}
+              property={property}
+              selected={property.id === selectedPropertyId}
+              onSelect={() => setSelectedPropertyId(property.id)}
+              onSwapPreview={swapPropertiesPreview}
+              onReorder={reorderProperties}
+            />
+          ))}
+
+          {isNewPropertyOpen ? (
+            <div key="new" ref={handleCreateNewRef}>
+              <PropertyListItem
+                partOfSpeech={selectedPartOfSpeech}
+                property={null}
+                selected={!selectedPropertyId}
+                onSelect={() => setSelectedPropertyId(null)}
+                onPropertyCreated={handlePropertyCreated}
+                onSwapPreview={swapPropertiesPreview}
+                onReorder={reorderProperties}
               />
             </div>
-          }
-        >
-          <PropertyListItem
-            property={null}
-            partOfSpeech={props.partOfSpeech}
-            selectedAction={Action.Create}
-            onActionSelect={onActionSelect}
-            isSortable={false}
-          />
-        </Show>
+          ) : (
+            <div key="end" className={styles.listEnd} />
+          )}
+        </div>
+
+        <PropertyListItemOverlay />
+
+        {!isNewPropertyOpen && (
+          <div className={styles.buttons}>
+            <ButtonIcon
+              icon={TbHexagonPlusFilled}
+              color="primary"
+              highlighted={true}
+              onClick={handleCreateNew}
+              wrapped
+            />
+          </div>
+        )}
       </div>
-    </ColorProvider>
+    </DndProvider>
   );
 };

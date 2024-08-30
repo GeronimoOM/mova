@@ -6,5 +6,7 @@ export function toTimestamp(dateTime: DateTime | null): string | null {
 }
 
 export function fromTimestamp(timestamp: string | null): DateTime | null {
-  return timestamp ? DateTime.fromFormat(timestamp, DATETIME_FORMAT) : null;
+  return timestamp
+    ? DateTime.fromFormat(timestamp, DATETIME_FORMAT, { zone: 'utc' })
+    : null;
 }

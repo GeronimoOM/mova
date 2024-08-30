@@ -1,27 +1,12 @@
-import { IconTypes } from 'solid-icons';
-import { TbCards } from 'solid-icons/tb';
-import { FaSolidKeyboard } from 'solid-icons/fa';
-
 export enum ExerciseType {
-  Cards = '/cards',
-  Typing = '/typing',
+  Recall = 'recall',
+  Spell = 'spell',
+  SpellAdv = 'type',
 }
 
-export type ExerciseProps = {
-  title: string;
-  icon: IconTypes;
-  route: ExerciseType;
-};
-
-export const exercisesProps: Record<ExerciseType, ExerciseProps> = {
-  [ExerciseType.Cards]: {
-    title: 'Cards',
-    icon: TbCards,
-    route: ExerciseType.Cards,
-  },
-  [ExerciseType.Typing]: {
-    title: 'Typing',
-    icon: FaSolidKeyboard,
-    route: ExerciseType.Typing,
-  },
+export const masteryToExerciseType: Record<number, ExerciseType> = {
+  0: ExerciseType.Recall,
+  1: ExerciseType.Spell,
+  2: ExerciseType.SpellAdv,
+  3: ExerciseType.SpellAdv,
 };
