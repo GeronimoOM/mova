@@ -41,7 +41,7 @@ export const Input: React.FC<InputProps> = ({
       type={type ?? 'text'}
       spellCheck={false}
       autoCapitalize={'off'}
-      value={value}
+      value={obscured ? '' : value}
       onChange={(e) => onChange(e.target.value)}
     />
   );

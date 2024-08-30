@@ -18,47 +18,6 @@ import { RecallExercise } from './RecallExercise';
 import { SpellExercise } from './SpellExercise';
 import { ExerciseType, masteryToExerciseType } from './exercises';
 
-type ExerciseProps = {
-  word: WordFieldsFullFragment;
-  properties: PropertyFieldsFragment[];
-  onSuccess: () => void;
-  onFailure: () => void;
-  onNext: () => void;
-};
-
-const Exercise: React.FC<ExerciseProps> = ({
-  word,
-  properties,
-  onSuccess,
-  onFailure,
-  onNext,
-}) => {
-  const exerciseType = masteryToExerciseType[word.mastery];
-  switch (exerciseType) {
-    case ExerciseType.Recall:
-      return (
-        <RecallExercise
-          word={word}
-          onSuccess={onSuccess}
-          onFailure={onFailure}
-          onNext={onNext}
-        />
-      );
-    case ExerciseType.Spell:
-    case ExerciseType.SpellAdv:
-      return (
-        <SpellExercise
-          word={word}
-          properties={properties}
-          onSuccess={onSuccess}
-          onFailure={onFailure}
-          onNext={onNext}
-          advanced={exerciseType === ExerciseType.SpellAdv}
-        />
-      );
-  }
-};
-
 export const ExerciseCard: React.FC = () => {
   const [selectedLanguageId] = useLanguageContext();
 
@@ -103,15 +62,15 @@ export const ExerciseCard: React.FC = () => {
 
   const handleStart = () => {
     setIsStarted(true);
-    setWordIndex(0);
     words ? refetchExerciseWords() : fetchExerciseWords();
+    setWordIndex(0);
   };
 
   const handleNext = () => {
     if (hasNext) {
       setWordIndex(wordIndex + 1);
     } else {
-      setIsStarted(false);
+      handleStart();
     }
   };
 
@@ -164,4 +123,45 @@ export const ExerciseCard: React.FC = () => {
       )}
     </div>
   );
+};
+
+type ExerciseProps = {
+  word: WordFieldsFullFragment;
+  properties: PropertyFieldsFragment[];
+  onSuccess: () => void;
+  onFailure: () => void;
+  onNext: () => void;
+};
+
+const Exercise: React.FC<ExerciseProps> = ({
+  word,
+  properties,
+  onSuccess,
+  onFailure,
+  onNext,
+}) => {
+  const exerciseType = masteryToExerciseType[word.mastery];
+  switch (exerciseType) {
+    case ExerciseType.Recall:
+      return (
+        <RecallExercise
+          word={word}
+          onSuccess={onSuccess}
+          onFailure={onFailure}
+          onNext={onNext}
+        />
+      );
+    case ExerciseType.Spell:
+    case ExerciseType.SpellAdv:
+      return (
+        <SpellExercise
+          word={word}
+          properties={properties}
+          onSuccess={onSuccess}
+          onFailure={onFailure}
+          onNext={onNext}
+          advanced={exerciseType === ExerciseType.SpellAdv}
+        />
+      );
+  }
 };

@@ -8,10 +8,12 @@ import {
   DeletePropertyDocument,
   DeleteWordDocument,
   GetLanguagesDocument,
+  GetProgressDocument,
   IncreaseWordMasteryDocument,
   LanguagePropertiesFragmentDoc,
   LanguageWordsFragmentDoc,
   PartOfSpeech,
+  ProgressType,
   PropertyFieldsFragment,
   PropertyFieldsFragmentDoc,
   ReorderPropertiesDocument,
@@ -311,6 +313,10 @@ export function useIncreaseWordMastery(): UseMutationResult<
         },
       };
     },
+    update: (_, { data }) => {
+      const word = readWordFull(data!.increaseMastery.id)!;
+      increaseCurrentProgress(word.languageId, ProgressType.Mastery);
+    },
   });
 }
 
@@ -353,4 +359,29 @@ function readWordFull(id: string): WordFieldsFullFragment | null {
     fragment: WordFieldsFullFragmentDoc,
     fragmentName: 'WordFieldsFull',
   })!;
+}
+
+function increaseCurrentProgress(languageId: string, type: ProgressType) {
+  cache.updateQuery(
+    {
+      query: GetProgressDocument,
+      variables: { languageId, type },
+      overwrite: true,
+    },
+    (query) =>
+      query?.language?.progress
+        ? {
+            language: {
+              id: query!.language!.id,
+              progress: {
+                ...query!.language!.progress,
+                current: {
+                  ...query!.language!.progress.current,
+                  points: query!.language!.progress.current.points + 1,
+                },
+              },
+            },
+          }
+        : null,
+  );
 }

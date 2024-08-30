@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { TbHexagonPlusFilled } from 'react-icons/tb';
-import { clearWordsSearch } from '../../../api/cache';
+import { cacheClearWordsSearch } from '../../../api/cache';
 import { MIN_QUERY_LENGTH } from '../../../utils/constants';
 import { useDebouncedValue } from '../../../utils/useDebouncedValue';
 import { useInfiniteScroll } from '../../../utils/useInfiniteScroll';
@@ -43,7 +43,7 @@ export const WordsList: React.FC<WordsListProps> = ({
 
   useEffect(() => {
     if (selectedLanguageId) {
-      clearWordsSearch(selectedLanguageId);
+      cacheClearWordsSearch(selectedLanguageId);
     }
   }, [selectedLanguageId, debouncedWordsSearchQuery]);
 

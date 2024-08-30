@@ -15,7 +15,7 @@ export const ProgressTab: React.FC = () => {
   const [selectedLanguageId] = useLanguageContext();
   const { data: progressQuery } = useQuery(GetAllProgressDocument, {
     variables: { languageId: selectedLanguageId! },
-    fetchPolicy: 'network-only',
+    fetchPolicy: 'cache-and-network',
   });
   const progressByType:
     | Record<ProgressType, ProgressFieldsFragment>

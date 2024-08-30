@@ -10,7 +10,7 @@ export const ExerciseProgress: React.FC = () => {
 
   const { data: progressQuery } = useQuery(GetProgressDocument, {
     variables: { languageId: selectedLanguageId!, type: ProgressType.Mastery },
-    fetchPolicy: 'network-only',
+    fetchPolicy: 'cache-and-network',
   });
   const progress = progressQuery?.language?.progress;
 

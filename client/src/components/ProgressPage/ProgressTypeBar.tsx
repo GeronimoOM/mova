@@ -21,7 +21,7 @@ export const ProgressTypeBar: React.FC<ProgressBarProps> = ({
   const currentPoints = progress?.current.points ?? 0;
   const goalPoints = progress?.goal?.points ?? 0;
   const progressPercent = goalPoints
-    ? Math.min(currentPoints / goalPoints) * 100
+    ? Math.min(1, currentPoints / goalPoints) * 100
     : 0;
   const cadence = progress?.cadence;
   const cadenceLabel = cadence

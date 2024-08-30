@@ -50,7 +50,7 @@ export const ProgressCalendar: React.FC = () => {
   const [fetchProgressHistory, { data: progressHistory }] = useLazyQuery(
     GetProgressHistoryDocument,
     {
-      fetchPolicy: 'network-only',
+      fetchPolicy: 'cache-and-network',
     },
   );
   const dailyHistory = progressHistory?.language?.progress.dailyHistory;
