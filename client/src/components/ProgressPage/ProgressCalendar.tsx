@@ -13,6 +13,7 @@ import {
 import { sequence, toRecord } from '../../utils/arrays';
 import { useLanguageContext } from '../LanguageContext';
 import { ButtonIcon } from '../common/ButtonIcon';
+import { Tooltip } from '../common/Tooltip';
 import * as styles from './ProgressCalendar.css';
 import { progressTypeToColor } from './progress';
 import {
@@ -25,6 +26,7 @@ import {
 const N_WEEKDAYS = 7;
 const WEEKDAY_FORMAT = 'ccc';
 const MONTH_FORMAT = 'LLL';
+const DATE_FORMAT = 'd LLL';
 
 export const ProgressCalendar: React.FC = () => {
   const [selectedLanguageId] = useLanguageContext();
@@ -112,14 +114,14 @@ export const ProgressCalendar: React.FC = () => {
 };
 
 type ProgressCalendarHeaderProps = {
-  weeklyData?: Array<ProgressCalendarInstance | undefined>;
+  weeklyData: Array<ProgressCalendarInstance | undefined>;
 };
 
 const ProgressCalendarHeader: React.FC<ProgressCalendarHeaderProps> = ({
   weeklyData,
 }) => {
   const months: Array<{ month: number; span: number }> = useMemo(() => {
-    return weeklyData ? getGroupedMonths(weeklyData) : [];
+    return getGroupedMonths(weeklyData);
   }, [weeklyData]);
 
   return (
@@ -140,8 +142,8 @@ const ProgressCalendarHeader: React.FC<ProgressCalendarHeaderProps> = ({
 
 type ProgressCalendarBodyProps = {
   type: ProgressType;
-  dailyData?: Array<ProgressCalendarInstance | undefined>;
-  weeklyData?: Array<ProgressCalendarInstance | undefined>;
+  dailyData: Array<ProgressCalendarInstance | undefined>;
+  weeklyData: Array<ProgressCalendarInstance | undefined>;
   goal?: GoalFieldsFragment;
   isGoalOnly?: boolean;
 };
@@ -163,7 +165,7 @@ const ProgressCalendarBody: React.FC<ProgressCalendarBodyProps> = ({
             }).toFormat(WEEKDAY_FORMAT)}
           </td>
 
-          {sequence(weeklyData?.length ?? 0).map((week) => (
+          {sequence(weeklyData.length).map((week) => (
             <td key={week}>
               <ProgressCalendarCell
                 type={type}
@@ -171,6 +173,7 @@ const ProgressCalendarBody: React.FC<ProgressCalendarBodyProps> = ({
                 instance={dailyData?.[week * N_WEEKDAYS + weekday]}
                 goal={goal}
                 isGoalOnly={isGoalOnly}
+                tooltipSide={getTooltipSide(week, weeklyData.length)}
               />
             </td>
           ))}
@@ -180,7 +183,7 @@ const ProgressCalendarBody: React.FC<ProgressCalendarBodyProps> = ({
       <tr key="week">
         <td className={styles.weekLabel}>Week</td>
 
-        {sequence(weeklyData?.length ?? 0).map((week) => (
+        {sequence(weeklyData.length).map((week) => (
           <td key={week}>
             <ProgressCalendarCell
               type={type}
@@ -188,6 +191,7 @@ const ProgressCalendarBody: React.FC<ProgressCalendarBodyProps> = ({
               instance={weeklyData?.[week]}
               goal={goal}
               isGoalOnly={isGoalOnly}
+              tooltipSide={getTooltipSide(week, weeklyData.length)}
             />
           </td>
         ))}
@@ -202,6 +206,7 @@ type ProgressCalendarCellProps = {
   instance?: ProgressCalendarInstance;
   goal?: GoalFieldsFragment;
   isGoalOnly?: boolean;
+  tooltipSide: 'top' | 'left' | 'right';
 };
 
 const ProgressCalendarCell: React.FC<ProgressCalendarCellProps> = ({
@@ -210,13 +215,19 @@ const ProgressCalendarCell: React.FC<ProgressCalendarCellProps> = ({
   instance,
   goal,
   isGoalOnly,
+  tooltipSide,
 }) => {
+  const [isTooltipOpen, setIsTooltipOpen] = useState(false);
+
   const points = instance?.points ?? 0;
-  const useColor =
-    goal &&
-    (isGoalOnly
-      ? goal.cadence === cadence && points >= goal.points
-      : points > 0);
+  const useColor = useMemo(
+    () =>
+      goal &&
+      (isGoalOnly
+        ? goal.cadence === cadence && points >= goal.points
+        : points > 0),
+    [cadence, goal, isGoalOnly, points],
+  );
   const color = useColor ? progressTypeToColor[type] : undefined;
 
   const intensity = useMemo(() => {
@@ -239,12 +250,78 @@ const ProgressCalendarCell: React.FC<ProgressCalendarCellProps> = ({
 
   return (
     instance && (
-      <div
-        className={styles.cell({
-          color,
-          intensity,
-        })}
-      />
+      <Tooltip
+        content={
+          <ProgressCalendarCellTooltip
+            type={type}
+            cadence={cadence}
+            date={instance.date}
+            points={instance.points}
+          />
+        }
+        side={tooltipSide}
+        onOpen={setIsTooltipOpen}
+      >
+        <div className={styles.cellWrapper({ selected: isTooltipOpen })}>
+          <div
+            className={styles.cell({
+              color,
+              intensity,
+            })}
+          />
+        </div>
+      </Tooltip>
     )
   );
+};
+
+type ProgressCalendarCellTooltipProps = {
+  type: ProgressType;
+  cadence: ProgressCadence;
+  date: DateTime;
+  points: number;
+};
+
+const ProgressCalendarCellTooltip: React.FC<
+  ProgressCalendarCellTooltipProps
+> = ({ type, cadence, date, points }) => {
+  let dateString;
+  if (cadence === ProgressCadence.Daily) {
+    dateString = date.toFormat(DATE_FORMAT);
+  } else {
+    const until = date.plus({ weeks: 1 }).minus({ days: 1 });
+    dateString = `${date.toFormat(DATE_FORMAT)} - ${until.toFormat(DATE_FORMAT)}`;
+  }
+
+  let pointsString;
+  if (type === ProgressType.Words) {
+    pointsString = points % 10 === 1 ? ' word added' : ' words added';
+  } else {
+    pointsString = ' mastery earned';
+  }
+
+  const color = points > 0 ? progressTypeToColor[type] : undefined;
+
+  return (
+    <div className={styles.cellTooltip}>
+      <div className={styles.cellTooltipDate}>{dateString}</div>
+      <div>
+        <span className={styles.cellTooltipPoints({ color })}>{points}</span>
+        {pointsString}
+      </div>
+    </div>
+  );
+};
+
+const getTooltipSide = (
+  week: number,
+  totalWeeks: number,
+): 'top' | 'left' | 'right' => {
+  if (week <= 3) {
+    return 'right';
+  } else if (week >= totalWeeks - 4) {
+    return 'left';
+  } else {
+    return 'top';
+  }
 };

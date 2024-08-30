@@ -34,13 +34,13 @@ export const [theme, themeVars] = createTheme({
   },
 });
 
-export const Colors = [
+export const colors = [
   'primary',
   'secondary1',
   'secondary2',
   'negative',
 ] as const;
-export type Color = (typeof Colors)[number];
+export type Color = (typeof colors)[number];
 
 globalStyle('html, body, #root', {
   fontFamily: jostFontFace,

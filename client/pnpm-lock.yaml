@@ -18,11 +18,8 @@ importers:
         specifier: 0.5.3
         version: 0.5.3(@vanilla-extract/css@1.15.3)
       classnames:
-        specifier: ^2.5.1
+        specifier: 2.5.1
         version: 2.5.1
-      konva:
-        specifier: ^9.3.14
-        version: 9.3.14
       luxon:
         specifier: 3.4.4
         version: 3.4.4
@@ -41,9 +38,9 @@ importers:
       react-icons:
         specifier: 5.2.1
         version: 5.2.1(react@18.3.1)
-      react-konva:
-        specifier: ^18.2.10
-        version: 18.2.10(konva@9.3.14)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react-minimal-pie-chart:
+        specifier: ^8.4.0
+        version: 8.4.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-router-dom:
         specifier: 6.23.1
         version: 6.23.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1670,14 +1667,14 @@ packages:
   '@types/react-dom@18.3.0':
     resolution: {integrity: sha512-EhwApuTmMBmXuFOikhQLIBUn6uFg81SwLMOAUgodJF14SOBOCMdU04gDoYi0WOJJHD144TL32z4yDqCW3dnkQg==}
 
-  '@types/react-reconciler@0.28.8':
-    resolution: {integrity: sha512-SN9c4kxXZonFhbX4hJrZy37yw9e7EIxcpHCxQv5JUS18wDE5ovkQKlqQEkufdJCCMfuI9BnjUJvhYeJ9x5Ra7g==}
-
   '@types/react@18.3.3':
     resolution: {integrity: sha512-hti/R0pS0q1/xx+TsI73XIqk26eBsISZ2R0wUijXIngRK9R/e7Xw/cXVxQK7R5JjW+SV4zGcn5hXjudkN/pLIw==}
 
   '@types/resolve@1.17.1':
     resolution: {integrity: sha512-yy7HuzQhj0dhGpD8RLXSZWEkLsV9ibvxvi6EiJ3bkqLAO1RGo0WbkWQiwpRlSFymTJRz0d3k5LM3kkx8ArDbLw==}
+
+  '@types/svg-path-parser@1.1.6':
+    resolution: {integrity: sha512-3sw6pk91pEtW6W7hRrJ9ZkAgPiJSaNdh7iY8rVOy7buajpQuy2J9A0ZUaiOVcbFvl0p7J+Ne4012muCE/MB+hQ==}
 
   '@types/trusted-types@2.0.7':
     resolution: {integrity: sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==}
@@ -2946,11 +2943,6 @@ packages:
     peerDependencies:
       ws: '*'
 
-  its-fine@1.2.5:
-    resolution: {integrity: sha512-fXtDA0X0t0eBYAGLVM5YsgJGsJ5jEmqZEPrGbzdf5awjv0xE7nqv3TVnvtUF060Tkes15DbDAKW/I48vsb6SyA==}
-    peerDependencies:
-      react: '>=18.0'
-
   jake@10.8.7:
     resolution: {integrity: sha512-ZDi3aP+fG/LchyBzUM804VjddnwfSfsdeYkwt8NcbKRvo4rFkjhs456iLFn3k2ZUWvNe4i48WACDbza8fhq2+w==}
     engines: {node: '>=10'}
@@ -3032,9 +3024,6 @@ packages:
 
   keyv@4.5.4:
     resolution: {integrity: sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==}
-
-  konva@9.3.14:
-    resolution: {integrity: sha512-Gmm5lyikGYJyogKQA7Fy6dKkfNh350V6DwfZkid0RVrGYP2cfCsxuMxgF5etKeCv7NjXYpJxKqi1dYkIkX/dcA==}
 
   leven@3.1.0:
     resolution: {integrity: sha512-qsda+H8jTaUaN/x5vzW2rzc+8Rw4TAQ/4KjB46IwK5VH+IlVeeeje/EoZRpiXvIqjFgK84QffqPztGI3VBLG1A==}
@@ -3515,18 +3504,11 @@ packages:
   react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
 
-  react-konva@18.2.10:
-    resolution: {integrity: sha512-ohcX1BJINL43m4ynjZ24MxFI1syjBdrXhqVxYVDw2rKgr3yuS0x/6m1Y2Z4sl4T/gKhfreBx8KHisd0XC6OT1g==}
+  react-minimal-pie-chart@8.4.0:
+    resolution: {integrity: sha512-A0wG+6mRjboyMxMDrzQNWp+2+GSn2ai4ERzRFHLp/OCC45PwIR1DpDVjwedawO+5AtFpzBRQKSFm3ZUxrqIEzA==}
     peerDependencies:
-      konva: ^8.0.1 || ^7.2.5 || ^9.0.0
-      react: '>=18.0.0'
-      react-dom: '>=18.0.0'
-
-  react-reconciler@0.29.2:
-    resolution: {integrity: sha512-zZQqIiYgDCTP/f1N/mAR10nJGrPD2ZR+jDSEsKWJHYC7Cm2wodlwbR3upZRdC3cjIjSlTLNVyO7Iu0Yy7t2AYg==}
-    engines: {node: '>=0.10.0'}
-    peerDependencies:
-      react: ^18.3.1
+      react: ^16.8.0 || ^17.0.0 || ^18
+      react-dom: ^16.8.0 || ^17.0.0 || ^18
 
   react-refresh@0.14.2:
     resolution: {integrity: sha512-jCvmsr+1IUSMUyzOkRcvnVbX3ZYC6g9TDrDbFuFmRDq7PD4yaGbLKNQL6k2jnArV8hjYxh7hVhAZB6s9HDGpZA==}
@@ -6106,10 +6088,6 @@ snapshots:
     dependencies:
       '@types/react': 18.3.3
 
-  '@types/react-reconciler@0.28.8':
-    dependencies:
-      '@types/react': 18.3.3
-
   '@types/react@18.3.3':
     dependencies:
       '@types/prop-types': 15.7.12
@@ -6118,6 +6096,8 @@ snapshots:
   '@types/resolve@1.17.1':
     dependencies:
       '@types/node': 20.10.6
+
+  '@types/svg-path-parser@1.1.6': {}
 
   '@types/trusted-types@2.0.7': {}
 
@@ -7654,11 +7634,6 @@ snapshots:
     dependencies:
       ws: 8.14.2
 
-  its-fine@1.2.5(react@18.3.1):
-    dependencies:
-      '@types/react-reconciler': 0.28.8
-      react: 18.3.1
-
   jake@10.8.7:
     dependencies:
       async: 3.2.5
@@ -7729,8 +7704,6 @@ snapshots:
   keyv@4.5.4:
     dependencies:
       json-buffer: 3.0.1
-
-  konva@9.3.14: {}
 
   leven@3.1.0: {}
 
@@ -8198,21 +8171,11 @@ snapshots:
 
   react-is@16.13.1: {}
 
-  react-konva@18.2.10(konva@9.3.14)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  react-minimal-pie-chart@8.4.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
-      '@types/react-reconciler': 0.28.8
-      its-fine: 1.2.5(react@18.3.1)
-      konva: 9.3.14
+      '@types/svg-path-parser': 1.1.6
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-      react-reconciler: 0.29.2(react@18.3.1)
-      scheduler: 0.23.2
-
-  react-reconciler@0.29.2(react@18.3.1):
-    dependencies:
-      loose-envify: 1.4.0
-      react: 18.3.1
-      scheduler: 0.23.2
 
   react-refresh@0.14.2: {}
 

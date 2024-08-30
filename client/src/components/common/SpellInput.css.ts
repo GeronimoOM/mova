@@ -2,7 +2,7 @@ import { globalStyle, style, StyleRule } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
 import {
   Color,
-  Colors,
+  colors,
   sourceCodeProFontFace,
   themeVars,
 } from '../../index.css';
@@ -47,7 +47,7 @@ export const cell = recipe({
 
     highlight: {
       ...(Object.fromEntries(
-        Colors.map((color) => [
+        colors.map((color) => [
           color,
           {
             color: themeVars.color[color],

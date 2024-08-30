@@ -5,4 +5,5 @@ export const wrapper = style({
   flexDirection: 'column',
   padding: 10,
   gap: 10,
+  overflowY: 'auto',
 });

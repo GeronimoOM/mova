@@ -1,37 +1,22 @@
+import { useQuery } from '@apollo/client';
 import React from 'react';
-import { ProgressType } from '../../api/types/graphql';
-import {
-  progressTypeToColor,
-  progressTypeToIcon,
-} from '../ProgressPage/progress';
-import { Icon } from '../common/Icon';
-import { ProgressBar } from '../common/ProgressBar';
+import { GetProgressDocument, ProgressType } from '../../api/types/graphql';
+import { useLanguageContext } from '../LanguageContext';
+import { ProgressTypeBar } from '../ProgressPage/ProgressTypeBar';
 import * as styles from './ExerciseProgress.css';
 
 export const ExerciseProgress: React.FC = () => {
-  // TODO
-  const current = 3;
-  const goal = 10;
+  const [selectedLanguageId] = useLanguageContext();
 
-  const progress = Math.min(current / goal, 1) * 100;
+  const { data: progressQuery } = useQuery(GetProgressDocument, {
+    variables: { languageId: selectedLanguageId!, type: ProgressType.Mastery },
+    fetchPolicy: 'network-only',
+  });
+  const progress = progressQuery?.language?.progress;
 
   return (
     <div className={styles.wrapper}>
-      <div
-        className={styles.icon({
-          color: progressTypeToColor[ProgressType.Mastery],
-        })}
-      >
-        <Icon icon={progressTypeToIcon[ProgressType.Mastery]} />
-      </div>
-
-      <div className={styles.bar}>
-        <ProgressBar
-          progress={progress}
-          color={progressTypeToColor[ProgressType.Mastery]}
-        />
-      </div>
-      <span className={styles.label}>{`${current} / ${goal}`}</span>
+      <ProgressTypeBar type={ProgressType.Mastery} progress={progress} />
     </div>
   );
 };

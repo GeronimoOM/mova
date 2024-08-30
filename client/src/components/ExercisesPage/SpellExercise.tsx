@@ -86,7 +86,7 @@ export const SpellExercise: React.FC<SpellExerciseProps> = ({
 
   return (
     <div className={styles.wrapper}>
-      <div className={styles.title}>Spell the word</div>
+      <div className={styles.title}>spell the word</div>
 
       <Input
         value={word.translation}

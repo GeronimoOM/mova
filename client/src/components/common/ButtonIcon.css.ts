@@ -1,6 +1,6 @@
 import { globalStyle, style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
-import { Colors, animations, themeVars } from '../../index.css';
+import { animations, colors, themeVars } from '../../index.css';
 
 export const button = recipe({
   base: {
@@ -21,7 +21,7 @@ export const button = recipe({
 
   variants: {
     color: Object.fromEntries(
-      Colors.map((color) => [
+      colors.map((color) => [
         color,
         {
           selectors: {

@@ -1,6 +1,6 @@
 import { style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
-import { Colors, themeVars } from '../../index.css';
+import { colors, themeVars } from '../../index.css';
 
 export const wrapper = style({
   display: 'flex',
@@ -24,7 +24,7 @@ export const icon = recipe({
 
   variants: {
     color: Object.fromEntries(
-      Colors.map((color) => [color, { color: themeVars.color[color] }]),
+      colors.map((color) => [color, { color: themeVars.color[color] }]),
     ),
   },
 });
@@ -45,7 +45,7 @@ export const label = recipe({
 
   variants: {
     color: Object.fromEntries(
-      Colors.map((color) => [
+      colors.map((color) => [
         color,
         {
           color: themeVars.color[color],

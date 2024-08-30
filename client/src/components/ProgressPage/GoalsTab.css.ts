@@ -1,6 +1,6 @@
 import { globalStyle, style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
-import { Colors, themeVars } from '../../index.css';
+import { colors, themeVars } from '../../index.css';
 
 export const wrapper = style({
   display: 'flex',
@@ -8,6 +8,7 @@ export const wrapper = style({
   alignItems: 'center',
   padding: 10,
   gap: 10,
+  overflowY: 'auto',
 });
 
 export const goal = style({
@@ -32,7 +33,7 @@ export const goalIcon = recipe({
 
   variants: {
     color: Object.fromEntries(
-      Colors.map((color) => [
+      colors.map((color) => [
         color,
         {
           color: themeVars.color[color],
@@ -59,7 +60,7 @@ export const goalCadence = recipe({
 
   variants: {
     color: Object.fromEntries(
-      Colors.map((color) => [
+      colors.map((color) => [
         color,
         {
           selectors: {

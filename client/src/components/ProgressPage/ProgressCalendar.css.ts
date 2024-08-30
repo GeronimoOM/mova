@@ -1,6 +1,6 @@
 import { globalStyle, style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
-import { Colors, themeVars } from '../../index.css';
+import { colors, themeVars } from '../../index.css';
 
 export const wrapper = style({
   boxSizing: 'border-box',
@@ -21,6 +21,10 @@ export const table = style({
   margin: '0 auto',
 });
 
+globalStyle(`${table} > thead > tr > td`, {
+  paddingBottom: 5,
+});
+
 globalStyle(`${table} > tbody > tr:last-child > td`, {
   paddingTop: 15,
 });
@@ -37,6 +41,16 @@ export const monthLabel = style({
   textAlign: 'center',
 });
 
+export const cellWrapper = recipe({
+  variants: {
+    selected: {
+      true: {
+        outline: `2px solid ${themeVars.color.muted}`,
+      },
+    },
+  },
+});
+
 export const cell = recipe({
   base: {
     width: '1rem',
@@ -46,7 +60,7 @@ export const cell = recipe({
 
   variants: {
     color: Object.fromEntries(
-      Colors.map((color) => [
+      colors.map((color) => [
         color,
         {
           backgroundColor: themeVars.color[color],
@@ -68,6 +82,32 @@ export const cell = recipe({
         opacity: 1,
       },
     },
+  },
+});
+
+export const cellTooltip = style({
+  display: 'flex',
+  flexDirection: 'column',
+  padding: 5,
+  gap: 5,
+  whiteSpace: 'nowrap',
+  color: themeVars.color.text,
+});
+
+export const cellTooltipDate = style({
+  fontSize: '0.8rem',
+  color: themeVars.color.muted,
+});
+
+export const cellTooltipPoints = recipe({
+  base: {
+    fontWeight: 'bold',
+  },
+
+  variants: {
+    color: Object.fromEntries(
+      colors.map((color) => [color, { color: themeVars.color[color] }]),
+    ),
   },
 });
 

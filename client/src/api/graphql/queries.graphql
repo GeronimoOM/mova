@@ -65,6 +65,15 @@ query GetAllProgress($languageId: ID!) {
   }
 }
 
+query GetProgress($languageId: ID!, $type: ProgressType!) {
+  language(id: $languageId) {
+    id
+    progress(type: $type) {
+      ...ProgressFields
+    }
+  }
+}
+
 query GetProgressHistory($languageId: ID!, $type: ProgressType!) {
   language(id: $languageId) {
     id

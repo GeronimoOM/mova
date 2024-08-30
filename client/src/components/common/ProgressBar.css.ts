@@ -1,10 +1,10 @@
 import { style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
-import { Colors, themeVars } from '../../index.css';
+import { colors, themeVars } from '../../index.css';
 
 export const container = style({
   width: '100%',
-  backgroundColor: themeVars.color.backgroundLightest,
+  backgroundColor: themeVars.color.backgroundLighter,
 });
 
 export const bar = recipe({
@@ -14,7 +14,7 @@ export const bar = recipe({
 
   variants: {
     color: Object.fromEntries(
-      Colors.map((color) => [
+      colors.map((color) => [
         color,
         {
           backgroundColor: themeVars.color[color],

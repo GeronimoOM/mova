@@ -1,7 +1,7 @@
 import { recipe } from '@vanilla-extract/recipes';
 import {
   animations,
-  Colors,
+  colors,
   jostFontFace,
   sourceCodeProFontFace,
   themeVars,
@@ -39,7 +39,7 @@ export const input = recipe({
     },
 
     textColor: Object.fromEntries(
-      Colors.map((color) => [
+      colors.map((color) => [
         color,
         {
           color: themeVars.color[color],
