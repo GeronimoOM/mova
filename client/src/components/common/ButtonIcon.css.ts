@@ -16,6 +16,11 @@ export const button = recipe({
       '&:hover': {
         backgroundColor: themeVars.color.backgroundLighter,
       },
+      '&.toggled': {
+        backgroundColor: themeVars.color.text,
+        border: `2px solid ${themeVars.color.text}`,
+        color: themeVars.color.background,
+      },
     },
   },
 

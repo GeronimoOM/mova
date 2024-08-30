@@ -19,11 +19,13 @@ export const exercise = style({
 
 export const details = style({
   position: 'absolute',
-  top: 0,
-  right: 0,
-  left: 0,
+  zIndex: 1,
+  top: 5,
+  right: 5,
+  left: 5,
   bottom: 60,
-  outline: `2px solid ${themeVars.color.muted}`,
+  outline: `2px solid ${themeVars.color.backgroundLightest}`,
+  backgroundColor: themeVars.color.background,
 });
 
 export const centered = style({

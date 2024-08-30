@@ -12,7 +12,6 @@ import {
   WordFieldsFullFragment,
 } from '../../api/types/graphql';
 import { toGroupedRecord } from '../../utils/arrays';
-import { useClickOutsideHandler } from '../../utils/useClickOutsideHandler';
 import { useLanguageContext } from '../LanguageContext';
 import { WordDetails } from '../WordsPage/WordDetails/WordDetails';
 import { ButtonIcon } from '../common/ButtonIcon';
@@ -69,6 +68,7 @@ export const ExerciseCard: React.FC = () => {
     setIsStarted(true);
     words ? refetchExerciseWords() : fetchExerciseWords();
     setWordIndex(0);
+    setIsWordDetailsOpen(false);
   };
 
   const handleNext = () => {
@@ -77,6 +77,7 @@ export const ExerciseCard: React.FC = () => {
     } else {
       handleStart();
     }
+    setIsWordDetailsOpen(false);
   };
 
   const handleSuccess = () => {
@@ -117,7 +118,8 @@ export const ExerciseCard: React.FC = () => {
             <div className={styles.bottom}>
               <ButtonIcon
                 icon={FaInfo}
-                onClick={() => setIsWordDetailsOpen(true)}
+                onClick={() => setIsWordDetailsOpen(!isWordDetailsOpen)}
+                toggled={isWordDetailsOpen}
               />
 
               <ButtonIcon
@@ -193,11 +195,6 @@ const WordDetailsOverlay: React.FC<WordDetailsOverlayProps> = ({
   onClose,
 }) => {
   const ref = useRef<HTMLDivElement>(null);
-
-  useClickOutsideHandler({
-    ref,
-    onClick: onClose,
-  });
 
   return (
     <div className={styles.details} ref={ref}>
