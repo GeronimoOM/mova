@@ -1,6 +1,6 @@
-# mova
+# ![alt text](https://github.com/GeronimoOM/mova/blob/main/client/public/images/favicon.ico?raw=true) 
 
-Mova is a personal dictionary app that can be used to facilitate learning vocabulary.
+**Mova** is a personal dictionary app that can be used to facilitate learning vocabulary.
 
 It allows maintaining a list of dictionary words and completing simple exercises to memorize them.
 
@@ -10,6 +10,7 @@ Features:
 - exercises for recalling translation, typing the word or one of its properties
 - tracking of added words and completed exercises, overview of daily/weekly/historic progress
 - dictionary statistics (breakdown by parts of speech, level of word mastery)
+- offline support (app can be installed as PWA)
 
 ## Back End
 
@@ -17,4 +18,4 @@ TypeScript, NestJS, GraphQL, MySQL, ElasticSearch, NGINX.
 
 ## Front End
 
-TypeScript, React, Apollo GraphQL, Vanilla Extract CSS.
+TypeScript, React, Apollo GraphQL, Vanilla Extract CSS, Workbox.
