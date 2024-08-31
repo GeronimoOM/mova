@@ -103,8 +103,9 @@ export class ExerciseService {
     }
 
     if (
-      currentWord.masteryIncAt?.plus(MASTERY_GAIN_DELAY[currentWord.mastery]) >
-      DateTime.utc()
+      (currentWord.masteryIncAt ?? currentWord.addedAt).plus(
+        MASTERY_GAIN_DELAY[currentWord.mastery],
+      ) >= DateTime.utc()
     ) {
       throw new Error('Word mastery cannot be increased yet');
     }

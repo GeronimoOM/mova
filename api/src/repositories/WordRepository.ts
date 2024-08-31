@@ -136,7 +136,7 @@ export class WordRepository {
 
     if (masteryIncOlderThan) {
       query.whereRaw(
-        `date_add(ifnull(mastery_inc_at, added_at), interval ? day) <= now()`,
+        `date_add(ifnull(mastery_inc_at, added_at), interval ? day) < now()`,
         [masteryIncOlderThan.days],
       );
     }
