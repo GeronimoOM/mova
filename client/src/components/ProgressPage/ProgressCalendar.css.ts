@@ -119,6 +119,31 @@ export const typeButtons = style({
   justifyContent: 'center',
 });
 
-globalStyle(`${typeButtons} > *:last-child`, {
+globalStyle(`${typeButtons} > *:nth-child(3)`, {
   marginLeft: 30,
+});
+
+export const streak = recipe({
+  base: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+  },
+
+  variants: {
+    color: Object.fromEntries(
+      colors.map((color) => [color, { color: themeVars.color[color] }]),
+    ),
+  },
+});
+
+export const streakNumber = style({
+  fontWeight: 'bold',
+});
+
+export const streakLabel = style({
+  paddingLeft: 5,
+  width: '3rem',
+  color: themeVars.color.text,
 });

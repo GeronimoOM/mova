@@ -219,7 +219,6 @@ fragment ProgressFields on Progress {
   current {
     ...ProgressInstanceFields
   }
-  streak
 }
 
 fragment ProgressHistoryFields on ProgressHistory {

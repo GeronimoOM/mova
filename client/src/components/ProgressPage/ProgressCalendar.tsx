@@ -1,16 +1,16 @@
-import { useLazyQuery, useQuery } from '@apollo/client';
+import { useLazyQuery } from '@apollo/client';
 import { DateTime, WeekdayNumbers } from 'luxon';
 import React, { useEffect, useMemo, useState } from 'react';
 import { FaBook, FaBrain } from 'react-icons/fa6';
+import { HiLightningBolt } from 'react-icons/hi';
 import { TbTargetArrow } from 'react-icons/tb';
 import {
-  GetGoalsDocument,
   GetProgressHistoryDocument,
   GoalFieldsFragment,
   ProgressCadence,
   ProgressType,
 } from '../../api/types/graphql';
-import { sequence, toRecord } from '../../utils/arrays';
+import { sequence } from '../../utils/arrays';
 import {
   DISPLAY_DATE_FORMAT,
   DISPLAY_MONTH_FORMAT,
@@ -19,6 +19,7 @@ import {
 } from '../../utils/constants';
 import { useLanguageContext } from '../LanguageContext';
 import { ButtonIcon } from '../common/ButtonIcon';
+import { Icon } from '../common/Icon';
 import { Tooltip } from '../common/Tooltip';
 import * as styles from './ProgressCalendar.css';
 import { progressTypeToColor } from './progress';
@@ -37,24 +38,30 @@ export const ProgressCalendar: React.FC = () => {
   );
   const [isGoalOnly, setIsGoalOnly] = useState(false);
 
-  const { data: goalsQuery } = useQuery(GetGoalsDocument, {
-    variables: { languageId: selectedLanguageId! },
-  });
-  const goals = goalsQuery?.language?.goals;
-  const goalByType = useMemo(
-    () => (goals ? toRecord(goals, (goal) => goal.type) : undefined),
-    [goals],
-  );
-  const goal = goalByType?.[selectedType];
-
   const [fetchProgressHistory, { data: progressHistory }] = useLazyQuery(
     GetProgressHistoryDocument,
     {
       fetchPolicy: 'cache-and-network',
     },
   );
-  const dailyHistory = progressHistory?.language?.progress.dailyHistory;
-  const weeklyHistory = progressHistory?.language?.progress.weeklyHistory;
+  const {
+    cadence,
+    goal,
+    streak = 0,
+    dailyHistory,
+    weeklyHistory,
+  } = progressHistory?.language?.progress ?? {};
+
+  const color = progressTypeToColor[selectedType];
+  const hasStreak = streak > 0;
+  const streakLabel = useMemo(() => {
+    if (cadence === ProgressCadence.Daily) {
+      return streak % 10 === 1 ? 'day' : 'days';
+    } else if (cadence === ProgressCadence.Weekly) {
+      return streak % 10 === 1 ? 'week' : 'weeks';
+    }
+    return '';
+  }, [streak, cadence]);
 
   const [dailyData, weeklyData] = useMemo(
     () => [
@@ -105,10 +112,16 @@ export const ProgressCalendar: React.FC = () => {
         />
         <ButtonIcon
           icon={TbTargetArrow}
-          color="primary"
+          color={color}
           toggled={isGoalOnly}
           onClick={() => setIsGoalOnly(!isGoalOnly)}
         />
+
+        <div className={styles.streak({ ...(hasStreak && { color }) })}>
+          <Icon icon={HiLightningBolt} />
+          <div className={styles.streakNumber}>{streak}</div>
+          <div className={styles.streakLabel}>{streakLabel}</div>
+        </div>
       </div>
     </div>
   );
@@ -298,7 +311,8 @@ const ProgressCalendarCellTooltip: React.FC<
   if (type === ProgressType.Words) {
     pointsString = points % 10 === 1 ? ' word added' : ' words added';
   } else {
-    pointsString = ' mastery earned';
+    pointsString =
+      points % 10 === 1 ? ' mastery point earned' : ' mastery points earned';
   }
 
   const color = points > 0 ? progressTypeToColor[type] : undefined;

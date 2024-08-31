@@ -79,6 +79,11 @@ query GetProgressHistory($languageId: ID!, $type: ProgressType!) {
     id
     progress(type: $type) {
       type
+      cadence
+      goal {
+        ...GoalFields
+      }
+      streak
 
       dailyHistory: history(cadence: Daily) {
         ...ProgressHistoryFields
@@ -87,6 +92,8 @@ query GetProgressHistory($languageId: ID!, $type: ProgressType!) {
       weeklyHistory: history(cadence: Weekly) {
         ...ProgressHistoryFields
       }
+
+      streak
     }
   }
 }
