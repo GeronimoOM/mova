@@ -1,5 +1,5 @@
 import { InMemoryCache, TypePolicy } from '@apollo/client';
-import { LanguageWordsArgs, WordPage } from './types/graphql';
+import { LanguageWordsArgs, Progress, WordPage } from './types/graphql';
 
 const languageTypePolicy: TypePolicy = {
   fields: {
@@ -14,27 +14,20 @@ const languageTypePolicy: TypePolicy = {
         };
       },
     },
-    stats: {
-      merge(_, incoming) {
-        return incoming;
-      },
-    },
     progress: {
-      merge(_, incoming) {
-        return incoming;
+      merge(original: Progress | undefined, incoming: Progress) {
+        return {
+          ...original,
+          ...incoming,
+        };
       },
     },
   },
 };
 
-const goalTypePolicy: TypePolicy = {
-  keyFields: ['type'],
-};
-
 export const cache = new InMemoryCache({
   typePolicies: {
     Language: languageTypePolicy,
-    Goal: goalTypePolicy,
   },
   possibleTypes: {
     IProperty: ['TextProperty', 'OptionProperty'],

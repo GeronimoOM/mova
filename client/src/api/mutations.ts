@@ -372,7 +372,7 @@ function increaseCurrentProgress(languageId: string, type: ProgressType) {
       query?.language?.progress
         ? {
             language: {
-              id: query!.language!.id,
+              ...query.language,
               progress: {
                 ...query!.language!.progress,
                 current: {
