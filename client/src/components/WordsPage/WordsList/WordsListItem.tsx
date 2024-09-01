@@ -2,7 +2,6 @@ import { DateTime } from 'luxon';
 import React from 'react';
 import { WordFieldsFragment } from '../../../api/types/graphql';
 import { DISPLAY_DATE_FORMAT } from '../../../utils/constants';
-import { PartOfSpeechPill } from '../../common/PartOfSpeechPill';
 import { WordMastery } from './WordMastery';
 import * as styles from './WordsListItem.css';
 
@@ -22,7 +21,6 @@ export const WordsListItem: React.FC<WordsListItemProps> = ({
       <div>
         <WordMastery mastery={word.mastery} size="small" />
       </div>
-      <PartOfSpeechPill partOfSpeech={word.partOfSpeech} disabled />
     </div>
   );
 };

@@ -7,6 +7,10 @@ export const pill = recipe({
     fontWeight: 'bold',
     width: 'fit-content',
     textTransform: 'lowercase',
+    padding: '3px 8px',
+    fontSize: '1rem',
+    borderRadius: 20,
+    border: `solid 2px ${themeVars.color.text}`,
     transition: 'color 0.2s ease, background-color 0.2s ease',
 
     selectors: {
@@ -19,22 +23,6 @@ export const pill = recipe({
   },
 
   variants: {
-    size: {
-      medium: {
-        padding: '2px 5px',
-        fontSize: '0.75rem',
-        borderRadius: 12,
-        border: `solid 2px ${themeVars.color.text}`,
-      },
-
-      large: {
-        padding: '3px 8px',
-        fontSize: '1rem',
-        borderRadius: 20,
-        border: `solid 2px ${themeVars.color.text}`,
-      },
-    },
-
     disabled: {
       false: {
         selectors: {
@@ -47,7 +35,6 @@ export const pill = recipe({
   },
 
   defaultVariants: {
-    size: 'medium',
     disabled: false,
   },
 });

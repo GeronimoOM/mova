@@ -22,7 +22,6 @@ export const PropertiesPartsOfSpeech: React.FC<
         >
           <PartOfSpeechPill
             partOfSpeech={partOfSpeech}
-            size="large"
             active={partOfSpeech === selectedPartOfSpeech}
           />
         </div>
