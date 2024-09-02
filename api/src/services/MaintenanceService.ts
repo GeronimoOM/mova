@@ -1,6 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { SearchClient } from 'clients/SearchClient';
-import { LanguageTable, PropertyTable, WordTable } from 'knex/types/tables';
+import {
+  GoalTable,
+  LanguageTable,
+  ProgressTable,
+  PropertyTable,
+  WordTable,
+} from 'knex/types/tables';
 import { Language, LanguageId } from 'models/Language';
 import {
   MigrationRecord,
@@ -8,6 +14,7 @@ import {
   MigrationRecordTypes,
 } from 'models/Migration';
 import { LanguageRepository } from 'repositories/LanguageRepository';
+import { ProgressRepository } from 'repositories/ProgressRepository';
 import { PropertyRepository } from 'repositories/PropertyRepository';
 import { WordRepository } from 'repositories/WordRepository';
 import { Readable } from 'stream';
@@ -27,6 +34,7 @@ export class MaintenanceService {
     private languageRepository: LanguageRepository,
     private propertyRepository: PropertyRepository,
     private wordRepository: WordRepository,
+    private progressRepository: ProgressRepository,
 
     private searchClient: SearchClient,
   ) {}
@@ -46,6 +54,7 @@ export class MaintenanceService {
   }
 
   async destroy(): Promise<void> {
+    await this.progressRepository.deleteAll();
     await this.wordRepository.deleteAll();
     await this.propertyRepository.deleteAll();
     await this.languageRepository.deleteAll();
@@ -73,8 +82,12 @@ export class MaintenanceService {
       yield { type: MigrationRecordType.Property, record: property };
     }
 
-    for await (const word of this.wordRepository.streamRecords()) {
-      yield { type: MigrationRecordType.Word, record: word };
+    for await (const goal of this.progressRepository.streamGoals()) {
+      yield { type: MigrationRecordType.Goal, record: goal };
+    }
+
+    for await (const progress of this.progressRepository.streamRecords()) {
+      yield { type: MigrationRecordType.Progress, record: progress };
     }
   }
 
@@ -97,6 +110,18 @@ export class MaintenanceService {
         case MigrationRecordType.Word:
           await this.wordRepository.insertBatch(
             records.map(({ record }) => record) as WordTable[],
+          );
+          break;
+
+        case MigrationRecordType.Goal:
+          await this.progressRepository.insertGoals(
+            records.map(({ record }) => record) as GoalTable[],
+          );
+          break;
+
+        case MigrationRecordType.Progress:
+          await this.progressRepository.insertBatch(
+            records.map(({ record }) => record) as ProgressTable[],
           );
           break;
       }

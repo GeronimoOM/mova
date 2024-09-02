@@ -41,7 +41,7 @@ declare module 'knex/types/tables' {
     language_id: LanguageId;
   }
 
-  interface GoalsTable {
+  interface GoalTable {
     type: ProgressType;
     cadence: ProgressCadence;
     points: number;
@@ -61,7 +61,7 @@ declare module 'knex/types/tables' {
     properties: PropertyTable;
     words: WordTable;
     progress: ProgressTable;
-    goals: GoalsTable;
+    goals: GoalTable;
     changes: ChangeTable;
   }
 }

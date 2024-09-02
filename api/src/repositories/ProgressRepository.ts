@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { GoalsTable } from 'knex/types/tables';
+import { GoalTable, ProgressTable } from 'knex/types/tables';
 import { DateTime } from 'luxon';
 import { Goal } from 'models/Goal';
 import { LanguageId } from 'models/Language';
@@ -106,6 +106,14 @@ export class ProgressRepository {
     }));
   }
 
+  streamRecords(): AsyncIterable<ProgressTable> {
+    return this.connectionManager.getConnection()(TABLE_PROGRESS).stream();
+  }
+
+  streamGoals(): AsyncIterable<GoalTable> {
+    return this.connectionManager.getConnection()(TABLE_GOALS).stream();
+  }
+
   async saveProgress(
     languageId: LanguageId,
     progress: ProgressInstance | ProgressInstance[],
@@ -146,7 +154,28 @@ export class ProgressRepository {
       .delete();
   }
 
-  private mapToGoal(goal: GoalsTable): Goal {
+  async deleteAll(): Promise<void> {
+    await this.connectionManager.getConnection()(TABLE_PROGRESS).delete();
+    await this.connectionManager.getConnection()(TABLE_GOALS).delete();
+  }
+
+  async insertGoals(goals: GoalTable[]): Promise<void> {
+    await this.connectionManager
+      .getConnection()(TABLE_GOALS)
+      .insert(goals)
+      .onConflict()
+      .merge();
+  }
+
+  async insertBatch(batch: ProgressTable[]): Promise<void> {
+    await this.connectionManager
+      .getConnection()(TABLE_PROGRESS)
+      .insert(batch)
+      .onConflict()
+      .merge();
+  }
+
+  private mapToGoal(goal: GoalTable): Goal {
     return {
       type: goal.type,
       cadence: goal.cadence,
