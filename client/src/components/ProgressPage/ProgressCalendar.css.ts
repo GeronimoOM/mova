@@ -6,6 +6,7 @@ export const wrapper = style({
   boxSizing: 'border-box',
   width: '100%',
   maxWidth: 500,
+  height: 'min-content',
   margin: '0 auto',
   display: 'flex',
   flexDirection: 'column',
@@ -14,10 +15,16 @@ export const wrapper = style({
   backgroundColor: themeVars.color.background,
 });
 
+export const tableWrapper = style({
+  boxSizing: 'border-box',
+  width: 'min-content',
+  margin: '0 auto',
+});
+
 export const table = style({
   padding: 10,
   borderSpacing: 0.5,
-  maxWidth: 'fit-content',
+  maxWidth: 'min-content',
   margin: '0 auto',
 });
 
@@ -111,7 +118,7 @@ export const cellTooltipPoints = recipe({
   },
 });
 
-export const typeButtons = style({
+export const footer = style({
   display: 'flex',
   flexDirection: 'row',
   padding: 10,
@@ -119,8 +126,8 @@ export const typeButtons = style({
   justifyContent: 'center',
 });
 
-globalStyle(`${typeButtons} > *:nth-child(3)`, {
-  marginLeft: 30,
+globalStyle(`${footer} > *:nth-child(3)`, {
+  marginLeft: 'auto',
 });
 
 export const streak = recipe({

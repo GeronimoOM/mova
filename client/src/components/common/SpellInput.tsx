@@ -87,6 +87,9 @@ export const SpellInput: React.FC<SpellInputProps> = ({
             }}
             onFocus={() => handleFocus(i, value)}
             disabled={disabled}
+            spellCheck={false}
+            autoCapitalize="off"
+            autoCorrect="off"
           />
         ))}
     </div>

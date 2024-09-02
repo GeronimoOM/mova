@@ -120,13 +120,14 @@ export const PropertyListItem: React.FC<PropertyListItemProps> = ({
             loading={isNewProperty ? propertyCreating : propertyUpdating}
           />
         </div>
-        <div className={classNames(styles.button, { hidden: !selected })}>
+        <div
+          ref={dragRef}
+          className={classNames(styles.button, { hidden: !selected })}
+        >
           <ButtonIcon
-            icon={FaFire}
-            onClick={deleteProperty}
-            color="negative"
-            disabled={!canDeleteProperty}
-            loading={propertyDeleting}
+            icon={IoReorderThree}
+            onClick={() => {}}
+            disabled={!canDragProperty}
           />
         </div>
       </div>
@@ -138,15 +139,13 @@ export const PropertyListItem: React.FC<PropertyListItemProps> = ({
           text={'translation'}
           size={'large'}
         />
-
-        <div
-          ref={dragRef}
-          className={classNames(styles.button, { hidden: !selected })}
-        >
+        <div className={classNames(styles.button, { hidden: !selected })}>
           <ButtonIcon
-            icon={IoReorderThree}
-            onClick={() => {}}
-            disabled={!canDragProperty}
+            icon={FaFire}
+            onClick={deleteProperty}
+            color="negative"
+            disabled={!canDeleteProperty}
+            loading={propertyDeleting}
           />
         </div>
       </div>
@@ -180,7 +179,7 @@ export const PropertyListItemOverlay: React.FC = () => {
           onClick={() => {}}
           disabled={true}
         />
-        <ButtonIcon icon={FaFire} onClick={() => {}} disabled={true} />
+        <ButtonIcon icon={IoReorderThree} onClick={() => {}} />
       </div>
 
       <div className={styles.content}>
@@ -190,7 +189,7 @@ export const PropertyListItemOverlay: React.FC = () => {
           text={'translation'}
           size={'large'}
         />
-        <ButtonIcon icon={IoReorderThree} onClick={() => {}} />
+        <ButtonIcon icon={FaFire} onClick={() => {}} disabled={true} />
       </div>
     </div>
   );

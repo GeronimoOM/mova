@@ -10,6 +10,7 @@ import {
   ProgressCadence,
   ProgressType,
 } from '../../api/types/graphql';
+import { breakpoints } from '../../index.css';
 import { sequence } from '../../utils/arrays';
 import {
   DISPLAY_DATE_FORMAT,
@@ -17,6 +18,7 @@ import {
   DISPLAY_WEEKDAY_FORMAT,
   N_WEEKDAYS,
 } from '../../utils/constants';
+import { useMediaQuery } from '../../utils/useMediaQuery';
 import { useLanguageContext } from '../LanguageContext';
 import { ButtonIcon } from '../common/ButtonIcon';
 import { Icon } from '../common/Icon';
@@ -63,16 +65,18 @@ export const ProgressCalendar: React.FC = () => {
     return '';
   }, [streak, cadence]);
 
+  const isFullCalendar = useMediaQuery(breakpoints.tiny);
+
   const [dailyData, weeklyData] = useMemo(
     () => [
       dailyHistory
-        ? parseCalendarData(dailyHistory)
-        : emptyCalendarData(ProgressCadence.Daily),
+        ? parseCalendarData(dailyHistory, isFullCalendar)
+        : emptyCalendarData(ProgressCadence.Daily, isFullCalendar),
       weeklyHistory
-        ? parseCalendarData(weeklyHistory)
-        : emptyCalendarData(ProgressCadence.Weekly),
+        ? parseCalendarData(weeklyHistory, isFullCalendar)
+        : emptyCalendarData(ProgressCadence.Weekly, isFullCalendar),
     ],
-    [dailyHistory, weeklyHistory],
+    [dailyHistory, weeklyHistory, isFullCalendar],
   );
 
   useEffect(() => {
@@ -86,41 +90,43 @@ export const ProgressCalendar: React.FC = () => {
 
   return (
     <div className={styles.wrapper}>
-      <table className={styles.table}>
-        <ProgressCalendarHeader weeklyData={weeklyData} />
-        <ProgressCalendarBody
-          type={selectedType}
-          dailyData={dailyData}
-          weeklyData={weeklyData}
-          goal={goal}
-          isGoalOnly={isGoalOnly}
-        />
-      </table>
+      <div className={styles.tableWrapper}>
+        <table className={styles.table}>
+          <ProgressCalendarHeader weeklyData={weeklyData} />
+          <ProgressCalendarBody
+            type={selectedType}
+            dailyData={dailyData}
+            weeklyData={weeklyData}
+            goal={goal}
+            isGoalOnly={isGoalOnly}
+          />
+        </table>
 
-      <div className={styles.typeButtons}>
-        <ButtonIcon
-          icon={FaBook}
-          color="secondary2"
-          toggled={selectedType === ProgressType.Words}
-          onClick={() => setSelectedType(ProgressType.Words)}
-        />
-        <ButtonIcon
-          icon={FaBrain}
-          color="secondary1"
-          toggled={selectedType === ProgressType.Mastery}
-          onClick={() => setSelectedType(ProgressType.Mastery)}
-        />
-        <ButtonIcon
-          icon={TbTargetArrow}
-          color={color}
-          toggled={isGoalOnly}
-          onClick={() => setIsGoalOnly(!isGoalOnly)}
-        />
+        <div className={styles.footer}>
+          <ButtonIcon
+            icon={FaBook}
+            color="secondary2"
+            toggled={selectedType === ProgressType.Words}
+            onClick={() => setSelectedType(ProgressType.Words)}
+          />
+          <ButtonIcon
+            icon={FaBrain}
+            color="secondary1"
+            toggled={selectedType === ProgressType.Mastery}
+            onClick={() => setSelectedType(ProgressType.Mastery)}
+          />
+          <ButtonIcon
+            icon={TbTargetArrow}
+            color={color}
+            toggled={isGoalOnly}
+            onClick={() => setIsGoalOnly(!isGoalOnly)}
+          />
 
-        <div className={styles.streak({ ...(hasStreak && { color }) })}>
-          <Icon icon={HiLightningBolt} />
-          <div className={styles.streakNumber}>{streak}</div>
-          <div className={styles.streakLabel}>{streakLabel}</div>
+          <div className={styles.streak({ ...(hasStreak && { color }) })}>
+            <Icon icon={HiLightningBolt} />
+            <div className={styles.streakNumber}>{streak}</div>
+            <div className={styles.streakLabel}>{streakLabel}</div>
+          </div>
         </div>
       </div>
     </div>

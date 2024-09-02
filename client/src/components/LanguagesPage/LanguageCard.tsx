@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
-import { FaCircle, FaFire } from 'react-icons/fa';
+import { FaCircle } from 'react-icons/fa';
 
 import { LanguageFieldsFragment } from '../../api/types/graphql';
 
 import classNames from 'classnames';
-import { FaFeatherPointed } from 'react-icons/fa6';
+import { FaFeatherPointed, FaFire } from 'react-icons/fa6';
 import { ButtonIcon } from '../common/ButtonIcon';
 import { Input } from '../common/Input';
 import * as styles from './LanguageCard.css';

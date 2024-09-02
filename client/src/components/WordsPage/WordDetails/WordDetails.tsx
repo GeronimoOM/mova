@@ -1,8 +1,7 @@
 import React, { useEffect } from 'react';
-import { FaFeatherPointed } from 'react-icons/fa6';
+import { FaFeatherPointed, FaFire } from 'react-icons/fa6';
 
 import { BsTranslate } from 'react-icons/bs';
-import { FaFire } from 'react-icons/fa6';
 import { HiMiniXMark } from 'react-icons/hi2';
 
 import { ButtonIcon } from '../../common/ButtonIcon';

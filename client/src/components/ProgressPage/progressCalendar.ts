@@ -7,6 +7,7 @@ import { sequence } from '../../utils/arrays';
 import { fromTimestamp } from '../../utils/datetime';
 
 const DEFAULT_HISTORY_SPAN = Duration.fromObject({ months: 3 });
+const SHORTENED_HISTORY_SPAN = Duration.fromObject({ months: 2 });
 
 export type ProgressCalendarInstance = {
   date: DateTime;
@@ -15,10 +16,18 @@ export type ProgressCalendarInstance = {
 
 export function parseCalendarData(
   history: ProgressHistoryFieldsFragment,
+  isFullCalendar: boolean,
 ): Array<ProgressCalendarInstance | undefined> {
   const isDailyCadence = history.cadence === ProgressCadence.Daily;
-  const from = fromTimestamp(history.from, true)!;
+  let from = fromTimestamp(history.from, true)!;
   const until = fromTimestamp(history.until, true)!;
+
+  if (!isFullCalendar) {
+    const today = DateTime.local();
+    from = today
+      .minus(SHORTENED_HISTORY_SPAN)
+      .startOf(isDailyCadence ? 'day' : 'week');
+  }
 
   const total = until.diff(from, isDailyCadence ? 'days' : 'weeks')[
     isDailyCadence ? 'days' : 'weeks'
@@ -59,11 +68,12 @@ export function parseCalendarData(
 
 export function emptyCalendarData(
   cadence: ProgressCadence,
+  isFullCalendar: boolean,
 ): Array<ProgressCalendarInstance | undefined> {
   const isDailyCadence = cadence === ProgressCadence.Daily;
   const today = DateTime.local();
   const from = today
-    .minus(DEFAULT_HISTORY_SPAN)
+    .minus(isFullCalendar ? DEFAULT_HISTORY_SPAN : SHORTENED_HISTORY_SPAN)
     .startOf(isDailyCadence ? 'day' : 'week');
   const until = today
     .plus(isDailyCadence ? { days: 1 } : { week: 1 })

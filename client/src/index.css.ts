@@ -69,6 +69,7 @@ globalStyle('*::-webkit-scrollbar-thumb:hover', {
 });
 
 export const breakpoints = {
+  tiny: 'screen and (min-width: 400px)',
   small: 'screen and (min-width: 640px)',
   medium: 'screen and (min-width: 768px)',
   large: 'screen and (min-width: 1024px)',
