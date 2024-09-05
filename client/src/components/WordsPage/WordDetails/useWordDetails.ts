@@ -184,7 +184,9 @@ export function useWordDetails(wordId: string | null): WordDetailsReturn {
           input: {
             id: wordId!,
             ...(wordInput.original && { original: wordInput.original }),
-            ...(wordInput.translation && { original: wordInput.translation }),
+            ...(wordInput.translation && {
+              translation: wordInput.translation,
+            }),
             ...(wordInput.properties &&
               Object.values(wordInput.properties).length && {
                 properties: Object.values(wordInput.properties),

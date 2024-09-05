@@ -5,7 +5,6 @@
   "author": "GeronimoOM",
   "license": "UNLICENSED",
   "devDependencies": {
-    "husky": "8.0.0",
     "lerna": "7.4.2"
   },
   "scripts": {
@@ -13,7 +12,6 @@
     "start:build": "docker-compose -f docker-compose.dev.yml up --build",
     "stop": "docker-compose -f docker-compose.dev.yml down",
     "start:prod": "docker-compose -f docker-compose.prod.yml up",
-    "stop:prod": "docker-compose -f docker-compose.prod.yml down",
-    "prepare": "husky install"
+    "stop:prod": "docker-compose -f docker-compose.prod.yml down"
   }
 }
