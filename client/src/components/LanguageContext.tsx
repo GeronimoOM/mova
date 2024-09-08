@@ -8,7 +8,7 @@ import React, {
 
 export type LanguageContextType = [
   language: string | null,
-  setLanguage: (language: string) => void,
+  setLanguage: (language: string | null) => void,
 ];
 
 export const LanguageContext = createContext<LanguageContextType>([
@@ -29,8 +29,13 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
     localStorage.getItem(LOCAL_STORAGE_LANGUAGE_KEY),
   );
 
-  const setLanguageAndSave = useCallback((language: string) => {
-    localStorage.setItem(LOCAL_STORAGE_LANGUAGE_KEY, language);
+  const setLanguageAndSave = useCallback((language: string | null) => {
+    if (language) {
+      localStorage.setItem(LOCAL_STORAGE_LANGUAGE_KEY, language);
+    } else {
+      localStorage.removeItem(LOCAL_STORAGE_LANGUAGE_KEY);
+    }
+
     setLanguage(language);
   }, []);
 

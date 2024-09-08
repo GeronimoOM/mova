@@ -29,7 +29,7 @@ import { ProgressService } from './ProgressService';
 import { PropertyService } from './PropertyService';
 
 export interface GetWordPageParams {
-  languageId?: LanguageId;
+  languageId: LanguageId | LanguageId[];
   partsOfSpeech?: PartOfSpeech[];
   query?: string;
   order?: WordOrder;
@@ -83,18 +83,26 @@ export class WordService {
     private connectionManager: DbConnectionManager,
   ) {}
 
-  async getById(wordId: WordId): Promise<Word> {
+  async getById(ctx: Context, wordId: WordId): Promise<Word> {
     const word = await this.wordRepository.getById(wordId);
-    if (!word) {
+    if (!word || !(await this.languageService.exists(ctx, word.languageId))) {
       throw new Error('Word does not exist');
     }
 
     return word;
   }
 
-  async getPage(params: GetWordPageParams): Promise<Page<Word, WordCursor>> {
-    let words: Page<Word, WordCursor>;
+  async getPage(
+    ctx: Context,
+    params: GetWordPageParams,
+  ): Promise<Page<Word, WordCursor>> {
+    if (Array.isArray(params.languageId)) {
+      await this.languageService.getByIds(ctx, params.languageId);
+    } else {
+      await this.languageService.getById(ctx, params.languageId);
+    }
 
+    let words: Page<Word, WordCursor>;
     if (params.query && params.query.length >= QUERY_MIN_LENGTH) {
       const wordIds = await this.searchClient.searchWords(
         params as SearchWordsParams,
@@ -112,7 +120,7 @@ export class WordService {
   }
 
   async create(ctx: Context, params: CreateWordParams): Promise<Word> {
-    await this.languageService.getById(params.languageId);
+    await this.languageService.getById(ctx, params.languageId);
 
     const word: Word = {
       id: params.id ?? uuid(),
@@ -126,6 +134,7 @@ export class WordService {
 
     if (params.properties) {
       const properties = await this.propertyService.getByLanguageId(
+        ctx,
         word.languageId,
         word.partOfSpeech,
       );
@@ -151,7 +160,7 @@ export class WordService {
   }
 
   async update(ctx: Context, params: UpdateWordParams): Promise<Word> {
-    const word = await this.getById(params.id);
+    const word = await this.getById(ctx, params.id);
     const currentWord = copy(word);
 
     if (params.original) {
@@ -164,6 +173,7 @@ export class WordService {
 
     if (params.properties) {
       const properties = await this.propertyService.getByLanguageId(
+        ctx,
         word.languageId,
         word.partOfSpeech,
       );
@@ -190,7 +200,7 @@ export class WordService {
   }
 
   async delete(ctx: Context, { id }: DeleteWordParams): Promise<Word> {
-    const word = await this.getById(id);
+    const word = await this.getById(ctx, id);
 
     await this.connectionManager.transactionally(async () => {
       await this.wordRepository.delete(id);
@@ -203,12 +213,6 @@ export class WordService {
     await this.searchClient.deleteWord(id);
 
     return word;
-  }
-
-  async index(wordId: WordId): Promise<void> {
-    const word = await this.getById(wordId);
-
-    await this.searchClient.indexWord(word);
   }
 
   async indexLanguage(languageId: LanguageId): Promise<void> {

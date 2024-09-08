@@ -1,10 +1,4 @@
-import {
-  Args,
-  Context as ContextDec,
-  Mutation,
-  Query,
-  Resolver,
-} from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { ChangeTypeMapper } from 'graphql/mappers/ChangeTypeMapper';
 import { PropertyTypeMapper } from 'graphql/mappers/PropertyTypeMapper';
 import { WordTypeMapper } from 'graphql/mappers/WordTypeMapper';
@@ -16,6 +10,7 @@ import {
 } from 'graphql/types/ChangeType';
 import { PageArgsType } from 'graphql/types/PageType';
 import { DateTime } from 'luxon';
+import { ContextDec } from 'middleware/ContextMiddleware';
 import { ChangeCursor, SyncType } from 'models/Change';
 import { Context } from 'models/Context';
 import { ChangeService } from 'services/ChangeService';
@@ -32,14 +27,14 @@ export class ChangeResolver {
 
   @Query((type) => ChangePageType)
   async changes(
-    @ContextDec('ctx') ctx: Context,
+    @ContextDec() ctx: Context,
     @Args() pageArgs: PageArgsType,
     @Args('syncType', { type: () => SyncType, nullable: true })
     syncType?: SyncType,
     @Args('changedAt', { type: () => TimestampScalar, nullable: true })
     changedAt?: DateTime,
   ): Promise<ChangePageType> {
-    const changePage = await this.changeService.getPage({
+    const changePage = await this.changeService.getPage(ctx, {
       syncType,
       changedAt,
       cursor: pageArgs.cursor
@@ -62,7 +57,7 @@ export class ChangeResolver {
 
   @Mutation((returns) => Boolean)
   async applyChanges(
-    @ContextDec('ctx') ctx: Context,
+    @ContextDec() ctx: Context,
     @Args('changes', { type: () => [ApplyChangeInput] })
     changes: ApplyChangeInput[],
   ): Promise<boolean> {

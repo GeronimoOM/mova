@@ -1,6 +1,5 @@
 import {
   Args,
-  Context as ContextDec,
   ID,
   Int,
   Mutation,
@@ -11,9 +10,10 @@ import {
 import { WordTypeMapper } from 'graphql/mappers/WordTypeMapper';
 import { LanguageType } from 'graphql/types/LanguageType';
 import { WordType } from 'graphql/types/WordType';
+import { ContextDec } from 'middleware/ContextMiddleware';
+import { Context } from 'models/Context';
 import { WordId } from 'models/Word';
 import { ExerciseService } from 'services/ExerciseService';
-import { Context } from 'vm';
 
 @Resolver((of) => LanguageType)
 export class ExerciseResolver {
@@ -36,7 +36,7 @@ export class ExerciseResolver {
 
   @Mutation((returns) => WordType)
   async increaseMastery(
-    @ContextDec('ctx') ctx: Context,
+    @ContextDec() ctx: Context,
     @Args('wordId', { type: () => ID }) wordId: WordId,
   ): Promise<WordType> {
     const word = await this.exerciseService.increaseMastery(ctx, wordId);

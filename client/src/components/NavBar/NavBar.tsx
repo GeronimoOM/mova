@@ -32,7 +32,7 @@ export const NavBar: React.FC = () => {
         text="Language"
       />
 
-      <NavBarItem href={'/login'} icon={FaUser} text="Log out" />
+      <NavBarItem href={AppRoute.User} icon={FaUser} text="User" />
     </nav>
   );
 };

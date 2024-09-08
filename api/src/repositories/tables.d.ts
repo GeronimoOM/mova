@@ -9,6 +9,7 @@ declare module 'knex/types/tables' {
     id: LanguageId;
     name: string;
     added_at: string;
+    user_id: string;
   }
 
   interface PropertyTable {
@@ -54,6 +55,7 @@ declare module 'knex/types/tables' {
     type: string;
     client_id?: string;
     data?: string;
+    user_id: string;
   }
 
   interface Tables {

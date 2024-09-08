@@ -31,6 +31,7 @@ const PUSH_CHANGES_BATCH = 20;
 
 export type SyncState = {
   id: 1;
+  token: string | null;
   clientId: string;
   currentSyncStartedAt: number | null;
   currentSyncCursor: string | null;
@@ -50,7 +51,7 @@ const gqlClient = new GraphQLClient(`${location.origin}/api/graphql`, {
 });
 
 export async function getSyncStatus(state?: SyncState): Promise<SyncStatus> {
-  const { lastSyncedAt } = state ?? (await cache.getState());
+  const { lastSyncedAt } = state ?? (await cache.getState()) ?? {};
   if (!lastSyncedAt) {
     return SyncStatus.Empty;
   } else if (isSyncStale(lastSyncedAt)) {
@@ -99,7 +100,12 @@ export async function sync(): Promise<void> {
 }
 
 async function pushChanges(): Promise<void> {
-  const { clientId } = await cache.getState();
+  const state = await cache.getState();
+  if (!state) {
+    return;
+  }
+
+  const { clientId } = state;
   let changes: Array<ApplyChangeInput & { id: number }>;
   let nChanges = 0;
   do {
@@ -119,6 +125,10 @@ async function pushChanges(): Promise<void> {
 
 async function pullChanges(): Promise<void> {
   const state = await cache.getState();
+  if (!state) {
+    return;
+  }
+
   const syncStatus = await getSyncStatus(state);
   const { clientId, lastSyncedAt } = state;
   let { currentSyncCursor, currentSyncStartedAt } = state;
@@ -277,7 +287,7 @@ async function pushApplyChanges(
 }
 
 async function getAuthHeaders(): Promise<Record<string, string>> {
-  const token = await cache.getToken();
+  const { token } = await cache.getState();
 
   return {
     ...(token && { Authorization: `Bearer ${token}` }),

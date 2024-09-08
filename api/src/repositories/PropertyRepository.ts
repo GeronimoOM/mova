@@ -57,9 +57,10 @@ export class PropertyRepository {
     return propertyRows.map((propertyRow) => this.mapToProperty(propertyRow));
   }
 
-  async getAll(): Promise<Property[]> {
+  async getAll(languageIds: LanguageId[]): Promise<Property[]> {
     const propertyRows = await this.connectionManager
       .getConnection()(TABLE_PROPERTIES)
+      .whereIn('language_id', languageIds)
       .orderBy('added_at', 'asc');
 
     return propertyRows.map((propertyRow) => this.mapToProperty(propertyRow));

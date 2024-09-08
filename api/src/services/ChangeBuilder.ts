@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DateTime } from 'luxon';
 import {
+  BaseChange,
   ChangeType,
   CreateLanguageChange,
   CreatePropertyChange,
@@ -40,11 +41,11 @@ export class ChangeBuilder {
     language: Language,
   ): CreateLanguageChange {
     return {
+      ...this.buildBaseChange(ctx),
       id: language.id,
       type: ChangeType.CreateLanguage,
       changedAt: language.addedAt,
       created: language,
-      clientId: ctx.clientId,
     };
   }
 
@@ -58,14 +59,13 @@ export class ChangeBuilder {
     }
 
     return {
+      ...this.buildBaseChange(ctx),
       id: language.id,
       type: ChangeType.UpdateLanguage,
-      changedAt: DateTime.utc(),
       updated: {
         id: language.id,
         name: language.name,
       },
-      clientId: ctx.clientId,
     };
   }
 
@@ -74,11 +74,10 @@ export class ChangeBuilder {
     language: Language,
   ): DeleteLanguageChange {
     return {
+      ...this.buildBaseChange(ctx),
       id: language.id,
       type: ChangeType.DeleteLanguage,
-      changedAt: DateTime.utc(),
       deleted: language.id,
-      clientId: ctx.clientId,
     };
   }
 
@@ -87,11 +86,11 @@ export class ChangeBuilder {
     property: Property,
   ): CreatePropertyChange {
     return {
+      ...this.buildBaseChange(ctx),
       id: property.id,
       type: ChangeType.CreateProperty,
       changedAt: property.addedAt,
       created: property,
-      clientId: ctx.clientId,
     };
   }
 
@@ -112,16 +111,15 @@ export class ChangeBuilder {
     }
 
     return {
+      ...this.buildBaseChange(ctx),
       id: property.id,
       type: ChangeType.UpdateProperty,
-      changedAt: DateTime.utc(),
       updated: {
         id: property.id,
         type: property.type,
         ...(property.name !== currentProperty.name && { name: property.name }),
         ...(isOptionsChange && { options: property.options }),
       },
-      clientId: ctx.clientId,
     };
   }
 
@@ -141,15 +139,14 @@ export class ChangeBuilder {
     }
 
     return {
+      ...this.buildBaseChange(ctx),
       id: languageId,
       type: ChangeType.ReorderProperties,
-      changedAt: DateTime.utc(),
       reordered: {
         languageId,
         partOfSpeech,
         propertyIds,
       },
-      clientId: ctx.clientId,
     };
   }
 
@@ -158,16 +155,16 @@ export class ChangeBuilder {
     property: Property,
   ): DeletePropertyChange {
     return {
+      ...this.buildBaseChange(ctx),
       id: property.id,
       type: ChangeType.DeleteProperty,
-      changedAt: DateTime.utc(),
       deleted: property.id,
-      clientId: ctx.clientId,
     };
   }
 
   buildCreateWordChange(ctx: Context, word: Word): CreateWordChange {
     return {
+      ...this.buildBaseChange(ctx),
       id: word.id,
       type: ChangeType.CreateWord,
       changedAt: word.addedAt,
@@ -179,7 +176,6 @@ export class ChangeBuilder {
           ),
         }),
       },
-      clientId: ctx.clientId,
     };
   }
 
@@ -218,9 +214,9 @@ export class ChangeBuilder {
     }
 
     return {
+      ...this.buildBaseChange(ctx),
       id: word.id,
       type: ChangeType.UpdateWord,
-      changedAt: DateTime.utc(),
       updated: {
         id: word.id,
         ...(word.original !== currentWord.original && {
@@ -246,17 +242,25 @@ export class ChangeBuilder {
           mastery: word.mastery,
         }),
       },
-      clientId: ctx.clientId,
     };
   }
 
   buildDeleteWordChange(ctx: Context, word: Word): DeleteWordChange {
     return {
+      ...this.buildBaseChange(ctx),
       id: word.id,
       type: ChangeType.DeleteWord,
-      changedAt: DateTime.utc(),
       deleted: word.id,
+    };
+  }
+
+  private buildBaseChange(
+    ctx: Context,
+  ): Pick<BaseChange, 'userId' | 'clientId' | 'changedAt'> {
+    return {
+      userId: ctx.user.id,
       clientId: ctx.clientId,
+      changedAt: DateTime.utc(),
     };
   }
 

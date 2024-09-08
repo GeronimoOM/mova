@@ -2,7 +2,8 @@ import { SwWorkerMessageHandler } from '../worker/messages';
 import { SwClientMessageType, sendMessageToServiceWorker } from './messages';
 
 const PERIODIC_SYNC_INTERVAL_MS = 120 * 1000;
-const PERIODIC_BACKGROUND_SYNC_INTERVAL_MS = 30 * 60 * 1000;
+// const PERIODIC_BACKGROUND_SYNC_INTERVAL_MS = 30 * 60 * 1000;
+let periodicSyncInterval: NodeJS.Timeout | null = null;
 
 export async function registerServiceWorker(
   messageHandler: SwWorkerMessageHandler,
@@ -33,14 +34,24 @@ export async function initServiceWorker(token: string) {
     token,
   });
   startPeriodicSync();
-  registerBackgroundSync();
+  // registerBackgroundSync();
+}
+
+export async function resetServiceWorker() {
+  sendMessageToServiceWorker({
+    type: SwClientMessageType.Destroy,
+  });
+
+  if (periodicSyncInterval) {
+    clearInterval(periodicSyncInterval);
+  }
 }
 
 function startPeriodicSync() {
   sendMessageToServiceWorker({
     type: SwClientMessageType.Sync,
   });
-  setInterval(() => {
+  periodicSyncInterval = setInterval(() => {
     sendMessageToServiceWorker({
       type: SwClientMessageType.Sync,
     });
@@ -53,22 +64,22 @@ function startPeriodicSync() {
   });
 }
 
-async function registerBackgroundSync() {
-  const perioricBgSyncStatus = await navigator.permissions.query({
-    name: 'periodic-background-sync' as PermissionName,
-  });
+// async function registerBackgroundSync() {
+//   const perioricBgSyncStatus = await navigator.permissions.query({
+//     name: 'periodic-background-sync' as PermissionName,
+//   });
 
-  if (perioricBgSyncStatus.state === 'granted') {
-    const registration = await window.navigator.serviceWorker.ready;
-    try {
-      await registration.periodicSync.register('sync-mova-data', {
-        minInterval: PERIODIC_BACKGROUND_SYNC_INTERVAL_MS,
-      });
-    } catch (err) {
-      console.log(err, 'Periodic sync could not be registered!');
-    }
-  }
-}
+//   if (perioricBgSyncStatus.state === 'granted') {
+//     const registration = await window.navigator.serviceWorker.ready;
+//     try {
+//       await registration.periodicSync.register('sync-mova-data', {
+//         minInterval: PERIODIC_BACKGROUND_SYNC_INTERVAL_MS,
+//       });
+//     } catch (err) {
+//       console.log(err, 'Periodic sync could not be registered!');
+//     }
+//   }
+// }
 
 async function registerMessageHandler(messageHandler: SwWorkerMessageHandler) {
   navigator.serviceWorker.addEventListener('message', (e) => {

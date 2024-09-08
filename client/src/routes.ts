@@ -4,10 +4,7 @@ export enum AppRoute {
   Exercises = '/exercises',
   Progress = '/progress',
   Languages = '/languages',
+  User = '/user',
 }
 
-export const getAppRouteMatch = (location: string): AppRoute | null => {
-  return (Object.entries(AppRoute).find(
-    ([, routeLocation]) => location === routeLocation,
-  )?.[0] ?? null) as AppRoute | null;
-};
+export const allowedNoLanguageRoutes = [AppRoute.Languages, AppRoute.User];

@@ -40,18 +40,9 @@ db.version(DB_VERSION).stores({
   properties: 'id,[languageId+partOfSpeech]',
   words: 'id,[languageId+addedAt+id],[languageId+original+id]',
   changes: 'id',
-  auth: 'id',
-});
-db.on('ready', () => {
-  return initState();
 });
 
 export async function getState(): Promise<SyncState> {
-  const state = await db.state.get(1);
-  if (!state) {
-    await initState();
-  }
-
   return (await db.state.get(1))!;
 }
 
@@ -59,20 +50,14 @@ export async function updateState(state: Partial<SyncState>): Promise<void> {
   await db.state.update(1, state);
 }
 
-async function initState(): Promise<void> {
-  await db.transaction('rw', 'state', async () => {
-    const state = await db.state.get(1);
-    if (state) {
-      return;
-    }
-
-    db.state.put({
-      id: 1,
-      clientId: uuid(),
-      currentSyncStartedAt: null,
-      currentSyncCursor: null,
-      lastSyncedAt: null,
-    });
+export async function initState(token: string): Promise<void> {
+  await db.state.put({
+    id: 1,
+    token,
+    clientId: uuid(),
+    currentSyncStartedAt: null,
+    currentSyncCursor: null,
+    lastSyncedAt: null,
   });
 }
 
@@ -313,17 +298,14 @@ export async function deleteChanges(ids: number[]): Promise<void> {
   await db.changes.bulkDelete(ids);
 }
 
-export async function getToken(): Promise<string | null> {
-  const auth = await db.auth.get(1);
-
-  return auth?.token ?? null;
-}
-
-export async function saveToken(token: string): Promise<void> {
-  await db.auth.put({
-    id: 1,
-    token,
-  });
+export async function destroy(): Promise<void> {
+  await Promise.all([
+    db.languages.clear(),
+    db.properties.clear(),
+    db.words.clear(),
+    db.changes.clear(),
+    db.state.clear(),
+  ]);
 }
 
 export async function transactionally<T>(fn: () => Promise<T>): Promise<T> {

@@ -9,12 +9,14 @@ import {
   PropertyId,
   PropertyUpdate,
 } from './Property';
+import { UserId } from './User';
 import { WordCreate, WordId, WordUpdate } from './Word';
 
 export type ChangeId = LanguageId | PropertyId | WordId;
 
 export interface BaseChange {
   id: ChangeId;
+  userId: UserId;
   changedAt: DateTime;
   type: ChangeType;
   clientId?: string;

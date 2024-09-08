@@ -1,15 +1,15 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { ScheduleModule } from '@nestjs/schedule';
-import { TestController } from 'controllers/TestController';
 import { ChangeTypeMapper } from 'graphql/mappers/ChangeTypeMapper';
 import { AuthResolver } from 'graphql/resolvers/AuthResolver';
 import { ChangeResolver } from 'graphql/resolvers/ChangeResolver';
 import { ExerciseResolver } from 'graphql/resolvers/ExerciseResolver';
 import { ProgressResolver } from 'graphql/resolvers/ProgressResolver';
-import { AuthGuard, CONFIG_JWT_KEY } from 'guards/AuthGuard';
+import { AuthGuard } from 'guards/AuthGuard';
+import { ContextMiddleware } from 'middleware/ContextMiddleware';
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { ChangeRepository } from 'repositories/ChangeRepository';
 import { ProgressRepository } from 'repositories/ProgressRepository';
@@ -21,6 +21,7 @@ import { ExerciseService } from 'services/ExerciseService';
 import { ProgressService } from 'services/ProgressService';
 import { ElasticClientModule } from './clients/ElasticClientModule';
 import { SearchClient } from './clients/SearchClient';
+import { configLoader } from './config';
 import { MaintenanceController } from './controllers/MaintenanceController';
 import { GraphQlModule } from './graphql/GraphQlModule';
 import { PropertyTypeMapper } from './graphql/mappers/PropertyTypeMapper';
@@ -42,12 +43,14 @@ import { WordService } from './services/WordService';
     GraphQlModule,
     ElasticClientModule,
     ScheduleModule.forRoot(),
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      load: [configLoader],
+    }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>(CONFIG_JWT_KEY),
+        secret: configService.get<string>('jwt.secret'),
       }),
     }),
   ],
@@ -88,6 +91,10 @@ import { WordService } from './services/WordService';
       useValue: new AsyncLocalStorage(),
     },
   ],
-  controllers: [TestController, MaintenanceController],
+  controllers: [MaintenanceController],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(ContextMiddleware).forRoutes('*');
+  }
+}

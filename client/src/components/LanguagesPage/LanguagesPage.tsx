@@ -2,7 +2,7 @@ import { useQuery } from '@apollo/client';
 import { GetLanguagesDocument } from '../../api/types/graphql';
 import { useLanguageContext } from '../LanguageContext';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { TbHexagonPlusFilled } from 'react-icons/tb';
 import { ButtonIcon } from '../common/ButtonIcon';
 import { LanguageCard } from './LanguageCard';
@@ -33,6 +33,18 @@ export const LanguagesPage: React.FC = () => {
   const handleLanguageCreated = useCallback(() => {
     setIsNewLanguageOpen(false);
   }, []);
+
+  useEffect(() => {
+    if (!languages) {
+      return;
+    }
+
+    if (!languages.length) {
+      setIsNewLanguageOpen(true);
+    } else if (languages.length === 1) {
+      setSelectedLanguageId(languages[0].id);
+    }
+  }, [languages, setSelectedLanguageId]);
 
   return (
     <div className={styles.wrapper}>

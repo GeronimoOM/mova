@@ -1,29 +1,48 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-
-const CONFIG_AUTH_USER = 'AUTH_USER';
-const CONFIG_AUTH_PASSWORD = 'AUTH_PASSWORD';
+import { User, UserAuth } from 'models/User';
 
 @Injectable()
 export class AuthService {
+  private users: User[];
+
   constructor(
     private jwtService: JwtService,
     private configService: ConfigService,
-  ) {}
+  ) {
+    this.users = this.configService.get<User[]>('users');
+  }
 
-  async auth(username: string, password: string): Promise<string> {
-    if (
-      username !== this.configService.get<string>(CONFIG_AUTH_USER) ||
-      password !== this.configService.get<string>(CONFIG_AUTH_PASSWORD)
-    ) {
+  async login(username: string, password: string): Promise<string> {
+    const user = this.users.find(
+      (user) => user.username === username && user.password === password,
+    );
+
+    if (!user) {
       throw new UnauthorizedException();
     }
 
-    const payload = { auth: true };
+    const payload: UserAuth = { userId: user.id };
 
     return await this.jwtService.signAsync(payload, {
       noTimestamp: true,
     });
+  }
+
+  async auth(token?: string): Promise<User | null> {
+    let user: User | null = null;
+    try {
+      const { userId } = await this.jwtService.verifyAsync<UserAuth>(token, {
+        secret: this.configService.get<string>('jwt.secret'),
+        ignoreExpiration: true,
+      });
+
+      user = this.users.find((user) => user.id === userId) ?? null;
+    } catch (e) {
+      Logger.warn('Failed to authenticate:', e);
+    }
+
+    return user;
   }
 }

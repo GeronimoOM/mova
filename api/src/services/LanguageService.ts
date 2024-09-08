@@ -42,16 +42,32 @@ export class LanguageService {
     private connectionManager: DbConnectionManager,
   ) {}
 
-  async getAll(): Promise<Language[]> {
-    return await this.languageRepository.getAll();
+  async getAll(ctx: Context): Promise<Language[]> {
+    return await this.languageRepository.getAll(ctx.user.id);
   }
 
-  async getById(id: LanguageId): Promise<Language> {
+  async getById(ctx: Context, id: LanguageId): Promise<Language> {
     const language = await this.languageRepository.getById(id);
-    if (!language) {
+    if (!language || language.userId !== ctx.user.id) {
       throw new Error('Language does not exist');
     }
     return language;
+  }
+
+  async getByIds(ctx: Context, ids: LanguageId[]): Promise<Language[]> {
+    const languages = (await this.languageRepository.getByIds(ids)).filter(
+      (language) => language.userId === ctx.user.id,
+    );
+    if (languages.length < ids.length) {
+      throw new Error('Language does not exist');
+    }
+
+    return languages;
+  }
+
+  async exists(ctx: Context, id: LanguageId): Promise<boolean> {
+    const language = await this.languageRepository.getById(id);
+    return language && language.userId === ctx.user.id;
   }
 
   async create(ctx: Context, params: CreateLanguageParams): Promise<Language> {
@@ -59,6 +75,7 @@ export class LanguageService {
       id: params.id ?? uuid(),
       name: params.name.trim(),
       addedAt: params.addedAt ?? DateTime.utc(),
+      userId: ctx.user.id,
     };
 
     await this.connectionManager.transactionally(async () => {
@@ -72,7 +89,7 @@ export class LanguageService {
   }
 
   async update(ctx: Context, params: UpdateLanguageParams): Promise<Language> {
-    const language = await this.getById(params.id);
+    const language = await this.getById(ctx, params.id);
     const currentLanguage = copy(language);
 
     language.name = params.name.trim();
@@ -94,7 +111,7 @@ export class LanguageService {
   }
 
   async delete(ctx: Context, { id }: DeleteLanguageParams): Promise<Language> {
-    const language = await this.getById(id);
+    const language = await this.getById(ctx, id);
 
     const wordCount = await this.wordService.getCount(language.id);
     if (wordCount > LANGUAGE_DELETION_WORDS_THRESHOLD) {

@@ -1,4 +1,5 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import knex, { Knex } from 'knex';
 import { AsyncLocalStorage } from 'node:async_hooks';
 
@@ -6,12 +7,21 @@ interface TransactionContext {
   transaction: Knex.Transaction;
 }
 
+type DbServiceConfig = {
+  host: string;
+  port: number;
+  user: string;
+  password: string;
+  database: string;
+};
+
 @Injectable()
 export class DbConnectionManager implements OnApplicationBootstrap {
   private connection: Knex | undefined;
 
   constructor(
     private asyncLocalStorage: AsyncLocalStorage<TransactionContext>,
+    private configService: ConfigService,
   ) {}
 
   getConnection(): Knex {
@@ -45,15 +55,17 @@ export class DbConnectionManager implements OnApplicationBootstrap {
   }
 
   private initConnection(): Knex {
-    //TODO extract
+    const { host, port, user, password, database } =
+      this.configService.get<DbServiceConfig>('env.database');
+
     return knex({
       client: 'mysql',
       connection: {
-        host: 'mova-db',
-        port: 3306,
-        user: 'mova',
-        password: 'secret-to-mova-db',
-        database: 'mova',
+        host,
+        port,
+        user,
+        password,
+        database,
         dateStrings: true,
       },
       migrations: {

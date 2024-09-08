@@ -1,4 +1,7 @@
-export type SwClientMessage = ClientInitializeMessage | ClientSyncMessage;
+export type SwClientMessage =
+  | ClientInitializeMessage
+  | ClientSyncMessage
+  | ClientDestroyMessage;
 
 export interface BaseSwClientMessage {
   type: SwClientMessageType;
@@ -7,6 +10,7 @@ export interface BaseSwClientMessage {
 export enum SwClientMessageType {
   Initialize = 'initialize',
   Sync = 'sync',
+  Destroy = 'destroy',
 }
 
 export interface ClientInitializeMessage extends BaseSwClientMessage {
@@ -16,6 +20,10 @@ export interface ClientInitializeMessage extends BaseSwClientMessage {
 
 export interface ClientSyncMessage extends BaseSwClientMessage {
   type: SwClientMessageType.Sync;
+}
+
+export interface ClientDestroyMessage extends BaseSwClientMessage {
+  type: SwClientMessageType.Destroy;
 }
 
 export type SwClientMessageHandler = (message: SwClientMessage) => void;

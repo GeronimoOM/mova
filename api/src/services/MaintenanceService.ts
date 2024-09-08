@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { SearchClient } from 'clients/SearchClient';
+import { Admin } from 'guards/metadata';
 import {
   GoalTable,
   LanguageTable,
@@ -13,21 +14,21 @@ import {
   MigrationRecordType,
   MigrationRecordTypes,
 } from 'models/Migration';
+import { UserId } from 'models/User';
 import { LanguageRepository } from 'repositories/LanguageRepository';
 import { ProgressRepository } from 'repositories/ProgressRepository';
 import { PropertyRepository } from 'repositories/PropertyRepository';
 import { WordRepository } from 'repositories/WordRepository';
 import { Readable } from 'stream';
-import { LanguageService } from './LanguageService';
 import { ProgressService } from './ProgressService';
 import { WordService } from './WordService';
 
 const RECORDS_BATCH = 1000;
 
+@Admin()
 @Injectable()
 export class MaintenanceService {
   constructor(
-    private languageService: LanguageService,
     private wordService: WordService,
     private progressService: ProgressService,
 
@@ -46,7 +47,9 @@ export class MaintenanceService {
   async import(recordStream: Readable): Promise<void> {
     await this.insertRecords(recordStream);
 
-    const languages = await this.languageService.getAll();
+    const languages = await Array.fromAsync(
+      this.languageRepository.streamRecords(),
+    );
     await this.searchClient.createIndices();
     await Promise.all(
       languages.map((language) => this.reindexLanguage(language.id)),
@@ -62,7 +65,7 @@ export class MaintenanceService {
   }
 
   async reindexLanguage(languageId: LanguageId): Promise<Language> {
-    const language = await this.languageService.getById(languageId);
+    const language = await this.languageRepository.getById(languageId);
 
     await this.wordService.indexLanguage(languageId);
 
@@ -72,6 +75,8 @@ export class MaintenanceService {
   async resyncProgress(languageId: LanguageId): Promise<void> {
     await this.progressService.syncAllWordsProgress(languageId);
   }
+
+  async setInitialUser(userId: UserId): Promise<void> {}
 
   private async *exportRecords(): AsyncGenerator<MigrationRecord> {
     for await (const language of this.languageRepository.streamRecords()) {

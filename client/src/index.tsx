@@ -19,13 +19,13 @@ registerServiceWorker((message) => {
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ApolloProvider client={client}>
-      <AuthProvider>
-        <LanguageProvider>
+      <LanguageProvider>
+        <AuthProvider>
           <BrowserRouter>
             <App />
           </BrowserRouter>
-        </LanguageProvider>
-      </AuthProvider>
+        </AuthProvider>
+      </LanguageProvider>
     </ApolloProvider>
   </React.StrictMode>,
 );

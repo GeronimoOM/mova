@@ -1,6 +1,5 @@
 import {
   Args,
-  Context as ContextDec,
   Int,
   Mutation,
   Parent,
@@ -14,6 +13,7 @@ import {
   ProgressInstanceType,
   ProgressType,
 } from 'graphql/types/ProgressType';
+import { ContextDec } from 'middleware/ContextMiddleware';
 import { Context } from 'models/Context';
 import { ProgressCadence } from 'models/Progress';
 import { ProgressService } from 'services/ProgressService';
@@ -24,7 +24,7 @@ export class ProgressResolver {
 
   @ResolveField((type) => ProgressInstanceType)
   async current(
-    @ContextDec('ctx') ctx: Context,
+    @ContextDec() ctx: Context,
     @Parent()
     progress: ProgressType,
     @Args('cadence', { type: () => ProgressCadence, nullable: true })
@@ -40,7 +40,7 @@ export class ProgressResolver {
 
   @ResolveField((type) => Int)
   async streak(
-    @ContextDec('ctx') ctx: Context,
+    @ContextDec() ctx: Context,
     @Parent()
     progress: ProgressType,
   ): Promise<number> {
@@ -53,7 +53,7 @@ export class ProgressResolver {
 
   @ResolveField((type) => ProgressHistoryType)
   async history(
-    @ContextDec('ctx') ctx: Context,
+    @ContextDec() ctx: Context,
     @Parent()
     progress: ProgressType,
     @Args('cadence', { type: () => ProgressCadence })
@@ -69,7 +69,7 @@ export class ProgressResolver {
 
   @Mutation((returns) => [GoalType])
   async setGoals(
-    @ContextDec('ctx') ctx: Context,
+    @ContextDec() ctx: Context,
     @Args('input') input: SetGoalsInput,
   ): Promise<GoalType[]> {
     return await this.progressService.setGoals(

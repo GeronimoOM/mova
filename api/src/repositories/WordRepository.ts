@@ -27,7 +27,7 @@ const TABLE_WORDS = 'words';
 const BATCH_SIZE = 100;
 
 export interface GetWordPageParams {
-  languageId?: LanguageId;
+  languageId: LanguageId | LanguageId[];
   order?: WordOrder;
   direction?: Direction;
   partsOfSpeech?: PartOfSpeech[];
@@ -77,10 +77,10 @@ export class WordRepository {
   }: GetWordPageParams): Promise<Page<Word, WordSortedCursor>> {
     const connection = this.connectionManager.getConnection();
 
-    const query = connection(TABLE_WORDS);
-    if (languageId) {
-      query.where({ language_id: languageId });
-    }
+    const query = connection(TABLE_WORDS).whereIn(
+      'language_id',
+      Array.isArray(languageId) ? languageId : [languageId],
+    );
 
     limit = Math.min(MAX_LIMIT, limit);
     let cursorKey: string;

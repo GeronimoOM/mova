@@ -1,6 +1,5 @@
 import {
   Args,
-  Context as ContextDec,
   ID,
   Mutation,
   Parent,
@@ -11,6 +10,7 @@ import {
 import { GoalType } from 'graphql/types/GoalType';
 import { ProgressType } from 'graphql/types/ProgressType';
 import { WordsStatsType } from 'graphql/types/WordsStatsType';
+import { ContextDec } from 'middleware/ContextMiddleware';
 import { Context } from 'models/Context';
 import { LanguageId } from 'models/Language';
 import { Direction, Page, encodePageCursor, mapPage } from 'models/Page';
@@ -45,20 +45,21 @@ export class LanguageResolver {
   ) {}
 
   @Query((type) => [LanguageType])
-  async languages(): Promise<LanguageType[]> {
-    return await this.languageService.getAll();
+  async languages(@ContextDec() ctx: Context): Promise<LanguageType[]> {
+    return await this.languageService.getAll(ctx);
   }
 
   @Query((type) => LanguageType, { nullable: true })
   async language(
+    @ContextDec() ctx: Context,
     @Args('id', { type: () => ID }) id: LanguageId,
   ): Promise<LanguageType | null> {
-    return this.languageService.getById(id).catch(() => null);
+    return this.languageService.getById(ctx, id).catch(() => null);
   }
 
   @Mutation((returns) => LanguageType)
   async createLanguage(
-    @ContextDec('ctx') ctx: Context,
+    @ContextDec() ctx: Context,
     @Args('input') input: CreateLanguageInput,
   ): Promise<LanguageType> {
     const createdLanguage = await this.languageService.create(ctx, input);
@@ -67,7 +68,7 @@ export class LanguageResolver {
 
   @Mutation((returns) => LanguageType)
   async updateLanguage(
-    @ContextDec('ctx') ctx: Context,
+    @ContextDec() ctx: Context,
     @Args('input') input: UpdateLanguageInput,
   ): Promise<LanguageType> {
     const updatedLanguage = await this.languageService.update(ctx, input);
@@ -76,7 +77,7 @@ export class LanguageResolver {
 
   @Mutation((returns) => LanguageType)
   async deleteLanguage(
-    @ContextDec('ctx') ctx: Context,
+    @ContextDec() ctx: Context,
     @Args('input') input: DeleteLanguageInput,
   ): Promise<LanguageType> {
     const deletedLanguage = await this.languageService.delete(ctx, input);
@@ -85,11 +86,13 @@ export class LanguageResolver {
 
   @ResolveField((type) => [PropertyUnionType])
   async properties(
+    @ContextDec() ctx: Context,
     @Parent() language: LanguageType,
     @Args('partOfSpeech', { type: () => PartOfSpeech, nullable: true })
     partOfSpeech?: PartOfSpeech,
   ): Promise<Array<typeof PropertyUnionType>> {
     const properties = await this.propertyService.getByLanguageId(
+      ctx,
       language.id,
       partOfSpeech,
     );
@@ -99,6 +102,7 @@ export class LanguageResolver {
 
   @ResolveField((type) => WordPageType)
   async words(
+    @ContextDec() ctx: Context,
     @Parent() language: LanguageType,
     @Args() pageArgs: PageArgsType,
     @Args('query', { nullable: true }) query?: string,
@@ -109,7 +113,7 @@ export class LanguageResolver {
     @Args('direction', { type: () => Direction, nullable: true })
     direction?: Direction,
   ): Promise<Page<WordType, string>> {
-    const wordPage = await this.wordService.getPage({
+    const wordPage = await this.wordService.getPage(ctx, {
       languageId: language.id,
       query,
       partsOfSpeech,
@@ -152,7 +156,7 @@ export class LanguageResolver {
 
   @ResolveField((type) => ProgressType)
   async progress(
-    @ContextDec('ctx') ctx: Context,
+    @ContextDec() ctx: Context,
     @Parent() language: LanguageType,
     @Args('type', { type: () => ProgressTypeEnum })
     type: ProgressTypeEnum,

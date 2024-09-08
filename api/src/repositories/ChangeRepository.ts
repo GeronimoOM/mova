@@ -10,6 +10,7 @@ import {
   SyncType,
 } from 'models/Change';
 import { mapPage, toPage } from 'models/Page';
+import { UserId } from 'models/User';
 import { fromTimestamp, toTimestamp } from 'utils/datetime';
 import { DbConnectionManager } from './DbConnectionManager';
 import { Serializer } from './Serializer';
@@ -17,6 +18,7 @@ import { Serializer } from './Serializer';
 const TABLE_CHANGES = 'changes';
 
 export interface GetChangePageParams {
+  userId: UserId;
   changedAt?: DateTime;
   cursor?: ChangeCursor;
   limit?: number;
@@ -31,6 +33,7 @@ export class ChangeRepository {
   ) {}
 
   async getPage({
+    userId,
     changedAt,
     cursor,
     limit,
@@ -40,6 +43,7 @@ export class ChangeRepository {
     const changedAtValue = cursor ? cursor.changedAt : toTimestamp(changedAt);
     const query = connection(TABLE_CHANGES)
       .limit(limit + 1)
+      .where({ user_id: userId })
       .orderBy([
         { column: 'changed_at', order: 'asc' },
         { column: 'id', order: 'asc' },
@@ -79,9 +83,10 @@ export class ChangeRepository {
     };
   }
 
-  async getOldestChangedAt(): Promise<DateTime | null> {
+  async getOldestChangedAt(userId: UserId): Promise<DateTime | null> {
     const change: ChangeTable | null = await this.connectionManager
       .getConnection()(TABLE_CHANGES)
+      .where({ user_id: userId })
       .limit(1)
       .orderBy('changed_at', 'asc')
       .first();
@@ -96,6 +101,7 @@ export class ChangeRepository {
       type: change.type,
       ...(change.clientId && { client_id: change.clientId }),
       data: this.mapDataFromChange(change),
+      user_id: change.userId,
     };
 
     await this.connectionManager
@@ -116,6 +122,7 @@ export class ChangeRepository {
       changedAt: fromTimestamp(row.changed_at),
       type: row.type as ChangeType,
       clientId: row.client_id,
+      userId: row.user_id,
     };
 
     const data = this.serializer.deserialize<Change>(row.data);

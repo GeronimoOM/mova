@@ -344,7 +344,7 @@ type Query {
 }
 
 type Mutation {
-  token(input: LoginInput!): String
+  login(input: LoginInput!): String
   createLanguage(input: CreateLanguageInput!): Language!
   updateLanguage(input: UpdateLanguageInput!): Language!
   deleteLanguage(input: DeleteLanguageInput!): Language!

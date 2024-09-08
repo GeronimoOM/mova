@@ -5,18 +5,22 @@ import { LoginDocument } from '../api/types/graphql';
 import { useAuthContext } from './AuthContext';
 
 import { FaCheck } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import { AppRoute } from '../routes';
 import * as styles from './LoginForm.css';
 import { ButtonIcon } from './common/ButtonIcon';
 import { Input } from './common/Input';
 
 export const LoginForm: React.FC = () => {
+  const navigate = useNavigate();
+
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
 
   const [loginMutation, { data: loginResult, loading }] =
     useMutation(LoginDocument);
 
-  const [, setToken] = useAuthContext();
+  const { setAuthToken } = useAuthContext();
 
   const login = useCallback(async () => {
     loginMutation({
@@ -30,13 +34,14 @@ export const LoginForm: React.FC = () => {
   }, [name, password, loginMutation]);
 
   useEffect(() => {
-    if (loginResult?.token) {
-      setToken(loginResult.token);
+    if (loginResult?.login) {
+      setAuthToken(loginResult.login);
+      navigate(AppRoute.Languages);
     } else {
       setName('');
       setPassword('');
     }
-  }, [loginResult, setToken]);
+  }, [loginResult, setAuthToken, navigate]);
 
   return (
     <div className={styles.wrapper}>

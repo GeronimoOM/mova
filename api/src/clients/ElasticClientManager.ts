@@ -1,12 +1,20 @@
 import * as elastic from '@elastic/elasticsearch';
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { retry } from 'utils/retry';
 
 const CONNECT_RETRY = 5000; // ms
 
+type IndexServiceConfig = {
+  host: string;
+  port: number;
+};
+
 @Injectable()
 export class ElasticClientManager implements OnApplicationBootstrap {
   private client: elastic.Client;
+
+  constructor(private configService: ConfigService) {}
 
   getClient() {
     if (!this.client) {
@@ -17,9 +25,11 @@ export class ElasticClientManager implements OnApplicationBootstrap {
   }
 
   private initClient(): elastic.Client {
-    //TODO extract
+    const { host, port } =
+      this.configService.get<IndexServiceConfig>('env.index');
+
     return new elastic.Client({
-      node: 'http://mova-index:9200',
+      node: `http://${host}:${port}`,
     });
   }
 

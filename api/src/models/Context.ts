@@ -1,9 +1,7 @@
+import { User } from './User';
+
 export interface Context {
-  jwtToken?: string;
+  user?: User;
   clientId?: string;
   timezone?: string;
-}
-
-export function emptyContext(): Context {
-  return {};
 }

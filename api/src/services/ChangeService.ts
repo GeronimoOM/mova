@@ -2,7 +2,7 @@ import { Inject, Injectable, Logger, forwardRef } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { DateTime } from 'luxon';
 import { Change, ChangeCursor, ChangePage, SyncType } from 'models/Change';
-import { Context, emptyContext } from 'models/Context';
+import { Context } from 'models/Context';
 import { Direction, mapCursor, mapPage } from 'models/Page';
 import { ChronologicalCursor, WordOrder } from 'models/Word';
 import { ChangeRepository } from 'repositories/ChangeRepository';
@@ -65,14 +65,17 @@ export class ChangeService {
     private connectionManager: DbConnectionManager,
   ) {}
 
-  async getPage(params: GetChangePageParams): Promise<ChangePage> {
-    const syncType = await this.determineSyncType(params);
+  async getPage(
+    ctx: Context,
+    params: GetChangePageParams,
+  ): Promise<ChangePage> {
+    const syncType = await this.determineSyncType(ctx, params);
     params.limit = params.limit ?? DEFAULT_LIMIT;
 
     if (syncType === SyncType.Delta) {
-      return await this.getDeltaPage(params);
+      return await this.getDeltaPage(ctx, params);
     } else {
-      return await this.getFullPage(params);
+      return await this.getFullPage(ctx, params);
     }
   }
 
@@ -118,11 +121,14 @@ export class ChangeService {
   }
 
   private async determineSyncType(
+    ctx: Context,
     params: GetChangePageParams,
   ): Promise<SyncType> {
     let syncType = SyncType.Full;
     if (params.syncType === SyncType.Delta && params.changedAt) {
-      const oldestChangeAt = await this.changeRepository.getOldestChangedAt();
+      const oldestChangeAt = await this.changeRepository.getOldestChangedAt(
+        ctx.user.id,
+      );
       if (oldestChangeAt && oldestChangeAt <= params.changedAt) {
         syncType = SyncType.Delta;
       }
@@ -130,12 +136,23 @@ export class ChangeService {
     return syncType;
   }
 
-  private async getDeltaPage(params: GetChangePageParams): Promise<ChangePage> {
-    return await this.changeRepository.getPage(params);
+  private async getDeltaPage(
+    ctx: Context,
+    params: GetChangePageParams,
+  ): Promise<ChangePage> {
+    return await this.changeRepository.getPage({
+      userId: ctx.user.id,
+      ...params,
+    });
   }
 
-  private async getFullPage(params: GetChangePageParams): Promise<ChangePage> {
-    const wordsPage = await this.wordService.getPage({
+  private async getFullPage(
+    ctx: Context,
+    params: GetChangePageParams,
+  ): Promise<ChangePage> {
+    const languages = await this.languageService.getAll(ctx);
+    const wordsPage = await this.wordService.getPage(ctx, {
+      languageId: languages.map((language) => language.id),
       order: WordOrder.Chronological,
       direction: Direction.Asc,
       cursor: params.cursor
@@ -150,7 +167,7 @@ export class ChangeService {
     const changes: ChangePage = {
       ...mapCursor(
         mapPage(wordsPage, (word) =>
-          this.changeBuilder.buildCreateWordChange(emptyContext(), word),
+          this.changeBuilder.buildCreateWordChange(ctx, word),
         ),
         (cursor: ChronologicalCursor) => ({
           changedAt: cursor.addedAt,
@@ -162,22 +179,16 @@ export class ChangeService {
 
     if (!params.cursor) {
       const [languages, properties] = await Promise.all([
-        this.languageService.getAll(),
-        this.propertyService.getAll(),
+        this.languageService.getAll(ctx),
+        this.propertyService.getAll(ctx),
       ]);
 
       changes.items = [
         ...languages.map((language) =>
-          this.changeBuilder.buildCreateLanguageChange(
-            emptyContext(),
-            language,
-          ),
+          this.changeBuilder.buildCreateLanguageChange(ctx, language),
         ),
         ...properties.map((property) =>
-          this.changeBuilder.buildCreatePropertyChange(
-            emptyContext(),
-            property,
-          ),
+          this.changeBuilder.buildCreatePropertyChange(ctx, property),
         ),
         ...changes.items,
       ];

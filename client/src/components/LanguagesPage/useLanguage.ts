@@ -58,9 +58,7 @@ export function useLanguage(
   const deletedLanguage = deleteLanguageResult?.deleteLanguage;
 
   const canCreateLanguage = Boolean(
-    selectedLanguageId &&
-      isNewLanguage &&
-      nameInput.length >= MIN_LANGUAGE_NAME_LENGTH,
+    isNewLanguage && nameInput.length >= MIN_LANGUAGE_NAME_LENGTH,
   );
   const canUpdateLanguage = Boolean(
     selectedLanguageId &&

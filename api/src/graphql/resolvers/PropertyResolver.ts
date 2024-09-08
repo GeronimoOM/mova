@@ -1,11 +1,5 @@
-import {
-  Args,
-  Context as ContextDec,
-  ID,
-  Mutation,
-  Query,
-  Resolver,
-} from '@nestjs/graphql';
+import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { ContextDec } from 'middleware/ContextMiddleware';
 import { Context } from 'models/Context';
 import { PropertyId } from 'models/Property';
 import { PropertyService } from 'services/PropertyService';
@@ -27,15 +21,18 @@ export class PropertyResolver {
 
   @Query((type) => PropertyUnionType, { nullable: true })
   async property(
+    @ContextDec() ctx: Context,
     @Args('id', { type: () => ID }) id: PropertyId,
   ): Promise<typeof PropertyUnionType | null> {
-    const property = await this.propertyService.getById(id).catch(() => null);
+    const property = await this.propertyService
+      .getById(ctx, id)
+      .catch(() => null);
     return property ? this.propertyTypeMapper.map(property) : null;
   }
 
   @Mutation((returns) => PropertyUnionType)
   async createProperty(
-    @ContextDec('ctx') ctx: Context,
+    @ContextDec() ctx: Context,
     @Args('input') input: CreatePropertyInput,
   ): Promise<typeof PropertyUnionType> {
     const createdProperty = await this.propertyService.create(ctx, input);
@@ -44,7 +41,7 @@ export class PropertyResolver {
 
   @Mutation((returns) => PropertyUnionType)
   async updateProperty(
-    @ContextDec('ctx') ctx: Context,
+    @ContextDec() ctx: Context,
     @Args('input') input: UpdatePropertyInput,
   ): Promise<typeof PropertyUnionType> {
     const updatedProperty = await this.propertyService.update(
@@ -56,12 +53,13 @@ export class PropertyResolver {
 
   @Mutation((returns) => [PropertyUnionType])
   async reorderProperties(
-    @ContextDec('ctx') ctx: Context,
+    @ContextDec() ctx: Context,
     @Args('input') input: ReorderPropertiesInput,
   ): Promise<Array<typeof PropertyUnionType>> {
     await this.propertyService.reorder(ctx, input);
 
     const properties = await this.propertyService.getByLanguageId(
+      ctx,
       input.languageId,
       input.partOfSpeech,
     );
@@ -70,7 +68,7 @@ export class PropertyResolver {
 
   @Mutation((returns) => PropertyUnionType)
   async deleteProperty(
-    @ContextDec('ctx') ctx: Context,
+    @ContextDec() ctx: Context,
     @Args('input') input: DeletePropertyInput,
   ): Promise<typeof PropertyUnionType> {
     const deletedProperty = await this.propertyService.delete(ctx, input);

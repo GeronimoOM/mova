@@ -78,18 +78,24 @@ export class PropertyService {
   ) {}
 
   async getByLanguageId(
+    ctx: Context,
     languageId: LanguageId,
     partOfSpeech?: PartOfSpeech,
   ): Promise<Property[]> {
+    await this.languageService.getById(ctx, languageId);
+
     return await this.propertyRepository.getByLanguageId(
       languageId,
       partOfSpeech,
     );
   }
 
-  async getById(id: PropertyId): Promise<Property> {
+  async getById(ctx: Context, id: PropertyId): Promise<Property> {
     const property = await this.propertyRepository.getById(id);
-    if (!property) {
+    if (
+      !property ||
+      !(await this.languageService.exists(ctx, property.languageId))
+    ) {
       throw new Error('Property does not exist');
     }
     return property;
@@ -99,12 +105,16 @@ export class PropertyService {
     return await this.propertyRepository.getByIds(ids);
   }
 
-  async getAll(): Promise<Property[]> {
-    return await this.propertyRepository.getAll();
+  async getAll(ctx: Context): Promise<Property[]> {
+    const languages = await this.languageService.getAll(ctx);
+
+    return await this.propertyRepository.getAll(
+      languages.map((language) => language.id),
+    );
   }
 
   async create(ctx: Context, params: CreatePropertyParams): Promise<Property> {
-    await this.languageService.getById(params.languageId);
+    await this.languageService.getById(ctx, params.languageId);
 
     const order =
       (await this.propertyRepository.getCount(
@@ -152,7 +162,7 @@ export class PropertyService {
   }
 
   async update(ctx: Context, params: UpdatePropertyParams): Promise<Property> {
-    const property = await this.getById(params.id);
+    const property = await this.getById(ctx, params.id);
     const currentProperty = copy(property);
 
     if (params.name) {
@@ -193,7 +203,7 @@ export class PropertyService {
     ctx: Context,
     { languageId, partOfSpeech, propertyIds }: ReorderPropertiesParams,
   ): Promise<void> {
-    await this.languageService.getById(languageId);
+    await this.languageService.getById(ctx, languageId);
 
     const properties = await this.propertyRepository.getByLanguageId(
       languageId,
@@ -221,7 +231,7 @@ export class PropertyService {
   }
 
   async delete(ctx: Context, { id }: DeletePropertyParams): Promise<Property> {
-    const property = await this.propertyRepository.getById(id);
+    const property = await this.getById(ctx, id);
 
     const wordCount = await this.wordService.getCountByProperty(
       property.languageId,

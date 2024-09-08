@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { LanguageTable } from 'knex/types/tables';
 import { Language, LanguageId } from 'models/Language';
+import { UserId } from 'models/User';
 import { fromTimestamp, toTimestamp } from 'utils/datetime';
 import { DbConnectionManager } from './DbConnectionManager';
 
@@ -10,9 +11,10 @@ const TABLE_LANGUAGES = 'languages';
 export class LanguageRepository {
   constructor(private connectionManager: DbConnectionManager) {}
 
-  async getAll(): Promise<Language[]> {
+  async getAll(userId: UserId): Promise<Language[]> {
     const languages = await this.connectionManager
       .getConnection()(TABLE_LANGUAGES)
+      .where({ user_id: userId })
       .orderBy('added_at', 'asc');
 
     return languages.map((language) => this.mapToLanguage(language));
@@ -27,11 +29,20 @@ export class LanguageRepository {
     return language ? this.mapToLanguage(language) : null;
   }
 
+  async getByIds(ids: LanguageId[]): Promise<Language[]> {
+    const languages = await this.connectionManager
+      .getConnection()(TABLE_LANGUAGES)
+      .whereIn('id', ids);
+
+    return languages.map((language) => this.mapToLanguage(language));
+  }
+
   async create(language: Language): Promise<void> {
     const languageRow: LanguageTable = {
       id: language.id,
       name: language.name,
       added_at: toTimestamp(language.addedAt),
+      user_id: language.userId,
     };
 
     await this.connectionManager
@@ -76,6 +87,7 @@ export class LanguageRepository {
       id: row.id,
       name: row.name,
       addedAt: fromTimestamp(row.added_at),
+      userId: row.user_id,
     };
   }
 }
