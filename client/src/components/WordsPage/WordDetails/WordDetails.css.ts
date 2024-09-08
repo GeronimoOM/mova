@@ -1,4 +1,5 @@
 import { style } from '@vanilla-extract/css';
+import { recipe } from '@vanilla-extract/recipes';
 import { themeVars } from '../../../index.css';
 
 export const wrapper = style({
@@ -17,12 +18,22 @@ export const innerWrapper = style({
   backgroundColor: themeVars.color.background,
 });
 
-export const details = style({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 10,
-  minHeight: 0,
-  marginRight: 50,
+export const details = recipe({
+  base: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 10,
+    minHeight: 0,
+    marginRight: 50,
+  },
+
+  variants: {
+    simplified: {
+      true: {
+        marginRight: 0,
+      },
+    },
+  },
 });
 
 export const detailsHeader = style({

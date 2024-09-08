@@ -51,13 +51,20 @@ export async function updateState(state: Partial<SyncState>): Promise<void> {
 }
 
 export async function initState(token: string): Promise<void> {
-  await db.state.put({
-    id: 1,
-    token,
-    clientId: uuid(),
-    currentSyncStartedAt: null,
-    currentSyncCursor: null,
-    lastSyncedAt: null,
+  await db.transaction('rw', 'state', async () => {
+    const state = await db.state.get(1);
+    if (state) {
+      return;
+    }
+
+    await db.state.put({
+      id: 1,
+      token,
+      clientId: uuid(),
+      currentSyncStartedAt: null,
+      currentSyncCursor: null,
+      lastSyncedAt: null,
+    });
   });
 }
 

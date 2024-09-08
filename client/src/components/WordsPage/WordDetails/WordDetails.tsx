@@ -68,9 +68,9 @@ export const WordDetails: React.FC<WordDetailsProps> = ({
   return (
     <div className={styles.wrapper}>
       <div className={styles.innerWrapper}>
-        <div className={styles.buttons}>
-          <ButtonIcon icon={HiMiniXMark} onClick={onClose} />
-          {!simplified && (
+        {!simplified && (
+          <div className={styles.buttons}>
+            <ButtonIcon icon={HiMiniXMark} onClick={onClose} />
             <ButtonIcon
               icon={FaFeatherPointed}
               onClick={isNewWord ? createWord : updateWord}
@@ -79,8 +79,7 @@ export const WordDetails: React.FC<WordDetailsProps> = ({
               disabled={!canCreateWord && !canUpdateWord}
               loading={isNewWord ? wordCreating : wordUpdating}
             />
-          )}
-          {!simplified && (
+
             <div className={styles.bottomButton}>
               <ButtonIcon
                 icon={FaFire}
@@ -90,10 +89,10 @@ export const WordDetails: React.FC<WordDetailsProps> = ({
                 loading={wordDeleting}
               />
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
-        <div className={styles.details}>
+        <div className={styles.details({ simplified })}>
           <div className={styles.detailsHeader}>
             <PartOfSpeechSelect
               partOfSpeech={word.partOfSpeech ?? null}

@@ -2,6 +2,7 @@ import React, {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
 } from 'react';
@@ -36,7 +37,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const setAuthToken = useCallback((token: string) => {
     localStorage.setItem(LOCAL_STORAGE_TOKEN_KEY, token);
     setToken(token);
-    initServiceWorker(token);
   }, []);
 
   const clearAuthToken = useCallback(() => {
@@ -55,6 +55,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }),
     [token, setAuthToken, clearAuthToken],
   );
+
+  useEffect(() => {
+    if (token) {
+      initServiceWorker(token);
+    }
+  }, [token]);
 
   return (
     <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
