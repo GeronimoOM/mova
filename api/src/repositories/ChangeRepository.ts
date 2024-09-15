@@ -116,6 +116,10 @@ export class ChangeRepository {
       .delete();
   }
 
+  async deleteAll(): Promise<void> {
+    await this.connectionManager.getConnection()(TABLE_CHANGES).delete();
+  }
+
   private mapToChange(row: ChangeTable): Change {
     const baseChange: BaseChange = {
       id: row.id,

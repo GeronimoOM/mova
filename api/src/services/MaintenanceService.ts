@@ -14,7 +14,7 @@ import {
   MigrationRecordType,
   MigrationRecordTypes,
 } from 'models/Migration';
-import { UserId } from 'models/User';
+import { ChangeRepository } from 'repositories/ChangeRepository';
 import { LanguageRepository } from 'repositories/LanguageRepository';
 import { ProgressRepository } from 'repositories/ProgressRepository';
 import { PropertyRepository } from 'repositories/PropertyRepository';
@@ -36,6 +36,7 @@ export class MaintenanceService {
     private propertyRepository: PropertyRepository,
     private wordRepository: WordRepository,
     private progressRepository: ProgressRepository,
+    private changeRepository: ChangeRepository,
 
     private searchClient: SearchClient,
   ) {}
@@ -50,6 +51,10 @@ export class MaintenanceService {
     const languages = await Array.fromAsync(
       this.languageRepository.streamRecords(),
     );
+    await Promise.all(
+      languages.map((language) => this.resyncProgress(language.id)),
+    );
+
     await this.searchClient.createIndices();
     await Promise.all(
       languages.map((language) => this.reindexLanguage(language.id)),
@@ -61,6 +66,7 @@ export class MaintenanceService {
     await this.wordRepository.deleteAll();
     await this.propertyRepository.deleteAll();
     await this.languageRepository.deleteAll();
+    await this.changeRepository.deleteAll();
     await this.searchClient.deleteIndices();
   }
 
@@ -76,8 +82,6 @@ export class MaintenanceService {
     await this.progressService.syncAllWordsProgress(languageId);
   }
 
-  async setInitialUser(userId: UserId): Promise<void> {}
-
   private async *exportRecords(): AsyncGenerator<MigrationRecord> {
     for await (const language of this.languageRepository.streamRecords()) {
       yield { type: MigrationRecordType.Language, record: language };
@@ -85,6 +89,10 @@ export class MaintenanceService {
 
     for await (const property of this.propertyRepository.streamRecords()) {
       yield { type: MigrationRecordType.Property, record: property };
+    }
+
+    for await (const word of this.wordRepository.streamRecords()) {
+      yield { type: MigrationRecordType.Word, record: word };
     }
 
     for await (const goal of this.progressRepository.streamGoals()) {
@@ -142,7 +150,10 @@ export class MaintenanceService {
     for await (const { value } of recordStream) {
       const record = value as MigrationRecord;
       if (record.type !== type) {
-        yield [type, batch];
+        if (batch.length) {
+          yield [type, batch];
+        }
+
         batch = [];
         type = types.next().value;
       } else {

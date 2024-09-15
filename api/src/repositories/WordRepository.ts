@@ -191,7 +191,10 @@ export class WordRepository {
         .offset(offset)
         .limit(batchSize + 1);
 
-      yield this.mapToWords(wordRows.slice(0, batchSize));
+      const wordsBatch = await this.mapToWords(wordRows.slice(0, batchSize));
+      if (wordsBatch.length) {
+        yield wordsBatch;
+      }
 
       if (wordRows.length <= batchSize) {
         break;

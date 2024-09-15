@@ -9,7 +9,9 @@ const languageTypePolicy: TypePolicy = {
       },
       merge(existing: WordPage | undefined, incoming: WordPage): WordPage {
         return {
-          items: [...(existing?.items ?? []), ...incoming.items],
+          items: Array.from(
+            new Set([...(existing?.items ?? []), ...incoming.items]),
+          ),
           nextCursor: incoming.nextCursor,
         };
       },
