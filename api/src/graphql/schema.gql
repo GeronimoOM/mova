@@ -356,7 +356,7 @@ type Mutation {
   createWord(input: CreateWordInput!): Word!
   updateWord(input: UpdateWordInput!): Word!
   deleteWord(input: DeleteWordInput!): Word!
-  increaseMastery(wordId: ID!): Word!
+  attemptMastery(wordId: ID!, success: Boolean!): Word!
   setGoals(input: SetGoalsInput!): [Goal!]!
 }
 

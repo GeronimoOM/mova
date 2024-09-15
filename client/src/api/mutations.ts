@@ -1,6 +1,8 @@
 import { TypedDocumentNode, useMutation } from '@apollo/client';
+import { MaxMastery } from '../utils/mastery';
 import { cache } from './cache';
 import {
+  AttemptWordMasteryDocument,
   CreateLanguageDocument,
   CreatePropertyDocument,
   CreateWordDocument,
@@ -9,7 +11,6 @@ import {
   DeleteWordDocument,
   GetLanguagesDocument,
   GetProgressDocument,
-  IncreaseWordMasteryDocument,
   LanguagePropertiesFragmentDoc,
   LanguageWordsFragmentDoc,
   PartOfSpeech,
@@ -299,23 +300,27 @@ export function useDeleteWord(): UseMutationResult<typeof DeleteWordDocument> {
   });
 }
 
-export function useIncreaseWordMastery(): UseMutationResult<
-  typeof IncreaseWordMasteryDocument
+export function useAttemptWordMastery(): UseMutationResult<
+  typeof AttemptWordMasteryDocument
 > {
-  return useMutation(IncreaseWordMasteryDocument, {
-    optimisticResponse: ({ wordId }) => {
+  return useMutation(AttemptWordMasteryDocument, {
+    optimisticResponse: ({ wordId, success }) => {
       const word = readWordFull(wordId)!;
 
       return {
-        increaseMastery: {
-          ...word,
-          mastery: word.mastery + 1,
-        },
+        attemptMastery: success
+          ? {
+              ...word,
+              mastery: Math.min(word.mastery + 1, MaxMastery),
+            }
+          : word,
       };
     },
-    update: (_, { data }) => {
-      const word = readWordFull(data!.increaseMastery.id)!;
-      increaseCurrentProgress(word.languageId, ProgressType.Mastery);
+    update: (_, { data }, { variables }) => {
+      if (variables?.success) {
+        const word = readWordFull(data!.attemptMastery.id)!;
+        increaseCurrentProgress(word.languageId, ProgressType.Mastery);
+      }
     },
   });
 }

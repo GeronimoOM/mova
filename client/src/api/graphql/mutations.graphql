@@ -67,8 +67,8 @@ mutation DeleteWord($input: DeleteWordInput!) {
   }
 }
 
-mutation IncreaseWordMastery($wordId: ID!) {
-  increaseMastery(wordId: $wordId) {
+mutation AttemptWordMastery($wordId: ID!, $success: Boolean!) {
+  attemptMastery(wordId: $wordId, success: $success) {
     ...WordFields
   }
 }

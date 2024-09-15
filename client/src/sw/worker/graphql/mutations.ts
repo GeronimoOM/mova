@@ -1,5 +1,6 @@
 import {
   ApplyChangeInput,
+  AttemptWordMasteryMutation,
   CreateLanguageMutation,
   CreateLanguageMutationVariables,
   CreatePropertyMutation,
@@ -12,7 +13,6 @@ import {
   DeletePropertyMutationVariables,
   DeleteWordMutation,
   DeleteWordMutationVariables,
-  IncreaseWordMasteryMutation,
   ReorderPropertiesMutation,
   ReorderPropertiesMutationVariables,
   UpdateLanguageMutation,
@@ -36,7 +36,7 @@ enum GraphQlMutation {
   CreateWord = 'CreateWord',
   UpdateWord = 'UpdateWord',
   DeleteWord = 'DeleteWord',
-  IncreaseMastery = 'IncreaseMastery',
+  AttemptMastery = 'AttemptMastery',
 }
 
 export function isGraphQlMutation(request: GraphQlRequest): boolean {
@@ -393,9 +393,9 @@ async function cacheGraphQlMutationResponse(
         await cache.deleteWord(deleteWord.id);
         break;
       }
-      case GraphQlMutation.IncreaseMastery: {
-        const { increaseMastery } = responseData as IncreaseWordMasteryMutation;
-        await cache.updateWord(increaseMastery);
+      case GraphQlMutation.AttemptMastery: {
+        const { attemptMastery } = responseData as AttemptWordMasteryMutation;
+        await cache.updateWord(attemptMastery);
         break;
       }
     }

@@ -2,7 +2,7 @@ import Dexie from 'dexie';
 import { v1 as uuid } from 'uuid';
 import type {
   ApplyChangeInput,
-  IncreaseWordMasteryMutation,
+  AttemptWordMasteryMutation,
   Language,
   LanguageFieldsFragment,
   LanguageUpdate,
@@ -237,7 +237,7 @@ export async function saveWord(
 export async function updateWord(
   wordUpdate:
     | UpdateWordMutation['updateWord']
-    | IncreaseWordMasteryMutation['increaseMastery']
+    | AttemptWordMasteryMutation['attemptMastery']
     | WordUpdate,
 ): Promise<void> {
   if (wordUpdate.__typename === 'Word') {

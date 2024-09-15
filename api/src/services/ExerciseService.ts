@@ -3,7 +3,14 @@ import { DateTime, Duration } from 'luxon';
 import { Context } from 'models/Context';
 import { LanguageId } from 'models/Language';
 import { ProgressType } from 'models/Progress';
-import { Word, WordMasteries, WordMastery, WordOrder } from 'models/Word';
+import {
+  MaxWordMastery,
+  Word,
+  WordId,
+  WordMasteries,
+  WordMastery,
+  WordOrder,
+} from 'models/Word';
 import { DbConnectionManager } from 'repositories/DbConnectionManager';
 import { WordRepository } from 'repositories/WordRepository';
 import { shuffle } from 'utils/arrays';
@@ -21,16 +28,23 @@ const MASTERY_DISTRIBUTION: Record<WordMastery, number> = {
   3: 0.05,
 };
 
-const MASTERY_GAIN_DELAY: Record<WordMastery, Duration> = {
-  0: Duration.fromObject({ days: 1 }),
-  1: Duration.fromObject({ days: 2 }),
-  2: Duration.fromObject({ days: 2 }),
-  3: Duration.fromObject({ days: 0 }),
+const MASTERY_INC_DELAY: Record<WordMastery, Duration> = {
+  0: Duration.fromObject({ hours: 1 }),
+  1: Duration.fromObject({ hours: 24 }),
+  2: Duration.fromObject({ hours: 24 * 5 }),
+  3: Duration.fromObject({ hours: 24 * 5 }),
 };
+
+const MASTERY_ATTEMPT_DELAY = Duration.fromObject({ hours: 1 });
 
 export type GetExerciseWordsParams = {
   languageId: LanguageId;
   total?: number;
+};
+
+export type AttemptMasteryParams = {
+  wordId: WordId;
+  success: boolean;
 };
 
 @Injectable()
@@ -92,27 +106,40 @@ export class ExerciseService {
     return shuffle(words);
   }
 
-  async increaseMastery(ctx: Context, wordId: string): Promise<Word> {
-    const currentWord = await this.wordRepository.getById(wordId);
+  async attemptMastery(
+    ctx: Context,
+    params: AttemptMasteryParams,
+  ): Promise<Word> {
+    const currentWord = await this.wordRepository.getById(params.wordId);
     if (!currentWord) {
       throw new Error('Word does not exist');
     }
 
-    if (currentWord.mastery >= 3) {
-      return currentWord;
-    }
-
     if (
-      (currentWord.masteryIncAt ?? currentWord.addedAt).plus(
-        MASTERY_GAIN_DELAY[currentWord.mastery],
-      ) >= DateTime.utc()
+      (params.success &&
+        (currentWord.masteryIncAt ?? currentWord.addedAt).plus(
+          MASTERY_INC_DELAY[currentWord.mastery],
+        ) >= DateTime.utc()) ||
+      (currentWord.masteryAttemptAt &&
+        currentWord.masteryAttemptAt.plus(MASTERY_ATTEMPT_DELAY) >=
+          DateTime.utc())
     ) {
       throw new Error('Word mastery cannot be increased yet');
     }
 
+    if (!params.success) {
+      const word = {
+        ...currentWord,
+        masteryAttemptAt: DateTime.utc(),
+      };
+      await this.wordRepository.update(word);
+
+      return word;
+    }
+
     const word = {
       ...currentWord,
-      mastery: currentWord.mastery + 1,
+      mastery: Math.min(currentWord.mastery + 1, MaxWordMastery),
     };
 
     const change = this.changeBuilder.buildUpdateWordChange(
@@ -120,20 +147,18 @@ export class ExerciseService {
       word,
       currentWord,
     );
+    word.masteryIncAt = change?.changedAt ?? DateTime.utc();
+    word.masteryAttemptAt = word.masteryIncAt;
 
-    if (change) {
-      word.masteryIncAt = change.changedAt;
-
-      await this.connectionManager.transactionally(async () => {
-        await this.wordRepository.update(word);
-        await this.changeService.create(change);
-        await this.progressService.saveProgress(word.languageId, {
-          id: uuid(),
-          type: ProgressType.Mastery,
-          date: change.changedAt,
-        });
+    await this.connectionManager.transactionally(async () => {
+      await this.wordRepository.update(word);
+      change && (await this.changeService.create(change));
+      await this.progressService.saveProgress(word.languageId, {
+        id: uuid(),
+        type: ProgressType.Mastery,
+        date: change.changedAt,
       });
-    }
+    });
 
     return word;
   }
@@ -149,7 +174,8 @@ export class ExerciseService {
         limit: total,
         order: WordOrder.Random,
         mastery,
-        masteryIncOlderThan: MASTERY_GAIN_DELAY[mastery],
+        masteryIncOlderThan: MASTERY_INC_DELAY[mastery],
+        masteryAttemptOlderThan: MASTERY_ATTEMPT_DELAY,
       })
     ).items;
   }

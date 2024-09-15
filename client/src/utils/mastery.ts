@@ -2,6 +2,8 @@ export type Mastery = 0 | 1 | 2 | 3;
 
 export const masteries = [0, 1, 2, 3] as const;
 
+export const MaxMastery = 3;
+
 export const masteryToColor: Record<Mastery, string> = {
   0: '#fbeaf2',
   1: '#f3bfd7',

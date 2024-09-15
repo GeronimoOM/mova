@@ -4,7 +4,7 @@ import { FaInfo } from 'react-icons/fa';
 import { HiMiniXMark } from 'react-icons/hi2';
 
 import { IoPlay } from 'react-icons/io5';
-import { useIncreaseWordMastery } from '../../api/mutations';
+import { useAttemptWordMastery } from '../../api/mutations';
 import {
   GetExerciseWordsDocument,
   GetPropertiesDocument,
@@ -45,12 +45,10 @@ export const ExerciseCard: React.FC = () => {
     variables: { languageId: selectedLanguageId! },
     fetchPolicy: 'network-only',
   });
-  const [increaseMastery] = useIncreaseWordMastery();
+  const [attemptMastery] = useAttemptWordMastery();
 
   const loading = propertiesLoading || wordsLoading;
-  const words = loading
-    ? undefined
-    : exerciseWordsQuery?.language?.exerciseWords;
+  const words = exerciseWordsQuery?.language?.exerciseWords;
   const currentWord = words?.[wordIndex];
   const hasNext = wordIndex + 1 < (words?.length ?? 0);
   const propertiesByPartOfSpeech = useMemo(
@@ -81,12 +79,16 @@ export const ExerciseCard: React.FC = () => {
   };
 
   const handleSuccess = () => {
-    increaseMastery({
-      variables: { wordId: currentWord!.id },
+    attemptMastery({
+      variables: { wordId: currentWord!.id, success: true },
     });
   };
 
-  const handleFailure = () => {};
+  const handleFailure = () => {
+    attemptMastery({
+      variables: { wordId: currentWord!.id, success: false },
+    });
+  };
 
   return (
     <div className={styles.card}>

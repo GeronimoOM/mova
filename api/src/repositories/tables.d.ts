@@ -32,6 +32,7 @@ declare module 'knex/types/tables' {
     added_at: string;
     mastery: number;
     mastery_inc_at?: string;
+    mastery_attempt_at?: string;
     properties?: string;
   }
 

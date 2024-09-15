@@ -34,6 +34,7 @@ export interface GetWordPageParams {
   mastery?: number;
   addedAtDate?: DateTime;
   masteryIncOlderThan?: Duration;
+  masteryAttemptOlderThan?: Duration;
   cursor?: WordSortedCursor;
   limit?: number;
 }
@@ -74,6 +75,7 @@ export class WordRepository {
     mastery,
     addedAtDate,
     masteryIncOlderThan,
+    masteryAttemptOlderThan,
   }: GetWordPageParams): Promise<Page<Word, WordSortedCursor>> {
     const connection = this.connectionManager.getConnection();
 
@@ -136,8 +138,15 @@ export class WordRepository {
 
     if (masteryIncOlderThan) {
       query.whereRaw(
-        `date_add(ifnull(mastery_inc_at, added_at), interval ? day) < now()`,
-        [masteryIncOlderThan.days],
+        `date_add(ifnull(mastery_inc_at, added_at), interval ? hour) < now()`,
+        [masteryIncOlderThan.hours],
+      );
+    }
+
+    if (masteryAttemptOlderThan) {
+      query.whereRaw(
+        `(mastery_attempt_at is null or date_add(mastery_attempt_at, interval ? hour) < now())`,
+        [masteryAttemptOlderThan.hours],
       );
     }
 
@@ -229,6 +238,9 @@ export class WordRepository {
         mastery: word.mastery,
         ...(word.masteryIncAt && {
           mastery_inc_at: toTimestamp(word.masteryIncAt),
+        }),
+        ...(word.masteryAttemptAt && {
+          mastery_attempt_at: toTimestamp(word.masteryAttemptAt),
         }),
         properties: this.mapFromWordProperties(word.properties),
       })

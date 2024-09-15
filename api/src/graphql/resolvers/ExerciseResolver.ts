@@ -35,11 +35,15 @@ export class ExerciseResolver {
   }
 
   @Mutation((returns) => WordType)
-  async increaseMastery(
+  async attemptMastery(
     @ContextDec() ctx: Context,
     @Args('wordId', { type: () => ID }) wordId: WordId,
+    @Args('success', { type: () => Boolean }) success: boolean,
   ): Promise<WordType> {
-    const word = await this.exerciseService.increaseMastery(ctx, wordId);
+    const word = await this.exerciseService.attemptMastery(ctx, {
+      wordId,
+      success,
+    });
 
     return this.wordTypeMapper.map(word);
   }

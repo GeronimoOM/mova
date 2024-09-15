@@ -18,6 +18,7 @@ export interface Word {
   addedAt: DateTime;
   mastery: number;
   masteryIncAt?: DateTime;
+  masteryAttemptAt?: DateTime;
   properties?: Record<PropertyId, PropertyValue>;
 }
 
@@ -38,6 +39,8 @@ export enum WordOrder {
 
 export const WordMasteries = [0, 1, 2, 3] as const;
 export type WordMastery = (typeof WordMasteries)[number];
+
+export const MaxWordMastery = Math.max(...WordMasteries);
 
 export interface WordCreate extends Omit<Word, 'properties'> {
   properties?: Record<PropertyId, PropertyValueSave>;
