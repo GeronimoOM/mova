@@ -1,7 +1,7 @@
 import React from 'react';
-// import { HiMiniXMark } from 'react-icons/hi2';
 import { BsEraserFill } from 'react-icons/bs';
 
+import { useTranslation } from 'react-i18next';
 import { PiMagnifyingGlassBold } from 'react-icons/pi';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { Icon } from '../../common/Icon';
@@ -19,6 +19,8 @@ export const WordsSearchBar: React.FC<WordsSearchBarProps> = ({
   onQueryChange,
   onClear,
 }) => {
+  const { t } = useTranslation();
+
   return (
     <div className={styles.wrapper}>
       <div className={styles.iconLeft}>
@@ -28,8 +30,8 @@ export const WordsSearchBar: React.FC<WordsSearchBarProps> = ({
         value={query}
         onChange={onQueryChange}
         text="original"
-        size="large"
         padding
+        placeholder={t('words.search')}
       />
       <ButtonIcon icon={BsEraserFill} onClick={onClear} disabled={!query} />
     </div>

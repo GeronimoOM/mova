@@ -12,6 +12,7 @@ import {
 import { Input } from '../common/Input';
 import { SpellInput } from '../common/SpellInput';
 
+import { useTranslation } from 'react-i18next';
 import { PiGraphBold } from 'react-icons/pi';
 import { Color } from '../../index.css';
 import { ButtonIcon } from '../common/ButtonIcon';
@@ -50,6 +51,8 @@ export const SpellExercise: React.FC<SpellExerciseProps> = ({
   const [result, setResult] = useState<boolean | null>(null);
   const [highlights, setHighlights] = useState<Array<Color | null>>([]);
 
+  const { t } = useTranslation();
+
   const isSubmitted = result !== null;
   const canSubmit =
     !isSubmitted && (advanced || input.length === propertyValue.length);
@@ -86,7 +89,7 @@ export const SpellExercise: React.FC<SpellExerciseProps> = ({
 
   return (
     <div className={styles.wrapper}>
-      <div className={styles.title}>spell the word</div>
+      <div className={styles.title}>{t('exercise.spell')}</div>
 
       <Input
         value={word.translation}
@@ -98,7 +101,7 @@ export const SpellExercise: React.FC<SpellExerciseProps> = ({
 
       <div className={styles.propertyLabel}>
         <Icon icon={FaBookOpen} size="small" />
-        {'word'}
+        {t('exercise.word')}
         {propertyName && (
           <>
             <span className={styles.propertyLabelDivider}>{'—'}</span>

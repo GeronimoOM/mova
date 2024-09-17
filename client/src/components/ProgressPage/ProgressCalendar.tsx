@@ -1,6 +1,7 @@
 import { useLazyQuery } from '@apollo/client';
 import { DateTime, WeekdayNumbers } from 'luxon';
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FaBook, FaBrain } from 'react-icons/fa6';
 import { HiLightningBolt } from 'react-icons/hi';
 import { TbTargetArrow } from 'react-icons/tb';
@@ -18,6 +19,7 @@ import {
   DISPLAY_WEEKDAY_FORMAT,
   N_WEEKDAYS,
 } from '../../utils/constants';
+import { useTranslationLanguage } from '../../utils/translator';
 import { useMediaQuery } from '../../utils/useMediaQuery';
 import { useLanguageContext } from '../LanguageContext';
 import { ButtonIcon } from '../common/ButtonIcon';
@@ -54,16 +56,14 @@ export const ProgressCalendar: React.FC = () => {
     weeklyHistory,
   } = progressHistory?.language?.progress ?? {};
 
+  const { t } = useTranslation();
+
   const color = progressTypeToColor[selectedType];
   const hasStreak = streak > 0;
-  const streakLabel = useMemo(() => {
-    if (cadence === ProgressCadence.Daily) {
-      return streak % 10 === 1 ? 'day' : 'days';
-    } else if (cadence === ProgressCadence.Weekly) {
-      return streak % 10 === 1 ? 'week' : 'weeks';
-    }
-    return '';
-  }, [streak, cadence]);
+  const streakLabel =
+    cadence === ProgressCadence.Daily
+      ? t('progress.days', { count: streak })
+      : t('progress.weeks', { count: streak });
 
   const isFullCalendar = useMediaQuery(breakpoints.tiny);
 
@@ -144,6 +144,8 @@ const ProgressCalendarHeader: React.FC<ProgressCalendarHeaderProps> = ({
     return getGroupedMonths(weeklyData);
   }, [weeklyData]);
 
+  const translationLanguage = useTranslationLanguage();
+
   return (
     <thead>
       <tr>
@@ -151,7 +153,9 @@ const ProgressCalendarHeader: React.FC<ProgressCalendarHeaderProps> = ({
         {months.map(({ month, span }) => (
           <td key={month} colSpan={span} className={styles.monthLabel}>
             {span > 2
-              ? DateTime.fromObject({ month }).toFormat(DISPLAY_MONTH_FORMAT)
+              ? DateTime.fromObject({ month })
+                  .setLocale(translationLanguage)
+                  .toFormat(DISPLAY_MONTH_FORMAT)
               : ''}
           </td>
         ))}
@@ -175,6 +179,9 @@ const ProgressCalendarBody: React.FC<ProgressCalendarBodyProps> = ({
   goal,
   isGoalOnly,
 }) => {
+  const { t } = useTranslation();
+  const translationLanguage = useTranslationLanguage();
+
   return (
     <tbody>
       {sequence(N_WEEKDAYS).map((weekday) => (
@@ -182,7 +189,9 @@ const ProgressCalendarBody: React.FC<ProgressCalendarBodyProps> = ({
           <td className={styles.weekLabel}>
             {DateTime.fromObject({
               weekday: (weekday + 1) as WeekdayNumbers,
-            }).toFormat(DISPLAY_WEEKDAY_FORMAT)}
+            })
+              .setLocale(translationLanguage)
+              .toFormat(DISPLAY_WEEKDAY_FORMAT)}
           </td>
 
           {sequence(weeklyData.length).map((week) => (
@@ -201,7 +210,7 @@ const ProgressCalendarBody: React.FC<ProgressCalendarBodyProps> = ({
       ))}
 
       <tr key="week">
-        <td className={styles.weekLabel}>Week</td>
+        <td className={styles.weekLabel}>{t('progress.week')}</td>
 
         {sequence(weeklyData.length).map((week) => (
           <td key={week}>
@@ -305,21 +314,23 @@ type ProgressCalendarCellTooltipProps = {
 const ProgressCalendarCellTooltip: React.FC<
   ProgressCalendarCellTooltipProps
 > = ({ type, cadence, date, points }) => {
+  const translationLanguage = useTranslationLanguage();
+  const { t } = useTranslation();
+
   let dateString;
   if (cadence === ProgressCadence.Daily) {
-    dateString = date.toFormat(DISPLAY_DATE_FORMAT);
+    dateString = date
+      .setLocale(translationLanguage)
+      .toFormat(DISPLAY_DATE_FORMAT);
   } else {
     const until = date.plus({ weeks: 1 }).minus({ days: 1 });
-    dateString = `${date.toFormat(DISPLAY_DATE_FORMAT)} - ${until.toFormat(DISPLAY_DATE_FORMAT)}`;
+    dateString = `${date.setLocale(translationLanguage).toFormat(DISPLAY_DATE_FORMAT)} - ${until.setLocale(translationLanguage).toFormat(DISPLAY_DATE_FORMAT)}`;
   }
 
-  let pointsString;
-  if (type === ProgressType.Words) {
-    pointsString = points % 10 === 1 ? ' word added' : ' words added';
-  } else {
-    pointsString =
-      points % 10 === 1 ? ' mastery point earned' : ' mastery points earned';
-  }
+  const pointsString =
+    type === ProgressType.Words
+      ? t('progress.wordsAdded', { count: points })
+      : t('progress.pointsEarned', { count: points });
 
   const color = points > 0 ? progressTypeToColor[type] : undefined;
 
@@ -328,7 +339,7 @@ const ProgressCalendarCellTooltip: React.FC<
       <div className={styles.cellTooltipDate}>{dateString}</div>
       <div>
         <span className={styles.cellTooltipPoints({ color })}>{points}</span>
-        {pointsString}
+        {` ${pointsString}`}
       </div>
     </div>
   );

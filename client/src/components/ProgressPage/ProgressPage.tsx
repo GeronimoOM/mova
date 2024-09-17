@@ -9,6 +9,7 @@ import { GoalsTab } from './GoalsTab';
 import { ProgressTab } from './ProgressTab';
 import { StatsTab } from './StatsTab';
 
+import { useTranslation } from 'react-i18next';
 import * as styles from './ProgressPage.css';
 
 export enum ProgressPageTab {
@@ -26,17 +27,17 @@ const tabs: Record<
   }
 > = {
   [ProgressPageTab.Progress]: {
-    label: 'Progress',
+    label: 'progress.progress',
     icon: BsFillBarChartFill,
     content: ProgressTab,
   },
   [ProgressPageTab.Goals]: {
-    label: 'Goals',
+    label: 'progress.goals',
     icon: TbTargetArrow,
     content: GoalsTab,
   },
   [ProgressPageTab.Stats]: {
-    label: 'Stats',
+    label: 'progress.stats',
     icon: FaChartPie,
     content: StatsTab,
   },
@@ -46,6 +47,8 @@ export const ProgressPage: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState<ProgressPageTab>(
     ProgressPageTab.Progress,
   );
+
+  const { t } = useTranslation();
 
   const TabContent = tabs[selectedTab].content;
 
@@ -61,7 +64,7 @@ export const ProgressPage: React.FC = () => {
             onClick={() => setSelectedTab(tab as ProgressPageTab)}
           >
             <Icon icon={icon} />
-            <div>{label}</div>
+            <div>{t(label)}</div>
           </div>
         ))}
       </div>

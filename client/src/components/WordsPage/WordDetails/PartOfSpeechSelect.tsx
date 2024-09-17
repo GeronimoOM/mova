@@ -1,7 +1,11 @@
 import React, { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { PiGraphBold } from 'react-icons/pi';
 import { PartOfSpeech } from '../../../api/types/graphql';
-import { partsOfSpeech } from '../../../utils/partsOfSpeech';
+import {
+  partOfSpeechToShortLabel,
+  partsOfSpeech,
+} from '../../../utils/partsOfSpeech';
 import { useClickOutsideHandler } from '../../../utils/useClickOutsideHandler';
 import { Icon } from '../../common/Icon';
 import * as styles from './PartOfSpeechSelect.css';
@@ -58,13 +62,15 @@ const PartOfSpeechSelectButton: React.FC<PartOfSpeechSelectButtonProps> = ({
   onOpenDropdown: onOpen,
   disabled,
 }) => {
+  const { t } = useTranslation();
+
   return (
     <div className={styles.button({ disabled })} onClick={onOpen}>
       <Icon icon={PiGraphBold} size="small" />
       {partOfSpeech ? (
-        <span>{partOfSpeech}</span>
+        <span> {t(partOfSpeechToShortLabel[partOfSpeech])}</span>
       ) : (
-        <span className={styles.placeholder}>select</span>
+        <span className={styles.placeholder}>{t('pos.select')}</span>
       )}
     </div>
   );
@@ -77,6 +83,8 @@ type PartOfSpeechSelectDropdownProps = {
 const PartOfSpeechSelectDropdown: React.FC<PartOfSpeechSelectDropdownProps> = ({
   onPartOfSpeechSelect,
 }) => {
+  const { t } = useTranslation();
+
   return (
     <div className={styles.dropdown}>
       {partsOfSpeech.map((partOfSpeech) => (
@@ -85,7 +93,7 @@ const PartOfSpeechSelectDropdown: React.FC<PartOfSpeechSelectDropdownProps> = ({
           className={styles.dropdownItem}
           onClick={() => onPartOfSpeechSelect(partOfSpeech)}
         >
-          {partOfSpeech}
+          {t(partOfSpeechToShortLabel[partOfSpeech])}
         </div>
       ))}
     </div>

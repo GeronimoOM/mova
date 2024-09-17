@@ -1,20 +1,15 @@
 import classNames from 'classnames';
 import React, { useEffect, useRef } from 'react';
 import { getEmptyImage } from 'react-dnd-html5-backend';
-import { IconType } from 'react-icons';
-import { BsUiChecksGrid } from 'react-icons/bs';
+import { useTranslation } from 'react-i18next';
 import { FaFeatherPointed, FaFire } from 'react-icons/fa6';
 import { IoReorderThree } from 'react-icons/io5';
-import { PiChatCenteredTextFill } from 'react-icons/pi';
-import {
-  PartOfSpeech,
-  PropertyFieldsFragment,
-  PropertyType,
-} from '../../api/types/graphql';
+import { PartOfSpeech, PropertyFieldsFragment } from '../../api/types/graphql';
 import { ButtonIcon } from '../common/ButtonIcon';
 import { Icon } from '../common/Icon';
 import { Input } from '../common/Input';
 import * as styles from './PropertyListItem.css';
+import { typeToIcon, typeToLabel } from './properties';
 import {
   usePropertyDrag,
   usePropertyDragLayer,
@@ -30,11 +25,6 @@ export type PropertyListItemProps = {
   onPropertyCreated?: () => void;
   onSwapPreview: (property1Id: string, property2Id: string) => void;
   onReorder: () => void;
-};
-
-const typeToIcon: Record<PropertyType, IconType> = {
-  [PropertyType.Text]: PiChatCenteredTextFill,
-  [PropertyType.Option]: BsUiChecksGrid,
 };
 
 export const PropertyListItem: React.FC<PropertyListItemProps> = ({
@@ -64,6 +54,8 @@ export const PropertyListItem: React.FC<PropertyListItemProps> = ({
     deleteProperty,
     propertyDeleting,
   } = useProperty(partOfSpeech, currentProperty);
+
+  const { t } = useTranslation();
 
   const canDragProperty = !isNewProperty;
 
@@ -106,7 +98,9 @@ export const PropertyListItem: React.FC<PropertyListItemProps> = ({
           {property.type && (
             <>
               <Icon icon={typeToIcon[property.type]} size="medium" />
-              <span className={styles.typeLabel}>{property?.type}</span>
+              <span className={styles.typeLabel}>
+                {property.type ? t(typeToLabel[property.type]) : ''}
+              </span>
             </>
           )}
         </div>
@@ -138,6 +132,7 @@ export const PropertyListItem: React.FC<PropertyListItemProps> = ({
           onChange={setName}
           text={'translation'}
           size={'large'}
+          placeholder={t('properties.name')}
         />
         <div className={classNames(styles.button, { hidden: !selected })}>
           <ButtonIcon

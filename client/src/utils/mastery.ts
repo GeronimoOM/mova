@@ -12,8 +12,8 @@ export const masteryToColor: Record<Mastery, string> = {
 };
 
 export const masteryToLabel: Record<Mastery, string> = {
-  0: 'none',
-  1: 'basic',
-  2: 'advanced',
-  3: 'mastered',
+  0: 'mastery.none',
+  1: 'mastery.basic',
+  2: 'mastery.advanced',
+  3: 'mastery.mastered',
 };

@@ -1,6 +1,8 @@
 import classNames from 'classnames';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { PartOfSpeech } from '../../api/types/graphql';
+import { partOfSpeechToShortLabel } from '../../utils/partsOfSpeech';
 import * as styles from './PartOfSpeechPill.css';
 
 export type PartOfSpeechPillProps = {
@@ -14,9 +16,11 @@ export const PartOfSpeechPill: React.FC<PartOfSpeechPillProps> = ({
   disabled,
   active,
 }) => {
+  const { t } = useTranslation();
+
   return (
     <div className={classNames(styles.pill({ disabled }), { active })}>
-      {partOfSpeech}
+      {t(partOfSpeechToShortLabel[partOfSpeech])}
     </div>
   );
 };

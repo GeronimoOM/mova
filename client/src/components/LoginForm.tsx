@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { LoginDocument } from '../api/types/graphql';
 import { useAuthContext } from './AuthContext';
 
+import { useTranslation } from 'react-i18next';
 import { FaCheck } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { AppRoute } from '../routes';
@@ -21,6 +22,7 @@ export const LoginForm: React.FC = () => {
     useMutation(LoginDocument);
 
   const { setAuthToken } = useAuthContext();
+  const { t } = useTranslation();
 
   const login = useCallback(async () => {
     loginMutation({
@@ -46,12 +48,12 @@ export const LoginForm: React.FC = () => {
   return (
     <div className={styles.wrapper}>
       <div className={styles.form}>
-        <div className={styles.label}>name</div>
+        <div className={styles.label}>{t('login.user')}</div>
         <div>
           <Input value={name} onChange={setName} />
         </div>
 
-        <div className={styles.label}>password</div>
+        <div className={styles.label}>{t('login.password')}</div>
         <div>
           <Input value={password} onChange={setPassword} type="password" />
         </div>

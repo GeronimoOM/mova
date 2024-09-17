@@ -1,0 +1,97 @@
+{
+  "login": {
+    "user": "користувач",
+    "password": "пароль"
+  },
+  "nav": {
+    "words": "Слова",
+    "exercises": "Вправи",
+    "progress": "Прогрес",
+    "properties": "Властивості",
+    "language": "Мови",
+    "user": "Користувач"
+  },
+  "words": {
+    "search": "пошук",
+    "translation": "переклад"
+  },
+  "exercise": {
+    "word": "слово",
+    "translation": "переклад",
+    "recall": "пригадай переклад",
+    "spell": "надрукуй слово"
+  },
+  "languages": {
+    "name": "Мова"
+  },
+  "properties": {
+    "name": "властивість",
+    "text": "текст",
+    "option": "варіанти"
+  },
+  "progress": {
+    "progress": "Прогрес",
+    "goals": "Цілі",
+    "stats": "Статистика",
+    "today": "сьогодні",
+    "thisWeek": "цього тижня",
+    "week": "тижд.",
+    "wordsAdded_one": "слово додано",
+    "wordsAdded_few": "слова додано",
+    "wordsAdded_many": "слів додано",
+    "pointsEarned_one": "бал зароблено",
+    "pointsEarned_few": "бали зароблено",
+    "pointsEarned_many": "балів зароблено",
+    "days_one": "день",
+    "days_few": "дні",
+    "days_many": "днів",
+    "weeks_one": "тиждень",
+    "weeks_few": "тижні",
+    "weeks_many": "тижнів"
+  },
+  "goals": {
+    "daily": "щодня",
+    "weekly": "щотижня"
+  },
+  "stats": {
+    "total": "всього слів",
+    "byPartOfSpeech": "слова за частинами мови",
+    "byMastery": "слова за володінням"
+  },
+  "pos": {
+    "noun": {
+      "short": "імен",
+      "full": "іменник"
+    },
+    "verb": {
+      "short": "дієc",
+      "full": "дієслово"
+    },
+    "adj": {
+      "short": "прикм",
+      "full": "прикметник"
+    },
+    "adv": {
+      "short": "присл",
+      "full": "прислівник"
+    },
+    "pron": {
+      "short": "займ",
+      "full": "займенник"
+    },
+    "misc": {
+      "short": "іншe",
+      "full": "інше"
+    },
+    "select": "обери"
+  },
+  "mastery": {
+    "none": "відсутнє",
+    "basic": "початкове",
+    "advanced": "поглиблене",
+    "mastered": "вивчено"
+  },
+  "users": {
+    "logout": "Вийти"
+  }
+}

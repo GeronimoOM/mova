@@ -14,6 +14,9 @@ export const nav = style({
       flexDirection: 'column',
       gap: 20,
     },
+    [breakpoints.medium]: {
+      width: 150,
+    },
   },
 });
 

@@ -7,6 +7,7 @@ export type InputProps = {
   onChange: (value: string) => void;
   type?: 'text' | 'password';
   text?: 'original' | 'translation';
+  placeholder?: string;
   textColor?: Color;
   size?: 'medium' | 'large';
   disabled?: boolean;
@@ -20,6 +21,7 @@ export const Input: React.FC<InputProps> = ({
   onChange,
   type,
   text,
+  placeholder,
   textColor,
   size,
   disabled,
@@ -44,6 +46,7 @@ export const Input: React.FC<InputProps> = ({
       autoCorrect="off"
       value={obscured ? '' : value}
       onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
     />
   );
 };

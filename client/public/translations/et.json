@@ -1,0 +1,93 @@
+{
+  "login": {
+    "user": "kasutaja",
+    "password": "parool"
+  },
+  "nav": {
+    "words": "Sõnad",
+    "exercises": "Harjutused",
+    "progress": "Progress",
+    "properties": "Omadused",
+    "language": "Keel",
+    "user": "Kasutaja"
+  },
+  "words": {
+    "search": "otsing",
+    "translation": "tõlge"
+  },
+  "exercise": {
+    "word": "sõna",
+    "translation": "tõlge",
+    "recall": "tuleta meelde tõlget",
+    "spell": "kirjuta sõna"
+  },
+  "languages": {
+    "name": "Keel"
+  },
+  "properties": {
+    "name": "omadus",
+    "text": "tekst",
+    "option": "variantid"
+  },
+  "progress": {
+    "progress": "Progress",
+    "goals": "Sihid",
+    "stats": "Statistika",
+    "today": "täna",
+    "thisWeek": "sel nädalal",
+    "week": "Näd.",
+    "wordsAdded_one": "sõna lisatud",
+    "wordsAdded_other": "sõna lisatud",
+    "pointsEarned_one": "punkt teenitud",
+    "pointsEarned_other": "punkti teenitud",
+    "days_one": "päev",
+    "days_other": "päeva",
+    "weeks_one": "nädal",
+    "weeks_other": "nädalat"
+  },
+  "goals": {
+    "daily": "päevas",
+    "weekly": "nädalas"
+  },
+  "stats": {
+    "total": "sõna kokku",
+    "byPartOfSpeech": "sõna sõnaliigi järgi",
+    "byMastery": "sõna oskuse järgi"
+  },
+  "pos": {
+    "noun": {
+      "short": "nimi",
+      "full": "nimisõna"
+    },
+    "verb": {
+      "short": "tegu",
+      "full": "tegusõna"
+    },
+    "adj": {
+      "short": "omad",
+      "full": "omadussõna"
+    },
+    "adv": {
+      "short": "määr",
+      "full": "määrsõna"
+    },
+    "pron": {
+      "short": "ase",
+      "full": "asesõna"
+    },
+    "misc": {
+      "short": "muu",
+      "full": "muu"
+    },
+    "select": "vali"
+  },
+  "mastery": {
+    "none": "puudub",
+    "basic": "algne",
+    "advanced": "edasijõudnud",
+    "mastered": "valdatud"
+  },
+  "users": {
+    "logout": "Logi välja"
+  }
+}

@@ -9,12 +9,15 @@ import { LanguageProvider } from './components/LanguageContext';
 import './index.css.ts';
 import { registerServiceWorker } from './sw/client/register.ts';
 import { SwWorkerMessageType } from './sw/worker/messages.ts';
+import { initTranslator } from './utils/translator.ts';
 
 registerServiceWorker((message) => {
   if (message.type === SwWorkerMessageType.Initialized) {
     setClientId(message.clientId);
   }
 });
+
+initTranslator();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

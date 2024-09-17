@@ -38,7 +38,6 @@ export const label = recipe({
     display: 'flex',
     alignItems: 'center',
     textAlign: 'right',
-    padding: 10,
     gap: 5,
     paddingLeft: 0,
   },
@@ -62,5 +61,6 @@ export const labelNumber = style({
 
 export const labelCadence = style({
   color: themeVars.color.text,
-  width: '5rem',
+  width: '4rem',
+  fontSize: '1rem',
 });

@@ -1,11 +1,16 @@
 import { useQuery } from '@apollo/client';
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FaBook, FaBrain } from 'react-icons/fa6';
 import { PiGraphBold } from 'react-icons/pi';
 import { PieChart } from 'react-minimal-pie-chart';
 import { GetStatsDocument } from '../../api/types/graphql';
 import { masteries, masteryToColor, masteryToLabel } from '../../utils/mastery';
-import { partOfSpeechToColor, partsOfSpeech } from '../../utils/partsOfSpeech';
+import {
+  partOfSpeechToColor,
+  partOfSpeechToFullLabel,
+  partsOfSpeech,
+} from '../../utils/partsOfSpeech';
 import { useLanguageContext } from '../LanguageContext';
 import { Icon } from '../common/Icon';
 import * as styles from './StatsTab.css';
@@ -21,6 +26,8 @@ export const StatsTab: React.FC = () => {
   const total = stats?.total;
   const byMastery = stats?.mastery;
   const byPartOfSpeech = stats?.partsOfSpeech;
+
+  const { t } = useTranslation();
 
   const masteryData = useMemo(
     () =>
@@ -45,7 +52,7 @@ export const StatsTab: React.FC = () => {
 
         return {
           color: partOfSpeechToColor[partOfSpeech],
-          title: partOfSpeech.toLowerCase(),
+          title: partOfSpeechToFullLabel[partOfSpeech],
           value: data?.total ?? 0,
         };
       }),
@@ -57,7 +64,7 @@ export const StatsTab: React.FC = () => {
       <div className={styles.card}>
         <div className={styles.cardRow}>
           <Icon icon={FaBook} size="small" />
-          {'total words'}
+          {t('stats.total')}
           <span className={styles.number}>{total}</span>
         </div>
       </div>
@@ -65,7 +72,7 @@ export const StatsTab: React.FC = () => {
       <div className={styles.card}>
         <div className={styles.cardRow}>
           <Icon icon={PiGraphBold} size="small" />
-          {'words by part of speech'}
+          {t('stats.byPartOfSpeech')}
         </div>
 
         <div className={styles.cardRow}>
@@ -77,7 +84,7 @@ export const StatsTab: React.FC = () => {
       <div className={styles.card}>
         <div className={styles.cardRow}>
           <Icon icon={FaBrain} size="small" />
-          {'words by mastery'}
+          {t('stats.byMastery')}
         </div>
 
         <div className={styles.cardRow}>
@@ -107,7 +114,8 @@ const Chart: React.FC<ChartProps> = ({ data }) => {
       paddingAngle={5}
       startAngle={-45}
       style={{
-        width: '150px',
+        width: '120px',
+        margin: '0 auto',
       }}
     />
   );
@@ -118,6 +126,8 @@ type ChartLegendProps = {
 };
 
 const ChartLegend: React.FC<ChartLegendProps> = ({ data }) => {
+  const { t } = useTranslation();
+
   return (
     <div className={styles.legend}>
       {data.map(({ color, title, value }) => (
@@ -126,7 +136,7 @@ const ChartLegend: React.FC<ChartLegendProps> = ({ data }) => {
             className={styles.legendIcon}
             style={{ backgroundColor: color }}
           />
-          {title}
+          {t(title)}
           <span className={styles.number}>{value}</span>
         </div>
       ))}

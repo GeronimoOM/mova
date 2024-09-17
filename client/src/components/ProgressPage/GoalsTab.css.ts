@@ -17,7 +17,7 @@ export const goal = style({
   alignItems: 'center',
   justifyContent: 'space-between',
   padding: 10,
-  gap: 20,
+  gap: 5,
   boxSizing: 'border-box',
   width: '100%',
   maxWidth: 500,
@@ -74,14 +74,13 @@ export const goalCadence = recipe({
   },
 });
 
-export const goalInput = style({
-  width: '4rem',
-});
+export const goalInput = style({});
 
 globalStyle(`${goalInput} input`, {
   textAlign: 'center',
   fontWeight: 'bold',
   textShadow: '1px 1px black',
+  width: '3rem',
 });
 
 export const buttons = style({

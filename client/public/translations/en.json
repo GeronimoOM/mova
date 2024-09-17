@@ -1,0 +1,93 @@
+{
+  "login": {
+    "user": "user",
+    "password": "password"
+  },
+  "nav": {
+    "words": "Words",
+    "exercises": "Exercises",
+    "progress": "Progress",
+    "properties": "Properties",
+    "language": "Language",
+    "user": "User"
+  },
+  "words": {
+    "search": "search",
+    "translation": "translation"
+  },
+  "exercise": {
+    "word": "word",
+    "translation": "translation",
+    "recall": "recall the translation",
+    "spell": "spell the word"
+  },
+  "languages": {
+    "name": "Language"
+  },
+  "properties": {
+    "name": "property",
+    "text": "text",
+    "option": "options"
+  },
+  "progress": {
+    "progress": "Progress",
+    "goals": "Goals",
+    "stats": "Stats",
+    "today": "today",
+    "thisWeek": "this week",
+    "week": "Week",
+    "wordsAdded_one": "word added",
+    "wordsAdded_other": "words added",
+    "pointsEarned_one": "point earned",
+    "pointsEarned_other": "points earned",
+    "days_one": "day",
+    "days_other": "days",
+    "weeks_one": "week",
+    "weeks_other": "weeks"
+  },
+  "goals": {
+    "daily": "daily",
+    "weekly": "weekly"
+  },
+  "stats": {
+    "total": "words in total",
+    "byPartOfSpeech": "words by part of speech",
+    "byMastery": "words by mastery"
+  },
+  "pos": {
+    "noun": {
+      "short": "noun",
+      "full": "noun"
+    },
+    "verb": {
+      "short": "verb",
+      "full": "verb"
+    },
+    "adj": {
+      "short": "adj",
+      "full": "adjective"
+    },
+    "adv": {
+      "short": "adv",
+      "full": "adverb"
+    },
+    "pron": {
+      "short": "pron",
+      "full": "pronoun"
+    },
+    "misc": {
+      "short": "misc",
+      "full": "miscellaneous"
+    },
+    "select": "select"
+  },
+  "mastery": {
+    "none": "none",
+    "basic": "basic",
+    "advanced": "advanced",
+    "mastered": "mastered"
+  },
+  "users": {
+    "logout": "Log out"
+  }
+}

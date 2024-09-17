@@ -23,6 +23,10 @@ export const input = recipe({
         backgroundColor: themeVars.color.backgroundLighter,
       },
     },
+
+    '::placeholder': {
+      color: themeVars.color.muted,
+    },
   },
 
   variants: {
@@ -31,10 +35,20 @@ export const input = recipe({
         fontFamily: sourceCodeProFontFace,
         fontWeight: 500,
         letterSpacing: '0.025em',
+
+        '::placeholder': {
+          fontFamily: sourceCodeProFontFace,
+          fontWeight: 500,
+          letterSpacing: '0.025em',
+        },
       },
 
       translation: {
         fontFamily: jostFontFace,
+
+        '::placeholder': {
+          fontFamily: jostFontFace,
+        },
       },
     },
 

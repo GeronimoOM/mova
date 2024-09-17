@@ -21,10 +21,12 @@ export const tab = style({
   display: 'flex',
   alignItems: 'center',
   padding: '5px 10px',
-  gap: 10,
+  gap: 5,
   cursor: 'pointer',
   transition: 'border 0.2s ease',
   borderBottom: '3px solid transparent',
+  fontWeight: 'bold',
+  fontSize: '0.8rem',
 
   selectors: {
     [`&:hover, &.active`]: {

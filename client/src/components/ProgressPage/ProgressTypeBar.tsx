@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   ProgressCadence,
   ProgressFieldsFragment,
@@ -18,6 +19,8 @@ export const ProgressTypeBar: React.FC<ProgressBarProps> = ({
   type,
   progress,
 }) => {
+  const { t } = useTranslation();
+
   const currentPoints = progress?.current.points ?? 0;
   const goalPoints = progress?.goal?.points ?? 0;
   const progressPercent = goalPoints
@@ -26,8 +29,8 @@ export const ProgressTypeBar: React.FC<ProgressBarProps> = ({
   const cadence = progress?.cadence;
   const cadenceLabel = cadence
     ? cadence === ProgressCadence.Daily
-      ? 'today'
-      : 'this week'
+      ? t('progress.today')
+      : t('progress.thisWeek')
     : '';
 
   return (

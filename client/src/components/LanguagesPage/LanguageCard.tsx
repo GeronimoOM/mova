@@ -4,6 +4,7 @@ import { FaCircle } from 'react-icons/fa';
 import { LanguageFieldsFragment } from '../../api/types/graphql';
 
 import classNames from 'classnames';
+import { useTranslation } from 'react-i18next';
 import { FaFeatherPointed, FaFire } from 'react-icons/fa6';
 import { ButtonIcon } from '../common/ButtonIcon';
 import { Input } from '../common/Input';
@@ -39,6 +40,8 @@ export const LanguageCard: React.FC<LanguageCardProps> = ({
     createdLanguage,
   } = useLanguage(currentLanguage);
 
+  const { t } = useTranslation();
+
   useEffect(() => {
     if (createdLanguage) {
       onLanguageCreated?.();
@@ -48,7 +51,12 @@ export const LanguageCard: React.FC<LanguageCardProps> = ({
   return (
     <div className={classNames(styles.card, { selected })}>
       <div className={styles.main}>
-        <Input value={language.name ?? ''} onChange={setName} size="large" />
+        <Input
+          value={language.name ?? ''}
+          onChange={setName}
+          size="large"
+          placeholder={t('languages.name')}
+        />
       </div>
       <div className={styles.buttons}>
         <ButtonIcon

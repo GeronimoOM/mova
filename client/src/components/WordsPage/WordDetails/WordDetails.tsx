@@ -4,6 +4,7 @@ import { FaFeatherPointed, FaFire } from 'react-icons/fa6';
 import { BsTranslate } from 'react-icons/bs';
 import { HiMiniXMark } from 'react-icons/hi2';
 
+import { useTranslation } from 'react-i18next';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { Icon } from '../../common/Icon';
 import { Input } from '../../common/Input';
@@ -51,6 +52,8 @@ export const WordDetails: React.FC<WordDetailsProps> = ({
     canDeleteWord,
     deletedWord,
   } = useWordDetails(wordId);
+
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (createdWord?.id) {
@@ -113,7 +116,7 @@ export const WordDetails: React.FC<WordDetailsProps> = ({
 
           <div className={styles.translationLabel}>
             <Icon icon={BsTranslate} size="small" />
-            {'translation'}
+            {t('words.translation')}
           </div>
 
           <Input

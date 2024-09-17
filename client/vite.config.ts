@@ -45,7 +45,7 @@ const pwaOptions: Partial<VitePWAOptions> = {
   srcDir: 'src',
   filename: 'sw.ts',
   injectRegister: null,
-  includeAssets: ['fonts/*.ttf', 'images/*.svg'],
+  includeAssets: ['fonts/*.ttf', 'images/*.svg', 'translations/*.json'],
   devOptions: {
     enabled: true,
     type: 'module',
