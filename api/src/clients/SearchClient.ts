@@ -59,11 +59,11 @@ export class SearchClient implements OnApplicationBootstrap {
     query = query.toLowerCase();
 
     const queryShould: QueryDslQueryContainer[] = [
-      { fuzzy: { original: { value: query, boost: 2 } } },
+      { fuzzy: { original: { value: query, boost: 1 } } },
       { prefix: { original: { value: query, boost: 4 } } },
-      { fuzzy: { translation: { value: query, boost: 1 } } },
+      { fuzzy: { translation: { value: query, boost: 0.5 } } },
       { prefix: { translation: { value: query, boost: 2 } } },
-      { fuzzy: { properties: { value: query, boost: 1 } } },
+      { fuzzy: { properties: { value: query, boost: 0.5 } } },
       { prefix: { properties: { value: query, boost: 2 } } },
     ];
 
