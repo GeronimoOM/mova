@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Delete,
   Get,
@@ -10,7 +11,10 @@ import {
 } from '@nestjs/common';
 import { FastifyRequest } from 'fastify';
 import { DateTime } from 'luxon';
+import { ContextDec } from 'middleware/ContextMiddleware';
+import { Context } from 'models/Context';
 import { LanguageId } from 'models/Language';
+import { UserId } from 'models/User';
 import { MaintenanceService } from 'services/MaintenanceService';
 import { chain } from 'stream-chain';
 import { parser as jsonParser } from 'stream-json/jsonl/Parser';
@@ -58,5 +62,13 @@ export class MaintenanceController {
   async resyncProgress(@Query('id') languageId: LanguageId) {
     const language = await this.maintenanceService.resyncProgress(languageId);
     return language;
+  }
+
+  @Post('/init/et')
+  async initEstonian(
+    @ContextDec() ctx: Context,
+    @Body('userId') userId: UserId,
+  ) {
+    await this.maintenanceService.initEstonian(ctx, userId);
   }
 }

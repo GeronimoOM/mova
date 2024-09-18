@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { UserId, UserSettings } from 'models/User';
+import { ConfigService } from '@nestjs/config';
+import { User, UserId, UserSettings } from 'models/User';
 import { UserRepository } from 'repositories/UserRepository';
 
 const DEFAULT_SETTINGS: UserSettings = {
@@ -8,7 +9,22 @@ const DEFAULT_SETTINGS: UserSettings = {
 
 @Injectable()
 export class UserService {
-  constructor(private userRepository: UserRepository) {}
+  private users: User[];
+
+  constructor(
+    private userRepository: UserRepository,
+    private configService: ConfigService,
+  ) {
+    this.users = this.configService.get<User[]>('users');
+  }
+
+  async getUser(userId: UserId): Promise<User | null> {
+    return this.users.find((user) => user.id === userId) ?? null;
+  }
+
+  async getUserByUsername(username: string): Promise<User | null> {
+    return this.users.find((user) => user.username === username) ?? null;
+  }
 
   async getSettings(userId: UserId) {
     return this.mergeSettings(await this.userRepository.getSettings(userId));

@@ -8,19 +8,28 @@ import {
   PropertyTable,
   WordTable,
 } from 'knex/types/tables';
+import { Context } from 'models/Context';
 import { Language, LanguageId } from 'models/Language';
 import {
   MigrationRecord,
   MigrationRecordType,
   MigrationRecordTypes,
 } from 'models/Migration';
+import { PropertyType } from 'models/Property';
+import { UserId } from 'models/User';
+import { PartOfSpeech } from 'models/Word';
 import { ChangeRepository } from 'repositories/ChangeRepository';
+import { DbConnectionManager } from 'repositories/DbConnectionManager';
 import { LanguageRepository } from 'repositories/LanguageRepository';
 import { ProgressRepository } from 'repositories/ProgressRepository';
 import { PropertyRepository } from 'repositories/PropertyRepository';
 import { WordRepository } from 'repositories/WordRepository';
 import { Readable } from 'stream';
+import { LanguageService } from './LanguageService';
+import * as etPreset from './presets/et';
 import { ProgressService } from './ProgressService';
+import { PropertyService } from './PropertyService';
+import { UserService } from './UserService';
 import { WordService } from './WordService';
 
 const RECORDS_BATCH = 1000;
@@ -31,6 +40,9 @@ export class MaintenanceService {
   constructor(
     private wordService: WordService,
     private progressService: ProgressService,
+    private propertyService: PropertyService,
+    private languageService: LanguageService,
+    private userService: UserService,
 
     private languageRepository: LanguageRepository,
     private propertyRepository: PropertyRepository,
@@ -39,6 +51,7 @@ export class MaintenanceService {
     private changeRepository: ChangeRepository,
 
     private searchClient: SearchClient,
+    private dbConnectionManager: DbConnectionManager,
   ) {}
 
   export(): Readable {
@@ -80,6 +93,27 @@ export class MaintenanceService {
 
   async resyncProgress(languageId: LanguageId): Promise<void> {
     await this.progressService.syncAllWordsProgress(languageId);
+  }
+
+  async initEstonian(ctx: Context, userId: UserId): Promise<void> {
+    ctx.user = await this.userService.getUser(userId);
+    await this.dbConnectionManager.transactionally(async () => {
+      const language = await this.languageService.create(ctx, {
+        name: etPreset.name,
+      });
+      for (const [partOfSpeech, properties] of Object.entries(
+        etPreset.properties,
+      )) {
+        for (const propertyName of properties) {
+          await this.propertyService.create(ctx, {
+            languageId: language.id,
+            name: propertyName,
+            partOfSpeech: partOfSpeech as PartOfSpeech,
+            type: PropertyType.Text,
+          });
+        }
+      }
+    });
   }
 
   private async *exportRecords(): AsyncGenerator<MigrationRecord> {
