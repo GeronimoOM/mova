@@ -43,7 +43,7 @@ export const ExerciseCard: React.FC = () => {
     },
   ] = useLazyQuery(GetExerciseWordsDocument, {
     variables: { languageId: selectedLanguageId! },
-    fetchPolicy: 'no-cache',
+    fetchPolicy: 'network-only',
   });
   const [attemptMastery] = useAttemptWordMastery();
 
