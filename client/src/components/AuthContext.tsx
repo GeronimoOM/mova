@@ -9,7 +9,6 @@ import React, {
 import { cacheEvict } from '../api/cache';
 import { initServiceWorker, resetServiceWorker } from '../sw/client/register';
 import { LOCAL_STORAGE_TOKEN_KEY } from '../utils/constants';
-import { useLanguageContext } from './LanguageContext';
 
 export type AuthContextType = {
   authToken: string | null;
@@ -28,8 +27,6 @@ type AuthProviderProps = {
 };
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [, setSelectedLanguageId] = useLanguageContext();
-
   const [token, setToken] = useState<string | null>(() =>
     localStorage.getItem(LOCAL_STORAGE_TOKEN_KEY),
   );
@@ -43,9 +40,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.removeItem(LOCAL_STORAGE_TOKEN_KEY);
     setToken(null);
     resetServiceWorker();
-    setSelectedLanguageId(null);
     cacheEvict();
-  }, [setSelectedLanguageId]);
+  }, []);
 
   const contextValue = useMemo<AuthContextType>(
     () => ({

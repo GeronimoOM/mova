@@ -86,3 +86,10 @@ mutation ApplyChanges($changes: [ApplyChangeInput!]!) {
 mutation Login($input: LoginInput!) {
   login(input: $input)
 }
+
+mutation UpdateSettings($input: UpdateUserSettingsInput!) {
+  updateSettings(input: $input) {
+    selectedLanguageId
+    selectedLocale
+  }
+}

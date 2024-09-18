@@ -50,6 +50,11 @@ declare module 'knex/types/tables' {
     language_id: LanguageId;
   }
 
+  interface UserSettingsTable {
+    user_id: UserId;
+    settings?: string;
+  }
+
   interface ChangeTable {
     id: ChangeId;
     changed_at: string;

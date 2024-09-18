@@ -116,6 +116,13 @@ query GetStats($languageId: ID!) {
   }
 }
 
+query GetSettings {
+  settings {
+    selectedLanguageId
+    selectedLocale
+  }
+}
+
 query GetChanges($syncType: SyncType!, $cursor: String, $changedAt: Timestamp) {
   changes(syncType: $syncType, cursor: $cursor, changedAt: $changedAt) {
     items {

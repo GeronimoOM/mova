@@ -8,17 +8,20 @@ import { AuthResolver } from 'graphql/resolvers/AuthResolver';
 import { ChangeResolver } from 'graphql/resolvers/ChangeResolver';
 import { ExerciseResolver } from 'graphql/resolvers/ExerciseResolver';
 import { ProgressResolver } from 'graphql/resolvers/ProgressResolver';
+import { UserResolver } from 'graphql/resolvers/UserResolver';
 import { AuthGuard } from 'guards/AuthGuard';
 import { ContextMiddleware } from 'middleware/ContextMiddleware';
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { ChangeRepository } from 'repositories/ChangeRepository';
 import { ProgressRepository } from 'repositories/ProgressRepository';
 import { Serializer } from 'repositories/Serializer';
+import { UserRepository } from 'repositories/UserRepository';
 import { AuthService } from 'services/AuthService';
 import { ChangeBuilder } from 'services/ChangeBuilder';
 import { ChangeService } from 'services/ChangeService';
 import { ExerciseService } from 'services/ExerciseService';
 import { ProgressService } from 'services/ProgressService';
+import { UserService } from 'services/UserService';
 import { ElasticClientModule } from './clients/ElasticClientModule';
 import { SearchClient } from './clients/SearchClient';
 import { configLoader } from './config';
@@ -62,6 +65,7 @@ import { WordService } from './services/WordService';
     WordResolver,
     ExerciseResolver,
     ProgressResolver,
+    UserResolver,
     PropertyTypeMapper,
     WordTypeMapper,
     ChangeTypeMapper,
@@ -72,6 +76,7 @@ import { WordService } from './services/WordService';
     WordService,
     ChangeService,
     ProgressService,
+    UserService,
     MaintenanceService,
     SearchClient,
     ChangeBuilder,
@@ -80,6 +85,7 @@ import { WordService } from './services/WordService';
     WordRepository,
     ChangeRepository,
     ProgressRepository,
+    UserRepository,
     DbConnectionManager,
     Serializer,
     {

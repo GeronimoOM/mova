@@ -38,7 +38,7 @@ export const LoginForm: React.FC = () => {
   useEffect(() => {
     if (loginResult?.login) {
       setAuthToken(loginResult.login);
-      navigate(AppRoute.Languages);
+      navigate(AppRoute.Words);
     } else {
       setName('');
       setPassword('');

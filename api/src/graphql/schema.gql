@@ -319,6 +319,11 @@ type ProgressHistory {
   instances: [ProgressInstance!]!
 }
 
+type UserSettings {
+  selectedLanguageId: ID
+  selectedLocale: String
+}
+
 type WordsStatsMastery {
   total: Int!
   mastery: Int!
@@ -341,6 +346,7 @@ type Query {
   property(id: ID!): Property
   changes(cursor: String, limit: Int, syncType: SyncType, changedAt: Timestamp): ChangePage!
   word(id: ID!): Word
+  settings: UserSettings!
 }
 
 type Mutation {
@@ -358,6 +364,7 @@ type Mutation {
   deleteWord(input: DeleteWordInput!): Word!
   attemptMastery(wordId: ID!, success: Boolean!): Word!
   setGoals(input: SetGoalsInput!): [Goal!]!
+  updateSettings(input: UpdateUserSettingsInput!): UserSettings!
 }
 
 input LoginInput {
@@ -460,4 +467,9 @@ input SetGoalInput {
   type: ProgressType!
   cadence: ProgressCadence!
   points: Int!
+}
+
+input UpdateUserSettingsInput {
+  selectedLanguageId: ID
+  selectedLocale: String
 }

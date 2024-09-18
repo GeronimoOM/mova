@@ -2,7 +2,7 @@ import { DateTime } from 'luxon';
 import React from 'react';
 import { WordFieldsFragment } from '../../../api/types/graphql';
 import { DISPLAY_DATE_FORMAT } from '../../../utils/constants';
-import { useTranslationLanguage } from '../../../utils/translator';
+import { useLocaleContext } from '../../LocaleContext';
 import { WordMastery } from './WordMastery';
 import * as styles from './WordsListItem.css';
 
@@ -39,13 +39,11 @@ export const WordsListItemDivider: React.FC<WordsListItemDividerProps> = ({
   total,
   isTotalComplete,
 }) => {
-  const translationLanguage = useTranslationLanguage();
+  const [locale] = useLocaleContext();
 
   return (
     <div className={styles.divider}>
-      <div>
-        {date.setLocale(translationLanguage).toFormat(DISPLAY_DATE_FORMAT)}
-      </div>
+      <div>{date.setLocale(locale).toFormat(DISPLAY_DATE_FORMAT)}</div>
       <div
         className={styles.dividerTotal}
       >{`${Math.min(total, MAX_DIVIDER_TOTAL)}${isTotalComplete ? '' : '+'}`}</div>

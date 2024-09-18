@@ -19,9 +19,9 @@ import {
   DISPLAY_WEEKDAY_FORMAT,
   N_WEEKDAYS,
 } from '../../utils/constants';
-import { useTranslationLanguage } from '../../utils/translator';
 import { useMediaQuery } from '../../utils/useMediaQuery';
 import { useLanguageContext } from '../LanguageContext';
+import { useLocaleContext } from '../LocaleContext';
 import { ButtonIcon } from '../common/ButtonIcon';
 import { Icon } from '../common/Icon';
 import { Tooltip } from '../common/Tooltip';
@@ -144,7 +144,7 @@ const ProgressCalendarHeader: React.FC<ProgressCalendarHeaderProps> = ({
     return getGroupedMonths(weeklyData);
   }, [weeklyData]);
 
-  const translationLanguage = useTranslationLanguage();
+  const [locale] = useLocaleContext();
 
   return (
     <thead>
@@ -154,7 +154,7 @@ const ProgressCalendarHeader: React.FC<ProgressCalendarHeaderProps> = ({
           <td key={month} colSpan={span} className={styles.monthLabel}>
             {span > 2
               ? DateTime.fromObject({ month })
-                  .setLocale(translationLanguage)
+                  .setLocale(locale)
                   .toFormat(DISPLAY_MONTH_FORMAT)
               : ''}
           </td>
@@ -180,7 +180,7 @@ const ProgressCalendarBody: React.FC<ProgressCalendarBodyProps> = ({
   isGoalOnly,
 }) => {
   const { t } = useTranslation();
-  const translationLanguage = useTranslationLanguage();
+  const [locale] = useLocaleContext();
 
   return (
     <tbody>
@@ -190,7 +190,7 @@ const ProgressCalendarBody: React.FC<ProgressCalendarBodyProps> = ({
             {DateTime.fromObject({
               weekday: (weekday + 1) as WeekdayNumbers,
             })
-              .setLocale(translationLanguage)
+              .setLocale(locale)
               .toFormat(DISPLAY_WEEKDAY_FORMAT)}
           </td>
 
@@ -314,17 +314,15 @@ type ProgressCalendarCellTooltipProps = {
 const ProgressCalendarCellTooltip: React.FC<
   ProgressCalendarCellTooltipProps
 > = ({ type, cadence, date, points }) => {
-  const translationLanguage = useTranslationLanguage();
+  const [locale] = useLocaleContext();
   const { t } = useTranslation();
 
   let dateString;
   if (cadence === ProgressCadence.Daily) {
-    dateString = date
-      .setLocale(translationLanguage)
-      .toFormat(DISPLAY_DATE_FORMAT);
+    dateString = date.setLocale(locale).toFormat(DISPLAY_DATE_FORMAT);
   } else {
     const until = date.plus({ weeks: 1 }).minus({ days: 1 });
-    dateString = `${date.setLocale(translationLanguage).toFormat(DISPLAY_DATE_FORMAT)} - ${until.setLocale(translationLanguage).toFormat(DISPLAY_DATE_FORMAT)}`;
+    dateString = `${date.setLocale(locale).toFormat(DISPLAY_DATE_FORMAT)} - ${until.setLocale(locale).toFormat(DISPLAY_DATE_FORMAT)}`;
   }
 
   const pointsString =

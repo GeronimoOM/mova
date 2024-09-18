@@ -38,14 +38,16 @@ export const flag = style({
   display: 'flex',
   width: '2.5rem',
   height: '2.5rem',
-  padding: 6,
+  padding: 3,
+  border: `3px solid transparent`,
   borderRadius: '100%',
   cursor: 'pointer',
   transition: 'background-color 0.2s ease, border 0.2s ease',
 
   selectors: {
     '&:hover, &.selected': {
-      backgroundColor: themeVars.color.primary,
+      border: `3px solid ${themeVars.color.primary}`,
+      backgroundColor: themeVars.color.backgroundLighter,
     },
   },
 });

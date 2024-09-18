@@ -1,8 +1,7 @@
-import React, { useEffect } from 'react';
-import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import { AppRoute, allowedNoLanguageRoutes } from '../routes';
+import React from 'react';
+import { Route, Routes } from 'react-router-dom';
+import { AppRoute } from '../routes';
 import { ExercisesPage } from './ExercisesPage/ExercisesPage';
-import { useLanguageContext } from './LanguageContext';
 import { LanguagesPage } from './LanguagesPage/LanguagesPage';
 import * as styles from './Main.css';
 import { ProgressPage } from './ProgressPage/ProgressPage';
@@ -11,19 +10,6 @@ import { UserPage } from './UserPage/UserPage';
 import { WordsPage } from './WordsPage/WordsPage';
 
 export const Main: React.FC = () => {
-  const [selectedLanguageId] = useLanguageContext();
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  useEffect(() => {
-    if (
-      !selectedLanguageId &&
-      !allowedNoLanguageRoutes.includes(location.pathname as AppRoute)
-    ) {
-      navigate(AppRoute.Languages);
-    }
-  }, [selectedLanguageId, location, navigate]);
-
   return (
     <main className={styles.main}>
       <Routes>

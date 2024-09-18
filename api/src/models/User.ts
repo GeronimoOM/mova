@@ -1,4 +1,5 @@
 import { Flavor } from 'utils/flavor';
+import { LanguageId } from './Language';
 
 export type UserId = Flavor<string, 'User'>;
 
@@ -11,4 +12,9 @@ export interface User {
 
 export interface UserAuth {
   userId: UserId;
+}
+
+export interface UserSettings {
+  selectedLanguageId?: LanguageId;
+  selectedLocale?: string;
 }

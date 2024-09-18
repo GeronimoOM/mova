@@ -6,10 +6,10 @@ import { client, setClientId } from './api/client';
 import { App } from './components/App';
 import { AuthProvider } from './components/AuthContext';
 import { LanguageProvider } from './components/LanguageContext';
+import { LocaleProvider, initTranslator } from './components/LocaleContext.tsx';
 import './index.css.ts';
 import { registerServiceWorker } from './sw/client/register.ts';
 import { SwWorkerMessageType } from './sw/worker/messages.ts';
-import { initTranslator } from './utils/translator.ts';
 
 registerServiceWorker((message) => {
   if (message.type === SwWorkerMessageType.Initialized) {
@@ -22,13 +22,15 @@ initTranslator();
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ApolloProvider client={client}>
-      <LanguageProvider>
-        <AuthProvider>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </AuthProvider>
-      </LanguageProvider>
+      <AuthProvider>
+        <LocaleProvider>
+          <LanguageProvider>
+            <BrowserRouter>
+              <App />
+            </BrowserRouter>
+          </LanguageProvider>
+        </LocaleProvider>
+      </AuthProvider>
     </ApolloProvider>
   </React.StrictMode>,
 );
