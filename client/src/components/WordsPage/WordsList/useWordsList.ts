@@ -1,4 +1,4 @@
-import { useLazyQuery } from '@apollo/client';
+import { NetworkStatus, useLazyQuery } from '@apollo/client';
 import { DateTime } from 'luxon';
 import { useCallback, useEffect, useMemo } from 'react';
 import {
@@ -20,8 +20,10 @@ export function useWordsList(wordsSearchQuery: string): WordsListReturn {
 
   const [
     fetchWordsPage,
-    { data: wordsQuery, loading: wordsLoading, fetchMore },
-  ] = useLazyQuery(GetWordsDocument);
+    { data: wordsQuery, fetchMore, networkStatus: wordsLoadingStatus },
+  ] = useLazyQuery(GetWordsDocument, {
+    notifyOnNetworkStatusChange: true,
+  });
   const words = wordsQuery?.language?.words.items;
   const nextCursor = wordsQuery?.language?.words.nextCursor ?? null;
   const dividedWords = useMemo(
@@ -29,6 +31,10 @@ export function useWordsList(wordsSearchQuery: string): WordsListReturn {
     [words, nextCursor],
   );
   const isSearch = wordsSearchQuery.length >= MIN_QUERY_LENGTH;
+  const wordsLoading = [
+    NetworkStatus.loading,
+    NetworkStatus.setVariables,
+  ].includes(wordsLoadingStatus);
 
   const fetchFirstWordsPage = useCallback(() => {
     if (!selectedLanguageId) {

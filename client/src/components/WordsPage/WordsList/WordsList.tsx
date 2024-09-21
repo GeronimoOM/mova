@@ -7,6 +7,7 @@ import { useDebouncedValue } from '../../../utils/useDebouncedValue';
 import { useInfiniteScroll } from '../../../utils/useInfiniteScroll';
 import { useLanguageContext } from '../../LanguageContext';
 import { ButtonIcon } from '../../common/ButtonIcon';
+import { Loader } from '../../common/Loader';
 import * as styles from './WordsList.css';
 import { WordsListItem, WordsListItemDivider } from './WordsListItem';
 import { isDivider, useWordsList } from './useWordsList';
@@ -51,7 +52,9 @@ export const WordsList: React.FC<WordsListProps> = ({
 
   return (
     <div className={styles.wrapper}>
-      {isEmpty ? (
+      {wordsLoading ? (
+        <Loader />
+      ) : isEmpty ? (
         <NoWords isSearch={isSearch} />
       ) : (
         <div className={styles.list}>
