@@ -116,7 +116,7 @@ query GetStats($languageId: ID!) {
   }
 }
 
-query GetSettings {
+query GetUserSettings {
   settings {
     selectedLanguageId
     selectedLocale

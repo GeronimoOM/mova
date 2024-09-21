@@ -35,6 +35,10 @@ export const cell = recipe({
       '&.hidden': {
         display: 'none',
       },
+
+      '&.muted': {
+        opacity: 0.5,
+      },
     },
   },
 

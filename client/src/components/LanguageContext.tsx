@@ -8,7 +8,7 @@ import React, {
   useState,
 } from 'react';
 import {
-  GetSettingsDocument,
+  GetUserSettingsDocument,
   UpdateSettingsDocument,
 } from '../api/types/graphql';
 import { useAuthContext } from './AuthContext';
@@ -38,7 +38,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
     localStorage.getItem(LOCAL_STORAGE_LANGUAGE_KEY),
   );
 
-  const [fetchUserSettings] = useLazyQuery(GetSettingsDocument, {
+  const [fetchUserSettings] = useLazyQuery(GetUserSettingsDocument, {
     fetchPolicy: 'no-cache',
   });
   const [updateUserSettings] = useMutation(UpdateSettingsDocument);

@@ -1,8 +1,9 @@
-import { useLazyQuery, useQuery } from '@apollo/client';
+import { NetworkStatus, useLazyQuery, useQuery } from '@apollo/client';
 import React, { useMemo, useRef, useState } from 'react';
 import { FaInfo } from 'react-icons/fa';
 import { HiMiniXMark } from 'react-icons/hi2';
 
+import { useTranslation } from 'react-i18next';
 import { IoPlay } from 'react-icons/io5';
 import { useAttemptWordMastery } from '../../api/mutations';
 import {
@@ -25,7 +26,7 @@ export const ExerciseCard: React.FC = () => {
   const [selectedLanguageId] = useLanguageContext();
 
   const [isStarted, setIsStarted] = useState(false);
-  const [wordIndex, setWordIndex] = useState(0);
+  const [wordIndex, setWordIndex] = useState(-1);
   const [isWordDetailsOpen, setIsWordDetailsOpen] = useState(false);
 
   const { data: propertiesQuery, loading: propertiesLoading } = useQuery(
@@ -38,19 +39,24 @@ export const ExerciseCard: React.FC = () => {
     fetchExerciseWords,
     {
       data: exerciseWordsQuery,
-      loading: wordsLoading,
+      networkStatus: fetchingExerciseWordsStatus,
       refetch: refetchExerciseWords,
     },
   ] = useLazyQuery(GetExerciseWordsDocument, {
     variables: { languageId: selectedLanguageId! },
     fetchPolicy: 'network-only',
+    notifyOnNetworkStatusChange: true,
   });
   const [attemptMastery] = useAttemptWordMastery();
 
+  const wordsLoading = [NetworkStatus.loading, NetworkStatus.refetch].includes(
+    fetchingExerciseWordsStatus,
+  );
   const loading = propertiesLoading || wordsLoading;
   const words = exerciseWordsQuery?.language?.exerciseWords;
   const currentWord = words?.[wordIndex];
   const hasNext = wordIndex + 1 < (words?.length ?? 0);
+
   const propertiesByPartOfSpeech = useMemo(
     () =>
       propertiesQuery
@@ -95,7 +101,7 @@ export const ExerciseCard: React.FC = () => {
       {isStarted ? (
         loading ? (
           <Loader />
-        ) : (
+        ) : currentWord ? (
           <>
             <div className={styles.exercise}>
               <Exercise
@@ -131,17 +137,40 @@ export const ExerciseCard: React.FC = () => {
               />
             </div>
           </>
+        ) : (
+          <ExercisesNotReady />
         )
       ) : (
-        <div className={styles.centered}>
-          <ButtonIcon
-            icon={IoPlay}
-            color="primary"
-            highlighted={true}
-            onClick={handleStart}
-          />
-        </div>
+        <StartButton onStart={handleStart} />
       )}
+    </div>
+  );
+};
+
+type StartButtonProps = {
+  onStart: () => void;
+};
+
+const StartButton: React.FC<StartButtonProps> = ({ onStart }) => (
+  <div className={styles.centered}>
+    <ButtonIcon
+      icon={IoPlay}
+      color="primary"
+      highlighted={true}
+      onClick={onStart}
+    />
+  </div>
+);
+
+const ExercisesNotReady: React.FC = () => {
+  const { t } = useTranslation();
+
+  return (
+    <div className={styles.centered}>
+      <div className={styles.noWordsTitle}>{t('exercise.empty.title')}</div>
+      <div className={styles.noWordsDescription}>
+        {t('exercise.empty.description')}
+      </div>
     </div>
   );
 };

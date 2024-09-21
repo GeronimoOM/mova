@@ -3,7 +3,7 @@ import { useCallback, useRef } from 'react';
 import { Color } from '../../index.css';
 import * as styles from './SpellInput.css';
 
-const OBSCURED_LENGTH = 50;
+const OBSCURED_LENGTH = 100;
 
 type SpellInputProps = {
   value: string;
@@ -42,16 +42,34 @@ export const SpellInput: React.FC<SpellInputProps> = ({
   }, []);
 
   const handleChange = useCallback(
-    (i: number, value: string, newValue: string | null) => {
-      if (newValue !== null) {
-        onChange(value + newValue);
-        if (i < length - 1) {
-          cells.current[i + 1].focus();
+    (
+      i: number,
+      value: string,
+      newValue: string | null,
+      selectionStart: number | null,
+    ) => {
+      if (newValue === '') {
+        return;
+      }
+
+      if (newValue) {
+        newValue = selectionStart === 1 ? newValue[0] : newValue[1];
+        const insertIndex = selectionStart === 1 ? i : i + 1;
+        onChange(
+          (
+            value.slice(0, insertIndex) +
+            newValue +
+            value.slice(insertIndex)
+          ).slice(0, length),
+        );
+        if (insertIndex < length - 1) {
+          cells.current[insertIndex + 1].focus();
         }
       } else {
-        onChange(value.slice(0, i - 1));
-        if (i > 0) {
-          cells.current[i - 1].focus();
+        const removeIndex = selectionStart === 0 ? i - 1 : i;
+        onChange(value.slice(0, removeIndex) + value.slice(removeIndex + 1));
+        if (removeIndex >= 0) {
+          cells.current[removeIndex].focus();
         }
       }
     },
@@ -72,17 +90,36 @@ export const SpellInput: React.FC<SpellInputProps> = ({
                 }),
               }),
               {
+                muted: obscureLength && i === value.length + 1,
                 hidden: obscureLength && i >= value.length + 2,
               },
             )}
             key={i}
             ref={(el) => handleCellRef(i, el)}
             value={value[i] ?? ''}
-            maxLength={1}
-            onChange={(e) => handleChange(i, value, e.target.value)}
+            maxLength={2}
+            onChange={(e) =>
+              handleChange(i, value, e.target.value, e.target.selectionStart)
+            }
             onKeyDown={(e) => {
+              const selectionStart = (
+                e.target as unknown as { selectionStart: number }
+              ).selectionStart;
+
               if (e.key === 'Backspace' && i > 0) {
-                handleChange(i, value, null);
+                handleChange(i, value, null, selectionStart);
+              } else if (
+                e.key === 'ArrowLeft' &&
+                i > 0 &&
+                selectionStart === 0
+              ) {
+                cells.current[i - 1].focus();
+              } else if (
+                e.key === 'ArrowRight' &&
+                i < length - 1 &&
+                selectionStart === 1
+              ) {
+                cells.current[i + 1].focus();
               }
             }}
             onFocus={() => handleFocus(i, value)}

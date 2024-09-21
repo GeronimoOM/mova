@@ -36,6 +36,16 @@ export const centered = style({
   justifyContent: 'center',
 });
 
+export const noWordsTitle = style({
+  color: themeVars.color.text,
+  textAlign: 'center',
+});
+
+export const noWordsDescription = style({
+  color: themeVars.color.muted,
+  textAlign: 'center',
+});
+
 export const bottom = style({
   marginTop: 'auto',
   display: 'flex',

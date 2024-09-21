@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { TbHexagonPlusFilled } from 'react-icons/tb';
 import { cacheClearWordsSearch } from '../../../api/cache';
 import { MIN_QUERY_LENGTH } from '../../../utils/constants';
@@ -35,6 +36,7 @@ export const WordsList: React.FC<WordsListProps> = ({
   const { words, wordsLoading, fetchNextWordsPage } = useWordsList(
     debouncedWordsSearchQuery,
   );
+  const isEmpty = !words?.length && !wordsLoading;
 
   const listEndRef = useInfiniteScroll<HTMLDivElement>({
     isFetching: wordsLoading,
@@ -49,27 +51,31 @@ export const WordsList: React.FC<WordsListProps> = ({
 
   return (
     <div className={styles.wrapper}>
-      <div className={styles.list}>
-        {words?.map((word) =>
-          isDivider(word) ? (
-            !isSearch && (
-              <WordsListItemDivider
-                key={word.date.toString()}
-                date={word.date}
-                total={word.total}
-                isTotalComplete={word.isTotalComplete}
+      {isEmpty ? (
+        <NoWords isSearch={isSearch} />
+      ) : (
+        <div className={styles.list}>
+          {words?.map((word) =>
+            isDivider(word) ? (
+              !isSearch && (
+                <WordsListItemDivider
+                  key={word.date.toString()}
+                  date={word.date}
+                  total={word.total}
+                  isTotalComplete={word.isTotalComplete}
+                />
+              )
+            ) : (
+              <WordsListItem
+                key={word.id}
+                word={word}
+                setSelectedWord={onSelectWord}
               />
-            )
-          ) : (
-            <WordsListItem
-              key={word.id}
-              word={word}
-              setSelectedWord={onSelectWord}
-            />
-          ),
-        )}
-        <div className={styles.listEnd} key="end" ref={listEndRef} />
-      </div>
+            ),
+          )}
+          <div className={styles.listEnd} key="end" ref={listEndRef} />
+        </div>
+      )}
 
       <div className={styles.buttons}>
         <ButtonIcon
@@ -80,6 +86,20 @@ export const WordsList: React.FC<WordsListProps> = ({
           wrapped
         />
       </div>
+    </div>
+  );
+};
+
+type NoWordsProps = {
+  isSearch: boolean;
+};
+
+const NoWords: React.FC<NoWordsProps> = ({ isSearch }) => {
+  const { t } = useTranslation();
+
+  return (
+    <div className={styles.noWords}>
+      <div>{isSearch ? t('words.empty.search') : t('words.empty.list')}</div>
     </div>
   );
 };

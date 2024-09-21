@@ -54,5 +54,5 @@ export const flag = style({
 
 globalStyle(`${flag} svg`, {
   borderRadius: '100%',
-  border: `2px solid ${themeVars.color.text}`,
+  border: `3px solid ${themeVars.color.text}`,
 });

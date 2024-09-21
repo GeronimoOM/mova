@@ -13,13 +13,21 @@
   },
   "words": {
     "search": "otsing",
-    "translation": "tõlge"
+    "translation": "tõlge",
+    "empty": {
+      "list": "Sõnu pole veel lisatud",
+      "search": "Sõnu pole leitud"
+    }
   },
   "exercise": {
     "word": "sõna",
     "translation": "tõlge",
     "recall": "tuleta meelde tõlget",
-    "spell": "kirjuta sõna"
+    "spell": "kirjuta sõna",
+    "empty": {
+      "title": "Harjutused pole veel valmis",
+      "description": "lisa rohkem sõnu oma sõnastikku või proovi lihtsalt hiljem uuesti"
+    }
   },
   "languages": {
     "name": "Keel"

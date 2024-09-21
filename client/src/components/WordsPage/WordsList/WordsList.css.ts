@@ -27,3 +27,12 @@ export const buttons = style({
   bottom: 10,
   right: 10,
 });
+
+export const noWords = style({
+  boxSizing: 'border-box',
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+});

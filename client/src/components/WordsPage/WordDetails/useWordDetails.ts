@@ -118,7 +118,6 @@ export function useWordDetails(wordId: string | null): WordDetailsReturn {
   }, [selectedLanguageId]);
 
   useEffect(() => {
-    setWordInput({});
     if (wordId) {
       fetchWord({
         variables: { id: wordId },

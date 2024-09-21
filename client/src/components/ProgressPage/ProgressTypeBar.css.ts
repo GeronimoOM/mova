@@ -10,7 +10,7 @@ export const wrapper = style({
   width: '100%',
   maxWidth: 500,
   margin: '0 auto',
-  padding: 10,
+  padding: '5px 10px',
   gap: 10,
   backgroundColor: themeVars.color.background,
 });

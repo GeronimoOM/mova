@@ -11,7 +11,7 @@ import React, {
 } from 'react';
 import { initReactI18next, useTranslation } from 'react-i18next';
 import {
-  GetSettingsDocument,
+  GetUserSettingsDocument,
   UpdateSettingsDocument,
 } from '../api/types/graphql';
 import { useAuthContext } from './AuthContext';
@@ -54,7 +54,7 @@ export const LocaleProvider: React.FC<LocaleProviderProps> = ({ children }) => {
     () => localStorage.getItem(LOCAL_STORAGE_LOCALE_KEY) as Locale,
   );
 
-  const [fetchUserSettings] = useLazyQuery(GetSettingsDocument, {
+  const [fetchUserSettings] = useLazyQuery(GetUserSettingsDocument, {
     fetchPolicy: 'no-cache',
   });
   const [updateUserSettings] = useMutation(UpdateSettingsDocument);

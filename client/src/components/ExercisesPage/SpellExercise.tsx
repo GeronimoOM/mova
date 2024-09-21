@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { FaAngleDoubleRight } from 'react-icons/fa';
 
+import { BsFillLightbulbFill } from 'react-icons/bs';
 import { FaCheck, FaMinus } from 'react-icons/fa';
 import { FaBookOpen } from 'react-icons/fa6';
 
@@ -19,7 +20,8 @@ import { ButtonIcon } from '../common/ButtonIcon';
 import { Icon } from '../common/Icon';
 import * as styles from './SpellExercise.css';
 
-const REVEAL_PREFIX = 1;
+const NORMAL_REVEAL_PREFIX = 1;
+const ADVANCED_REVEAL_PREFIX = 0;
 
 export type SpellExerciseProps = {
   word: WordFieldsFullFragment;
@@ -47,7 +49,10 @@ export const SpellExercise: React.FC<SpellExerciseProps> = ({
     useState<SpellProperty>(() =>
       getSpellProperty(word, properties, advanced ?? false),
     );
-  const [input, setInput] = useState(propertyValue.slice(0, REVEAL_PREFIX));
+  const [revealPrefix, setRevealPrefix] = useState(
+    advanced ? ADVANCED_REVEAL_PREFIX : NORMAL_REVEAL_PREFIX,
+  );
+  const [input, setInput] = useState(propertyValue.slice(0, revealPrefix));
   const [result, setResult] = useState<boolean | null>(null);
   const [highlights, setHighlights] = useState<Array<Color | null>>([]);
 
@@ -58,7 +63,7 @@ export const SpellExercise: React.FC<SpellExerciseProps> = ({
     !isSubmitted && (advanced || input.length === propertyValue.length);
 
   const handleInput = (value: string) => {
-    if (value.length >= REVEAL_PREFIX) {
+    if (value.length >= revealPrefix) {
       setInput(value);
     }
   };
@@ -85,6 +90,14 @@ export const SpellExercise: React.FC<SpellExerciseProps> = ({
     } else {
       onNext();
     }
+  };
+
+  const handleHint = () => {
+    setRevealPrefix(NORMAL_REVEAL_PREFIX);
+    setInput(
+      propertyValue.slice(0, NORMAL_REVEAL_PREFIX) +
+        input.slice(NORMAL_REVEAL_PREFIX),
+    );
   };
 
   return (
@@ -121,6 +134,14 @@ export const SpellExercise: React.FC<SpellExerciseProps> = ({
       />
 
       <div className={styles.result}>
+        {advanced && (
+          <ButtonIcon
+            icon={BsFillLightbulbFill}
+            onClick={handleHint}
+            disabled={!canSubmit || revealPrefix !== ADVANCED_REVEAL_PREFIX}
+          />
+        )}
+
         <ButtonIcon
           icon={!isSubmitted || result ? FaCheck : FaMinus}
           color={!isSubmitted || result ? 'primary' : 'negative'}
