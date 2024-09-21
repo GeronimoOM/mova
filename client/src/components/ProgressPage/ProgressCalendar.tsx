@@ -4,7 +4,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaBook, FaBrain } from 'react-icons/fa6';
 import { HiLightningBolt } from 'react-icons/hi';
-import { TbTargetArrow } from 'react-icons/tb';
 import {
   GetProgressHistoryDocument,
   GoalFieldsFragment,
@@ -40,7 +39,6 @@ export const ProgressCalendar: React.FC = () => {
   const [selectedType, setSelectedType] = useState<ProgressType>(
     ProgressType.Words,
   );
-  const [isGoalOnly, setIsGoalOnly] = useState(false);
 
   const [fetchProgressHistory, { data: progressHistory }] = useLazyQuery(
     GetProgressHistoryDocument,
@@ -98,7 +96,6 @@ export const ProgressCalendar: React.FC = () => {
             dailyData={dailyData}
             weeklyData={weeklyData}
             goal={goal}
-            isGoalOnly={isGoalOnly}
           />
         </table>
 
@@ -114,12 +111,6 @@ export const ProgressCalendar: React.FC = () => {
             color="secondary1"
             toggled={selectedType === ProgressType.Mastery}
             onClick={() => setSelectedType(ProgressType.Mastery)}
-          />
-          <ButtonIcon
-            icon={TbTargetArrow}
-            color={color}
-            toggled={isGoalOnly}
-            onClick={() => setIsGoalOnly(!isGoalOnly)}
           />
 
           <div className={styles.streak({ ...(hasStreak && { color }) })}>
@@ -169,7 +160,6 @@ type ProgressCalendarBodyProps = {
   dailyData: Array<ProgressCalendarInstance | undefined>;
   weeklyData: Array<ProgressCalendarInstance | undefined>;
   goal?: GoalFieldsFragment;
-  isGoalOnly?: boolean;
 };
 
 const ProgressCalendarBody: React.FC<ProgressCalendarBodyProps> = ({
@@ -177,7 +167,6 @@ const ProgressCalendarBody: React.FC<ProgressCalendarBodyProps> = ({
   dailyData,
   weeklyData,
   goal,
-  isGoalOnly,
 }) => {
   const { t } = useTranslation();
   const [locale] = useLocaleContext();
@@ -201,7 +190,6 @@ const ProgressCalendarBody: React.FC<ProgressCalendarBodyProps> = ({
                 cadence={ProgressCadence.Daily}
                 instance={dailyData?.[week * N_WEEKDAYS + weekday]}
                 goal={goal}
-                isGoalOnly={isGoalOnly}
                 tooltipSide={getTooltipSide(week, weeklyData.length)}
               />
             </td>
@@ -219,7 +207,6 @@ const ProgressCalendarBody: React.FC<ProgressCalendarBodyProps> = ({
               cadence={ProgressCadence.Weekly}
               instance={weeklyData?.[week]}
               goal={goal}
-              isGoalOnly={isGoalOnly}
               tooltipSide={getTooltipSide(week, weeklyData.length)}
             />
           </td>
@@ -234,7 +221,6 @@ type ProgressCalendarCellProps = {
   cadence: ProgressCadence;
   instance?: ProgressCalendarInstance;
   goal?: GoalFieldsFragment;
-  isGoalOnly?: boolean;
   tooltipSide: 'top' | 'left' | 'right';
 };
 
@@ -243,20 +229,12 @@ const ProgressCalendarCell: React.FC<ProgressCalendarCellProps> = ({
   cadence,
   instance,
   goal,
-  isGoalOnly,
   tooltipSide,
 }) => {
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
 
   const points = instance?.points ?? 0;
-  const useColor = useMemo(
-    () =>
-      goal &&
-      (isGoalOnly
-        ? goal.cadence === cadence && points >= goal.points
-        : points > 0),
-    [cadence, goal, isGoalOnly, points],
-  );
+  const useColor = useMemo(() => goal && points > 0, [goal, points]);
   const color = useColor ? progressTypeToColor[type] : undefined;
 
   const intensity = useMemo(() => {
