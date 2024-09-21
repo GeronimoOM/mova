@@ -57,9 +57,10 @@ export const WordDetails: React.FC<WordDetailsProps> = ({
 
   useEffect(() => {
     if (createdWord?.id) {
-      onSelectWord(createdWord?.id);
+      onSelectWord(null);
+      onClose();
     }
-  }, [createdWord?.id, onSelectWord]);
+  }, [createdWord, onClose, onSelectWord]);
 
   useEffect(() => {
     if (deletedWord) {
