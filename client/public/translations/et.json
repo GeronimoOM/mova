@@ -15,8 +15,8 @@
     "search": "otsing",
     "translation": "tõlge",
     "empty": {
-      "list": "Sõnu pole veel lisatud",
-      "search": "Sõnu pole leitud"
+      "list": "sõnu pole veel lisatud",
+      "search": "sõnu pole leitud"
     }
   },
   "exercise": {
@@ -25,7 +25,7 @@
     "recall": "tuleta meelde tõlget",
     "spell": "kirjuta sõna",
     "empty": {
-      "title": "Harjutused pole veel valmis",
+      "title": "harjutused pole veel valmis",
       "description": "lisa rohkem sõnu oma sõnastikku või proovi lihtsalt hiljem uuesti"
     }
   },

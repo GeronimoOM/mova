@@ -15,8 +15,8 @@
     "search": "search",
     "translation": "translation",
     "empty": {
-      "list": "No words added yet",
-      "search": "No words found"
+      "list": "no words added yet",
+      "search": "no words found"
     }
   },
   "exercise": {
@@ -25,7 +25,7 @@
     "recall": "recall the translation",
     "spell": "spell the word",
     "empty": {
-      "title": "No exercises yet",
+      "title": "no exercises yet",
       "description": "add more words to your vocabulary or simply try again later"
     }
   },
