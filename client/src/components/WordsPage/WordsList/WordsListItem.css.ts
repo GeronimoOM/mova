@@ -7,10 +7,11 @@ export const item = style({
   gridTemplateColumns: 'subgrid',
   gridTemplateRows: 'auto auto',
   alignItems: 'center',
-  gap: '2px 10px',
+  gap: '5px 10px',
   padding: '5px 10px',
   cursor: 'pointer',
   transition: 'background-color 0.2s ease',
+  borderBottom: `1px solid ${themeVars.color.backgroundLighter}`,
 
   selectors: {
     [`&:hover`]: {

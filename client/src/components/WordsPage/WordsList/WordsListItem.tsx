@@ -3,7 +3,6 @@ import React from 'react';
 import { WordFieldsFragment } from '../../../api/types/graphql';
 import { DISPLAY_DATE_FORMAT } from '../../../utils/constants';
 import { useLocaleContext } from '../../LocaleContext';
-import { WordMastery } from './WordMastery';
 import * as styles from './WordsListItem.css';
 
 export type WordsListItemProps = {
@@ -19,9 +18,6 @@ export const WordsListItem: React.FC<WordsListItemProps> = ({
     <div className={styles.item} onClick={() => setSelectedWord(word.id)}>
       <div className={styles.original}>{word.original}</div>
       <div className={styles.translation}>{word.translation}</div>
-      <div>
-        <WordMastery mastery={word.mastery} size="small" />
-      </div>
     </div>
   );
 };

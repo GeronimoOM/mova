@@ -27,6 +27,10 @@ globalStyle(`${wrapper} > input`, {
   flex: '1 1 0%',
 });
 
+globalStyle(`${wrapper}.highlighted > input`, {
+  outline: `2px solid ${themeVars.color.text}`,
+});
+
 export const buttonRight = style({
   position: 'absolute',
   right: 5,

@@ -8,21 +8,18 @@ const MAX_PROGRESS = 3;
 
 type WordMasteryProps = {
   mastery: number;
-  size?: 'small' | 'medium';
 };
 
-export const WordMastery: React.FC<WordMasteryProps> = ({ mastery, size }) => {
-  const iconSize = size === 'small' ? 'tiny' : size;
-
+export const WordMastery: React.FC<WordMasteryProps> = ({ mastery }) => {
   return (
     <div className={styles.progress}>
       {Array(MAX_PROGRESS)
         .fill(null)
         .map((_, index) =>
           mastery > index ? (
-            <Icon key={index} icon={TbRectangleFilled} size={iconSize} />
+            <Icon key={index} icon={TbRectangleFilled} />
           ) : (
-            <Icon key={index} icon={TbRectangle} size={iconSize} />
+            <Icon key={index} icon={TbRectangle} />
           ),
         )}
     </div>

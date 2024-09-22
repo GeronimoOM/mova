@@ -3,6 +3,7 @@ import { recipe } from '@vanilla-extract/recipes';
 import { themeVars } from '../../../index.css';
 
 export const wrapper = style({
+  gridRow: '1 / 3',
   position: 'relative',
   display: 'flex',
   flexDirection: 'column',

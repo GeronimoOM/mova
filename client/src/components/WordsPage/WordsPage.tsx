@@ -15,11 +15,13 @@ export const WordsPage: React.FC = () => {
   const handleWordSelect = useCallback((selectedWordId: string) => {
     setSelectedWordId(selectedWordId);
     setIsWordDetailsOpen(true);
+    setWordsSearchQuery('');
   }, []);
 
   const handleCreateNew = useCallback(() => {
     setSelectedWordId(null);
     setIsWordDetailsOpen(true);
+    setWordsSearchQuery('');
   }, []);
 
   useEffect(() => {
@@ -30,11 +32,6 @@ export const WordsPage: React.FC = () => {
 
   return (
     <div className={styles.wrapper}>
-      <WordsSearchBar
-        query={wordsSearchQuery}
-        onQueryChange={setWordsSearchQuery}
-        onClear={() => setWordsSearchQuery('')}
-      />
       {isWordDetailsOpen ? (
         <WordDetails
           wordId={selectedWordId}
@@ -42,12 +39,19 @@ export const WordsPage: React.FC = () => {
           onClose={() => setIsWordDetailsOpen(false)}
         />
       ) : (
-        <WordsList
-          onSelectWord={handleWordSelect}
-          onCreateNew={handleCreateNew}
-          onOpenDetails={() => setIsWordDetailsOpen(true)}
-          wordsSearchQuery={wordsSearchQuery}
-        />
+        <>
+          <WordsSearchBar
+            query={wordsSearchQuery}
+            onQueryChange={setWordsSearchQuery}
+            onClear={() => setWordsSearchQuery('')}
+          />
+          <WordsList
+            onSelectWord={handleWordSelect}
+            onCreateNew={handleCreateNew}
+            onOpenDetails={() => setIsWordDetailsOpen(true)}
+            wordsSearchQuery={wordsSearchQuery}
+          />
+        </>
       )}
     </div>
   );

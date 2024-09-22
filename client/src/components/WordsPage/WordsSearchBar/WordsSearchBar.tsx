@@ -1,8 +1,10 @@
 import React from 'react';
 import { BsEraserFill } from 'react-icons/bs';
 
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { PiMagnifyingGlassBold } from 'react-icons/pi';
+import { MIN_QUERY_LENGTH } from '../../../utils/constants';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { Icon } from '../../common/Icon';
 import { Input } from '../../common/Input';
@@ -12,6 +14,7 @@ type WordsSearchBarProps = {
   query: string;
   onQueryChange: (query: string) => void;
   onClear: () => void;
+  disabled?: boolean;
 };
 
 export const WordsSearchBar: React.FC<WordsSearchBarProps> = ({
@@ -20,9 +23,10 @@ export const WordsSearchBar: React.FC<WordsSearchBarProps> = ({
   onClear,
 }) => {
   const { t } = useTranslation();
+  const isSearch = query.length >= MIN_QUERY_LENGTH;
 
   return (
-    <div className={styles.wrapper}>
+    <div className={classNames(styles.wrapper, { highlighted: isSearch })}>
       <div className={styles.iconLeft}>
         <Icon icon={PiMagnifyingGlassBold} />
       </div>
