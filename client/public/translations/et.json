@@ -58,9 +58,9 @@
     "weekly": "nädalas"
   },
   "stats": {
-    "total": "sõna kokku",
-    "byPartOfSpeech": "sõna sõnaliigi järgi",
-    "byMastery": "sõna oskuse järgi"
+    "total": "sõnu kokku",
+    "byPartOfSpeech": "sõnad sõnaliigi järgi",
+    "byMastery": "sõnad oskuse järgi"
   },
   "pos": {
     "noun": {
