@@ -30,8 +30,8 @@ const MASTERY_DISTRIBUTION: Record<WordMastery, number> = {
 
 const MASTERY_INC_DELAY: Record<WordMastery, Duration> = {
   0: Duration.fromObject({ hours: 1 }),
-  1: Duration.fromObject({ hours: 24 }),
-  2: Duration.fromObject({ hours: 24 * 5 }),
+  1: Duration.fromObject({ hours: 12 }),
+  2: Duration.fromObject({ hours: 24 * 3 }),
   3: Duration.fromObject({ hours: 24 * 5 }),
 };
 
