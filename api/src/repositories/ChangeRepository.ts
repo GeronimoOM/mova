@@ -106,7 +106,9 @@ export class ChangeRepository {
 
     await this.connectionManager
       .getConnection()(TABLE_CHANGES)
-      .insert(changeRow);
+      .insert(changeRow)
+      .onConflict()
+      .ignore();
   }
 
   async deleteOlder(changeAt: DateTime): Promise<void> {
