@@ -74,11 +74,12 @@ export function useLanguage(
         variables: {
           input: {
             id: uuid(),
-            name: nameInput,
+            name: nameInput.trim(),
             addedAt: toTimestamp(DateTime.utc()),
           },
         },
       });
+      setNameInput(nameInput.trim());
     }
   }, [nameInput, canCreateLanguage, createLanguageMutate]);
 
@@ -88,10 +89,11 @@ export function useLanguage(
         variables: {
           input: {
             id: language!.id,
-            name: nameInput,
+            name: nameInput.trim(),
           },
         },
       });
+      setNameInput(nameInput.trim());
     }
   }, [language, nameInput, canUpdateLanguage, updateLanguageMutate]);
 
@@ -107,10 +109,6 @@ export function useLanguage(
     }
   }, [language, canDeleteLanguage, deleteLanguageMutate]);
 
-  const setName = useCallback((name: string) => {
-    setNameInput(name.trim());
-  }, []);
-
   return useMemo<LanguageReturn>(
     () => ({
       isNewLanguage,
@@ -118,7 +116,7 @@ export function useLanguage(
         ...language,
         name: nameInput,
       },
-      setName,
+      setName: setNameInput,
 
       canCreateLanguage,
       createLanguage,

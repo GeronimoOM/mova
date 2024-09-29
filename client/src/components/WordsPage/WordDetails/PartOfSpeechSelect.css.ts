@@ -4,7 +4,6 @@ import { themeVars } from '../../../index.css';
 
 export const wrapper = style({
   position: 'relative',
-  padding: 5,
 });
 
 export const button = recipe({

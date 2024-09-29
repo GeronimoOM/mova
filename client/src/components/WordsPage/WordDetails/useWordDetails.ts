@@ -138,11 +138,11 @@ export function useWordDetails(wordId: string | null): WordDetailsReturn {
   }, [selectedLanguageId, word.partOfSpeech, fetchProperties]);
 
   const setOriginal = useCallback((original: string) => {
-    setWordInput((prev) => ({ ...prev, original: original.trim() }));
+    setWordInput((prev) => ({ ...prev, original: original }));
   }, []);
 
   const setTranslation = useCallback((translation: string) => {
-    setWordInput((prev) => ({ ...prev, translation: translation.trim() }));
+    setWordInput((prev) => ({ ...prev, translation: translation }));
   }, []);
 
   const setPartOfSpeech = useCallback((partOfSpeech: PartOfSpeech) => {
@@ -155,12 +155,7 @@ export function useWordDetails(wordId: string | null): WordDetailsReturn {
         ...prev,
         properties: {
           ...prev.properties,
-          [propertyValue.id]: {
-            ...propertyValue,
-            ...(propertyValue.text && {
-              text: propertyValue.text.trim(),
-            }),
-          },
+          [propertyValue.id]: propertyValue,
         },
       }));
     },
@@ -173,12 +168,17 @@ export function useWordDetails(wordId: string | null): WordDetailsReturn {
         variables: {
           input: {
             id: uuid(),
-            original: wordInput.original!,
-            translation: wordInput.translation!,
+            original: wordInput.original!.trim(),
+            translation: wordInput.translation!.trim(),
             addedAt: toTimestamp(DateTime.utc()),
             languageId: selectedLanguageId!,
             partOfSpeech: wordInput.partOfSpeech!,
-            properties: Object.values(wordInput.properties ?? {}),
+            properties: Object.values(wordInput.properties ?? {}).map(
+              (prop) => ({
+                ...prop,
+                ...(prop.text && { text: prop.text.trim() }),
+              }),
+            ),
           },
         },
       });
@@ -191,13 +191,16 @@ export function useWordDetails(wordId: string | null): WordDetailsReturn {
         variables: {
           input: {
             id: wordId!,
-            ...(wordInput.original && { original: wordInput.original }),
+            ...(wordInput.original && { original: wordInput.original.trim() }),
             ...(wordInput.translation && {
-              translation: wordInput.translation,
+              translation: wordInput.translation.trim(),
             }),
             ...(wordInput.properties &&
               Object.values(wordInput.properties).length && {
-                properties: Object.values(wordInput.properties),
+                properties: Object.values(wordInput.properties).map((prop) => ({
+                  ...prop,
+                  ...(prop.text && { text: prop.text.trim() }),
+                })),
               }),
           },
         },

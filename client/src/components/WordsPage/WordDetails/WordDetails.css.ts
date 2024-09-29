@@ -42,6 +42,7 @@ export const detailsHeader = style({
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'space-between',
+  paddingLeft: 5,
 });
 
 export const translationLabel = style({

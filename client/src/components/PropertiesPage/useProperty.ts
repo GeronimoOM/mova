@@ -83,13 +83,14 @@ export function useProperty(
           input: {
             id: uuid(),
             languageId: selectedLanguageId!,
-            name: nameInput,
+            name: nameInput.trim(),
             type: PropertyType.Text, // TODO add support for other types
             partOfSpeech,
             addedAt: toTimestamp(DateTime.utc()),
           },
         },
       });
+      setNameInput(nameInput.trim());
     }
   }, [
     selectedLanguageId,
@@ -105,10 +106,11 @@ export function useProperty(
         variables: {
           input: {
             id: property!.id,
-            name: nameInput,
+            name: nameInput.trim(),
           },
         },
       });
+      setNameInput(nameInput.trim());
     }
   }, [property, nameInput, canUpdateProperty, updatePropertyMutate]);
 
@@ -124,10 +126,6 @@ export function useProperty(
     }
   }, [property, canDeleteProperty, deletePropertyMutate]);
 
-  const setName = useCallback((name: string) => {
-    setNameInput(name.trim());
-  }, []);
-
   return useMemo<PropertyReturn>(
     () => ({
       isNewProperty,
@@ -136,7 +134,7 @@ export function useProperty(
         name: nameInput,
         type: typeInput,
       },
-      setName,
+      setName: setNameInput,
 
       canCreateProperty,
       createProperty,
