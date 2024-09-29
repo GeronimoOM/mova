@@ -95,7 +95,7 @@ export const cell = recipe({
 export const cellTooltip = style({
   display: 'flex',
   flexDirection: 'column',
-  padding: 5,
+  padding: 10,
   gap: 5,
   whiteSpace: 'nowrap',
   color: themeVars.color.text,

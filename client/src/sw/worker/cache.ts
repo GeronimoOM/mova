@@ -30,17 +30,23 @@ export class MovaDb extends Dexie {
   auth!: Dexie.Table<{ id: number; token: string }>;
 }
 
-const DB_VERSION = 1;
-
 const db = new Dexie('mova') as MovaDb;
 
-db.version(DB_VERSION).stores({
+const indices = {
   state: 'id',
   languages: 'id,addedAt',
   properties: 'id,[languageId+partOfSpeech]',
   words: 'id,[languageId+addedAt+id],[languageId+original+id]',
   changes: 'id',
-});
+};
+
+db.version(1).stores(indices);
+
+db.version(2)
+  .stores(indices)
+  .upgrade(async () => {
+    await destroy();
+  });
 
 export async function getState(): Promise<SyncState> {
   return (await db.state.get(1))!;

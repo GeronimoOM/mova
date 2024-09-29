@@ -34,6 +34,7 @@ export const centered = style({
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
+  gap: 10,
 });
 
 export const noWordsTitle = style({
@@ -53,4 +54,15 @@ export const bottom = style({
   justifyContent: 'space-between',
   boxSizing: 'border-box',
   width: '100%',
+});
+
+export const exercisesReady = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: 5,
+});
+
+export const exercisesReadyNumber = style({
+  color: themeVars.color.secondary1,
+  fontWeight: 'bold',
 });

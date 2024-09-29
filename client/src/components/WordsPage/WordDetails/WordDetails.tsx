@@ -103,7 +103,11 @@ export const WordDetails: React.FC<WordDetailsProps> = ({
               onPartOfSpeechSelect={setPartOfSpeech}
               disabled={!isNewWord}
             />
-            <WordMastery mastery={word.mastery ?? 0} />
+            <WordMastery
+              mastery={word.mastery ?? 0}
+              nextExerciseAt={word.nextExerciseAt ?? null}
+              tooltipSide={simplified ? 'bottomLeft' : undefined}
+            />
           </div>
 
           <Input

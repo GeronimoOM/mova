@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { AppRoute } from '../../routes';
 import { useAuthContext } from '../AuthContext';
 import { Locale, useLocaleContext } from '../LocaleContext';
+import { Font, useStyleContext } from '../StyleContext';
 import { ButtonIcon } from '../common/ButtonIcon';
 import * as styles from './UserPage.css';
 
@@ -20,6 +21,7 @@ const translationLanguageToFlag: Record<Locale, FlagComponent> = {
 export const UserPage: React.FC = () => {
   const { t } = useTranslation();
   const [locale, setLocale] = useLocaleContext();
+  const [font, setFont] = useStyleContext();
   const navigate = useNavigate();
   const { clearAuthToken } = useAuthContext();
 
@@ -37,6 +39,12 @@ export const UserPage: React.FC = () => {
           <FlagButton language="uk" selected={locale} onSelect={setLocale} />
 
           <FlagButton language="et" selected={locale} onSelect={setLocale} />
+        </div>
+
+        <div className={styles.card}>
+          <FontButton font="default" selected={font} onSelect={setFont} />
+
+          <FontButton font="classic" selected={font} onSelect={setFont} />
         </div>
 
         <div className={styles.card}>
@@ -70,3 +78,29 @@ const FlagButton: React.FC<FlagButtonProps> = ({
     </div>
   );
 };
+
+type FontButtonProps = {
+  font: Font;
+  selected: Font;
+  onSelect: (font: Font) => void;
+};
+
+const FontButton: React.FC<FontButtonProps> = ({
+  font,
+  selected,
+  onSelect,
+}) => {
+  return (
+    <div
+      className={classNames(styles.font, {
+        selected: font === selected,
+      })}
+      onClick={() => onSelect(font)}
+    >
+      <div className={styles.fontBase({ font })}>AaБб</div>
+      <div className={styles.fontMono({ font })}>AaBb</div>
+    </div>
+  );
+};
+
+//AaБб

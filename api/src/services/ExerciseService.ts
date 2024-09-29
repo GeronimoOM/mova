@@ -21,18 +21,16 @@ import { ProgressService } from './ProgressService';
 
 const DEFAULT_EXERCISE_WORDS_TOTAL = 20;
 
-const MASTERY_DISTRIBUTION: Record<WordMastery, number> = {
+const MASTERY_DISTRIBUTION: Record<Exclude<WordMastery, 3>, number> = {
   0: 0.5,
   1: 0.3,
-  2: 0.15,
-  3: 0.05,
+  2: 0.2,
 };
 
-const MASTERY_INC_DELAY: Record<WordMastery, Duration> = {
+const MASTERY_INC_DELAY: Record<Exclude<WordMastery, 3>, Duration> = {
   0: Duration.fromObject({ hours: 1 }),
   1: Duration.fromObject({ hours: 12 }),
   2: Duration.fromObject({ hours: 24 * 3 }),
-  3: Duration.fromObject({ hours: 24 * 5 }),
 };
 
 const MASTERY_ATTEMPT_DELAY = Duration.fromObject({ hours: 1 });
@@ -64,10 +62,12 @@ export class ExerciseService {
   }: GetExerciseWordsParams): Promise<Word[]> {
     const wordsByMastery = Object.fromEntries(
       await Promise.all(
-        WordMasteries.map(async (mastery) => [
-          mastery,
-          await this.getWordsByMastery(languageId, mastery, total),
-        ]),
+        WordMasteries.filter((mastery) => mastery < MaxWordMastery).map(
+          async (mastery) => [
+            mastery,
+            await this.getWordsByMastery(languageId, mastery, total),
+          ],
+        ),
       ),
     ) as Record<WordMastery, Word[]>;
 
@@ -104,6 +104,22 @@ export class ExerciseService {
     );
 
     return shuffle(words);
+  }
+
+  async getCount(languageId: LanguageId): Promise<number> {
+    const counts = await Promise.all(
+      WordMasteries.filter((mastery) => mastery < MaxWordMastery).map(
+        async (mastery) =>
+          await this.wordRepository.getExerciseCount({
+            languageId,
+            mastery,
+            masteryIncOlderThan: MASTERY_INC_DELAY[mastery],
+            masteryAttemptOlderThan: MASTERY_ATTEMPT_DELAY,
+          }),
+      ),
+    );
+
+    return counts.reduce((sum, count) => sum + count, 0);
   }
 
   async attemptMastery(
@@ -161,6 +177,29 @@ export class ExerciseService {
     });
 
     return word;
+  }
+
+  getNextExerciseAt(
+    word: Pick<
+      Word,
+      'mastery' | 'addedAt' | 'masteryIncAt' | 'masteryAttemptAt'
+    >,
+  ): DateTime | null {
+    if (word.mastery === MaxWordMastery) {
+      return null;
+    }
+
+    const masteryDelayUntil = (word.masteryIncAt ?? word.addedAt).plus(
+      MASTERY_INC_DELAY[word.mastery],
+    );
+    const attemptDelayUntil = word.masteryAttemptAt?.plus(
+      MASTERY_ATTEMPT_DELAY,
+    );
+    const maxDelayUntil = attemptDelayUntil
+      ? DateTime.max(masteryDelayUntil, attemptDelayUntil)
+      : masteryDelayUntil;
+
+    return maxDelayUntil > DateTime.utc() ? maxDelayUntil : null;
   }
 
   private async getWordsByMastery(

@@ -19,6 +19,10 @@ export const sourceCodeProFontFace = fontFace({
   fontStyle: 'normal',
 });
 
+export const verdanaFontFace = fontFace({
+  src: 'url("/fonts/Verdana.ttf") format("woff2")',
+});
+
 export const [theme, themeVars] = createTheme({
   color: {
     text: '#f1e4f3',
@@ -32,6 +36,20 @@ export const [theme, themeVars] = createTheme({
     backgroundLighter: '#434b5c',
     backgroundLightest: '#555f73',
   },
+  font: {
+    base: jostFontFace,
+    mono: sourceCodeProFontFace,
+  },
+});
+
+export const [defaultFontTheme, fontThemeVars] = createTheme({
+  baseFont: jostFontFace,
+  monoFont: sourceCodeProFontFace,
+});
+
+export const classicFontTheme = createTheme(fontThemeVars, {
+  baseFont: verdanaFontFace,
+  monoFont: verdanaFontFace,
 });
 
 export const colors = [
@@ -43,8 +61,6 @@ export const colors = [
 export type Color = (typeof colors)[number];
 
 globalStyle('html, body, #root', {
-  fontFamily: jostFontFace,
-
   margin: 0,
   height: '100%',
   WebkitFontSmoothing: 'antialiased',

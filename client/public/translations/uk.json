@@ -17,9 +17,17 @@
     "empty": {
       "list": "жодних слів ще не додано",
       "search": "жодного слова не знайдено"
+    },
+    "mastery": {
+      "mastered": "cлово вивчено",
+      "nextExerciseAt": "наступна вправа о:",
+      "exerciseReady": "вправа готова"
     }
   },
   "exercise": {
+    "ready_one": "вправа готова",
+    "ready_few": "вправи готові",
+    "ready_many": "вправ готово",
     "word": "слово",
     "translation": "переклад",
     "recall": "пригадай переклад",
@@ -94,9 +102,9 @@
     "select": "обери"
   },
   "mastery": {
-    "none": "відсутнє",
-    "basic": "початкове",
-    "advanced": "поглиблене",
+    "none": "відсутній",
+    "basic": "початковий",
+    "advanced": "поглиблений",
     "mastered": "вивчено"
   },
   "users": {

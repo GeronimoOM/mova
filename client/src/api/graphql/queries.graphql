@@ -53,6 +53,13 @@ query GetExerciseWords($languageId: ID!) {
   }
 }
 
+query GetExerciseCount($languageId: ID!) {
+  language(id: $languageId) {
+    id
+    exerciseCount
+  }
+}
+
 query GetAllProgress($languageId: ID!) {
   language(id: $languageId) {
     id
@@ -120,6 +127,7 @@ query GetUserSettings {
   settings {
     selectedLanguageId
     selectedLocale
+    selectedFont
   }
 }
 

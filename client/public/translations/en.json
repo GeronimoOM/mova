@@ -17,9 +17,16 @@
     "empty": {
       "list": "no words added yet",
       "search": "no words found"
+    },
+    "mastery": {
+      "mastered": "word is mastered",
+      "nextExerciseAt": "next exercise at:",
+      "exerciseReady": "exercise is ready"
     }
   },
   "exercise": {
+    "ready_one": "exercise ready",
+    "ready_other": "exercises ready",
     "word": "word",
     "translation": "translation",
     "recall": "recall the translation",

@@ -27,6 +27,7 @@ fragment WordFields on Word {
   addedAt
   languageId
   mastery
+  nextExerciseAt
 }
 
 fragment WordFieldsFull on Word {
@@ -162,8 +163,9 @@ fragment CreateWordChangeFields on CreateWordChange {
     original
     translation
     partOfSpeech
-    mastery
     addedAt
+    mastery
+    nextExerciseAt
     languageId
     properties {
       ...PropertyValueSaveFields

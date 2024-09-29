@@ -22,6 +22,8 @@ import {
   UpdateLanguageDocument,
   UpdatePropertyDocument,
   UpdateWordDocument,
+  WordFieldsFragment,
+  WordFieldsFragmentDoc,
   WordFieldsFullFragment,
   WordFieldsFullFragmentDoc,
 } from './types/graphql';
@@ -208,6 +210,7 @@ export function useCreateWord(): UseMutationResult<typeof CreateWordDocument> {
         id: input.id!,
         addedAt: input.addedAt!,
         mastery: 0,
+        nextExerciseAt: null,
         properties:
           input.properties?.map(({ id, text }) => ({
             property: {
@@ -317,6 +320,7 @@ export function useAttemptWordMastery(): UseMutationResult<
       };
     },
     update: (_, { data }, { variables }) => {
+      updateWord(data!.attemptMastery);
       if (variables?.success) {
         const word = readWordFull(data!.attemptMastery.id)!;
         increaseCurrentProgress(word.languageId, ProgressType.Mastery);
@@ -364,6 +368,15 @@ function readWordFull(id: string): WordFieldsFullFragment | null {
     fragment: WordFieldsFullFragmentDoc,
     fragmentName: 'WordFieldsFull',
   })!;
+}
+
+function updateWord(word: WordFieldsFragment) {
+  cache.writeFragment({
+    id: `Word:${word.id}`,
+    fragment: WordFieldsFragmentDoc,
+    fragmentName: 'WordFields',
+    data: word,
+  });
 }
 
 function increaseCurrentProgress(languageId: string, type: ProgressType) {

@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import { sourceCodeProFontFace, themeVars } from '../../../index.css';
+import { fontThemeVars, themeVars } from '../../../index.css';
 
 export const item = style({
   display: 'grid',
@@ -21,7 +21,7 @@ export const item = style({
 });
 
 export const original = style({
-  fontFamily: sourceCodeProFontFace,
+  fontFamily: fontThemeVars.monoFont,
   fontWeight: 500,
   letterSpacing: '0.025em',
   overflow: 'hidden',

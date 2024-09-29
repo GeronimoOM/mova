@@ -5,6 +5,7 @@ import { UserRepository } from 'repositories/UserRepository';
 
 const DEFAULT_SETTINGS: UserSettings = {
   selectedLocale: 'en',
+  selectedFont: 'default',
 };
 
 @Injectable()

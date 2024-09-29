@@ -4,11 +4,14 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { LoginDocument } from '../api/types/graphql';
 import { useAuthContext } from './AuthContext';
 
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { FaCheck } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import { classicFontTheme, defaultFontTheme } from '../index.css';
 import { AppRoute } from '../routes';
 import * as styles from './LoginForm.css';
+import { useStyleContext } from './StyleContext';
 import { ButtonIcon } from './common/ButtonIcon';
 import { Input } from './common/Input';
 
@@ -22,6 +25,7 @@ export const LoginForm: React.FC = () => {
     useMutation(LoginDocument);
 
   const { setAuthToken } = useAuthContext();
+  const [font] = useStyleContext();
   const { t } = useTranslation();
 
   const login = useCallback(async () => {
@@ -46,7 +50,12 @@ export const LoginForm: React.FC = () => {
   }, [loginResult, setAuthToken, navigate]);
 
   return (
-    <div className={styles.wrapper}>
+    <div
+      className={classNames(
+        styles.wrapper,
+        font === 'default' ? defaultFontTheme : classicFontTheme,
+      )}
+    >
       <div className={styles.form}>
         <div className={styles.label}>{t('login.user')}</div>
         <div>

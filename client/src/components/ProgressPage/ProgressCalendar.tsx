@@ -14,6 +14,7 @@ import { breakpoints } from '../../index.css';
 import { sequence } from '../../utils/arrays';
 import {
   DISPLAY_DATE_FORMAT,
+  DISPLAY_MONTH_DAY_FORMAT,
   DISPLAY_MONTH_FORMAT,
   DISPLAY_WEEKDAY_FORMAT,
   N_WEEKDAYS,
@@ -300,7 +301,7 @@ const ProgressCalendarCellTooltip: React.FC<
     dateString = date.setLocale(locale).toFormat(DISPLAY_DATE_FORMAT);
   } else {
     const until = date.plus({ weeks: 1 }).minus({ days: 1 });
-    dateString = `${date.setLocale(locale).toFormat(DISPLAY_DATE_FORMAT)} - ${until.setLocale(locale).toFormat(DISPLAY_DATE_FORMAT)}`;
+    dateString = `${date.setLocale(locale).toFormat(DISPLAY_MONTH_DAY_FORMAT)} - ${until.setLocale(locale).toFormat(DISPLAY_DATE_FORMAT)}`;
   }
 
   const pointsString =

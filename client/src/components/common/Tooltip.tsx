@@ -5,7 +5,7 @@ import * as styles from './Tooltip.css';
 export type TooltipProps = {
   content: React.ReactNode;
   children: React.ReactNode;
-  side?: 'top' | 'left' | 'right';
+  side?: 'top' | 'left' | 'right' | 'bottom' | 'bottomLeft' | 'bottomRight';
   onOpen?: (isOpen: boolean) => void;
 };
 
@@ -18,6 +18,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
   const [isOpen, setIsOpen] = useState(false);
 
   const contentRef = useRef<HTMLDivElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
   const handleOpen = (isOpen: boolean) => {
     setIsOpen(isOpen);
@@ -26,12 +27,15 @@ export const Tooltip: React.FC<TooltipProps> = ({
 
   useClickOutsideHandler({
     ref: contentRef,
+    excludeRef: wrapperRef,
     onClick: () => handleOpen(false),
   });
 
   return (
     <div className={styles.relative}>
-      <div onClick={() => handleOpen(!isOpen)}>{children}</div>
+      <div ref={wrapperRef} onClick={() => handleOpen(!isOpen)}>
+        {children}
+      </div>
 
       {isOpen && (
         <div ref={contentRef} className={styles.tooltip({ side })}>

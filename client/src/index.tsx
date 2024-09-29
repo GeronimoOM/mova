@@ -7,6 +7,7 @@ import { App } from './components/App';
 import { AuthProvider } from './components/AuthContext';
 import { LanguageProvider } from './components/LanguageContext';
 import { LocaleProvider, initTranslator } from './components/LocaleContext.tsx';
+import { StyleProvider } from './components/StyleContext.tsx';
 import './index.css.ts';
 import { registerServiceWorker } from './sw/client/register.ts';
 import { SwWorkerMessageType } from './sw/worker/messages.ts';
@@ -24,11 +25,13 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <ApolloProvider client={client}>
       <AuthProvider>
         <LocaleProvider>
-          <LanguageProvider>
-            <BrowserRouter>
-              <App />
-            </BrowserRouter>
-          </LanguageProvider>
+          <StyleProvider>
+            <LanguageProvider>
+              <BrowserRouter>
+                <App />
+              </BrowserRouter>
+            </LanguageProvider>
+          </StyleProvider>
         </LocaleProvider>
       </AuthProvider>
     </ApolloProvider>

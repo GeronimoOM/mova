@@ -34,6 +34,11 @@ export class ExerciseResolver {
     return words.map((word) => this.wordTypeMapper.map(word));
   }
 
+  @ResolveField((type) => Int)
+  async exerciseCount(@Parent() language: LanguageType): Promise<number> {
+    return await this.exerciseService.getCount(language.id);
+  }
+
   @Mutation((returns) => WordType)
   async attemptMastery(
     @ContextDec() ctx: Context,

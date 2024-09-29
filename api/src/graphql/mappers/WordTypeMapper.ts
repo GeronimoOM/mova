@@ -7,6 +7,7 @@ import {
   isTextPropertyValue,
 } from 'models/PropertyValue';
 import { Word, WordCreate, WordUpdate } from 'models/Word';
+import { ExerciseService } from 'services/ExerciseService';
 import {
   CreateWordParams,
   UpdatePropertyValueParams,
@@ -27,7 +28,10 @@ import { PropertyTypeMapper } from './PropertyTypeMapper';
 
 @Injectable()
 export class WordTypeMapper {
-  constructor(private propertyTypeMapper: PropertyTypeMapper) {}
+  constructor(
+    private exerciseService: ExerciseService,
+    private propertyTypeMapper: PropertyTypeMapper,
+  ) {}
 
   map(word: Word): WordType {
     return {
@@ -36,11 +40,12 @@ export class WordTypeMapper {
       translation: word.translation,
       partOfSpeech: word.partOfSpeech,
       addedAt: word.addedAt,
+      mastery: word.mastery,
+      nextExerciseAt: this.exerciseService.getNextExerciseAt(word),
       languageId: word.languageId,
       properties: Object.values(word.properties ?? {}).map((value) =>
         this.mapPropertyValue(value),
       ),
-      mastery: word.mastery,
     };
   }
 
@@ -50,8 +55,9 @@ export class WordTypeMapper {
       original: wordCreate.original,
       translation: wordCreate.translation,
       partOfSpeech: wordCreate.partOfSpeech,
-      mastery: wordCreate.mastery,
       addedAt: wordCreate.addedAt,
+      mastery: wordCreate.mastery,
+      nextExerciseAt: this.exerciseService.getNextExerciseAt(wordCreate),
       languageId: wordCreate.languageId,
       properties: Object.values(wordCreate.properties ?? {}),
     };

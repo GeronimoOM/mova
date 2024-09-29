@@ -1,5 +1,11 @@
 import { globalStyle, style } from '@vanilla-extract/css';
-import { themeVars } from '../../index.css';
+import { recipe } from '@vanilla-extract/recipes';
+import {
+  jostFontFace,
+  sourceCodeProFontFace,
+  themeVars,
+  verdanaFontFace,
+} from '../../index.css';
 
 export const wrapper = style({
   display: 'flex',
@@ -55,4 +61,50 @@ export const flag = style({
 globalStyle(`${flag} svg`, {
   borderRadius: '100%',
   border: `3px solid ${themeVars.color.text}`,
+});
+
+export const font = style({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  height: '2rem',
+  padding: 10,
+  gap: 5,
+  borderRadius: 5,
+  cursor: 'pointer',
+  transition: 'background-color 0.2s ease, border 0.2s ease',
+  border: `2px solid transparent`,
+
+  selectors: {
+    '&:hover, &.selected': {
+      border: `2px solid ${themeVars.color.primary}`,
+      backgroundColor: themeVars.color.backgroundLighter,
+    },
+  },
+});
+
+export const fontBase = recipe({
+  variants: {
+    font: {
+      default: {
+        fontFamily: jostFontFace,
+      },
+      classic: {
+        fontFamily: verdanaFontFace,
+      },
+    },
+  },
+});
+
+export const fontMono = recipe({
+  variants: {
+    font: {
+      default: {
+        fontFamily: sourceCodeProFontFace,
+      },
+      classic: {
+        fontFamily: verdanaFontFace,
+      },
+    },
+  },
 });

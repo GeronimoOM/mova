@@ -32,11 +32,14 @@ export class WordType {
   @Field((type) => PartOfSpeech)
   partOfSpeech: PartOfSpeech;
 
+  @Field((type) => TimestampScalar)
+  addedAt: DateTime;
+
   @Field((type) => Int)
   mastery: number;
 
-  @Field((type) => TimestampScalar)
-  addedAt: DateTime;
+  @Field((type) => TimestampScalar, { nullable: true })
+  nextExerciseAt?: DateTime;
 
   @Field((type) => ID)
   languageId: LanguageId;

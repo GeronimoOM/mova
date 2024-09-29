@@ -8,6 +8,9 @@ export class UserSettingsType {
 
   @Field({ nullable: true })
   selectedLocale?: string;
+
+  @Field({ nullable: true })
+  selectedFont?: string;
 }
 
 @InputType()
@@ -17,4 +20,7 @@ export class UpdateUserSettingsInput {
 
   @Field({ nullable: true })
   selectedLocale?: string;
+
+  @Field({ nullable: true })
+  selectedFont?: string;
 }

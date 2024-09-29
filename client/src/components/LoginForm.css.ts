@@ -1,9 +1,10 @@
 import { style } from '@vanilla-extract/css';
-import { theme, themeVars } from '../index.css';
+import { fontThemeVars, theme, themeVars } from '../index.css';
 
 export const wrapper = style([
   theme,
   {
+    fontFamily: fontThemeVars.baseFont,
     boxSizing: 'border-box',
     width: '100%',
     maxWidth: 900,

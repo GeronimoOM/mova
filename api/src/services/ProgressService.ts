@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { DateTime, Duration } from 'luxon';
 import { Context } from 'models/Context';
 import { Goal } from 'models/Goal';
@@ -36,6 +36,7 @@ const DEFAULT_HISTORY_SPAN = Duration.fromObject({ months: 3 });
 @Injectable()
 export class ProgressService {
   constructor(
+    @Inject(forwardRef(() => WordRepository))
     private wordRepository: WordRepository,
     private progressRepository: ProgressRepository,
     private dbConnectionManager: DbConnectionManager,

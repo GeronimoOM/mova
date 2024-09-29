@@ -39,6 +39,13 @@ export interface GetWordPageParams {
   limit?: number;
 }
 
+export type GetExerciseCountParams = { languageId: LanguageId } & Required<
+  Pick<
+    GetWordPageParams,
+    'mastery' | 'masteryIncOlderThan' | 'masteryAttemptOlderThan'
+  >
+>;
+
 type WordLite = Omit<Word, 'properties'> & {
   properties?: WordPropertiesLite;
 };
@@ -270,6 +277,28 @@ export class WordRepository {
     return Number(count);
   }
 
+  async getExerciseCount({
+    languageId,
+    mastery,
+    masteryIncOlderThan,
+    masteryAttemptOlderThan,
+  }: GetExerciseCountParams): Promise<number> {
+    const [{ count }] = await this.connectionManager
+      .getConnection()(TABLE_WORDS)
+      .where({ language_id: languageId, mastery })
+      .whereRaw(
+        `date_add(ifnull(mastery_inc_at, added_at), interval ? hour) < now()`,
+        [masteryIncOlderThan.hours],
+      )
+      .whereRaw(
+        `(mastery_attempt_at is null or date_add(mastery_attempt_at, interval ? hour) < now())`,
+        [masteryAttemptOlderThan.hours],
+      )
+      .count('id', { as: 'count' });
+
+    return Number(count);
+  }
+
   async getCountByMastery(
     languageId: LanguageId,
   ): Promise<Record<WordMastery, number>> {
@@ -358,6 +387,9 @@ export class WordRepository {
       mastery: row.mastery,
       ...(row.mastery_inc_at && {
         masteryIncAt: fromTimestamp(row.mastery_inc_at),
+      }),
+      ...(row.mastery_attempt_at && {
+        masteryAttemptAt: fromTimestamp(row.mastery_attempt_at),
       }),
       ...(row.properties && {
         properties: this.serializer.deserialize(row.properties),

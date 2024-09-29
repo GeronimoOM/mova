@@ -91,5 +91,6 @@ mutation UpdateSettings($input: UpdateUserSettingsInput!) {
   updateSettings(input: $input) {
     selectedLanguageId
     selectedLocale
+    selectedFont
   }
 }

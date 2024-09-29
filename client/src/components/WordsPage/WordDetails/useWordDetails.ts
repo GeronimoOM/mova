@@ -109,6 +109,7 @@ export function useWordDetails(wordId: string | null): WordDetailsReturn {
       partOfSpeech: wordInput?.partOfSpeech ?? currentWord?.partOfSpeech,
       properties: { ...currentWordProperties, ...wordInput.properties },
       mastery: currentWord?.mastery,
+      nextExerciseAt: currentWord?.nextExerciseAt,
     }),
     [currentWord, currentWordProperties, wordInput],
   );
@@ -137,11 +138,11 @@ export function useWordDetails(wordId: string | null): WordDetailsReturn {
   }, [selectedLanguageId, word.partOfSpeech, fetchProperties]);
 
   const setOriginal = useCallback((original: string) => {
-    setWordInput((prev) => ({ ...prev, original }));
+    setWordInput((prev) => ({ ...prev, original: original.trim() }));
   }, []);
 
   const setTranslation = useCallback((translation: string) => {
-    setWordInput((prev) => ({ ...prev, translation }));
+    setWordInput((prev) => ({ ...prev, translation: translation.trim() }));
   }, []);
 
   const setPartOfSpeech = useCallback((partOfSpeech: PartOfSpeech) => {
@@ -152,7 +153,15 @@ export function useWordDetails(wordId: string | null): WordDetailsReturn {
     (propertyValue: UpdatePropertyValueInput) => {
       setWordInput((prev) => ({
         ...prev,
-        properties: { ...prev.properties, [propertyValue.id]: propertyValue },
+        properties: {
+          ...prev.properties,
+          [propertyValue.id]: {
+            ...propertyValue,
+            ...(propertyValue.text && {
+              text: propertyValue.text.trim(),
+            }),
+          },
+        },
       }));
     },
     [],

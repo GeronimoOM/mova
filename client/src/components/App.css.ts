@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import { breakpoints, theme, themeVars } from '../index.css';
+import { breakpoints, fontThemeVars, theme, themeVars } from '../index.css';
 
 export const app = style([
   theme,
@@ -20,6 +20,7 @@ export const app = style([
       },
     },
 
+    fontFamily: fontThemeVars.baseFont,
     color: themeVars.color.text,
     backgroundColor: themeVars.color.background,
   },

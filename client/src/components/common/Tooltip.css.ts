@@ -10,7 +10,7 @@ export const relative = style({
 export const tooltip = recipe({
   base: {
     position: 'absolute',
-    zIndex: 1,
+    zIndex: 20,
     backgroundColor: themeVars.color.backgroundLight,
     border: `1px solid ${themeVars.color.background}`,
   },
@@ -31,6 +31,19 @@ export const tooltip = recipe({
         left: 'calc(100% + 5px)',
         top: '50%',
         transform: 'translateY(-50%)',
+      },
+      bottom: {
+        top: 'calc(100% + 5px)',
+        left: '50%',
+        transform: 'translate(-50%)',
+      },
+      bottomLeft: {
+        top: 'calc(100% + 5px)',
+        right: 0,
+      },
+      bottomRight: {
+        top: 'calc(100% + 5px)',
+        left: 0,
       },
     },
   },

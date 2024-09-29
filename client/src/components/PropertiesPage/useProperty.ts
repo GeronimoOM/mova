@@ -124,6 +124,10 @@ export function useProperty(
     }
   }, [property, canDeleteProperty, deletePropertyMutate]);
 
+  const setName = useCallback((name: string) => {
+    setNameInput(name.trim());
+  }, []);
+
   return useMemo<PropertyReturn>(
     () => ({
       isNewProperty,
@@ -132,7 +136,7 @@ export function useProperty(
         name: nameInput,
         type: typeInput,
       },
-      setName: setNameInput,
+      setName,
 
       canCreateProperty,
       createProperty,

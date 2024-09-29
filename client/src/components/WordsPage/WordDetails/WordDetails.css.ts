@@ -40,6 +40,7 @@ export const details = recipe({
 export const detailsHeader = style({
   display: 'flex',
   flexDirection: 'row',
+  alignItems: 'center',
   justifyContent: 'space-between',
 });
 

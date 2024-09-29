@@ -1,11 +1,6 @@
 import { globalStyle, style, StyleRule } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
-import {
-  Color,
-  colors,
-  sourceCodeProFontFace,
-  themeVars,
-} from '../../index.css';
+import { Color, colors, fontThemeVars, themeVars } from '../../index.css';
 
 export const container = style({
   display: 'flex',
@@ -27,7 +22,7 @@ export const cell = recipe({
     backgroundColor: themeVars.color.backgroundLight,
     color: themeVars.color.text,
     transition: 'background-color 0.2s ease',
-    fontFamily: sourceCodeProFontFace,
+    fontFamily: fontThemeVars.monoFont,
     fontWeight: 600,
     letterSpacing: '0.025em',
 

@@ -12,6 +12,7 @@ type Language {
   goals: [Goal!]!
   progress(type: ProgressType!): Progress!
   exerciseWords(total: Int): [Word!]!
+  exerciseCount: Int!
 }
 
 """
@@ -92,8 +93,9 @@ type Word {
   original: String!
   translation: String!
   partOfSpeech: PartOfSpeech!
-  mastery: Int!
   addedAt: Timestamp!
+  mastery: Int!
+  nextExerciseAt: Timestamp
   languageId: ID!
   properties: [PropertyValue!]!
 }
@@ -131,8 +133,9 @@ type WordCreate {
   original: String!
   translation: String!
   partOfSpeech: PartOfSpeech!
-  mastery: Int!
   addedAt: Timestamp!
+  mastery: Int!
+  nextExerciseAt: Timestamp
   languageId: ID!
   properties: [PropertyValueSave!]!
 }
@@ -322,6 +325,7 @@ type ProgressHistory {
 type UserSettings {
   selectedLanguageId: ID
   selectedLocale: String
+  selectedFont: String
 }
 
 type WordsStatsMastery {
@@ -472,4 +476,5 @@ input SetGoalInput {
 input UpdateUserSettingsInput {
   selectedLanguageId: ID
   selectedLocale: String
+  selectedFont: String
 }

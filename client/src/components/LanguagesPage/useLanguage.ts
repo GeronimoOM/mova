@@ -107,6 +107,10 @@ export function useLanguage(
     }
   }, [language, canDeleteLanguage, deleteLanguageMutate]);
 
+  const setName = useCallback((name: string) => {
+    setNameInput(name.trim());
+  }, []);
+
   return useMemo<LanguageReturn>(
     () => ({
       isNewLanguage,
@@ -114,7 +118,7 @@ export function useLanguage(
         ...language,
         name: nameInput,
       },
-      setName: setNameInput,
+      setName,
 
       canCreateLanguage,
       createLanguage,

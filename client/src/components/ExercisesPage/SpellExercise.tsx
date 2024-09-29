@@ -54,7 +54,9 @@ export const SpellExercise: React.FC<SpellExerciseProps> = ({
   );
   const [input, setInput] = useState(propertyValue.slice(0, revealPrefix));
   const [result, setResult] = useState<boolean | null>(null);
-  const [highlights, setHighlights] = useState<Array<Color | null>>([]);
+  const [highlights, setHighlights] = useState<Array<Color | null>>(
+    Array(revealPrefix).fill('primary'),
+  );
 
   const { t } = useTranslation();
 
@@ -98,6 +100,7 @@ export const SpellExercise: React.FC<SpellExerciseProps> = ({
       propertyValue.slice(0, NORMAL_REVEAL_PREFIX) +
         input.slice(NORMAL_REVEAL_PREFIX),
     );
+    setHighlights(Array(NORMAL_REVEAL_PREFIX).fill('primary'));
   };
 
   return (
@@ -150,7 +153,7 @@ export const SpellExercise: React.FC<SpellExerciseProps> = ({
         />
 
         <ButtonIcon
-          icon={FaAngleDoubleRight}
+          icon={!isSubmitted ? FaMinus : FaAngleDoubleRight}
           {...(!isSubmitted && { color: 'negative' })}
           onClick={handleNext}
         />

@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { IoPlay } from 'react-icons/io5';
 import { useAttemptWordMastery } from '../../api/mutations';
 import {
+  GetExerciseCountDocument,
   GetExerciseWordsDocument,
   GetPropertiesDocument,
   PropertyFieldsFragment,
@@ -35,6 +36,13 @@ export const ExerciseCard: React.FC = () => {
       variables: { languageId: selectedLanguageId! },
     },
   );
+  const { data: exerciseCountQuery, loading: exerciseCountLoading } = useQuery(
+    GetExerciseCountDocument,
+    {
+      variables: { languageId: selectedLanguageId! },
+      fetchPolicy: 'network-only',
+    },
+  );
   const [
     fetchExerciseWords,
     {
@@ -49,10 +57,11 @@ export const ExerciseCard: React.FC = () => {
   });
   const [attemptMastery] = useAttemptWordMastery();
 
+  const exerciseCount = exerciseCountQuery?.language?.exerciseCount;
   const wordsLoading = [NetworkStatus.loading, NetworkStatus.refetch].includes(
     fetchingExerciseWordsStatus,
   );
-  const loading = propertiesLoading || wordsLoading;
+  const loading = propertiesLoading || exerciseCountLoading || wordsLoading;
   const words = exerciseWordsQuery?.language?.exerciseWords;
   const currentWord = words?.[wordIndex];
   const hasNext = wordIndex + 1 < (words?.length ?? 0);
@@ -141,26 +150,53 @@ export const ExerciseCard: React.FC = () => {
           <ExercisesNotReady />
         )
       ) : (
-        <StartButton onStart={handleStart} />
+        <ExerciseStart
+          loading={loading}
+          exerciseCount={exerciseCount}
+          onStart={handleStart}
+        />
       )}
     </div>
   );
 };
 
-type StartButtonProps = {
+type ExerciseStartProps = {
+  loading: boolean;
+  exerciseCount?: number;
   onStart: () => void;
 };
 
-const StartButton: React.FC<StartButtonProps> = ({ onStart }) => (
-  <div className={styles.centered}>
-    <ButtonIcon
-      icon={IoPlay}
-      color="primary"
-      highlighted={true}
-      onClick={onStart}
-    />
-  </div>
-);
+const ExerciseStart: React.FC<ExerciseStartProps> = ({
+  loading,
+  exerciseCount,
+  onStart,
+}) => {
+  const { t } = useTranslation();
+
+  if (loading) {
+    return <Loader />;
+  }
+
+  if (!exerciseCount) {
+    return <ExercisesNotReady />;
+  }
+
+  return (
+    <div className={styles.centered}>
+      <ButtonIcon
+        icon={IoPlay}
+        color="primary"
+        highlighted={true}
+        onClick={onStart}
+      />
+
+      <div className={styles.exercisesReady}>
+        <div className={styles.exercisesReadyNumber}>{exerciseCount}</div>
+        {t('exercise.ready', { count: exerciseCount })}
+      </div>
+    </div>
+  );
+};
 
 const ExercisesNotReady: React.FC = () => {
   const { t } = useTranslation();

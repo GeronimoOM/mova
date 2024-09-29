@@ -1,11 +1,5 @@
 import { recipe } from '@vanilla-extract/recipes';
-import {
-  animations,
-  colors,
-  jostFontFace,
-  sourceCodeProFontFace,
-  themeVars,
-} from '../../index.css';
+import { animations, colors, fontThemeVars, themeVars } from '../../index.css';
 
 export const input = recipe({
   base: {
@@ -32,22 +26,22 @@ export const input = recipe({
   variants: {
     text: {
       original: {
-        fontFamily: sourceCodeProFontFace,
+        fontFamily: fontThemeVars.monoFont,
         fontWeight: 500,
         letterSpacing: '0.025em',
 
         '::placeholder': {
-          fontFamily: sourceCodeProFontFace,
+          fontFamily: fontThemeVars.monoFont,
           fontWeight: 500,
           letterSpacing: '0.025em',
         },
       },
 
       translation: {
-        fontFamily: jostFontFace,
+        fontFamily: fontThemeVars.baseFont,
 
         '::placeholder': {
-          fontFamily: jostFontFace,
+          fontFamily: fontThemeVars.baseFont,
         },
       },
     },

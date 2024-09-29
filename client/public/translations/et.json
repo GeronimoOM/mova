@@ -17,9 +17,16 @@
     "empty": {
       "list": "sõnu pole veel lisatud",
       "search": "sõnu pole leitud"
+    },
+    "mastery": {
+      "mastered": "sõna on valdatud",
+      "nextExerciseAt": "järgmine harjutus:",
+      "exerciseReady": "harjutus on valmis"
     }
   },
   "exercise": {
+    "ready_one": "harjutus on valmis",
+    "ready_other": "harjutust on valmis",
     "word": "sõna",
     "translation": "tõlge",
     "recall": "tuleta meelde tõlget",
