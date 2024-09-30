@@ -87,7 +87,7 @@ export class ExerciseService {
     );
     for (
       let mastery = 0;
-      mastery < WordMasteries.length && sum < total;
+      mastery < WordMasteries.length - 1 && sum < total;
       mastery++
     ) {
       const masteryDistributionExtra = Math.min(
