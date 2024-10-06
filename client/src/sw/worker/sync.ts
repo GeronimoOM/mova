@@ -72,11 +72,15 @@ async function startSyncing(): Promise<void> {
   });
 }
 
-async function releaseSyncing(isSuccess = true): Promise<void> {
+async function releaseSyncing({
+  isSuccess = true,
+  hasChanges = false,
+}): Promise<void> {
   isSyncing = false;
   await sendMessageToClient({
     type: SwWorkerMessageType.SyncOver,
     isSuccess,
+    hasChanges,
   });
 }
 
@@ -87,15 +91,16 @@ export async function sync(): Promise<void> {
 
   await startSyncing();
   let isSyncSuccess = false;
+  let hasChanges = false;
   try {
     await pushChanges();
-    await pullChanges();
+    hasChanges = await pullChanges();
     isSyncSuccess = true;
     console.log('Sync success');
   } catch (err) {
     console.error('Sync failure', err);
   } finally {
-    await releaseSyncing(isSyncSuccess);
+    await releaseSyncing({ isSuccess: isSyncSuccess, hasChanges });
   }
 }
 
@@ -123,10 +128,10 @@ async function pushChanges(): Promise<void> {
   console.log(`Pushed changes: ${nChanges}`);
 }
 
-async function pullChanges(): Promise<void> {
+async function pullChanges(): Promise<boolean> {
   const state = await cache.getState();
   if (!state) {
-    return;
+    return false;
   }
 
   const syncStatus = await getSyncStatus(state);
@@ -168,6 +173,8 @@ async function pullChanges(): Promise<void> {
   });
 
   console.log(`Pulled changes: ${nChanges} (${syncType} sync)`);
+
+  return nChanges > 0;
 }
 
 async function applyChanges(

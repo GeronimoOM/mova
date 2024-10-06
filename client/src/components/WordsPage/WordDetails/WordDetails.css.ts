@@ -1,5 +1,4 @@
 import { style } from '@vanilla-extract/css';
-import { recipe } from '@vanilla-extract/recipes';
 import { themeVars } from '../../../index.css';
 
 export const wrapper = style({
@@ -15,26 +14,16 @@ export const innerWrapper = style({
   height: '100%',
   overflowY: 'scroll',
   margin: 10,
-  padding: '15px 10px',
+  padding: 10,
   backgroundColor: themeVars.color.background,
+  outline: `1px solid ${themeVars.color.background}`,
 });
 
-export const details = recipe({
-  base: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 10,
-    minHeight: 0,
-    marginRight: 50,
-  },
-
-  variants: {
-    simplified: {
-      true: {
-        marginRight: 0,
-      },
-    },
-  },
+export const details = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 15,
+  minHeight: 0,
 });
 
 export const detailsHeader = style({
@@ -42,31 +31,68 @@ export const detailsHeader = style({
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'space-between',
-  paddingLeft: 5,
+  padding: 5,
+  paddingRight: 0,
+  selectors: {
+    '&:not(.simplified)': {
+      marginRight: 65,
+    },
+  },
+});
+
+export const detailsRow = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 5,
+});
+
+export const originalRow = style({
+  selectors: {
+    '&:not(.simplified)': {
+      marginRight: 65,
+    },
+  },
 });
 
 export const translationLabel = style({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  gap: 5,
   color: themeVars.color.muted,
   fontWeight: 'bold',
 });
 
+export const translationIcon = style({
+  display: 'flex',
+  alignItems: 'center',
+  padding: 5,
+  color: themeVars.color.muted,
+});
+
+export const translationRow = style({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 5,
+});
+
 export const buttons = style({
   position: 'absolute',
-  top: 15,
-  bottom: 15,
+  top: 10,
+  bottom: 10,
   right: 18,
+
   padding: 10,
-  gap: 20,
+  gap: 10,
   display: 'flex',
   flexDirection: 'column',
-  backgroundColor: themeVars.color.background,
   zIndex: 10,
 });
 
 export const bottomButton = style({
   marginTop: 'auto',
+});
+
+export const detailsEnd = style({
+  minHeight: 50,
 });

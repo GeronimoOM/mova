@@ -105,6 +105,14 @@ export const ExerciseCard: React.FC = () => {
     });
   };
 
+  const handleClose = () => {
+    if (isWordDetailsOpen) {
+      setIsWordDetailsOpen(false);
+    } else {
+      setIsStarted(false);
+    }
+  };
+
   return (
     <div className={styles.card}>
       {isStarted ? (
@@ -142,7 +150,7 @@ export const ExerciseCard: React.FC = () => {
               <ButtonIcon
                 icon={HiMiniXMark}
                 color="negative"
-                onClick={() => setIsStarted(false)}
+                onClick={handleClose}
               />
             </div>
           </>
@@ -226,7 +234,8 @@ const Exercise: React.FC<ExerciseProps> = ({
   onFailure,
   onNext,
 }) => {
-  const exerciseType = masteryToExerciseType[word.mastery];
+  const [mastery] = useState(word.mastery);
+  const exerciseType = masteryToExerciseType[mastery];
   switch (exerciseType) {
     case ExerciseType.Recall:
       return (

@@ -162,9 +162,9 @@ export function useWordDetails(wordId: string | null): WordDetailsReturn {
     [],
   );
 
-  const createWord = useCallback(() => {
+  const createWord = useCallback(async () => {
     if (canCreateWord) {
-      createWordMutate({
+      await createWordMutate({
         variables: {
           input: {
             id: uuid(),
@@ -182,12 +182,14 @@ export function useWordDetails(wordId: string | null): WordDetailsReturn {
           },
         },
       });
+
+      setWordInput({});
     }
   }, [canCreateWord, selectedLanguageId, wordInput, createWordMutate]);
 
-  const updateWord = useCallback(() => {
+  const updateWord = useCallback(async () => {
     if (canUpdateWord) {
-      updateWordMutate({
+      await updateWordMutate({
         variables: {
           input: {
             id: wordId!,
@@ -205,6 +207,8 @@ export function useWordDetails(wordId: string | null): WordDetailsReturn {
           },
         },
       });
+
+      setWordInput({});
     }
   }, [canUpdateWord, wordId, wordInput, updateWordMutate]);
 

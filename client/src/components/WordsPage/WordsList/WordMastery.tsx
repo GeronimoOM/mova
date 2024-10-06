@@ -18,13 +18,11 @@ const MAX_PROGRESS = 3;
 type WordMasteryProps = {
   mastery: number;
   nextExerciseAt: string | null;
-  tooltipSide?: 'left' | 'bottom' | 'bottomLeft';
 };
 
 export const WordMastery: React.FC<WordMasteryProps> = ({
   mastery,
   nextExerciseAt,
-  tooltipSide,
 }) => {
   const isSmall = useMediaQuery(breakpoints.small);
 
@@ -33,7 +31,7 @@ export const WordMastery: React.FC<WordMasteryProps> = ({
       content={
         <WordMasteryTooltip mastery={mastery} nextExerciseAt={nextExerciseAt} />
       }
-      side={tooltipSide ?? (isSmall ? 'left' : 'bottom')}
+      side={isSmall ? 'left' : 'bottomLeft'}
     >
       <div className={styles.mastery}>
         {Array(MAX_PROGRESS)

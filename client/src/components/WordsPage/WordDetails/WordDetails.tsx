@@ -4,6 +4,7 @@ import { FaFeatherPointed, FaFire } from 'react-icons/fa6';
 import { BsTranslate } from 'react-icons/bs';
 import { HiMiniXMark } from 'react-icons/hi2';
 
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { Icon } from '../../common/Icon';
@@ -74,7 +75,8 @@ export const WordDetails: React.FC<WordDetailsProps> = ({
       <div className={styles.innerWrapper}>
         {!simplified && (
           <div className={styles.buttons}>
-            <ButtonIcon icon={HiMiniXMark} onClick={onClose} />
+            <ButtonIcon icon={HiMiniXMark} onClick={onClose} wrapped={true} />
+
             <ButtonIcon
               icon={FaFeatherPointed}
               onClick={isNewWord ? createWord : updateWord}
@@ -82,6 +84,7 @@ export const WordDetails: React.FC<WordDetailsProps> = ({
               highlighted={true}
               disabled={!canCreateWord && !canUpdateWord}
               loading={isNewWord ? wordCreating : wordUpdating}
+              wrapped={true}
             />
 
             <div className={styles.bottomButton}>
@@ -91,13 +94,14 @@ export const WordDetails: React.FC<WordDetailsProps> = ({
                 color="negative"
                 disabled={!canDeleteWord}
                 loading={wordDeleting}
+                wrapped={true}
               />
             </div>
           </div>
         )}
 
-        <div className={styles.details({ simplified })}>
-          <div className={styles.detailsHeader}>
+        <div className={styles.details}>
+          <div className={classNames(styles.detailsHeader, { simplified })}>
             <PartOfSpeechSelect
               partOfSpeech={word.partOfSpeech ?? null}
               onPartOfSpeechSelect={setPartOfSpeech}
@@ -106,32 +110,39 @@ export const WordDetails: React.FC<WordDetailsProps> = ({
             <WordMastery
               mastery={word.mastery ?? 0}
               nextExerciseAt={word.nextExerciseAt ?? null}
-              tooltipSide={simplified ? 'bottomLeft' : undefined}
             />
           </div>
 
-          <Input
-            text="original"
-            size="large"
-            value={word?.original ?? ''}
-            onChange={setOriginal}
-            loading={wordLoading}
-            disabled={simplified}
-          />
-
-          <div className={styles.translationLabel}>
-            <Icon icon={BsTranslate} size="small" />
-            {t('words.translation')}
+          <div className={classNames(styles.originalRow, { simplified })}>
+            <Input
+              text="original"
+              value={word?.original ?? ''}
+              onChange={setOriginal}
+              loading={wordLoading}
+              disabled={simplified}
+            />
           </div>
 
-          <Input
-            text="translation"
-            size="medium"
-            value={word?.translation ?? ''}
-            onChange={setTranslation}
-            loading={wordLoading}
-            disabled={simplified}
-          />
+          <div className={styles.detailsRow}>
+            <div className={styles.translationLabel}>
+              {t('words.translation')}
+            </div>
+            <div className={styles.translationRow}>
+              <div className={styles.translationIcon}>
+                <Icon icon={BsTranslate} />
+              </div>
+
+              <Input
+                text="translation"
+                size="medium"
+                value={word?.translation ?? ''}
+                onChange={setTranslation}
+                loading={wordLoading}
+                disabled={simplified}
+              />
+            </div>
+          </div>
+
           {!propertiesLoading ? (
             properties?.map((property) => (
               <WordDetailsProperty
@@ -145,6 +156,8 @@ export const WordDetails: React.FC<WordDetailsProps> = ({
           ) : (
             <WordDetailsPropertiesSkeleton />
           )}
+
+          {!simplified && <div className={styles.detailsEnd} />}
         </div>
       </div>
     </div>

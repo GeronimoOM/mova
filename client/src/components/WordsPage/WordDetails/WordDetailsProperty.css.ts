@@ -2,6 +2,12 @@ import { style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
 import { animations, themeVars } from '../../../index.css';
 
+export const row = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 5,
+});
+
 export const label = style({
   color: themeVars.color.muted,
   fontWeight: 'bold',

@@ -12,7 +12,7 @@ export const tooltip = recipe({
     position: 'absolute',
     zIndex: 20,
     backgroundColor: themeVars.color.backgroundLight,
-    border: `1px solid ${themeVars.color.background}`,
+    outline: `1px solid ${themeVars.color.background}`,
   },
 
   variants: {

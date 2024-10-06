@@ -2,19 +2,24 @@ import { ApolloProvider } from '@apollo/client';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
+import { cacheEvict } from './api/cache';
 import { client, setClientId } from './api/client';
 import { App } from './components/App';
 import { AuthProvider } from './components/AuthContext';
 import { LanguageProvider } from './components/LanguageContext';
 import { LocaleProvider, initTranslator } from './components/LocaleContext.tsx';
 import { StyleProvider } from './components/StyleContext.tsx';
-import './index.css.ts';
-import { registerServiceWorker } from './sw/client/register.ts';
-import { SwWorkerMessageType } from './sw/worker/messages.ts';
+import './index.css';
+import { registerServiceWorker } from './sw/client/register';
+import { SwWorkerMessageType } from './sw/worker/messages';
 
 registerServiceWorker((message) => {
   if (message.type === SwWorkerMessageType.Initialized) {
     setClientId(message.clientId);
+  } else if (message.type === SwWorkerMessageType.SyncOver) {
+    if (message.isSuccess && message.hasChanges) {
+      cacheEvict();
+    }
   }
 });
 

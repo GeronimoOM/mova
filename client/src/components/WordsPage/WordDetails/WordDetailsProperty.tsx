@@ -20,7 +20,7 @@ export const WordDetailsProperty: React.FC<WordDetailsPropertyProps> = ({
   simplified,
 }) => {
   return (
-    <>
+    <div className={styles.row}>
       <div className={styles.label}>{property.name}</div>
       <Input
         value={wordProperty?.text ?? ''}
@@ -32,7 +32,7 @@ export const WordDetailsProperty: React.FC<WordDetailsPropertyProps> = ({
         }
         disabled={simplified}
       />
-    </>
+    </div>
   );
 };
 

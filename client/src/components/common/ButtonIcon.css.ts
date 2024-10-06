@@ -51,9 +51,14 @@ export const button = recipe({
 
     disabled: {
       true: {
-        color: `${themeVars.color.muted} !important`,
-        border: `2px solid ${themeVars.color.muted} !important`,
         pointerEvents: 'none',
+
+        selectors: {
+          '&:not(.toggled)': {
+            color: `${themeVars.color.muted} !important`,
+            border: `2px solid ${themeVars.color.muted} !important`,
+          },
+        },
       },
     },
 
@@ -70,9 +75,9 @@ export const button = recipe({
 });
 
 export const wrapper = style({
-  border: `2px solid ${themeVars.color.text}`,
-  backgroundColor: themeVars.color.background,
-  padding: 5,
+  outline: `1px solid ${themeVars.color.background}`,
+  backgroundColor: themeVars.color.backgroundLight,
+  padding: 8,
   borderRadius: 30,
 });
 

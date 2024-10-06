@@ -10,6 +10,8 @@ import { ProgressTab } from './ProgressTab';
 import { StatsTab } from './StatsTab';
 
 import { useTranslation } from 'react-i18next';
+import { breakpoints } from '../../index.css';
+import { useMediaQuery } from '../../utils/useMediaQuery';
 import * as styles from './ProgressPage.css';
 
 export enum ProgressPageTab {
@@ -49,6 +51,7 @@ export const ProgressPage: React.FC = () => {
   );
 
   const { t } = useTranslation();
+  const isSmall = useMediaQuery(breakpoints.small);
 
   const TabContent = tabs[selectedTab].content;
 
@@ -60,6 +63,7 @@ export const ProgressPage: React.FC = () => {
             key={tab}
             className={classNames(styles.tab, {
               active: selectedTab === tab,
+              mini: !isSmall,
             })}
             onClick={() => setSelectedTab(tab as ProgressPageTab)}
           >

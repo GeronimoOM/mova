@@ -301,7 +301,15 @@ const ProgressCalendarCellTooltip: React.FC<
     dateString = date.setLocale(locale).toFormat(DISPLAY_DATE_FORMAT);
   } else {
     const until = date.plus({ weeks: 1 }).minus({ days: 1 });
-    dateString = `${date.setLocale(locale).toFormat(DISPLAY_MONTH_DAY_FORMAT)} - ${until.setLocale(locale).toFormat(DISPLAY_DATE_FORMAT)}`;
+    const dateFrom = date
+      .setLocale(locale)
+      .toFormat(
+        date.month === until.month
+          ? DISPLAY_MONTH_DAY_FORMAT
+          : DISPLAY_DATE_FORMAT,
+      );
+    const dateUntil = until.setLocale(locale).toFormat(DISPLAY_DATE_FORMAT);
+    dateString = `${dateFrom} - ${dateUntil}`;
   }
 
   const pointsString =

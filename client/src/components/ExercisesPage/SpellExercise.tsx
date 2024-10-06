@@ -22,6 +22,7 @@ import * as styles from './SpellExercise.css';
 
 const NORMAL_REVEAL_PREFIX = 1;
 const ADVANCED_REVEAL_PREFIX = 0;
+const EXTRA_CHARACTERS_CHAR = '_';
 
 export type SpellExerciseProps = {
   word: WordFieldsFullFragment;
@@ -79,11 +80,20 @@ export const SpellExercise: React.FC<SpellExerciseProps> = ({
       onFailure();
     }
 
-    setHighlights(
-      propertyValue
-        .split('')
-        .map((char, i) => (char === input[i] ? 'primary' : 'negative')),
-    );
+    let verifiedInput = propertyValue;
+    const verifiedHighlights = propertyValue
+      .split('')
+      .map((char, i) => (char === input[i] ? 'primary' : 'negative'));
+    if (
+      input.length > propertyValue.length &&
+      input.slice(0, propertyValue.length) === propertyValue
+    ) {
+      verifiedInput += EXTRA_CHARACTERS_CHAR;
+      verifiedHighlights.push('negative');
+    }
+
+    setInput(verifiedInput);
+    setHighlights(verifiedHighlights);
   };
 
   const handleNext = () => {
@@ -128,10 +138,10 @@ export const SpellExercise: React.FC<SpellExerciseProps> = ({
       </div>
 
       <SpellInput
-        value={isSubmitted ? propertyValue : input}
+        value={input}
         onChange={handleInput}
         disabled={isSubmitted}
-        length={propertyValue.length}
+        length={isSubmitted ? input.length : propertyValue.length}
         obscureLength={advanced && !isSubmitted}
         highlights={highlights}
       />
@@ -150,6 +160,7 @@ export const SpellExercise: React.FC<SpellExerciseProps> = ({
           color={!isSubmitted || result ? 'primary' : 'negative'}
           onClick={handleSubmit}
           disabled={!canSubmit}
+          toggled={isSubmitted}
         />
 
         <ButtonIcon

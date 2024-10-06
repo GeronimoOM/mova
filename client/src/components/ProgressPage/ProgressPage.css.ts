@@ -26,11 +26,13 @@ export const tab = style({
   transition: 'border 0.2s ease',
   borderBottom: '3px solid transparent',
   fontWeight: 'bold',
-  fontSize: '0.8rem',
 
   selectors: {
     [`&:hover, &.active`]: {
       borderBottom: `3px solid ${themeVars.color.primary}`,
+    },
+    '&.mini': {
+      fontSize: '0.8rem',
     },
   },
 });

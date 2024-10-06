@@ -23,7 +23,7 @@ export const details = style({
   top: 5,
   right: 5,
   left: 5,
-  bottom: 60,
+  bottom: 65,
   outline: `2px solid ${themeVars.color.backgroundLightest}`,
   backgroundColor: themeVars.color.background,
 });
