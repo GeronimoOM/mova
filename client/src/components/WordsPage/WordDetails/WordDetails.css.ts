@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import { themeVars } from '../../../index.css';
+import { fontThemeVars, themeVars } from '../../../index.css';
 
 export const wrapper = style({
   gridRow: '1 / 3',
@@ -50,6 +50,36 @@ export const originalRow = style({
   selectors: {
     '&:not(.simplified)': {
       marginRight: 65,
+    },
+  },
+});
+
+export const existingWarningIcon = style({
+  display: 'flex',
+  alignItems: 'center',
+  color: themeVars.color.negative,
+});
+
+export const existingWarningTooltip = style({
+  display: 'flex',
+  alignItems: 'center',
+  flexWrap: 'wrap',
+  padding: 10,
+  gap: 10,
+  whiteSpace: 'nowrap',
+});
+
+export const existingWarningWord = style({
+  fontFamily: fontThemeVars.monoFont,
+  padding: 5,
+  borderRadius: 5,
+  backgroundColor: themeVars.color.backgroundLighter,
+  cursor: 'pointer',
+  transition: 'background-color 0.2s ease',
+
+  selectors: {
+    '&:hover': {
+      backgroundColor: themeVars.color.backgroundLightest,
     },
   },
 });

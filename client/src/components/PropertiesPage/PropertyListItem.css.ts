@@ -87,8 +87,7 @@ globalStyle(`${header} > *:first-child`, {
   marginRight: 'auto',
 });
 
-globalStyle(`${content} > input`, {
-  flex: '1 1 0%',
+globalStyle(`${content} input`, {
   textTransform: 'lowercase',
 });
 

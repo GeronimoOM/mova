@@ -211,6 +211,16 @@ export async function getWord(
   return (await db.words.get(id)) as WordFieldsFullFragment;
 }
 
+export async function getWordByOriginal(
+  languageId: string,
+  original: string,
+): Promise<WordFieldsFullFragment | undefined> {
+  return (await db.words.get({
+    languageId,
+    original,
+  })) as WordFieldsFullFragment;
+}
+
 export async function updateWords(words: WordFieldsFragment[]): Promise<void> {
   await db.transaction('rw', 'words', async () => {
     await Promise.all(words.map((word) => db.words.update(word.id, word)));

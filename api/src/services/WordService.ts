@@ -119,6 +119,13 @@ export class WordService {
     return words;
   }
 
+  async getByOriginal(
+    languageId: LanguageId,
+    original: string,
+  ): Promise<Word | null> {
+    return await this.wordRepository.getByOriginal(languageId, original);
+  }
+
   async create(ctx: Context, params: CreateWordParams): Promise<Word> {
     await this.languageService.getById(ctx, params.languageId);
 

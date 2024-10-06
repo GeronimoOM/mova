@@ -130,6 +130,16 @@ export class LanguageResolver {
     );
   }
 
+  @ResolveField((type) => WordType, { nullable: true })
+  async word(
+    @ContextDec() ctx: Context,
+    @Parent() language: LanguageType,
+    @Args('original') original: string,
+  ): Promise<WordType | null> {
+    const word = await this.wordService.getByOriginal(language.id, original);
+    return word ? this.wordTypeMapper.map(word) : null;
+  }
+
   @ResolveField((type) => WordsStatsType)
   async stats(@Parent() language: LanguageType): Promise<WordsStatsType> {
     const wordsStats = await this.progressService.getStats(language.id);

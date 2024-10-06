@@ -22,7 +22,8 @@
       "mastered": "sõna on valdatud",
       "nextExerciseAt": "järgmine harjutus:",
       "exerciseReady": "harjutus on valmis"
-    }
+    },
+    "existing": "on juba lisatud"
   },
   "exercise": {
     "ready_one": "harjutus on valmis",

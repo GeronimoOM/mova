@@ -191,6 +191,21 @@ export class WordRepository {
     return await this.mapToWords(wordRows);
   }
 
+  async getByOriginal(
+    languageId: LanguageId,
+    original: string,
+  ): Promise<Word | null> {
+    const wordRow = await this.connectionManager
+      .getConnection()(TABLE_WORDS)
+      .where({
+        language_id: languageId,
+        original,
+      })
+      .first();
+
+    return wordRow ? await this.mapToWord(wordRow) : null;
+  }
+
   async *getBatches(
     languageId: LanguageId,
     batchSize: number = BATCH_SIZE,

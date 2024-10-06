@@ -40,7 +40,7 @@ export const ExerciseCard: React.FC = () => {
     GetExerciseCountDocument,
     {
       variables: { languageId: selectedLanguageId! },
-      fetchPolicy: 'network-only',
+      fetchPolicy: 'no-cache',
     },
   );
   const [
@@ -52,7 +52,7 @@ export const ExerciseCard: React.FC = () => {
     },
   ] = useLazyQuery(GetExerciseWordsDocument, {
     variables: { languageId: selectedLanguageId! },
-    fetchPolicy: 'network-only',
+    fetchPolicy: 'no-cache',
     notifyOnNetworkStatusChange: true,
   });
   const [attemptMastery] = useAttemptWordMastery();

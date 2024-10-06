@@ -5,10 +5,10 @@ export const item = style({
   display: 'grid',
   gridColumn: '1 / 3',
   gridTemplateColumns: 'subgrid',
-  gridTemplateRows: 'auto auto',
+  gridTemplateRows: 'auto',
   alignItems: 'center',
   gap: '5px 10px',
-  padding: '5px 10px',
+  padding: 10,
   cursor: 'pointer',
   transition: 'background-color 0.2s ease',
   borderBottom: `1px solid ${themeVars.color.backgroundLighter}`,
@@ -40,8 +40,12 @@ export const translation = style({
 export const divider = style({
   gridColumn: '1 / 3',
   padding: 5,
+  borderBottom: `1px solid ${themeVars.color.backgroundLighter}`,
+});
+
+export const dividerInner = style({
+  padding: 5,
   backgroundColor: themeVars.color.background,
-  margin: 5,
   fontSize: '0.8rem',
   display: 'flex',
   alignItems: 'center',

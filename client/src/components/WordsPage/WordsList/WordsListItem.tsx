@@ -39,10 +39,12 @@ export const WordsListItemDivider: React.FC<WordsListItemDividerProps> = ({
 
   return (
     <div className={styles.divider}>
-      <div>{date.setLocale(locale).toFormat(DISPLAY_DATE_FORMAT)}</div>
-      <div
-        className={styles.dividerTotal}
-      >{`${Math.min(total, MAX_DIVIDER_TOTAL)}${isTotalComplete ? '' : '+'}`}</div>
+      <div className={styles.dividerInner}>
+        <div>{date.setLocale(locale).toFormat(DISPLAY_DATE_FORMAT)}</div>
+        <div
+          className={styles.dividerTotal}
+        >{`${Math.min(total, MAX_DIVIDER_TOTAL)}${isTotalComplete ? '' : '+'}`}</div>
+      </div>
     </div>
   );
 };

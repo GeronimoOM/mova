@@ -2,6 +2,8 @@ import {
   GetLanguagesQuery,
   GetPropertiesQuery,
   GetPropertiesQueryVariables,
+  GetWordByOriginalQuery,
+  GetWordByOriginalQueryVariables,
   GetWordQuery,
   GetWordQueryVariables,
   GetWordsQuery,
@@ -23,6 +25,7 @@ enum GraphQlQuery {
   GetProperties = 'GetProperties',
   GetWords = 'GetWords',
   GetWord = 'GetWord',
+  GetWordByOriginal = 'GetWordByOriginal',
 }
 
 export function isGraphQlQuery(request: GraphQlRequest): boolean {
@@ -63,6 +66,8 @@ function getGraphQlQueryPolicy(request: GraphQlRequest): GraphQlQueryPolicy {
     case GraphQlQuery.GetProperties:
       return GraphQlQueryPolicy.CacheFirst;
     case GraphQlQuery.GetWord:
+      return GraphQlQueryPolicy.CacheFirst;
+    case GraphQlQuery.GetWordByOriginal:
       return GraphQlQueryPolicy.CacheFirst;
     case GraphQlQuery.GetWords: {
       const { query, order } = request.variables as GetWordsQueryVariables;
@@ -126,6 +131,8 @@ async function handleGraphQlQueryFromCache(
       return handleGraphQlQueryWordsFromCache(request);
     case GraphQlQuery.GetWord:
       return handleGraphQlQueryWordFromCache(request);
+    case GraphQlQuery.GetWordByOriginal:
+      return handleGraphQlQueryWordByOriginalFromCache(request);
     default:
       throw new Error(`Unknown operationName: ${request.operationName}`);
   }
@@ -205,6 +212,15 @@ async function handleGraphQlQueryWordFromCache(
   const { id } = request.variables as GetWordQueryVariables;
   const word = await cache.getWord(id);
   return response<GetWordQuery>({ word });
+}
+
+async function handleGraphQlQueryWordByOriginalFromCache(
+  request: GraphQlRequest,
+): Promise<Response> {
+  const { languageId, original } =
+    request.variables as GetWordByOriginalQueryVariables;
+  const word = await cache.getWordByOriginal(languageId, original);
+  return response<GetWordByOriginalQuery>({ language: { word } });
 }
 
 async function cacheGraphQlQueryResponse(

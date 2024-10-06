@@ -1,5 +1,29 @@
+import { style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
 import { animations, colors, fontThemeVars, themeVars } from '../../index.css';
+
+export const wrapper = style({
+  position: 'relative',
+  width: '100%',
+});
+
+export const left = style({
+  position: 'absolute',
+  left: 10,
+  top: 10,
+  bottom: 10,
+  display: 'flex',
+  alignItems: 'center',
+});
+
+export const right = style({
+  position: 'absolute',
+  right: 10,
+  top: 10,
+  bottom: 10,
+  display: 'flex',
+  alignItems: 'center',
+});
 
 export const input = recipe({
   base: {
@@ -69,9 +93,15 @@ export const input = recipe({
       },
     },
 
-    padding: {
+    left: {
       true: {
-        paddingLeft: 50,
+        paddingLeft: 45,
+      },
+    },
+
+    right: {
+      true: {
+        paddingRight: 45,
       },
     },
 

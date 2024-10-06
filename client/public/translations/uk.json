@@ -22,7 +22,8 @@
       "mastered": "cлово вивчено",
       "nextExerciseAt": "наступна вправа о:",
       "exerciseReady": "вправа готова"
-    }
+    },
+    "existing": "уже додано"
   },
   "exercise": {
     "ready_one": "вправа готова",

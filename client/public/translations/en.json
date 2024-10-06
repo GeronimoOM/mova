@@ -22,7 +22,8 @@
       "mastered": "word is mastered",
       "nextExerciseAt": "next exercise at:",
       "exerciseReady": "exercise is ready"
-    }
+    },
+    "existing": "already added"
   },
   "exercise": {
     "ready_one": "exercise ready",

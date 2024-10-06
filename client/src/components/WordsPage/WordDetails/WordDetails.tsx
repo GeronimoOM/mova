@@ -1,14 +1,22 @@
 import React, { useEffect } from 'react';
 import { FaFeatherPointed, FaFire } from 'react-icons/fa6';
 
-import { BsTranslate } from 'react-icons/bs';
+import { BsFillExclamationDiamondFill, BsTranslate } from 'react-icons/bs';
 import { HiMiniXMark } from 'react-icons/hi2';
 
+import { NetworkStatus, useLazyQuery } from '@apollo/client';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
+import {
+  GetWordByOriginalDocument,
+  WordFieldsFragment,
+} from '../../../api/types/graphql';
+import { useDebouncedValue } from '../../../utils/useDebouncedValue';
+import { useLanguageContext } from '../../LanguageContext';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { Icon } from '../../common/Icon';
 import { Input } from '../../common/Input';
+import { Tooltip } from '../../common/Tooltip';
 import { WordMastery } from '../WordsList/WordMastery';
 import { PartOfSpeechSelect } from './PartOfSpeechSelect';
 import * as styles from './WordDetails.css';
@@ -25,12 +33,16 @@ export type WordDetailsProps = {
   simplified?: boolean;
 };
 
+const EXISTS_DELAY_MS = 300;
+
 export const WordDetails: React.FC<WordDetailsProps> = ({
   wordId,
   onSelectWord,
   onClose,
   simplified,
 }) => {
+  const [selectedLanguageId] = useLanguageContext();
+
   const {
     isNewWord,
     word,
@@ -54,7 +66,35 @@ export const WordDetails: React.FC<WordDetailsProps> = ({
     deletedWord,
   } = useWordDetails(wordId);
 
+  const [
+    fetchExistingWord,
+    { data: existingWordQuery, networkStatus: existingWordStatus },
+  ] = useLazyQuery(GetWordByOriginalDocument, {
+    fetchPolicy: 'no-cache',
+    notifyOnNetworkStatusChange: true,
+  });
+  const existingWordLoading = [
+    NetworkStatus.loading,
+    NetworkStatus.setVariables,
+  ].includes(existingWordStatus);
+
   const { t } = useTranslation();
+  const debouncedOriginal = useDebouncedValue(word?.original, EXISTS_DELAY_MS);
+  const existingWord =
+    isNewWord && debouncedOriginal && !existingWordLoading
+      ? existingWordQuery?.language?.word
+      : undefined;
+
+  useEffect(() => {
+    if (selectedLanguageId && isNewWord && debouncedOriginal) {
+      fetchExistingWord({
+        variables: {
+          languageId: selectedLanguageId,
+          original: debouncedOriginal,
+        },
+      });
+    }
+  }, [selectedLanguageId, isNewWord, debouncedOriginal, fetchExistingWord]);
 
   useEffect(() => {
     if (createdWord?.id) {
@@ -120,6 +160,14 @@ export const WordDetails: React.FC<WordDetailsProps> = ({
               onChange={setOriginal}
               loading={wordLoading}
               disabled={simplified}
+              right={
+                existingWord && (
+                  <ExistingWordWarningIcon
+                    word={existingWord}
+                    onSelectWord={() => onSelectWord(existingWord.id)}
+                  />
+                )
+              }
             />
           </div>
 
@@ -160,6 +208,45 @@ export const WordDetails: React.FC<WordDetailsProps> = ({
           {!simplified && <div className={styles.detailsEnd} />}
         </div>
       </div>
+    </div>
+  );
+};
+
+type ExistingWarningProps = {
+  word: WordFieldsFragment;
+  onSelectWord: () => void;
+};
+
+const ExistingWordWarningIcon: React.FC<ExistingWarningProps> = ({
+  word,
+  onSelectWord,
+}) => {
+  return (
+    <Tooltip
+      content={
+        <ExistingWordWarningTooltip word={word} onSelectWord={onSelectWord} />
+      }
+      side="bottomLeft"
+    >
+      <div className={styles.existingWarningIcon}>
+        <Icon icon={BsFillExclamationDiamondFill} />
+      </div>
+    </Tooltip>
+  );
+};
+
+const ExistingWordWarningTooltip: React.FC<ExistingWarningProps> = ({
+  word,
+  onSelectWord,
+}) => {
+  const { t } = useTranslation();
+
+  return (
+    <div className={styles.existingWarningTooltip}>
+      <div className={styles.existingWarningWord} onClick={onSelectWord}>
+        {word.original}
+      </div>
+      {t('words.existing')}
     </div>
   );
 };

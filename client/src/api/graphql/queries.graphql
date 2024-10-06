@@ -35,6 +35,14 @@ query GetWord($id: ID!) {
   }
 }
 
+query GetWordByOriginal($languageId: ID!, $original: String!) {
+  language(id: $languageId) {
+    word(original: $original) {
+      ...WordFieldsFull
+    }
+  }
+}
+
 query GetProperties($languageId: ID!, $partOfSpeech: PartOfSpeech) {
   language(id: $languageId) {
     id

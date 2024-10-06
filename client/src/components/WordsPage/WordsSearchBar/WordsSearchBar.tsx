@@ -27,15 +27,12 @@ export const WordsSearchBar: React.FC<WordsSearchBarProps> = ({
 
   return (
     <div className={classNames(styles.wrapper, { highlighted: isSearch })}>
-      <div className={styles.iconLeft}>
-        <Icon icon={PiMagnifyingGlassBold} />
-      </div>
       <Input
         value={query}
         onChange={onQueryChange}
         text="original"
-        padding
         placeholder={t('words.search')}
+        left={<Icon icon={PiMagnifyingGlassBold} />}
       />
       <ButtonIcon icon={BsEraserFill} onClick={onClear} disabled={!query} />
     </div>

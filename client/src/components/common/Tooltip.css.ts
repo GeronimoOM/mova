@@ -13,6 +13,7 @@ export const tooltip = recipe({
     zIndex: 20,
     backgroundColor: themeVars.color.backgroundLight,
     outline: `1px solid ${themeVars.color.background}`,
+    cursor: 'default',
   },
 
   variants: {
