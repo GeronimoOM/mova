@@ -4,7 +4,7 @@ import * as styles from './Input.css';
 
 export type InputProps = {
   value: string;
-  onChange: (value: string) => void;
+  onChange?: (value: string) => void;
   onBlur?: () => void;
   type?: 'text' | 'password';
   text?: 'original' | 'translation';
@@ -49,7 +49,7 @@ export const Input: React.FC<InputProps> = ({
         })}
         type={type ?? 'text'}
         value={obscured ? '' : value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => onChange?.(e.target.value)}
         onBlur={onBlur}
         placeholder={placeholder}
         spellCheck={false}

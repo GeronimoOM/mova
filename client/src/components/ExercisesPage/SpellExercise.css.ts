@@ -4,18 +4,23 @@ import { themeVars } from '../../index.css';
 export const wrapper = style({
   display: 'flex',
   flexDirection: 'column',
-  gap: 10,
+  gap: 15,
 });
 
 export const title = style({
-  margin: 10,
+  padding: 5,
   textAlign: 'center',
   color: themeVars.color.muted,
   fontWeight: 'bold',
 });
 
+export const property = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 5,
+});
+
 export const propertyLabel = style({
-  marginTop: 20,
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
@@ -25,12 +30,8 @@ export const propertyLabel = style({
   textTransform: 'lowercase',
 });
 
-export const propertyLabelDivider = style({
-  margin: '0 5px',
-});
-
 export const result = style({
-  marginTop: 20,
+  marginTop: 10,
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'center',

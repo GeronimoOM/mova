@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FaAngleDoubleRight } from 'react-icons/fa';
 
 import { BsFillLightbulbFill } from 'react-icons/bs';
@@ -7,6 +7,7 @@ import { FaBookOpen } from 'react-icons/fa6';
 
 import {
   PropertyFieldsFragment,
+  TextPropertyFieldsFragment,
   TextPropertyValueFieldsFragment,
   WordFieldsFullFragment,
 } from '../../api/types/graphql';
@@ -14,7 +15,6 @@ import { Input } from '../common/Input';
 import { SpellInput } from '../common/SpellInput';
 
 import { useTranslation } from 'react-i18next';
-import { PiGraphBold } from 'react-icons/pi';
 import { Color } from '../../index.css';
 import { ButtonIcon } from '../common/ButtonIcon';
 import { Icon } from '../common/Icon';
@@ -23,6 +23,7 @@ import * as styles from './SpellExercise.css';
 const NORMAL_REVEAL_PREFIX = 1;
 const ADVANCED_REVEAL_PREFIX = 0;
 const EXTRA_CHARACTERS_CHAR = '_';
+const ADVANCED_MAX_PROPERTIES = 2;
 
 export type SpellExerciseProps = {
   word: WordFieldsFullFragment;
@@ -33,11 +34,6 @@ export type SpellExerciseProps = {
   advanced?: boolean;
 };
 
-type SpellProperty = {
-  name: string | null;
-  value: string;
-};
-
 export const SpellExercise: React.FC<SpellExerciseProps> = ({
   word,
   properties,
@@ -46,54 +42,42 @@ export const SpellExercise: React.FC<SpellExerciseProps> = ({
   onNext,
   advanced,
 }) => {
-  const [{ name: propertyName, value: propertyValue }] =
-    useState<SpellProperty>(() =>
-      getSpellProperty(word, properties, advanced ?? false),
-    );
   const [revealPrefix, setRevealPrefix] = useState(
     advanced ? ADVANCED_REVEAL_PREFIX : NORMAL_REVEAL_PREFIX,
   );
-  const [input, setInput] = useState(propertyValue.slice(0, revealPrefix));
-  const [result, setResult] = useState<boolean | null>(null);
-  const [highlights, setHighlights] = useState<Array<Color | null>>(
-    Array(revealPrefix).fill('primary'),
+  const [isSubmitted, setSubmitted] = useState<boolean>(false);
+  const [wordProperties] = useState(() =>
+    advanced ? getExerciseProperties(word, properties) : [],
   );
+  const [partialResults, setPartialResults] = useState<Record<string, boolean>>(
+    {},
+  );
+  const [result, setResult] = useState<boolean | null>(null);
+  const hasResult = result !== null;
 
   const { t } = useTranslation();
 
-  const isSubmitted = result !== null;
-  const canSubmit =
-    !isSubmitted && (advanced || input.length === propertyValue.length);
-
-  const handleInput = (value: string) => {
-    if (value.length >= revealPrefix) {
-      setInput(value);
+  useEffect(() => {
+    const partialResultValues = Object.values(partialResults);
+    if (hasResult || partialResultValues.length < wordProperties.length + 1) {
+      return;
     }
+
+    const result = partialResultValues.every((value) => value);
+    setResult(result);
+    if (result) {
+      onSuccess();
+    } else {
+      onFailure();
+    }
+  }, [hasResult, partialResults, onFailure, onSuccess, wordProperties]);
+
+  const handlePartialResult = (propertyId: string, result: boolean) => {
+    setPartialResults((results) => ({ ...results, [propertyId]: result }));
   };
 
   const handleSubmit = () => {
-    if (input === propertyValue) {
-      setResult(true);
-      onSuccess();
-    } else {
-      setResult(false);
-      onFailure();
-    }
-
-    let verifiedInput = propertyValue;
-    const verifiedHighlights = propertyValue
-      .split('')
-      .map((char, i) => (char === input[i] ? 'primary' : 'negative'));
-    if (
-      input.length > propertyValue.length &&
-      input.slice(0, propertyValue.length) === propertyValue
-    ) {
-      verifiedInput += EXTRA_CHARACTERS_CHAR;
-      verifiedHighlights.push('negative');
-    }
-
-    setInput(verifiedInput);
-    setHighlights(verifiedHighlights);
+    setSubmitted(true);
   };
 
   const handleNext = () => {
@@ -106,11 +90,6 @@ export const SpellExercise: React.FC<SpellExerciseProps> = ({
 
   const handleHint = () => {
     setRevealPrefix(NORMAL_REVEAL_PREFIX);
-    setInput(
-      propertyValue.slice(0, NORMAL_REVEAL_PREFIX) +
-        input.slice(NORMAL_REVEAL_PREFIX),
-    );
-    setHighlights(Array(NORMAL_REVEAL_PREFIX).fill('primary'));
   };
 
   return (
@@ -121,22 +100,134 @@ export const SpellExercise: React.FC<SpellExerciseProps> = ({
         value={word.translation}
         text="translation"
         size="large"
-        onChange={() => {}}
         disabled
       />
 
-      <div className={styles.propertyLabel}>
-        <Icon icon={FaBookOpen} size="small" />
-        {t('exercise.word')}
-        {propertyName && (
-          <>
-            <span className={styles.propertyLabelDivider}>{'—'}</span>
-            <Icon icon={PiGraphBold} size="small" />
-            {propertyName}
-          </>
-        )}
-      </div>
+      <SpellTextExerciseProperty
+        word={word}
+        property={null}
+        isSubmitted={isSubmitted}
+        revealPrefix={revealPrefix}
+        advanced={advanced}
+        onResult={(result) => handlePartialResult('original', result)}
+      />
 
+      {wordProperties.map((property) => (
+        <SpellTextExerciseProperty
+          key={property.id}
+          word={word}
+          property={property as TextPropertyFieldsFragment}
+          isSubmitted={isSubmitted}
+          revealPrefix={revealPrefix}
+          advanced={advanced}
+          onResult={(result) => handlePartialResult(property.id, result)}
+        />
+      ))}
+
+      <div className={styles.result}>
+        {advanced && (
+          <ButtonIcon
+            icon={BsFillLightbulbFill}
+            onClick={handleHint}
+            disabled={isSubmitted || revealPrefix !== ADVANCED_REVEAL_PREFIX}
+          />
+        )}
+
+        <ButtonIcon
+          icon={!hasResult || result ? FaCheck : FaMinus}
+          color={!hasResult || result ? 'primary' : 'negative'}
+          onClick={handleSubmit}
+          disabled={isSubmitted}
+          toggled={hasResult}
+        />
+
+        <ButtonIcon
+          icon={!hasResult ? FaMinus : FaAngleDoubleRight}
+          {...(!hasResult && { color: 'negative' })}
+          onClick={handleNext}
+        />
+      </div>
+    </div>
+  );
+};
+
+type SpellTextExercisePropertyProps = {
+  word: WordFieldsFullFragment;
+  property: TextPropertyFieldsFragment | null;
+  isSubmitted: boolean;
+  revealPrefix: number;
+  advanced?: boolean;
+  onResult: (result: boolean) => void;
+};
+
+const SpellTextExerciseProperty: React.FC<SpellTextExercisePropertyProps> = ({
+  word,
+  property,
+  isSubmitted,
+  revealPrefix,
+  advanced,
+  onResult,
+}) => {
+  const propertyValue = useMemo(() => {
+    if (!property) {
+      return word.original;
+    }
+
+    const wordProperty = word.properties.find(
+      (prop) => prop.property.id === property.id,
+    ) as TextPropertyValueFieldsFragment;
+    return wordProperty.text;
+  }, [word, property]);
+
+  const [input, setInput] = useState(propertyValue.slice(0, revealPrefix));
+  const [highlights, setHighlights] = useState<Array<Color | null>>(
+    Array(revealPrefix).fill('primary'),
+  );
+
+  const { t } = useTranslation();
+
+  useEffect(() => {
+    setInput(
+      (input) =>
+        propertyValue.slice(0, revealPrefix) + input.slice(revealPrefix),
+    );
+    setHighlights(Array(revealPrefix).fill('primary'));
+  }, [propertyValue, revealPrefix]);
+
+  const handleInput = (value: string) => {
+    if (value.length >= revealPrefix) {
+      setInput(value);
+    }
+  };
+
+  useEffect(() => {
+    if (isSubmitted) {
+      onResult(input === propertyValue);
+
+      let verifiedInput = propertyValue;
+      const verifiedHighlights = propertyValue
+        .split('')
+        .map((char, i) => (char === input[i] ? 'primary' : 'negative'));
+      if (
+        input.length > propertyValue.length &&
+        input.slice(0, propertyValue.length) === propertyValue
+      ) {
+        verifiedInput += EXTRA_CHARACTERS_CHAR;
+        verifiedHighlights.push('negative');
+      }
+
+      setInput(verifiedInput);
+      setHighlights(verifiedHighlights);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSubmitted]);
+
+  return (
+    <div className={styles.property}>
+      <div className={styles.propertyLabel}>
+        {!property && <Icon icon={FaBookOpen} size="small" />}
+        {!property ? t('exercise.word') : property.name}
+      </div>
       <SpellInput
         value={input}
         onChange={handleInput}
@@ -145,52 +236,31 @@ export const SpellExercise: React.FC<SpellExerciseProps> = ({
         obscureLength={advanced && !isSubmitted}
         highlights={highlights}
       />
-
-      <div className={styles.result}>
-        {advanced && (
-          <ButtonIcon
-            icon={BsFillLightbulbFill}
-            onClick={handleHint}
-            disabled={!canSubmit || revealPrefix !== ADVANCED_REVEAL_PREFIX}
-          />
-        )}
-
-        <ButtonIcon
-          icon={!isSubmitted || result ? FaCheck : FaMinus}
-          color={!isSubmitted || result ? 'primary' : 'negative'}
-          onClick={handleSubmit}
-          disabled={!canSubmit}
-          toggled={isSubmitted}
-        />
-
-        <ButtonIcon
-          icon={!isSubmitted ? FaMinus : FaAngleDoubleRight}
-          {...(!isSubmitted && { color: 'negative' })}
-          onClick={handleNext}
-        />
-      </div>
     </div>
   );
 };
 
-function getSpellProperty(
+function getExerciseProperties(
   word: WordFieldsFullFragment,
   allProperties: PropertyFieldsFragment[],
-  advanced: boolean,
-): SpellProperty {
-  let randomPropertyValue: TextPropertyValueFieldsFragment | null = null;
-  let randomProperty: PropertyFieldsFragment | null = null;
-  if (advanced) {
-    const properties = [null, ...word.properties];
-    randomPropertyValue = properties[
-      Math.floor(Math.random() * properties.length)
-    ] as TextPropertyValueFieldsFragment | null;
-    randomProperty = allProperties.find(
-      (prop) => prop.id === randomPropertyValue?.property.id,
-    )!;
+): PropertyFieldsFragment[] {
+  const wordPropertyIds = word.properties.map((prop) => prop.property.id);
+  const selectedPropertyIds: string[] = [];
+  while (
+    wordPropertyIds.length &&
+    selectedPropertyIds.length < ADVANCED_MAX_PROPERTIES
+  ) {
+    const randomIndex = Math.floor(Math.random() * wordPropertyIds.length);
+    selectedPropertyIds.push(wordPropertyIds[randomIndex]);
+    wordPropertyIds.splice(randomIndex, 1);
   }
 
-  return randomPropertyValue && randomProperty
-    ? { name: randomProperty.name, value: randomPropertyValue.text }
-    : { name: null, value: word.original };
+  const selectedProperties = selectedPropertyIds.map(
+    (propId) =>
+      allProperties.find(
+        (prop) => prop.id === propId,
+      ) as PropertyFieldsFragment,
+  );
+
+  return selectedProperties.sort((p1, p2) => p1.order - p2.order);
 }

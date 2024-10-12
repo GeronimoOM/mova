@@ -28,7 +28,8 @@ export const ExerciseCard: React.FC = () => {
 
   const [isStarted, setIsStarted] = useState(false);
   const [wordIndex, setWordIndex] = useState(-1);
-  const [isWordDetailsOpen, setIsWordDetailsOpen] = useState(false);
+  const [isInfoAvailable, setInfoAvailable] = useState(false);
+  const [isInfoOpen, setInfoOpen] = useState(false);
 
   const { data: propertiesQuery, loading: propertiesLoading } = useQuery(
     GetPropertiesDocument,
@@ -81,7 +82,7 @@ export const ExerciseCard: React.FC = () => {
     setIsStarted(true);
     words ? refetchExerciseWords() : fetchExerciseWords();
     setWordIndex(0);
-    setIsWordDetailsOpen(false);
+    setInfoOpen(false);
   };
 
   const handleNext = () => {
@@ -90,24 +91,27 @@ export const ExerciseCard: React.FC = () => {
     } else {
       handleStart();
     }
-    setIsWordDetailsOpen(false);
+    setInfoAvailable(false);
+    setInfoOpen(false);
   };
 
   const handleSuccess = () => {
+    setInfoAvailable(true);
     attemptMastery({
       variables: { wordId: currentWord!.id, success: true },
     });
   };
 
   const handleFailure = () => {
+    setInfoAvailable(true);
     attemptMastery({
       variables: { wordId: currentWord!.id, success: false },
     });
   };
 
   const handleClose = () => {
-    if (isWordDetailsOpen) {
-      setIsWordDetailsOpen(false);
+    if (isInfoOpen) {
+      setInfoOpen(false);
     } else {
       setIsStarted(false);
     }
@@ -132,10 +136,10 @@ export const ExerciseCard: React.FC = () => {
                 onNext={handleNext}
               />
 
-              {isWordDetailsOpen && currentWord && (
+              {isInfoOpen && currentWord && (
                 <WordDetailsOverlay
                   wordId={currentWord.id}
-                  onClose={() => setIsWordDetailsOpen(false)}
+                  onClose={() => setInfoOpen(false)}
                 />
               )}
             </div>
@@ -143,8 +147,9 @@ export const ExerciseCard: React.FC = () => {
             <div className={styles.bottom}>
               <ButtonIcon
                 icon={FaInfo}
-                onClick={() => setIsWordDetailsOpen(!isWordDetailsOpen)}
-                toggled={isWordDetailsOpen}
+                onClick={() => setInfoOpen(!isInfoOpen)}
+                disabled={!isInfoAvailable}
+                toggled={isInfoOpen}
               />
 
               <ButtonIcon

@@ -180,7 +180,6 @@ export const PropertyListItemOverlay: React.FC = () => {
       <div className={styles.content}>
         <Input
           value={property?.name ?? ''}
-          onChange={() => {}}
           text={'translation'}
           size={'large'}
         />

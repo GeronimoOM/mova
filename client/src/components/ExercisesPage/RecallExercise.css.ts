@@ -4,18 +4,23 @@ import { themeVars } from '../../index.css';
 export const wrapper = style({
   display: 'flex',
   flexDirection: 'column',
-  gap: 10,
+  gap: 15,
 });
 
 export const title = style({
-  margin: 10,
+  padding: 5,
   textAlign: 'center',
   color: themeVars.color.muted,
   fontWeight: 'bold',
 });
 
+export const translation = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 5,
+});
+
 export const translationLabel = style({
-  marginTop: 20,
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
@@ -31,7 +36,7 @@ export const translationRow = style({
 });
 
 export const result = style({
-  marginTop: 20,
+  marginTop: 10,
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'center',

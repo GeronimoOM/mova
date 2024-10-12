@@ -3,7 +3,7 @@ import { WordFieldsFullFragment } from '../../api/types/graphql';
 
 import classNames from 'classnames';
 import { useCallback, useState } from 'react';
-import { FaCheck, FaMinus } from 'react-icons/fa';
+import { FaAngleDoubleRight, FaCheck, FaMinus } from 'react-icons/fa';
 import { FaEye } from 'react-icons/fa6';
 
 import { useTranslation } from 'react-i18next';
@@ -26,61 +26,69 @@ export const RecallExercise: React.FC<RecallExerciseProps> = ({
   onNext,
 }) => {
   const [isRevealed, setIsRevealed] = useState(false);
+  const [result, setResult] = useState<boolean | null>(null);
+  const isSubmitted = result !== null;
 
   const { t } = useTranslation();
 
   const handleSuccess = useCallback(() => {
+    setResult(true);
     onSuccess();
-    onNext();
-  }, [onNext, onSuccess]);
+  }, [onSuccess]);
 
   const handleFailure = useCallback(() => {
+    setResult(false);
     onFailure();
-    onNext();
-  }, [onFailure, onNext]);
+  }, [onFailure]);
 
   return (
     <div className={styles.wrapper}>
       <div className={styles.title}>{t('exercise.recall')}</div>
 
-      <Input value={word.original} size="large" onChange={() => {}} disabled />
+      <Input value={word.original} size="large" disabled />
 
-      <div className={styles.translationLabel}>
-        <Icon icon={BsTranslate} size="small" />
-        {t('exercise.translation')}
-      </div>
+      <div className={styles.translation}>
+        <div className={styles.translationLabel}>
+          <Icon icon={BsTranslate} size="small" />
+          {t('exercise.translation')}
+        </div>
 
-      <div
-        className={classNames(
-          styles.translationRow,
-          classNames({ revealed: isRevealed }),
-        )}
-      >
-        <Input
-          value={word.translation}
-          text="translation"
-          size="large"
-          onChange={() => {}}
-          disabled
-          obscured={!isRevealed}
-        />
+        <div
+          className={classNames(
+            styles.translationRow,
+            classNames({ revealed: isRevealed }),
+          )}
+        >
+          <Input
+            value={word.translation}
+            text="translation"
+            size="large"
+            disabled
+            obscured={!isRevealed}
+          />
 
-        <ButtonIcon
-          icon={FaEye}
-          onClick={() => setIsRevealed(true)}
-          disabled={isRevealed}
-        />
+          <ButtonIcon
+            icon={FaEye}
+            onClick={() => setIsRevealed(true)}
+            disabled={isRevealed}
+          />
+        </div>
       </div>
 
       <div className={styles.result}>
         <ButtonIcon
-          icon={FaCheck}
+          icon={!isSubmitted || result ? FaCheck : FaMinus}
+          color={!isSubmitted || result ? 'primary' : 'negative'}
           onClick={handleSuccess}
-          color="primary"
-          highlighted={true}
+          disabled={isSubmitted}
+          toggled={isSubmitted}
         />
 
-        <ButtonIcon icon={FaMinus} onClick={handleFailure} color="negative" />
+        <ButtonIcon
+          icon={!isSubmitted ? FaMinus : FaAngleDoubleRight}
+          onClick={isSubmitted ? onNext : handleFailure}
+          {...(!isSubmitted && { color: 'negative' })}
+        />
       </div>
     </div>
   );
