@@ -48,6 +48,12 @@ db.version(2)
     await destroy();
   });
 
+db.version(3)
+  .stores(indices)
+  .upgrade(async () => {
+    await destroy();
+  });
+
 export async function getState(): Promise<SyncState> {
   return (await db.state.get(1))!;
 }
@@ -287,6 +293,10 @@ export async function updateWord(
         ...(wordUpdate.original && { original: wordUpdate.original }),
         ...(wordUpdate.translation && { translation: wordUpdate.translation }),
         ...(properties && { properties }),
+        ...(wordUpdate.mastery && { mastery: wordUpdate.mastery }),
+        ...(wordUpdate.nextExerciseAt && {
+          nextExerciseAt: wordUpdate.nextExerciseAt,
+        }),
       });
     });
   }

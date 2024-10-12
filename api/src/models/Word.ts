@@ -52,6 +52,7 @@ export interface WordUpdate {
   translation?: string;
   properties?: Record<PropertyId, PropertyValueSave>;
   mastery?: number;
+  nextExerciseAt?: DateTime;
 }
 
 export type ChronologicalCursor = Static<typeof ChronologicalCursor>;

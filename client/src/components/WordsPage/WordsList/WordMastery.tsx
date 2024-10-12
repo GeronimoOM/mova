@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next';
 import { breakpoints } from '../../../index.css';
 import { DISPLAY_DATE_TIME_FORMAT } from '../../../utils/constants';
 import { fromTimestamp } from '../../../utils/datetime';
-import { MaxMastery } from '../../../utils/mastery';
 import { useMediaQuery } from '../../../utils/useMediaQuery';
 import { useLocaleContext } from '../../LocaleContext';
 import { Icon } from '../../common/Icon';
@@ -28,9 +27,7 @@ export const WordMastery: React.FC<WordMasteryProps> = ({
 
   return (
     <Tooltip
-      content={
-        <WordMasteryTooltip mastery={mastery} nextExerciseAt={nextExerciseAt} />
-      }
+      content={<WordMasteryTooltip nextExerciseAt={nextExerciseAt} />}
       side={isSmall ? 'left' : 'bottomLeft'}
     >
       <div className={styles.mastery}>
@@ -48,18 +45,15 @@ export const WordMastery: React.FC<WordMasteryProps> = ({
   );
 };
 
-const WordMasteryTooltip: React.FC<WordMasteryProps> = ({
-  mastery,
-  nextExerciseAt,
-}) => {
+const WordMasteryTooltip: React.FC<
+  Pick<WordMasteryProps, 'nextExerciseAt'>
+> = ({ nextExerciseAt }) => {
   const [locale] = useLocaleContext();
   const { t } = useTranslation();
 
   let tooltip: string;
   let formattedNextExerciseAt: string | null = null;
-  if (mastery === MaxMastery) {
-    tooltip = t('words.mastery.mastered');
-  } else if (nextExerciseAt) {
+  if (nextExerciseAt) {
     const nextExerciseAtDate = fromTimestamp(nextExerciseAt)!;
     if (nextExerciseAtDate >= DateTime.utc()) {
       tooltip = t('words.mastery.nextExerciseAt');

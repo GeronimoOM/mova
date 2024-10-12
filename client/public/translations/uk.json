@@ -19,8 +19,7 @@
       "search": "жодного слова не знайдено"
     },
     "mastery": {
-      "mastered": "cлово вивчено",
-      "nextExerciseAt": "наступна вправа о:",
+      "nextExerciseAt": "наступна вправа о",
       "exerciseReady": "вправа готова"
     },
     "existing": "уже додано"

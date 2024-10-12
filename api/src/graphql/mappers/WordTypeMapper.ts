@@ -69,6 +69,7 @@ export class WordTypeMapper {
       original: wordUpdate.original,
       translation: wordUpdate.translation,
       mastery: wordUpdate.mastery,
+      nextExerciseAt: wordUpdate.nextExerciseAt,
       ...(wordUpdate.properties && {
         properties: Object.values(wordUpdate.properties),
       }),

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { DateTime } from 'luxon';
 import {
   BaseChange,
@@ -33,9 +33,15 @@ import {
 } from 'models/PropertyValue';
 import { PartOfSpeech, Word } from 'models/Word';
 import * as records from 'utils/records';
+import { ExerciseService } from './ExerciseService';
 
 @Injectable()
 export class ChangeBuilder {
+  constructor(
+    @Inject(forwardRef(() => ExerciseService))
+    private exerciseService: ExerciseService,
+  ) {}
+
   buildCreateLanguageChange(
     ctx: Context,
     language: Language,
@@ -204,11 +210,16 @@ export class ChangeBuilder {
         return false;
       },
     );
+    const nextExerciseAt = this.exerciseService.getNextExerciseAt(word);
+    const currentNextExerciseAt =
+      this.exerciseService.getNextExerciseAt(currentWord);
+
     if (
       word.original === currentWord.original &&
       word.translation === currentWord.translation &&
       !propertiesDiff &&
-      word.mastery === currentWord.mastery
+      word.mastery === currentWord.mastery &&
+      nextExerciseAt === currentNextExerciseAt
     ) {
       return null;
     }
@@ -240,6 +251,9 @@ export class ChangeBuilder {
         }),
         ...(word.mastery !== currentWord.mastery && {
           mastery: word.mastery,
+        }),
+        ...(nextExerciseAt !== currentNextExerciseAt && {
+          nextExerciseAt,
         }),
       },
     };

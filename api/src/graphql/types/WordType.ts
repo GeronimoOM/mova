@@ -38,8 +38,8 @@ export class WordType {
   @Field((type) => Int)
   mastery: number;
 
-  @Field((type) => TimestampScalar, { nullable: true })
-  nextExerciseAt?: DateTime;
+  @Field((type) => TimestampScalar)
+  nextExerciseAt: DateTime;
 
   @Field((type) => ID)
   languageId: LanguageId;

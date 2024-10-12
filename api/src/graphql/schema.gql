@@ -96,7 +96,7 @@ type Word {
   partOfSpeech: PartOfSpeech!
   addedAt: Timestamp!
   mastery: Int!
-  nextExerciseAt: Timestamp
+  nextExerciseAt: Timestamp!
   languageId: ID!
   properties: [PropertyValue!]!
 }
@@ -136,7 +136,7 @@ type WordCreate {
   partOfSpeech: PartOfSpeech!
   addedAt: Timestamp!
   mastery: Int!
-  nextExerciseAt: Timestamp
+  nextExerciseAt: Timestamp!
   languageId: ID!
   properties: [PropertyValueSave!]!
 }
@@ -166,6 +166,7 @@ type WordUpdate {
   translation: String
   properties: [PropertyValueSave!]
   mastery: Int
+  nextExerciseAt: Timestamp
 }
 
 type ChangePage {

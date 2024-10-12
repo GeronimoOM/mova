@@ -19,8 +19,7 @@
       "search": "sõnu pole leitud"
     },
     "mastery": {
-      "mastered": "sõna on valdatud",
-      "nextExerciseAt": "järgmine harjutus:",
+      "nextExerciseAt": "järgmine harjutus kell",
       "exerciseReady": "harjutus on valmis"
     },
     "existing": "on juba lisatud"

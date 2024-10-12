@@ -21,16 +21,18 @@ import { ProgressService } from './ProgressService';
 
 const DEFAULT_EXERCISE_WORDS_TOTAL = 20;
 
-const MASTERY_DISTRIBUTION: Record<Exclude<WordMastery, 3>, number> = {
+const MASTERY_DISTRIBUTION: Record<WordMastery, number> = {
   0: 0.5,
   1: 0.3,
-  2: 0.2,
+  2: 0.15,
+  3: 0.05,
 };
 
-const MASTERY_INC_DELAY: Record<Exclude<WordMastery, 3>, Duration> = {
+const MASTERY_INC_DELAY: Record<WordMastery, Duration> = {
   0: Duration.fromObject({ hours: 1 }),
   1: Duration.fromObject({ hours: 12 }),
   2: Duration.fromObject({ hours: 24 * 3 }),
+  3: Duration.fromObject({ hours: 24 * 21 }),
 };
 
 const MASTERY_ATTEMPT_DELAY = Duration.fromObject({ hours: 1 });
@@ -52,6 +54,7 @@ export class ExerciseService {
     @Inject(forwardRef(() => ChangeService))
     private changeService: ChangeService,
     private progressService: ProgressService,
+    @Inject(forwardRef(() => ChangeBuilder))
     private changeBuilder: ChangeBuilder,
     private connectionManager: DbConnectionManager,
   ) {}
@@ -62,12 +65,10 @@ export class ExerciseService {
   }: GetExerciseWordsParams): Promise<Word[]> {
     const wordsByMastery = Object.fromEntries(
       await Promise.all(
-        WordMasteries.filter((mastery) => mastery < MaxWordMastery).map(
-          async (mastery) => [
-            mastery,
-            await this.getWordsByMastery(languageId, mastery, total),
-          ],
-        ),
+        WordMasteries.map(async (mastery) => [
+          mastery,
+          await this.getWordsByMastery(languageId, mastery, total),
+        ]),
       ),
     ) as Record<WordMastery, Word[]>;
 
@@ -87,7 +88,7 @@ export class ExerciseService {
     );
     for (
       let mastery = 0;
-      mastery < WordMasteries.length - 1 && sum < total;
+      sum < total && mastery < WordMasteries.length;
       mastery++
     ) {
       const masteryDistributionExtra = Math.min(
@@ -108,7 +109,7 @@ export class ExerciseService {
 
   async getCount(languageId: LanguageId): Promise<number> {
     const counts = await Promise.all(
-      WordMasteries.filter((mastery) => mastery < MaxWordMastery).map(
+      WordMasteries.map(
         async (mastery) =>
           await this.wordRepository.getExerciseCount({
             languageId,
@@ -143,37 +144,31 @@ export class ExerciseService {
       throw new Error('Word mastery cannot be increased yet');
     }
 
-    if (!params.success) {
-      const word = {
-        ...currentWord,
-        masteryAttemptAt: DateTime.utc(),
-      };
-      await this.wordRepository.update(word);
-
-      return word;
-    }
-
+    const now = DateTime.utc();
     const word = {
       ...currentWord,
-      mastery: Math.min(currentWord.mastery + 1, MaxWordMastery),
+      masteryAttemptAt: now,
+      ...(params.success && {
+        masteryIncAt: now,
+        mastery: Math.min(currentWord.mastery + 1, MaxWordMastery),
+      }),
     };
-
     const change = this.changeBuilder.buildUpdateWordChange(
       ctx,
       word,
       currentWord,
     );
-    word.masteryIncAt = change?.changedAt ?? DateTime.utc();
-    word.masteryAttemptAt = word.masteryIncAt;
+    change.changedAt = now;
 
     await this.connectionManager.transactionally(async () => {
       await this.wordRepository.update(word);
       change && (await this.changeService.create(change));
-      await this.progressService.saveProgress(word.languageId, {
-        id: uuid(),
-        type: ProgressType.Mastery,
-        date: change.changedAt,
-      });
+      params.success &&
+        (await this.progressService.saveProgress(word.languageId, {
+          id: uuid(),
+          type: ProgressType.Mastery,
+          date: change.changedAt,
+        }));
     });
 
     return word;
@@ -184,11 +179,7 @@ export class ExerciseService {
       Word,
       'mastery' | 'addedAt' | 'masteryIncAt' | 'masteryAttemptAt'
     >,
-  ): DateTime | null {
-    if (word.mastery === MaxWordMastery) {
-      return null;
-    }
-
+  ): DateTime {
     const masteryDelayUntil = (word.masteryIncAt ?? word.addedAt).plus(
       MASTERY_INC_DELAY[word.mastery],
     );
@@ -199,7 +190,7 @@ export class ExerciseService {
       ? DateTime.max(masteryDelayUntil, attemptDelayUntil)
       : masteryDelayUntil;
 
-    return maxDelayUntil > DateTime.utc() ? maxDelayUntil : null;
+    return maxDelayUntil;
   }
 
   private async getWordsByMastery(

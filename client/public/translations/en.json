@@ -19,8 +19,7 @@
       "search": "no words found"
     },
     "mastery": {
-      "mastered": "word is mastered",
-      "nextExerciseAt": "next exercise at:",
+      "nextExerciseAt": "next exercise at",
       "exerciseReady": "exercise is ready"
     },
     "existing": "already added"

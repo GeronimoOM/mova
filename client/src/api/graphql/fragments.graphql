@@ -178,6 +178,8 @@ fragment UpdateWordChangeFields on UpdateWordChange {
     id
     original
     translation
+    mastery
+    nextExerciseAt
     properties {
       ...PropertyValueSaveFields
     }
