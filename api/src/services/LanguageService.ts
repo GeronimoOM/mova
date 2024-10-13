@@ -4,7 +4,7 @@ import { Context } from 'models/Context';
 import { Language, LanguageId } from 'models/Language';
 import { DbConnectionManager } from 'repositories/DbConnectionManager';
 import { LanguageRepository } from 'repositories/LanguageRepository';
-import { copy } from 'utils/copy';
+import { Serializer } from 'repositories/Serializer';
 import { v1 as uuid } from 'uuid';
 import { ChangeBuilder } from './ChangeBuilder';
 import { ChangeService } from './ChangeService';
@@ -40,6 +40,7 @@ export class LanguageService {
     private changeService: ChangeService,
     private changeBuilder: ChangeBuilder,
     private connectionManager: DbConnectionManager,
+    private serializer: Serializer,
   ) {}
 
   async getAll(ctx: Context): Promise<Language[]> {
@@ -90,7 +91,7 @@ export class LanguageService {
 
   async update(ctx: Context, params: UpdateLanguageParams): Promise<Language> {
     const language = await this.getById(ctx, params.id);
-    const currentLanguage = copy(language);
+    const currentLanguage = this.serializer.copy(language);
 
     language.name = params.name.trim();
 

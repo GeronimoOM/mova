@@ -2,7 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { DateTime } from 'luxon';
 import { fromTimestamp, toTimestamp } from 'utils/datetime';
 
-const DATETIME_KEYS = ['addedAt', 'changedAt'];
+const DATETIME_KEYS = [
+  'addedAt',
+  'changedAt',
+  'masteryIncAt',
+  'masteryAttemptAt',
+];
 
 @Injectable()
 export class Serializer {
@@ -22,6 +27,10 @@ export class Serializer {
       }
       return value;
     });
+  }
+
+  copy<T>(obj: T): T {
+    return this.deserialize(this.serialize(obj));
   }
 
   private isDateTimeKey(key: string): boolean {

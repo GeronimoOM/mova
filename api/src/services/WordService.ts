@@ -14,12 +14,12 @@ import {
 } from 'models/Property';
 import { PartOfSpeech, Word, WordCursor, WordId, WordOrder } from 'models/Word';
 import { DbConnectionManager } from 'repositories/DbConnectionManager';
+import { Serializer } from 'repositories/Serializer';
 import {
   GetWordPageParams as RepoGetWordPageParams,
   WordRepository,
 } from 'repositories/WordRepository';
 import { QUERY_MIN_LENGTH } from 'utils/constants';
-import { copy } from 'utils/copy';
 import * as records from 'utils/records';
 import { v1 as uuid } from 'uuid';
 import { ChangeBuilder } from './ChangeBuilder';
@@ -81,6 +81,7 @@ export class WordService {
     private progressService: ProgressService,
     private changeBuilder: ChangeBuilder,
     private connectionManager: DbConnectionManager,
+    private serializer: Serializer,
   ) {}
 
   async getById(ctx: Context, wordId: WordId): Promise<Word> {
@@ -168,7 +169,7 @@ export class WordService {
 
   async update(ctx: Context, params: UpdateWordParams): Promise<Word> {
     const word = await this.getById(ctx, params.id);
-    const currentWord = copy(word);
+    const currentWord = this.serializer.copy(word);
 
     if (params.original) {
       word.original = params.original.trim();

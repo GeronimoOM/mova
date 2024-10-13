@@ -15,8 +15,8 @@ import {
 import { PartOfSpeech } from 'models/Word';
 import { DbConnectionManager } from 'repositories/DbConnectionManager';
 import { PropertyRepository } from 'repositories/PropertyRepository';
+import { Serializer } from 'repositories/Serializer';
 import * as arrays from 'utils/arrays';
-import { copy } from 'utils/copy';
 import { v1 as uuid } from 'uuid';
 import { ChangeBuilder } from './ChangeBuilder';
 import { ChangeService } from './ChangeService';
@@ -75,6 +75,7 @@ export class PropertyService {
     private changeService: ChangeService,
     private changeBuilder: ChangeBuilder,
     private connectionManager: DbConnectionManager,
+    private serializer: Serializer,
   ) {}
 
   async getByLanguageId(
@@ -116,11 +117,10 @@ export class PropertyService {
   async create(ctx: Context, params: CreatePropertyParams): Promise<Property> {
     await this.languageService.getById(ctx, params.languageId);
 
-    const order =
-      (await this.propertyRepository.getCount(
-        params.languageId,
-        params.partOfSpeech,
-      )) + 1;
+    const order = await this.propertyRepository.getCount(
+      params.languageId,
+      params.partOfSpeech,
+    );
 
     const baseProperty: BaseProperty = {
       id: params.id ?? uuid(),
@@ -163,7 +163,7 @@ export class PropertyService {
 
   async update(ctx: Context, params: UpdatePropertyParams): Promise<Property> {
     const property = await this.getById(ctx, params.id);
-    const currentProperty = copy(property);
+    const currentProperty = this.serializer.copy(property);
 
     if (params.name) {
       property.name = params.name.trim();
