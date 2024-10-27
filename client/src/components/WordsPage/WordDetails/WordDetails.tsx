@@ -196,7 +196,7 @@ export const WordDetails: React.FC<WordDetailsProps> = ({
               <WordDetailsProperty
                 key={property.id}
                 property={property}
-                propertyValue={word.properties?.[property.id] ?? null}
+                wordProperty={word.properties?.[property.id] ?? null}
                 onChange={setPropertyValue}
                 simplified={simplified}
               />
