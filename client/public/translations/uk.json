@@ -108,6 +108,7 @@
     "mastered": "вивчено"
   },
   "users": {
+    "includeMastered": "Запитувати вивчені слова",
     "logout": "Вийти"
   }
 }

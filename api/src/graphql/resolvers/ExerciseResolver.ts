@@ -24,10 +24,11 @@ export class ExerciseResolver {
 
   @ResolveField((type) => [WordType])
   async exerciseWords(
+    @ContextDec() ctx: Context,
     @Parent() language: LanguageType,
     @Args('total', { type: () => Int, nullable: true }) total: number,
   ): Promise<WordType[]> {
-    const words = await this.exerciseService.getWords({
+    const words = await this.exerciseService.getWords(ctx, {
       languageId: language.id,
       total,
     });
@@ -35,8 +36,11 @@ export class ExerciseResolver {
   }
 
   @ResolveField((type) => Int)
-  async exerciseCount(@Parent() language: LanguageType): Promise<number> {
-    return await this.exerciseService.getCount(language.id);
+  async exerciseCount(
+    @ContextDec() ctx: Context,
+    @Parent() language: LanguageType,
+  ): Promise<number> {
+    return await this.exerciseService.getCount(ctx, language.id);
   }
 
   @Mutation((returns) => WordType)

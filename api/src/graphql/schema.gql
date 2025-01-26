@@ -328,6 +328,7 @@ type UserSettings {
   selectedLanguageId: ID
   selectedLocale: String
   selectedFont: String
+  includeMastered: Boolean
 }
 
 type WordsStatsMastery {
@@ -479,4 +480,5 @@ input UpdateUserSettingsInput {
   selectedLanguageId: ID
   selectedLocale: String
   selectedFont: String
+  includeMastered: Boolean
 }

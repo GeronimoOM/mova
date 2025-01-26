@@ -1,5 +1,6 @@
 import { EE, FlagComponent, GB, UA } from 'country-flag-icons/react/1x1';
 import React from 'react';
+import { FaRepeat } from 'react-icons/fa6';
 import { MdLogout } from 'react-icons/md';
 
 import classNames from 'classnames';
@@ -8,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { AppRoute } from '../../routes';
 import { useAuthContext } from '../AuthContext';
 import { Locale, useLocaleContext } from '../LocaleContext';
-import { Font, useStyleContext } from '../StyleContext';
+import { Font, useSettingsContext } from '../SettingsContext';
 import { ButtonIcon } from '../common/ButtonIcon';
 import * as styles from './UserPage.css';
 
@@ -21,7 +22,8 @@ const translationLanguageToFlag: Record<Locale, FlagComponent> = {
 export const UserPage: React.FC = () => {
   const { t } = useTranslation();
   const [locale, setLocale] = useLocaleContext();
-  const [font, setFont] = useStyleContext();
+  const { font, setFont, includeMastered, setIncludeMastered } =
+    useSettingsContext();
   const navigate = useNavigate();
   const { clearAuthToken } = useAuthContext();
 
@@ -45,6 +47,13 @@ export const UserPage: React.FC = () => {
           <FontButton font="default" selected={font} onSelect={setFont} />
 
           <FontButton font="classic" selected={font} onSelect={setFont} />
+        </div>
+
+        <div className={styles.card}>
+          <IncludeMasteredButton
+            includeMastered={includeMastered}
+            onSetIncludeMastered={setIncludeMastered}
+          />
         </div>
 
         <div className={styles.card}>
@@ -103,4 +112,25 @@ const FontButton: React.FC<FontButtonProps> = ({
   );
 };
 
-//AaБб
+type IncludeMasteredButtonProps = {
+  includeMastered: boolean;
+  onSetIncludeMastered: (includeMastered: boolean) => void;
+};
+
+const IncludeMasteredButton: React.FC<IncludeMasteredButtonProps> = ({
+  includeMastered,
+  onSetIncludeMastered,
+}) => {
+  const { t } = useTranslation();
+
+  return (
+    <>
+      <ButtonIcon
+        icon={FaRepeat}
+        toggled={includeMastered}
+        onClick={() => onSetIncludeMastered(!includeMastered)}
+      />
+      {t('users.includeMastered')}
+    </>
+  );
+};

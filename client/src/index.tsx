@@ -6,8 +6,8 @@ import { client, setClientId } from './api/client';
 import { App } from './components/App';
 import { AuthProvider } from './components/AuthContext';
 import { LanguageProvider } from './components/LanguageContext';
-import { LocaleProvider, initTranslator } from './components/LocaleContext.tsx';
-import { StyleProvider } from './components/StyleContext.tsx';
+import { LocaleProvider, initTranslator } from './components/LocaleContext';
+import { SettingsProvider } from './components/SettingsContext';
 import './index.css';
 import { registerServiceWorker } from './sw/client/register';
 import { SwWorkerMessageType } from './sw/worker/messages';
@@ -29,13 +29,13 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <ApolloProvider client={client}>
       <AuthProvider>
         <LocaleProvider>
-          <StyleProvider>
+          <SettingsProvider>
             <LanguageProvider>
               <BrowserRouter>
                 <App />
               </BrowserRouter>
             </LanguageProvider>
-          </StyleProvider>
+          </SettingsProvider>
         </LocaleProvider>
       </AuthProvider>
     </ApolloProvider>

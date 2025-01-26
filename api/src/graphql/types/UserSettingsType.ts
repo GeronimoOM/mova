@@ -11,6 +11,9 @@ export class UserSettingsType {
 
   @Field({ nullable: true })
   selectedFont?: string;
+
+  @Field({ nullable: true })
+  includeMastered?: boolean;
 }
 
 @InputType()
@@ -23,4 +26,7 @@ export class UpdateUserSettingsInput {
 
   @Field({ nullable: true })
   selectedFont?: string;
+
+  @Field({ nullable: true })
+  includeMastered?: boolean;
 }

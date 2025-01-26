@@ -18,6 +18,7 @@ import { v1 as uuid } from 'uuid';
 import { ChangeBuilder } from './ChangeBuilder';
 import { ChangeService } from './ChangeService';
 import { ProgressService } from './ProgressService';
+import { UserService } from './UserService';
 
 const DEFAULT_EXERCISE_WORDS_TOTAL = 20;
 
@@ -54,18 +55,26 @@ export class ExerciseService {
     @Inject(forwardRef(() => ChangeService))
     private changeService: ChangeService,
     private progressService: ProgressService,
+    private userService: UserService,
     @Inject(forwardRef(() => ChangeBuilder))
     private changeBuilder: ChangeBuilder,
     private connectionManager: DbConnectionManager,
   ) {}
 
-  async getWords({
-    languageId,
-    total = DEFAULT_EXERCISE_WORDS_TOTAL,
-  }: GetExerciseWordsParams): Promise<Word[]> {
+  async getWords(
+    ctx: Context,
+    {
+      languageId,
+      total = DEFAULT_EXERCISE_WORDS_TOTAL,
+    }: GetExerciseWordsParams,
+  ): Promise<Word[]> {
+    const includeMastered = await this.getIncludeMastered(ctx);
+
     const wordsByMastery = Object.fromEntries(
       await Promise.all(
-        WordMasteries.map(async (mastery) => [
+        WordMasteries.filter(
+          (mastery) => includeMastered || mastery < MaxWordMastery,
+        ).map(async (mastery) => [
           mastery,
           await this.getWordsByMastery(languageId, mastery, total),
         ]),
@@ -77,7 +86,7 @@ export class ExerciseService {
         mastery,
         Math.min(
           Math.floor(distribution * total),
-          wordsByMastery[mastery].length,
+          wordsByMastery[mastery]?.length ?? 0,
         ),
       ]),
     ) as Record<WordMastery, number>;
@@ -101,15 +110,20 @@ export class ExerciseService {
     }
 
     const words: Word[] = Object.entries(totalByMastery).flatMap(
-      ([mastery, count]) => wordsByMastery[Number(mastery)].slice(0, count),
+      ([mastery, count]) =>
+        wordsByMastery[Number(mastery)]?.slice(0, count) ?? [],
     );
 
     return shuffle(words);
   }
 
-  async getCount(languageId: LanguageId): Promise<number> {
+  async getCount(ctx: Context, languageId: LanguageId): Promise<number> {
+    const includeMastered = await this.getIncludeMastered(ctx);
+
     const counts = await Promise.all(
-      WordMasteries.map(
+      WordMasteries.filter(
+        (mastery) => includeMastered || mastery < MaxWordMastery,
+      ).map(
         async (mastery) =>
           await this.wordRepository.getExerciseCount({
             languageId,
@@ -208,5 +222,11 @@ export class ExerciseService {
         masteryAttemptOlderThan: MASTERY_ATTEMPT_DELAY,
       })
     ).items;
+  }
+
+  private async getIncludeMastered(ctx: Context): Promise<boolean> {
+    return ctx.user
+      ? (await this.userService.getSettings(ctx.user.id)).includeMastered
+      : true;
   }
 }

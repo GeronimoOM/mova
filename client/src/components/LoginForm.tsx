@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { classicFontTheme, defaultFontTheme } from '../index.css';
 import { AppRoute } from '../routes';
 import * as styles from './LoginForm.css';
-import { useStyleContext } from './StyleContext';
+import { useSettingsContext } from './SettingsContext';
 import { ButtonIcon } from './common/ButtonIcon';
 import { Input } from './common/Input';
 
@@ -25,7 +25,7 @@ export const LoginForm: React.FC = () => {
     useMutation(LoginDocument);
 
   const { setAuthToken } = useAuthContext();
-  const [font] = useStyleContext();
+  const { font } = useSettingsContext();
   const { t } = useTranslation();
 
   const login = useCallback(async () => {

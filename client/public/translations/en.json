@@ -103,6 +103,7 @@
     "mastered": "mastered"
   },
   "users": {
+    "includeMastered": "Ask about mastered words",
     "logout": "Log out"
   }
 }

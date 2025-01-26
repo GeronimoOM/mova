@@ -8,12 +8,12 @@ import { classicFontTheme, defaultFontTheme } from '../index.css';
 import * as styles from './App.css';
 import { useLanguageContext } from './LanguageContext';
 import { LoginForm } from './LoginForm';
-import { useStyleContext } from './StyleContext';
+import { useSettingsContext } from './SettingsContext';
 
 export const App: React.FC = () => {
   const { authToken } = useAuthContext();
   const [, setLanguage] = useLanguageContext();
-  const [font] = useStyleContext();
+  const { font } = useSettingsContext();
 
   useEffect(() => {
     if (!authToken) {

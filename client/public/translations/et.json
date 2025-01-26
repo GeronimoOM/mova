@@ -103,6 +103,7 @@
     "mastered": "valdatud"
   },
   "users": {
+    "includeMastered": "Küsi valdatud sõnu",
     "logout": "Logi välja"
   }
 }
