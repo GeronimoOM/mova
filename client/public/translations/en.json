@@ -99,11 +99,11 @@
   "mastery": {
     "none": "none",
     "basic": "basic",
-    "advanced": "advanced",
+    "advanced": "intermediary",
     "mastered": "mastered"
   },
   "users": {
-    "includeMastered": "Ask about mastered words",
+    "includeMastered": "Quiz mastered words",
     "logout": "Log out"
   }
 }

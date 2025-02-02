@@ -100,10 +100,10 @@
     "none": "puudub",
     "basic": "algne",
     "advanced": "keskmine",
-    "mastered": "meisterlik"
+    "mastered": "õpitud"
   },
   "users": {
-    "includeMastered": "Küsi valdatud sõnu",
+    "includeMastered": "Küsida õpitud sõnu",
     "logout": "Logi välja"
   }
 }
