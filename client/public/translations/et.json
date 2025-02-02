@@ -99,8 +99,8 @@
   "mastery": {
     "none": "puudub",
     "basic": "algne",
-    "advanced": "edasijõudnud",
-    "mastered": "valdatud"
+    "advanced": "keskmine",
+    "mastered": "meisterlik"
   },
   "users": {
     "includeMastered": "Küsi valdatud sõnu",
