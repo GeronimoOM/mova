@@ -7,7 +7,7 @@
     "words": "Слова",
     "exercises": "Вправи",
     "progress": "Прогрес",
-    "properties": "Властивості",
+    "properties": "Поля",
     "language": "Мови",
     "user": "Користувач"
   },
@@ -41,7 +41,7 @@
     "name": "Мова"
   },
   "properties": {
-    "name": "властивість",
+    "name": "поле",
     "text": "текст",
     "option": "варіанти"
   },
