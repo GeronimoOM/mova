@@ -22,6 +22,7 @@ export class AuthService {
     const payload: UserAuth = { userId: user.id };
 
     return await this.jwtService.signAsync(payload, {
+      secret: this.configService.get<string>('jwt.secret'),
       noTimestamp: true,
     });
   }
