@@ -87,7 +87,7 @@ export class WordService {
   async getById(ctx: Context, wordId: WordId): Promise<Word> {
     const word = await this.wordRepository.getById(wordId);
     if (!word || !(await this.languageService.exists(ctx, word.languageId))) {
-      throw new Error('Word does not exist');
+      throw new Error(`Word does not exist (id:${wordId})`);
     }
 
     return word;
@@ -264,7 +264,7 @@ export class WordService {
         (property) => property.id === propertyId,
       );
       if (!property) {
-        throw new Error('Property is not valid for word');
+        throw new Error(`Property is not valid for word (wordId:${word.id},propertyId:${propertyId})`);
       }
 
       if (isTextProperty(property)) {
@@ -280,7 +280,7 @@ export class WordService {
         if (!propertyValue.option) {
           delete word.properties[propertyId];
         } else if (!property.options[propertyValue.option]) {
-          throw new Error('Options is not valid for property');
+          throw new Error('Option is not valid for property');
         } else {
           word.properties[propertyId] = {
             property,

@@ -15,7 +15,11 @@ async function bootstrap() {
     },
   );
 
-  await app.register(fastifyMultipart);
+  await app.register(fastifyMultipart, {
+    limits: {
+      fileSize: 50e6,
+    }
+  });
 
   app.enableCors();
 

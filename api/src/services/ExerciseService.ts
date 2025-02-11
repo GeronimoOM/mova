@@ -143,7 +143,7 @@ export class ExerciseService {
   ): Promise<Word> {
     const currentWord = await this.wordRepository.getById(params.wordId);
     if (!currentWord) {
-      throw new Error('Word does not exist');
+      throw new Error(`Word does not exist (wordId:${params.wordId})`);
     }
 
     if (
@@ -155,7 +155,7 @@ export class ExerciseService {
         currentWord.masteryAttemptAt.plus(MASTERY_ATTEMPT_DELAY) >=
           DateTime.utc())
     ) {
-      throw new Error('Word mastery cannot be increased yet');
+      throw new Error(`Word mastery cannot be increased yet (wordId:${params.wordId})`);
     }
 
     const now = DateTime.utc();

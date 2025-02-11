@@ -97,7 +97,7 @@ export class PropertyService {
       !property ||
       !(await this.languageService.exists(ctx, property.languageId))
     ) {
-      throw new Error('Property does not exist');
+      throw new Error(`Property does not exist (id:${id})`);
     }
     return property;
   }
@@ -140,7 +140,7 @@ export class PropertyService {
       case PropertyType.Option:
         const options = (params as CreateOptionPropertyParams).options;
         if (!options || options.length < 2) {
-          throw new Error('Options are required');
+          throw new Error(`Options are required (propertyId:${params.id})`);
         }
         property = {
           ...baseProperty,
@@ -173,7 +173,7 @@ export class PropertyService {
       if (params.options) {
         for (const [optionId, optionValue] of Object.entries(params.options)) {
           if (!property.options[optionId]) {
-            throw new Error('Option does not exist');
+            throw new Error(`Option does not exist (optionId:${optionId})`);
           } else if (!optionValue) {
             delete property[optionId];
           } else {
@@ -239,7 +239,7 @@ export class PropertyService {
       property.partOfSpeech,
     );
     if (wordCount > PROPERTY_DELETION_WORDS_THRESHOLD) {
-      throw new Error('Property has too many words');
+      throw new Error(`Property has too many words (id:${id})`);
     }
 
     await this.connectionManager.transactionally(async () => {

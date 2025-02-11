@@ -50,7 +50,7 @@ export class LanguageService {
   async getById(ctx: Context, id: LanguageId): Promise<Language> {
     const language = await this.languageRepository.getById(id);
     if (!language || language.userId !== ctx.user.id) {
-      throw new Error('Language does not exist');
+      throw new Error(`Language does not exist (id:${id})`);
     }
     return language;
   }
@@ -60,7 +60,8 @@ export class LanguageService {
       (language) => language.userId === ctx.user.id,
     );
     if (languages.length < ids.length) {
-      throw new Error('Language does not exist');
+      const missingIds = ids.filter((id) => !languages.find((language) => language.id === id));
+      throw new Error(`Languages do not exist (ids:${missingIds.join(',')})`);
     }
 
     return languages;
@@ -116,7 +117,7 @@ export class LanguageService {
 
     const wordCount = await this.wordService.getCount(language.id);
     if (wordCount > LANGUAGE_DELETION_WORDS_THRESHOLD) {
-      throw new Error('Language has too many words');
+      throw new Error(`Language has too many words (id:${id})`);
     }
 
     await this.connectionManager.transactionally(async () => {
