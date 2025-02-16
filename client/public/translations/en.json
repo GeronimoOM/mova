@@ -22,7 +22,8 @@
       "nextExerciseAt": "next exercise at",
       "exerciseReady": "exercise is ready"
     },
-    "existing": "already added"
+    "existing": "already added",
+    "delete": "delete word"
   },
   "exercise": {
     "ready_one": "exercise ready",
@@ -37,12 +38,14 @@
     }
   },
   "languages": {
-    "name": "Language"
+    "name": "Language",
+    "delete": "delete language"
   },
   "properties": {
     "name": "property",
     "text": "text",
-    "option": "options"
+    "option": "options",
+    "delete": "delete property"
   },
   "progress": {
     "progress": "Progress",

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaCircle } from 'react-icons/fa';
 
 import { LanguageFieldsFragment } from '../../api/types/graphql';
@@ -10,6 +10,8 @@ import { ButtonIcon } from '../common/ButtonIcon';
 import { Input } from '../common/Input';
 import * as styles from './LanguageCard.css';
 import { useLanguage } from './useLanguage';
+import { Modal } from '../common/Modal';
+import { HiMiniXMark } from 'react-icons/hi2';
 
 export type LanguageCardProps = {
   language: LanguageFieldsFragment | null;
@@ -41,6 +43,8 @@ export const LanguageCard: React.FC<LanguageCardProps> = ({
   } = useLanguage(currentLanguage);
 
   const { t } = useTranslation();
+
+  const [isDeleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
   useEffect(() => {
     if (createdLanguage) {
@@ -76,12 +80,36 @@ export const LanguageCard: React.FC<LanguageCardProps> = ({
         />
         <ButtonIcon
           icon={FaFire}
-          onClick={deleteLanguage}
+          onClick={() => setDeleteConfirmOpen(true)}
           color="negative"
           disabled={!canDeleteLanguage}
-          loading={languageDeleting}
         />
       </div>
+
+      {isDeleteConfirmOpen && <Modal onClose={() => setDeleteConfirmOpen(false)}>
+        <div className={styles.deleteConfirm}>
+          <div className={styles.deleteConfirmText}>
+            {t('languages.delete')}
+            <div className={styles.deleteConfirmLanguage}>
+            {language.name}
+            </div>
+          </div>
+
+          <div className={styles.deleteConfirmButtons}>
+            <ButtonIcon
+              icon={FaFire}
+              onClick={deleteLanguage}
+              color="negative"
+              loading={languageDeleting}
+            />
+
+            <ButtonIcon
+              icon={HiMiniXMark}
+              onClick={() => setDeleteConfirmOpen(false)}
+            />
+          </div>
+        </div>
+      </Modal>}
     </div>
   );
 };

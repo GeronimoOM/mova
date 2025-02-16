@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { useTranslation } from 'react-i18next';
 import { FaFeatherPointed, FaFire } from 'react-icons/fa6';
@@ -16,6 +16,8 @@ import {
   usePropertyDrop,
 } from './reorderProperties';
 import { useProperty } from './useProperty';
+import { Modal } from '../common/Modal';
+import { HiMiniXMark } from 'react-icons/hi2';
 
 export type PropertyListItemProps = {
   partOfSpeech: PartOfSpeech;
@@ -72,6 +74,8 @@ export const PropertyListItem: React.FC<PropertyListItemProps> = ({
     property?.id ? property : null,
     ref.current ?? null,
   );
+
+  const [isDeleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
   useEffect(() => {
     dragPreviewRef(getEmptyImage(), { captureDraggingState: true });
@@ -137,13 +141,36 @@ export const PropertyListItem: React.FC<PropertyListItemProps> = ({
         <div className={classNames(styles.button, { hidden: !selected })}>
           <ButtonIcon
             icon={FaFire}
-            onClick={deleteProperty}
+            onClick={() => setDeleteConfirmOpen(true)}
             color="negative"
             disabled={!canDeleteProperty}
-            loading={propertyDeleting}
           />
         </div>
       </div>
+        {isDeleteConfirmOpen && <Modal onClose={() => setDeleteConfirmOpen(false)}>
+          <div className={styles.deleteConfirm}>
+            <div className={styles.deleteConfirmText}>
+            {t('properties.delete')}
+              <div className={styles.deleteConfirmProperty}>
+                {property.name}
+              </div>
+            </div>
+
+            <div className={styles.deleteConfirmButtons}>
+              <ButtonIcon
+                icon={FaFire}
+                onClick={deleteProperty}
+                color="negative"
+                loading={propertyDeleting}
+              />
+
+              <ButtonIcon
+                icon={HiMiniXMark}
+                onClick={() => setDeleteConfirmOpen(false)}
+              />
+            </div>
+          </div>
+        </Modal>}
     </div>
   );
 };

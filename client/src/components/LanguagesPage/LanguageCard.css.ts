@@ -32,3 +32,32 @@ export const buttons = style({
 globalStyle(`${buttons} > *:last-child`, {
   marginTop: 'auto',
 });
+
+export const deleteConfirm = style({
+  minWidth: '200px',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  padding: 10,
+  gap: 30,
+});
+
+export const deleteConfirmText = style({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: 10,
+});
+
+export const deleteConfirmLanguage = style({
+  fontSize: '1.25rem',
+  padding: '5px 10px',
+  borderRadius: 5,
+  backgroundColor: themeVars.color.backgroundLighter,
+});
+
+export const deleteConfirmButtons = style({
+  display: 'flex',
+  flexDirection: 'row',
+  gap: 10,
+});

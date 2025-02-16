@@ -126,3 +126,32 @@ export const bottomButton = style({
 export const detailsEnd = style({
   minHeight: 50,
 });
+
+export const deleteConfirm = style({
+  minWidth: '200px',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  padding: 10,
+  gap: 30,
+});
+
+export const deleteConfirmText = style({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: 10,
+});
+
+export const deleteConfirmWord = style({
+  fontFamily: fontThemeVars.monoFont,
+  padding: 5,
+  borderRadius: 5,
+  backgroundColor: themeVars.color.backgroundLighter,
+});
+
+export const deleteConfirmButtons = style({
+  display: 'flex',
+  flexDirection: 'row',
+  gap: 10,
+});

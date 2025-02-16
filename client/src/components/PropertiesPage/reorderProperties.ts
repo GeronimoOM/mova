@@ -1,4 +1,4 @@
-import { useLazyQuery } from '@apollo/client';
+import { NetworkStatus, useLazyQuery } from '@apollo/client';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDrag, useDragLayer, useDrop } from 'react-dnd';
 import { useReorderProperties } from '../../api/mutations';
@@ -119,21 +119,30 @@ export const useOrderedProperties = (
 ) => {
   const [
     fetchProperties,
-    { data: propertiesQuery, loading: propertiesLoading },
-  ] = useLazyQuery(GetPropertiesDocument);
+    { data: propertiesQuery, networkStatus: fetchingPropertiesStatus },
+  ] = useLazyQuery(GetPropertiesDocument, {
+    notifyOnNetworkStatusChange: true,
+  });
+  const propertiesLoading = [NetworkStatus.loading, NetworkStatus.refetch].includes(
+    fetchingPropertiesStatus,
+  );
+
   const properties = propertiesLoading
     ? undefined
     : propertiesQuery?.language?.properties;
 
-  const [orderedPropertyIds, setOrderedPropertyIds] = useState<string[]>([]);
+  const [orderedPropertyIds, setOrderedPropertyIds] = useState<string[] | null>(null);
 
   const orderedProperties = useMemo(() => {
     if (!properties) {
       return undefined;
     }
 
-    const propertiesById = toRecord(properties, (property) => property.id);
+    if (!orderedPropertyIds) {
+      return properties;
+    }
 
+    const propertiesById = toRecord(properties, (property) => property.id);
     return orderedPropertyIds.map((id) => propertiesById[id]);
   }, [properties, orderedPropertyIds]);
 
@@ -141,16 +150,22 @@ export const useOrderedProperties = (
 
   const swapPropertiesPreview = useCallback(
     (property1Id: string, property2Id: string) => {
-      const property1Index = orderedPropertyIds.indexOf(property1Id);
-      const property2Index = orderedPropertyIds.indexOf(property2Id);
+      if (!properties) {
+        return;
+      }
 
-      const reorderedPropertyIds = [...orderedPropertyIds];
+      const oldOrderedPropertyIds = orderedPropertyIds ?? properties.map((property) => property.id);
+
+      const property1Index = oldOrderedPropertyIds.indexOf(property1Id);
+      const property2Index = oldOrderedPropertyIds.indexOf(property2Id);
+
+      const reorderedPropertyIds = [...oldOrderedPropertyIds];
       reorderedPropertyIds[property1Index] = property2Id;
       reorderedPropertyIds[property2Index] = property1Id;
 
       setOrderedPropertyIds(reorderedPropertyIds);
     },
-    [orderedPropertyIds],
+    [properties, orderedPropertyIds],
   );
 
   const reorderProperties = useCallback(() => {
@@ -181,9 +196,8 @@ export const useOrderedProperties = (
   ]);
 
   useEffect(() => {
-    setOrderedPropertyIds([]);
-
     if (languageId) {
+      setOrderedPropertyIds(null);
       fetchProperties({
         variables: {
           languageId,
@@ -192,12 +206,6 @@ export const useOrderedProperties = (
       });
     }
   }, [languageId, partOfSpeech, fetchProperties]);
-
-  useEffect(() => {
-    if (properties) {
-      setOrderedPropertyIds(properties.map((property) => property.id));
-    }
-  }, [properties]);
 
   return useMemo(
     () => ({

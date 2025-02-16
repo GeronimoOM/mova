@@ -22,7 +22,8 @@
       "nextExerciseAt": "наступна вправа о",
       "exerciseReady": "вправа готова"
     },
-    "existing": "уже додано"
+    "existing": "уже додано",
+    "delete": "видалити слово"
   },
   "exercise": {
     "ready_one": "вправа готова",
@@ -38,12 +39,14 @@
     }
   },
   "languages": {
-    "name": "Мова"
+    "name": "Мова",
+    "delete": "видалити мову"
   },
   "properties": {
     "name": "поле",
     "text": "текст",
-    "option": "варіанти"
+    "option": "варіанти",
+    "delete": "видалити поле"
   },
   "progress": {
     "progress": "Прогрес",

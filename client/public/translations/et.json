@@ -22,7 +22,8 @@
       "nextExerciseAt": "järgmine harjutus kell",
       "exerciseReady": "harjutus on valmis"
     },
-    "existing": "on juba lisatud"
+    "existing": "on juba lisatud",
+    "delete": "kustutada sõna"
   },
   "exercise": {
     "ready_one": "harjutus on valmis",
@@ -37,12 +38,14 @@
     }
   },
   "languages": {
-    "name": "Keel"
+    "name": "Keel",
+    "delete": "kustutada keele"
   },
   "properties": {
     "name": "omadus",
     "text": "tekst",
-    "option": "variantid"
+    "option": "variantid",
+    "delete": "kustutada omaduse"
   },
   "progress": {
     "progress": "Progress",
