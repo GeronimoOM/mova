@@ -8,7 +8,7 @@ import { Icon, IconProps } from './Icon';
 
 export type ButtonIconProps = IconProps & {
   icon?: IconType;
-  onClick: () => void;
+  onClick?: () => void;
   color?: Color;
   highlighted?: boolean;
   disabled?: boolean;

@@ -124,7 +124,6 @@ export const PropertyListItem: React.FC<PropertyListItemProps> = ({
         >
           <ButtonIcon
             icon={IoReorderThree}
-            onClick={() => {}}
             disabled={!canDragProperty}
           />
         </div>
@@ -198,10 +197,9 @@ export const PropertyListItemOverlay: React.FC = () => {
         </div>
         <ButtonIcon
           icon={FaFeatherPointed}
-          onClick={() => {}}
           disabled={true}
         />
-        <ButtonIcon icon={IoReorderThree} onClick={() => {}} />
+        <ButtonIcon icon={IoReorderThree} />
       </div>
 
       <div className={styles.content}>
@@ -210,7 +208,7 @@ export const PropertyListItemOverlay: React.FC = () => {
           text={'translation'}
           size={'large'}
         />
-        <ButtonIcon icon={FaFire} onClick={() => {}} disabled={true} />
+        <ButtonIcon icon={FaFire} disabled={true} />
       </div>
     </div>
   );

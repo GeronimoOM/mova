@@ -113,13 +113,16 @@ export const buttons = style({
   right: 18,
 
   padding: 10,
-  gap: 10,
   display: 'flex',
   flexDirection: 'column',
+  gap: 10,
   zIndex: 10,
 });
 
 export const bottomButton = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 10,
   marginTop: 'auto',
 });
 

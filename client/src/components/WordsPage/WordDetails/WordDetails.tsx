@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FaFeatherPointed, FaFire } from 'react-icons/fa6';
+import { FaArrowUp, FaArrowDown } from 'react-icons/fa';
 
 import { BsFillExclamationDiamondFill, BsTranslate } from 'react-icons/bs';
 import { HiMiniXMark } from 'react-icons/hi2';
@@ -31,6 +32,10 @@ export type WordDetailsProps = {
   wordId: string | null;
   onSelectWord: (wordId: string | null) => void;
   onClose: () => void;
+  hasPrev?: boolean;
+  onSelectPrev?: () => void;
+  hasNext?: boolean;
+  onSelectNext?: () => void;
   simplified?: boolean;
 };
 
@@ -40,6 +45,10 @@ export const WordDetails: React.FC<WordDetailsProps> = ({
   wordId,
   onSelectWord,
   onClose,
+  hasPrev,
+  onSelectPrev,
+  hasNext,
+  onSelectNext,
   simplified,
 }) => {
   const [selectedLanguageId] = useLanguageContext();
@@ -131,6 +140,20 @@ export const WordDetails: React.FC<WordDetailsProps> = ({
             />
 
             <div className={styles.bottomButton}>
+              {!simplified && <ButtonIcon
+                icon={FaArrowUp}
+                onClick={onSelectPrev}
+                disabled={!hasPrev}
+                wrapped={true}
+              />}
+
+              {!simplified && <ButtonIcon
+                icon={FaArrowDown}
+                onClick={onSelectNext}
+                disabled={!hasNext}
+                wrapped={true}
+              />}
+
               <ButtonIcon
                 icon={FaFire}
                 onClick={() => setDeleteConfirmOpen(true)}

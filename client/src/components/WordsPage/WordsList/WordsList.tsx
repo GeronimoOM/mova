@@ -1,54 +1,42 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { TbHexagonPlusFilled } from 'react-icons/tb';
-import { cacheClearWordsSearch } from '../../../api/cache';
 import { MIN_QUERY_LENGTH } from '../../../utils/constants';
-import { useDebouncedValue } from '../../../utils/useDebouncedValue';
 import { useInfiniteScroll } from '../../../utils/useInfiniteScroll';
 import { useLanguageContext } from '../../LanguageContext';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { Loader } from '../../common/Loader';
 import * as styles from './WordsList.css';
 import { WordsListItem, WordsListItemDivider } from './WordsListItem';
-import { isDivider, useWordsList } from './useWordsList';
-
-const SEARCH_DELAY_MS = 300;
+import { isDivider, WordDateDivider } from './useWordsList';
+import { WordFieldsFragment } from '../../../api/types/graphql';
 
 export type WordsListProps = {
+  words: Array<WordFieldsFragment | WordDateDivider> | undefined,
+  wordsLoading: boolean;
+  wordsSearchQuery: string;
+  onFetchNextPage: () => void;
   onSelectWord: (selectedWord: string) => void;
   onCreateNew: () => void;
-  onOpenDetails: () => void;
-  wordsSearchQuery: string;
 };
 
 export const WordsList: React.FC<WordsListProps> = ({
+  words,
+  wordsLoading,
+  wordsSearchQuery,
+  onFetchNextPage,
   onSelectWord,
   onCreateNew,
-  wordsSearchQuery,
 }) => {
   const [selectedLanguageId] = useLanguageContext();
   const isSearch = wordsSearchQuery.length >= MIN_QUERY_LENGTH;
 
-  const debouncedWordsSearchQuery = useDebouncedValue(
-    wordsSearchQuery,
-    SEARCH_DELAY_MS,
-  );
-
-  const { words, wordsLoading, fetchNextWordsPage } = useWordsList(
-    debouncedWordsSearchQuery,
-  );
   const isEmpty = !words?.length && !wordsLoading;
 
   const listEndRef = useInfiniteScroll<HTMLDivElement>({
     isFetching: wordsLoading,
-    fetchNextPage: fetchNextWordsPage,
+    fetchNextPage: onFetchNextPage,
   });
-
-  useEffect(() => {
-    if (selectedLanguageId) {
-      cacheClearWordsSearch(selectedLanguageId);
-    }
-  }, [selectedLanguageId, debouncedWordsSearchQuery]);
 
   return (
     <div className={styles.wrapper}>

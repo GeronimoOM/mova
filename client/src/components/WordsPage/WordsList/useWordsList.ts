@@ -10,7 +10,8 @@ import { fromTimestamp } from '../../../utils/datetime';
 import { useLanguageContext } from '../../LanguageContext';
 
 export type WordsListReturn = {
-  words: Array<WordFieldsFragment | WordDateDivider> | undefined;
+  words: Array<WordFieldsFragment> | undefined;
+  dividedWords: Array<WordFieldsFragment | WordDateDivider> | undefined;
   wordsLoading: boolean;
   fetchNextWordsPage: () => void;
 };
@@ -75,7 +76,8 @@ export function useWordsList(wordsSearchQuery: string): WordsListReturn {
 
   return useMemo(
     () => ({
-      words: dividedWords,
+      words,
+      dividedWords,
       wordsLoading,
       fetchNextWordsPage,
     }),

@@ -10,7 +10,6 @@ export const Loader: React.FC = () => {
         icon={FaSyncAlt}
         color="primary"
         highlighted={true}
-        onClick={() => {}}
         loading={true}
       />
     </div>
