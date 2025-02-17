@@ -58,10 +58,12 @@ export default defineConfig({
   server: {
     host: true,
     port: 4000,
+    allowedHosts: ['client'],
   },
   preview: {
     host: true,
     port: 4000,
+    allowedHosts: ['client'],
   },
   build: {
     target: 'esnext',
