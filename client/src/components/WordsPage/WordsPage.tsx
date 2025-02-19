@@ -1,16 +1,16 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { cacheClearWordsSearch } from '../../api/cache';
+import { useDebouncedValue } from '../../utils/useDebouncedValue';
 import { useLanguageContext } from '../LanguageContext';
 import { WordDetails } from './WordDetails/WordDetails';
+import { isDivider, useWordsList } from './WordsList/useWordsList';
 import { WordsList } from './WordsList/WordsList';
 import * as styles from './WordsPage.css';
 import { WordsSearchBar } from './WordsSearchBar/WordsSearchBar';
-import { useDebouncedValue } from '../../utils/useDebouncedValue';
-import { isDivider, useWordsList } from './WordsList/useWordsList';
-import { cacheClearWordsSearch } from '../../api/cache';
 
 const SEARCH_DELAY_MS = 300;
 
-export const WordsPage: React.FC = () => {
+export const WordsPage = () => {
   const [selectedLanguageId] = useLanguageContext();
   const [selectedWordId, setSelectedWordId] = useState<string | null>(null);
   const [isWordDetailsOpen, setIsWordDetailsOpen] = useState(false);
@@ -21,9 +21,8 @@ export const WordsPage: React.FC = () => {
     SEARCH_DELAY_MS,
   );
 
-  const { words, dividedWords, wordsLoading, fetchNextWordsPage } = useWordsList(
-    debouncedWordsSearchQuery,
-  );
+  const { words, dividedWords, wordsLoading, fetchNextWordsPage } =
+    useWordsList(debouncedWordsSearchQuery);
 
   const handleWordSelect = useCallback((selectedWordId: string) => {
     setSelectedWordId(selectedWordId);
@@ -50,28 +49,34 @@ export const WordsPage: React.FC = () => {
   }, [selectedLanguageId, debouncedWordsSearchQuery]);
 
   const selectedWordIndex = useMemo(() => {
-    const index = words?.findIndex((w) => !isDivider(w) && w.id === selectedWordId);
+    const index = words?.findIndex(
+      (w) => !isDivider(w) && w.id === selectedWordId,
+    );
 
     return index !== -1 ? index : undefined;
   }, [words, selectedWordId]);
 
-  const hasPrevWord = words && selectedWordIndex !== undefined && selectedWordIndex > 0;
+  const hasPrevWord =
+    words && selectedWordIndex !== undefined && selectedWordIndex > 0;
   const handleSelectPrev = () => {
     if (!words || selectedWordIndex === undefined) {
       return;
     }
 
     setSelectedWordId(words[selectedWordIndex - 1].id);
-  }
+  };
 
-  const hasNextWord = words && selectedWordIndex !== undefined && selectedWordIndex < words?.length - 1;
+  const hasNextWord =
+    words &&
+    selectedWordIndex !== undefined &&
+    selectedWordIndex < words?.length - 1;
   const handleSelectNext = () => {
     if (!words || selectedWordIndex === undefined) {
       return;
     }
 
     setSelectedWordId(words[selectedWordIndex + 1].id);
-  }
+  };
 
   return (
     <div className={styles.wrapper}>

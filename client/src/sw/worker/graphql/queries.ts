@@ -92,7 +92,7 @@ async function handleGraphQlQueryNetworkFirst(
     const response = await tryFetch(event);
     event.waitUntil(cacheGraphQlQueryResponse(request, response));
     return response;
-  } catch (error) {
+  } catch {
     return handleGraphQlQueryFromCache(request);
   }
 }
@@ -103,7 +103,7 @@ async function handleGraphQlQueryCacheFirst(
 ): Promise<Response> {
   try {
     return await handleGraphQlQueryFromCache(request);
-  } catch (error) {
+  } catch {
     const response = await tryFetch(event);
     event.waitUntil(cacheGraphQlQueryResponse(request, response));
     return response;

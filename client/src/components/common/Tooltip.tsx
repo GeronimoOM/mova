@@ -9,12 +9,7 @@ export type TooltipProps = {
   onOpen?: (isOpen: boolean) => void;
 };
 
-export const Tooltip: React.FC<TooltipProps> = ({
-  content,
-  children,
-  side,
-  onOpen,
-}) => {
+export const Tooltip = ({ content, children, side, onOpen }: TooltipProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const contentRef = useRef<HTMLDivElement>(null);

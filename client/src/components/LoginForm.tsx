@@ -1,5 +1,5 @@
 import { useMutation } from '@apollo/client';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { LoginDocument } from '../api/types/graphql';
 import { useAuthContext } from './AuthContext';
@@ -15,7 +15,7 @@ import { useSettingsContext } from './SettingsContext';
 import { ButtonIcon } from './common/ButtonIcon';
 import { Input } from './common/Input';
 
-export const LoginForm: React.FC = () => {
+export const LoginForm = () => {
   const navigate = useNavigate();
 
   const [name, setName] = useState('');

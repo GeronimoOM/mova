@@ -7,16 +7,16 @@ import { ContextDec } from 'middleware/ContextMiddleware';
 import { Context } from 'models/Context';
 import { UserService } from 'services/UserService';
 
-@Resolver((of) => UserSettingsType)
+@Resolver(() => UserSettingsType)
 export class UserResolver {
   constructor(private userService: UserService) {}
 
-  @Query((type) => UserSettingsType)
+  @Query(() => UserSettingsType)
   async settings(@ContextDec() ctx: Context): Promise<UserSettingsType> {
     return await this.userService.getSettings(ctx.user.id);
   }
 
-  @Mutation((returns) => UserSettingsType)
+  @Mutation(() => UserSettingsType)
   async updateSettings(
     @ContextDec() ctx: Context,
     @Args('input') input: UpdateUserSettingsInput,

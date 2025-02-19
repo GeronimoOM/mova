@@ -1,6 +1,6 @@
 import { useLazyQuery } from '@apollo/client';
 import { DateTime, WeekdayNumbers } from 'luxon';
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaBook, FaBrain } from 'react-icons/fa6';
 import { HiLightningBolt } from 'react-icons/hi';
@@ -34,7 +34,7 @@ import {
   parseCalendarData,
 } from './progressCalendar';
 
-export const ProgressCalendar: React.FC = () => {
+export const ProgressCalendar = () => {
   const [selectedLanguageId] = useLanguageContext();
 
   const [selectedType, setSelectedType] = useState<ProgressType>(
@@ -129,9 +129,9 @@ type ProgressCalendarHeaderProps = {
   weeklyData: Array<ProgressCalendarInstance | undefined>;
 };
 
-const ProgressCalendarHeader: React.FC<ProgressCalendarHeaderProps> = ({
+const ProgressCalendarHeader = ({
   weeklyData,
-}) => {
+}: ProgressCalendarHeaderProps) => {
   const months: Array<{ month: number; span: number }> = useMemo(() => {
     return getGroupedMonths(weeklyData);
   }, [weeklyData]);
@@ -163,12 +163,12 @@ type ProgressCalendarBodyProps = {
   goal?: GoalFieldsFragment;
 };
 
-const ProgressCalendarBody: React.FC<ProgressCalendarBodyProps> = ({
+const ProgressCalendarBody = ({
   type,
   dailyData,
   weeklyData,
   goal,
-}) => {
+}: ProgressCalendarBodyProps) => {
   const { t } = useTranslation();
   const [locale] = useLocaleContext();
 
@@ -225,13 +225,13 @@ type ProgressCalendarCellProps = {
   tooltipSide: 'top' | 'left' | 'right';
 };
 
-const ProgressCalendarCell: React.FC<ProgressCalendarCellProps> = ({
+const ProgressCalendarCell = ({
   type,
   cadence,
   instance,
   goal,
   tooltipSide,
-}) => {
+}: ProgressCalendarCellProps) => {
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
 
   const points = instance?.points ?? 0;
@@ -290,9 +290,12 @@ type ProgressCalendarCellTooltipProps = {
   points: number;
 };
 
-const ProgressCalendarCellTooltip: React.FC<
-  ProgressCalendarCellTooltipProps
-> = ({ type, cadence, date, points }) => {
+const ProgressCalendarCellTooltip = ({
+  type,
+  cadence,
+  date,
+  points,
+}: ProgressCalendarCellTooltipProps) => {
   const [locale] = useLocaleContext();
   const { t } = useTranslation();
 

@@ -54,7 +54,7 @@ export async function handleGraphQlMutation(
     event.waitUntil(cacheGraphQlMutationResponse(request, response));
 
     return response;
-  } catch (err) {
+  } catch {
     console.log('Mutation request failed. Saving to cache.');
 
     await cache.saveChange(buildChange(request));

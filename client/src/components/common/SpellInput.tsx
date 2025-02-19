@@ -14,14 +14,14 @@ type SpellInputProps = {
   highlights?: Array<Color | null>;
 };
 
-export const SpellInput: React.FC<SpellInputProps> = ({
+export const SpellInput = ({
   value,
   onChange,
   length,
   obscureLength,
   disabled,
   highlights,
-}) => {
+}: SpellInputProps) => {
   length = obscureLength ? OBSCURED_LENGTH : length;
 
   const cells = useRef<HTMLInputElement[]>(Array(length).fill(null));

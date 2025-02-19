@@ -20,7 +20,7 @@ registerEnumType(PartOfSpeech, {
 
 @ObjectType('Word')
 export class WordType {
-  @Field((type) => ID)
+  @Field(() => ID)
   id: WordId;
 
   @Field()
@@ -29,22 +29,22 @@ export class WordType {
   @Field()
   translation: string;
 
-  @Field((type) => PartOfSpeech)
+  @Field(() => PartOfSpeech)
   partOfSpeech: PartOfSpeech;
 
-  @Field((type) => TimestampScalar)
+  @Field(() => TimestampScalar)
   addedAt: DateTime;
 
-  @Field((type) => Int)
+  @Field(() => Int)
   mastery: number;
 
-  @Field((type) => TimestampScalar)
+  @Field(() => TimestampScalar)
   nextExerciseAt: DateTime;
 
-  @Field((type) => ID)
+  @Field(() => ID)
   languageId: LanguageId;
 
-  @Field((type) => [PropertyValueUnionType])
+  @Field(() => [PropertyValueUnionType])
   properties: Array<typeof PropertyValueUnionType>;
 }
 
@@ -56,7 +56,7 @@ registerEnumType(WordOrder, {
 
 @InputType()
 export class CreateWordInput {
-  @Field((type) => ID, { nullable: true })
+  @Field(() => ID, { nullable: true })
   id?: WordId;
 
   @Field()
@@ -65,22 +65,22 @@ export class CreateWordInput {
   @Field()
   translation: string;
 
-  @Field((type) => ID)
+  @Field(() => ID)
   languageId: LanguageId;
 
-  @Field((type) => PartOfSpeech)
+  @Field(() => PartOfSpeech)
   partOfSpeech: PartOfSpeech;
 
-  @Field((type) => TimestampScalar, { nullable: true })
+  @Field(() => TimestampScalar, { nullable: true })
   addedAt?: DateTime;
 
-  @Field((type) => [UpdatePropertyValueInput], { nullable: true })
+  @Field(() => [UpdatePropertyValueInput], { nullable: true })
   properties?: UpdatePropertyValueInput[];
 }
 
 @InputType()
 export class UpdateWordInput {
-  @Field((type) => ID)
+  @Field(() => ID)
   id: WordId;
 
   @Field({ nullable: true })
@@ -89,24 +89,24 @@ export class UpdateWordInput {
   @Field({ nullable: true })
   translation?: string;
 
-  @Field((type) => [UpdatePropertyValueInput], { nullable: true })
+  @Field(() => [UpdatePropertyValueInput], { nullable: true })
   properties?: UpdatePropertyValueInput[];
 }
 
 @InputType()
 export class UpdatePropertyValueInput {
-  @Field((type) => ID)
+  @Field(() => ID)
   id: PropertyId;
 
   @Field({ nullable: true })
   text?: string;
 
-  @Field((type) => ID, { nullable: true })
+  @Field(() => ID, { nullable: true })
   option?: OptionId;
 }
 
 @InputType()
 export class DeleteWordInput {
-  @Field((type) => ID)
+  @Field(() => ID)
   id: WordId;
 }

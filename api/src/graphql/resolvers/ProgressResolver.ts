@@ -18,11 +18,11 @@ import { Context } from 'models/Context';
 import { ProgressCadence } from 'models/Progress';
 import { ProgressService } from 'services/ProgressService';
 
-@Resolver((of) => ProgressType)
+@Resolver(() => ProgressType)
 export class ProgressResolver {
   constructor(private progressService: ProgressService) {}
 
-  @ResolveField((type) => ProgressInstanceType)
+  @ResolveField(() => ProgressInstanceType)
   async current(
     @ContextDec() ctx: Context,
     @Parent()
@@ -38,7 +38,7 @@ export class ProgressResolver {
     );
   }
 
-  @ResolveField((type) => Int)
+  @ResolveField(() => Int)
   async streak(
     @ContextDec() ctx: Context,
     @Parent()
@@ -51,7 +51,7 @@ export class ProgressResolver {
     );
   }
 
-  @ResolveField((type) => ProgressHistoryType)
+  @ResolveField(() => ProgressHistoryType)
   async history(
     @ContextDec() ctx: Context,
     @Parent()
@@ -67,7 +67,7 @@ export class ProgressResolver {
     );
   }
 
-  @Mutation((returns) => [GoalType])
+  @Mutation(() => [GoalType])
   async setGoals(
     @ContextDec() ctx: Context,
     @Args('input') input: SetGoalsInput,

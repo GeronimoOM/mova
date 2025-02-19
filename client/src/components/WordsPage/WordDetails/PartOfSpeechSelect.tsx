@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PiGraphBold } from 'react-icons/pi';
 import { PartOfSpeech } from '../../../api/types/graphql';
@@ -16,11 +16,11 @@ export type PartOfSpeechSelectProps = {
   disabled?: boolean;
 };
 
-export const PartOfSpeechSelect: React.FC<PartOfSpeechSelectProps> = ({
+export const PartOfSpeechSelect = ({
   partOfSpeech,
   onPartOfSpeechSelect,
   disabled,
-}) => {
+}: PartOfSpeechSelectProps) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const selectRef = useRef<HTMLDivElement>(null);
 
@@ -57,11 +57,11 @@ type PartOfSpeechSelectButtonProps = {
   disabled?: boolean;
 };
 
-const PartOfSpeechSelectButton: React.FC<PartOfSpeechSelectButtonProps> = ({
+const PartOfSpeechSelectButton = ({
   partOfSpeech,
   onOpenDropdown: onOpen,
   disabled,
-}) => {
+}: PartOfSpeechSelectButtonProps) => {
   const { t } = useTranslation();
 
   return (
@@ -80,9 +80,9 @@ type PartOfSpeechSelectDropdownProps = {
   onPartOfSpeechSelect: (partOfSpeech: PartOfSpeech) => void;
 };
 
-const PartOfSpeechSelectDropdown: React.FC<PartOfSpeechSelectDropdownProps> = ({
+const PartOfSpeechSelectDropdown = ({
   onPartOfSpeechSelect,
-}) => {
+}: PartOfSpeechSelectDropdownProps) => {
   const { t } = useTranslation();
 
   return (

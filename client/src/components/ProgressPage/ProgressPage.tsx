@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import React, { ComponentType, useState } from 'react';
+import { ComponentType, useState } from 'react';
 import { IconType } from 'react-icons';
 import { BsFillBarChartFill } from 'react-icons/bs';
 import { FaChartPie } from 'react-icons/fa6';
@@ -45,7 +45,7 @@ const tabs: Record<
   },
 };
 
-export const ProgressPage: React.FC = () => {
+export const ProgressPage = () => {
   const [selectedTab, setSelectedTab] = useState<ProgressPageTab>(
     ProgressPageTab.Progress,
   );

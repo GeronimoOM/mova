@@ -1,4 +1,3 @@
-import React from 'react';
 import { BsFillBarChartFill } from 'react-icons/bs';
 import { FaUser } from 'react-icons/fa';
 import { FaBook, FaBrain, FaEarthEurope } from 'react-icons/fa6';
@@ -9,7 +8,7 @@ import { AppRoute } from '../../routes';
 import * as styles from './NavBar.css';
 import { NavBarItem } from './NavBarItem';
 
-export const NavBar: React.FC = () => {
+export const NavBar = () => {
   const { t } = useTranslation();
 
   return (

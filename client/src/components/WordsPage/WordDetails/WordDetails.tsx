@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { FaArrowDown, FaArrowUp } from 'react-icons/fa';
 import { FaFeatherPointed, FaFire } from 'react-icons/fa6';
-import { FaArrowUp, FaArrowDown } from 'react-icons/fa';
 
 import { BsFillExclamationDiamondFill, BsTranslate } from 'react-icons/bs';
 import { HiMiniXMark } from 'react-icons/hi2';
@@ -17,6 +17,7 @@ import { useLanguageContext } from '../../LanguageContext';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { Icon } from '../../common/Icon';
 import { Input } from '../../common/Input';
+import { Modal } from '../../common/Modal';
 import { Tooltip } from '../../common/Tooltip';
 import { WordMastery } from '../WordsList/WordMastery';
 import { PartOfSpeechSelect } from './PartOfSpeechSelect';
@@ -26,7 +27,6 @@ import {
   WordDetailsProperty,
 } from './WordDetailsProperty';
 import { useWordDetails } from './useWordDetails';
-import { Modal } from '../../common/Modal';
 
 export type WordDetailsProps = {
   wordId: string | null;
@@ -41,7 +41,7 @@ export type WordDetailsProps = {
 
 const EXISTS_DELAY_MS = 300;
 
-export const WordDetails: React.FC<WordDetailsProps> = ({
+export const WordDetails = ({
   wordId,
   onSelectWord,
   onClose,
@@ -50,7 +50,7 @@ export const WordDetails: React.FC<WordDetailsProps> = ({
   hasNext,
   onSelectNext,
   simplified,
-}) => {
+}: WordDetailsProps) => {
   const [selectedLanguageId] = useLanguageContext();
 
   const {
@@ -140,19 +140,23 @@ export const WordDetails: React.FC<WordDetailsProps> = ({
             />
 
             <div className={styles.bottomButton}>
-              {!simplified && <ButtonIcon
-                icon={FaArrowUp}
-                onClick={onSelectPrev}
-                disabled={!hasPrev}
-                wrapped={true}
-              />}
+              {!simplified && (
+                <ButtonIcon
+                  icon={FaArrowUp}
+                  onClick={onSelectPrev}
+                  disabled={!hasPrev}
+                  wrapped={true}
+                />
+              )}
 
-              {!simplified && <ButtonIcon
-                icon={FaArrowDown}
-                onClick={onSelectNext}
-                disabled={!hasNext}
-                wrapped={true}
-              />}
+              {!simplified && (
+                <ButtonIcon
+                  icon={FaArrowDown}
+                  onClick={onSelectNext}
+                  disabled={!hasNext}
+                  wrapped={true}
+                />
+              )}
 
               <ButtonIcon
                 icon={FaFire}
@@ -234,30 +238,30 @@ export const WordDetails: React.FC<WordDetailsProps> = ({
         </div>
       </div>
 
-      {isDeleteConfirmOpen && <Modal onClose={() => setDeleteConfirmOpen(false)}>
-        <div className={styles.deleteConfirm}>
-          <div className={styles.deleteConfirmText}>
-            {t('words.delete')}
-            <div className={styles.deleteConfirmWord}>
-              {word.original}
+      {isDeleteConfirmOpen && (
+        <Modal onClose={() => setDeleteConfirmOpen(false)}>
+          <div className={styles.deleteConfirm}>
+            <div className={styles.deleteConfirmText}>
+              {t('words.delete')}
+              <div className={styles.deleteConfirmWord}>{word.original}</div>
+            </div>
+
+            <div className={styles.deleteConfirmButtons}>
+              <ButtonIcon
+                icon={FaFire}
+                onClick={deleteWord}
+                color="negative"
+                loading={wordDeleting}
+              />
+
+              <ButtonIcon
+                icon={HiMiniXMark}
+                onClick={() => setDeleteConfirmOpen(false)}
+              />
             </div>
           </div>
-
-          <div className={styles.deleteConfirmButtons}>
-            <ButtonIcon
-              icon={FaFire}
-              onClick={deleteWord}
-              color="negative"
-              loading={wordDeleting}
-            />
-
-            <ButtonIcon
-              icon={HiMiniXMark}
-              onClick={() => setDeleteConfirmOpen(false)}
-            />
-          </div>
-        </div>
-      </Modal>}
+        </Modal>
+      )}
     </div>
   );
 };
@@ -267,10 +271,10 @@ type ExistingWarningProps = {
   onSelectWord: () => void;
 };
 
-const ExistingWordWarningIcon: React.FC<ExistingWarningProps> = ({
+const ExistingWordWarningIcon = ({
   word,
   onSelectWord,
-}) => {
+}: ExistingWarningProps) => {
   return (
     <Tooltip
       content={
@@ -285,10 +289,10 @@ const ExistingWordWarningIcon: React.FC<ExistingWarningProps> = ({
   );
 };
 
-const ExistingWordWarningTooltip: React.FC<ExistingWarningProps> = ({
+const ExistingWordWarningTooltip = ({
   word,
   onSelectWord,
-}) => {
+}: ExistingWarningProps) => {
   const { t } = useTranslation();
 
   return (

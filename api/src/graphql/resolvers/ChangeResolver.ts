@@ -16,7 +16,7 @@ import { Context } from 'models/Context';
 import { ChangeService } from 'services/ChangeService';
 import { decodeCursor, encodeCursor } from 'utils/cursors';
 
-@Resolver((of) => ChangeUnionType)
+@Resolver(() => ChangeUnionType)
 export class ChangeResolver {
   constructor(
     private changeService: ChangeService,
@@ -25,7 +25,7 @@ export class ChangeResolver {
     private wordTypeMapper: WordTypeMapper,
   ) {}
 
-  @Query((type) => ChangePageType)
+  @Query(() => ChangePageType)
   async changes(
     @ContextDec() ctx: Context,
     @Args() pageArgs: PageArgsType,
@@ -55,7 +55,7 @@ export class ChangeResolver {
     };
   }
 
-  @Mutation((returns) => Boolean)
+  @Mutation(() => Boolean)
   async applyChanges(
     @ContextDec() ctx: Context,
     @Args('changes', { type: () => [ApplyChangeInput] })

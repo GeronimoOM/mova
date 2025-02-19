@@ -21,7 +21,7 @@ export function decodeCursor<T extends TSchema>(
     }
 
     return Value.Decode(schema, cursor);
-  } catch (err) {
+  } catch {
     Logger.log('Invalid cursor', hash);
 
     return null;

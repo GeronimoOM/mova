@@ -18,7 +18,7 @@ export function pageType<T>(
 ): Type<Page<T, string>> {
   @ObjectType(`${typeName}Page`)
   abstract class PageType {
-    @Field((type) => [classRef])
+    @Field(() => [classRef])
     items: T[];
 
     @Field({ nullable: true })
@@ -33,6 +33,6 @@ export class PageArgsType {
   @Field({ nullable: true })
   cursor?: string;
 
-  @Field((type) => Int, { nullable: true })
+  @Field(() => Int, { nullable: true })
   limit?: number;
 }

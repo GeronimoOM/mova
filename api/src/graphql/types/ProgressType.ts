@@ -11,22 +11,22 @@ import { GoalType } from './GoalType';
 
 @ObjectType('ProgressInstance')
 export class ProgressInstanceType {
-  @Field((type) => TimestampScalar)
+  @Field(() => TimestampScalar)
   date: DateTime;
 
-  @Field((type) => Int)
+  @Field(() => Int)
   points: number;
 }
 
 @ObjectType('Progress')
 export class ProgressType {
-  @Field((type) => ProgressTypeEnum)
+  @Field(() => ProgressTypeEnum)
   type: ProgressTypeEnum;
 
-  @Field((type) => ProgressCadence)
+  @Field(() => ProgressCadence)
   cadence: ProgressCadence;
 
-  @Field((type) => GoalType)
+  @Field(() => GoalType)
   goal: Goal;
 
   languageId: LanguageId;
@@ -34,15 +34,15 @@ export class ProgressType {
 
 @ObjectType('ProgressHistory')
 export class ProgressHistoryType {
-  @Field((type) => ProgressCadence)
+  @Field(() => ProgressCadence)
   cadence: ProgressCadence;
 
-  @Field((type) => TimestampScalar)
+  @Field(() => TimestampScalar)
   from: DateTime;
 
-  @Field((type) => TimestampScalar)
+  @Field(() => TimestampScalar)
   until: DateTime;
 
-  @Field((type) => [ProgressInstanceType])
+  @Field(() => [ProgressInstanceType])
   instances: ProgressInstanceType[];
 }

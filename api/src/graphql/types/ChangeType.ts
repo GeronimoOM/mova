@@ -52,13 +52,13 @@ registerEnumType(SyncType, {
 
 @InterfaceType('IChange')
 export abstract class ChangeInterface {
-  @Field((type) => ID)
+  @Field(() => ID)
   id: ChangeId;
 
-  @Field((type) => TimestampScalar)
+  @Field(() => TimestampScalar)
   changedAt: DateTime;
 
-  @Field((type) => ChangeTypeEnum)
+  @Field(() => ChangeTypeEnum)
   type: ChangeTypeEnum;
 }
 
@@ -72,7 +72,7 @@ export class CreateLanguageChangeType extends ChangeInterface {
 
 @ObjectType('LanguageUpdate')
 export class LanguageUpdateType {
-  @Field((type) => ID)
+  @Field(() => ID)
   id: LanguageId;
 
   @Field()
@@ -91,7 +91,7 @@ export class UpdateLanguageChangeType extends ChangeInterface {
   implements: () => ChangeInterface,
 })
 export class DeleteLanguageChangeType extends ChangeInterface {
-  @Field((type) => ID)
+  @Field(() => ID)
   deleted: LanguageId;
 }
 
@@ -99,16 +99,16 @@ export class DeleteLanguageChangeType extends ChangeInterface {
   implements: () => ChangeInterface,
 })
 export class CreatePropertyChangeType extends ChangeInterface {
-  @Field((type) => PropertyUnionType)
+  @Field(() => PropertyUnionType)
   created: typeof PropertyUnionType;
 }
 
 @InterfaceType('IPropertyUpdate')
 export abstract class PropertyUpdateInterface {
-  @Field((type) => ID)
+  @Field(() => ID)
   id: PropertyId;
 
-  @Field((type) => PropertyType)
+  @Field(() => PropertyType)
   type: PropertyType;
 
   @Field({ nullable: true })
@@ -124,7 +124,7 @@ export class TextPropertyUpdateType extends PropertyUpdateInterface {}
   implements: () => PropertyUpdateInterface,
 })
 export class OptionPropertyUpdateType extends PropertyUpdateInterface {
-  @Field((type) => [OptionType], { nullable: true })
+  @Field(() => [OptionType], { nullable: true })
   options?: OptionType[];
 }
 
@@ -145,19 +145,19 @@ export const PropertyUpdateUnionType = createUnionType({
   implements: () => ChangeInterface,
 })
 export class UpdatePropertyChangeType extends ChangeInterface {
-  @Field((type) => PropertyUpdateUnionType)
+  @Field(() => PropertyUpdateUnionType)
   updated: typeof PropertyUpdateUnionType;
 }
 
 @ObjectType('PropertiesReorder')
 export class PropertiesReorderType {
-  @Field((type) => ID)
+  @Field(() => ID)
   languageId: LanguageId;
 
-  @Field((type) => PartOfSpeech)
+  @Field(() => PartOfSpeech)
   partOfSpeech: PartOfSpeech;
 
-  @Field((type) => [ID])
+  @Field(() => [ID])
   propertyIds: PropertyId[];
 }
 
@@ -173,16 +173,16 @@ export class ReorderPropertiesChangeType extends ChangeInterface {
   implements: () => ChangeInterface,
 })
 export class DeletePropertyChangeType extends ChangeInterface {
-  @Field((type) => ID)
+  @Field(() => ID)
   deleted: PropertyId;
 }
 
 @InterfaceType('IPropertyValueSave')
 export abstract class PropertyValuesSaveInterface {
-  @Field((type) => ID)
+  @Field(() => ID)
   propertyId: PropertyId;
 
-  @Field((type) => PropertyType)
+  @Field(() => PropertyType)
   type: PropertyType;
 }
 
@@ -198,7 +198,7 @@ export class TextPropertyValueSaveType extends PropertyValuesSaveInterface {
   implements: () => PropertyValuesSaveInterface,
 })
 export class OptionPropertyValueSaveType extends PropertyValuesSaveInterface {
-  @Field((type) => ID, { nullable: true })
+  @Field(() => ID, { nullable: true })
   optionId?: OptionId;
 }
 
@@ -218,7 +218,7 @@ export const PropertyValueSaveUnionType = createUnionType({
 
 @ObjectType('WordCreate')
 export class WordCreateType {
-  @Field((type) => ID)
+  @Field(() => ID)
   id: WordId;
 
   @Field()
@@ -227,22 +227,22 @@ export class WordCreateType {
   @Field()
   translation: string;
 
-  @Field((type) => PartOfSpeech)
+  @Field(() => PartOfSpeech)
   partOfSpeech: PartOfSpeech;
 
-  @Field((type) => TimestampScalar)
+  @Field(() => TimestampScalar)
   addedAt: DateTime;
 
-  @Field((type) => Int)
+  @Field(() => Int)
   mastery: number;
 
-  @Field((type) => TimestampScalar)
+  @Field(() => TimestampScalar)
   nextExerciseAt: DateTime;
 
-  @Field((type) => ID)
+  @Field(() => ID)
   languageId: LanguageId;
 
-  @Field((type) => [PropertyValueSaveUnionType])
+  @Field(() => [PropertyValueSaveUnionType])
   properties: Array<typeof PropertyValueSaveUnionType>;
 }
 
@@ -256,7 +256,7 @@ export class CreateWordChangeType extends ChangeInterface {
 
 @ObjectType('WordUpdate')
 export class WordUpdateType {
-  @Field((type) => ID)
+  @Field(() => ID)
   id: WordId;
 
   @Field({ nullable: true })
@@ -265,13 +265,13 @@ export class WordUpdateType {
   @Field({ nullable: true })
   translation?: string;
 
-  @Field((type) => [PropertyValueSaveUnionType], { nullable: true })
+  @Field(() => [PropertyValueSaveUnionType], { nullable: true })
   properties?: Array<typeof PropertyValueSaveUnionType>;
 
-  @Field((type) => Int, { nullable: true })
+  @Field(() => Int, { nullable: true })
   mastery?: number;
 
-  @Field((type) => TimestampScalar, { nullable: true })
+  @Field(() => TimestampScalar, { nullable: true })
   nextExerciseAt?: DateTime;
 }
 
@@ -287,7 +287,7 @@ export class UpdateWordChangeType extends ChangeInterface {
   implements: () => ChangeInterface,
 })
 export class DeleteWordChangeType extends ChangeInterface {
-  @Field((type) => ID)
+  @Field(() => ID)
   deleted: WordId;
 }
 
@@ -334,45 +334,45 @@ export const ChangeUnionType = createUnionType({
 
 @ObjectType('ChangePage')
 export class ChangePageType {
-  @Field((type) => [ChangeUnionType])
+  @Field(() => [ChangeUnionType])
   items: Array<typeof ChangeUnionType>;
 
   @Field({ nullable: true })
   nextCursor?: string;
 
-  @Field((type) => SyncType)
+  @Field(() => SyncType)
   syncType: SyncType;
 }
 
 @InputType()
 export class ApplyChangeInput {
-  @Field((type) => CreateLanguageInput, { nullable: true })
+  @Field(() => CreateLanguageInput, { nullable: true })
   createLanguage: CreateLanguageInput;
 
-  @Field((type) => UpdateLanguageInput, { nullable: true })
+  @Field(() => UpdateLanguageInput, { nullable: true })
   updateLanguage: UpdateLanguageInput;
 
-  @Field((type) => DeleteLanguageInput, { nullable: true })
+  @Field(() => DeleteLanguageInput, { nullable: true })
   deleteLanguage: DeleteLanguageInput;
 
-  @Field((type) => CreatePropertyInput, { nullable: true })
+  @Field(() => CreatePropertyInput, { nullable: true })
   createProperty: CreatePropertyInput;
 
-  @Field((type) => UpdatePropertyInput, { nullable: true })
+  @Field(() => UpdatePropertyInput, { nullable: true })
   updateProperty: UpdatePropertyInput;
 
-  @Field((type) => ReorderPropertiesInput, { nullable: true })
+  @Field(() => ReorderPropertiesInput, { nullable: true })
   reorderProperties: ReorderPropertiesInput;
 
-  @Field((type) => DeletePropertyInput, { nullable: true })
+  @Field(() => DeletePropertyInput, { nullable: true })
   deleteProperty: DeletePropertyInput;
 
-  @Field((type) => CreateWordInput, { nullable: true })
+  @Field(() => CreateWordInput, { nullable: true })
   createWord: CreateWordInput;
 
-  @Field((type) => UpdateWordInput, { nullable: true })
+  @Field(() => UpdateWordInput, { nullable: true })
   updateWord: UpdateWordInput;
 
-  @Field((type) => DeleteWordInput, { nullable: true })
+  @Field(() => DeleteWordInput, { nullable: true })
   deleteWord: DeleteWordInput;
 }

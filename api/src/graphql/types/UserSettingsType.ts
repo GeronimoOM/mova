@@ -3,7 +3,7 @@ import { LanguageId } from 'models/Language';
 
 @ObjectType('UserSettings')
 export class UserSettingsType {
-  @Field((type) => ID, { nullable: true })
+  @Field(() => ID, { nullable: true })
   selectedLanguageId?: LanguageId;
 
   @Field({ nullable: true })
@@ -18,7 +18,7 @@ export class UserSettingsType {
 
 @InputType()
 export class UpdateUserSettingsInput {
-  @Field((type) => ID, { nullable: true })
+  @Field(() => ID, { nullable: true })
   selectedLanguageId?: LanguageId;
 
   @Field({ nullable: true })

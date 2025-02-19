@@ -1,4 +1,3 @@
-import React from 'react';
 import { TbRectangle, TbRectangleFilled } from 'react-icons/tb';
 
 import { DateTime } from 'luxon';
@@ -19,10 +18,7 @@ type WordMasteryProps = {
   nextExerciseAt: string | null;
 };
 
-export const WordMastery: React.FC<WordMasteryProps> = ({
-  mastery,
-  nextExerciseAt,
-}) => {
+export const WordMastery = ({ mastery, nextExerciseAt }: WordMasteryProps) => {
   const isSmall = useMediaQuery(breakpoints.small);
 
   return (
@@ -45,9 +41,9 @@ export const WordMastery: React.FC<WordMasteryProps> = ({
   );
 };
 
-const WordMasteryTooltip: React.FC<
-  Pick<WordMasteryProps, 'nextExerciseAt'>
-> = ({ nextExerciseAt }) => {
+const WordMasteryTooltip = ({
+  nextExerciseAt,
+}: Pick<WordMasteryProps, 'nextExerciseAt'>) => {
   const [locale] = useLocaleContext();
   const { t } = useTranslation();
 

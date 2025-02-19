@@ -11,14 +11,14 @@ import {
   WordType,
 } from '../types/WordType';
 
-@Resolver((of) => WordType)
+@Resolver(() => WordType)
 export class WordResolver {
   constructor(
     private wordService: WordService,
     private wordTypeMapper: WordTypeMapper,
   ) {}
 
-  @Query((type) => WordType, { nullable: true })
+  @Query(() => WordType, { nullable: true })
   async word(
     @ContextDec() ctx: Context,
     @Args('id', { type: () => ID }) id: WordId,
@@ -27,7 +27,7 @@ export class WordResolver {
     return word ? this.wordTypeMapper.map(word) : null;
   }
 
-  @Mutation((returns) => WordType)
+  @Mutation(() => WordType)
   async createWord(
     @ContextDec() ctx: Context,
     @Args('input') input: CreateWordInput,
@@ -39,7 +39,7 @@ export class WordResolver {
     return this.wordTypeMapper.map(createdWord);
   }
 
-  @Mutation((returns) => WordType)
+  @Mutation(() => WordType)
   async updateWord(
     @ContextDec() ctx: Context,
     @Args('input') input: UpdateWordInput,
@@ -51,7 +51,7 @@ export class WordResolver {
     return this.wordTypeMapper.map(updatedWord);
   }
 
-  @Mutation((returns) => WordType)
+  @Mutation(() => WordType)
   async deleteWord(
     @ContextDec() ctx: Context,
     @Args('input') input: DeleteWordInput,

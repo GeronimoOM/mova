@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaBook, FaBrain } from 'react-icons/fa6';
 import { PiGraphBold } from 'react-icons/pi';
@@ -15,7 +15,7 @@ import { useLanguageContext } from '../LanguageContext';
 import { Icon } from '../common/Icon';
 import * as styles from './StatsTab.css';
 
-export const StatsTab: React.FC = () => {
+export const StatsTab = () => {
   const [selectedLanguageId] = useLanguageContext();
 
   const { data: statsQuery } = useQuery(GetStatsDocument, {
@@ -106,7 +106,7 @@ type ChartProps = {
   data: ChartEntry[];
 };
 
-const Chart: React.FC<ChartProps> = ({ data }) => {
+const Chart = ({ data }: ChartProps) => {
   return (
     <PieChart
       data={data}
@@ -125,7 +125,7 @@ type ChartLegendProps = {
   data: ChartEntry[];
 };
 
-const ChartLegend: React.FC<ChartLegendProps> = ({ data }) => {
+const ChartLegend = ({ data }: ChartLegendProps) => {
   const { t } = useTranslation();
 
   return (

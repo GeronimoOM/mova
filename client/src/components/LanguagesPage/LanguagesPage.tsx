@@ -8,7 +8,7 @@ import { ButtonIcon } from '../common/ButtonIcon';
 import { LanguageCard } from './LanguageCard';
 import * as styles from './LanguagesPage.css';
 
-export const LanguagesPage: React.FC = () => {
+export const LanguagesPage = () => {
   const [selectedLanguageId, setSelectedLanguageId] = useLanguageContext();
   const [isNewLanguageOpen, setIsNewLanguageOpen] = useState(false);
 

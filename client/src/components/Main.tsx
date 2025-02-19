@@ -1,4 +1,3 @@
-import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { AppRoute } from '../routes';
 import { ExercisesPage } from './ExercisesPage/ExercisesPage';
@@ -9,7 +8,7 @@ import { PropertiesPage } from './PropertiesPage/PropertiesPage';
 import { UserPage } from './UserPage/UserPage';
 import { WordsPage } from './WordsPage/WordsPage';
 
-export const Main: React.FC = () => {
+export const Main = () => {
   return (
     <main className={styles.main}>
       <Routes>

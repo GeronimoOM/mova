@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import {
   GetAllProgressDocument,
   ProgressFieldsFragment,
@@ -11,7 +11,7 @@ import * as styles from './ProgressTab.css';
 import { ProgressTypeBar } from './ProgressTypeBar';
 import { ProgressTypes } from './progress';
 
-export const ProgressTab: React.FC = () => {
+export const ProgressTab = () => {
   const [selectedLanguageId] = useLanguageContext();
   const { data: progressQuery } = useQuery(GetAllProgressDocument, {
     variables: { languageId: selectedLanguageId! },

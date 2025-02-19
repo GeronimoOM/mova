@@ -1,5 +1,4 @@
 import classNames from 'classnames';
-import React from 'react';
 import { IconType } from 'react-icons';
 import { FaSyncAlt } from 'react-icons/fa';
 import { Color } from '../../index.css';
@@ -18,7 +17,7 @@ export type ButtonIconProps = IconProps & {
   wrapped?: boolean;
 };
 
-export const ButtonIcon: React.FC<ButtonIconProps> = ({
+export const ButtonIcon = ({
   icon,
   onClick,
   color,
@@ -28,7 +27,7 @@ export const ButtonIcon: React.FC<ButtonIconProps> = ({
   toggled,
   empty,
   wrapped,
-}) => {
+}: ButtonIconProps) => {
   const button = (
     <div
       className={classNames(styles.button({ color, disabled, loading }), {

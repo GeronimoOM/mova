@@ -460,7 +460,6 @@ export class WordRepository {
       ? this.serializer.serialize(
           records.mapValues(
             propertyValues,
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             ({ property, ...propertyValue }) => propertyValue,
           ),
         )

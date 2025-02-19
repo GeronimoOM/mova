@@ -136,7 +136,6 @@ export class ChangeRepository {
   }
 
   private mapDataFromChange(change: Change): string {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, changedAt, type, clientId, ...changeData } = change;
 
     return this.serializer.serialize(changeData);

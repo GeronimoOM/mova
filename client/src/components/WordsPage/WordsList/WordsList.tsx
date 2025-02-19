@@ -1,18 +1,16 @@
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { TbHexagonPlusFilled } from 'react-icons/tb';
+import { WordFieldsFragment } from '../../../api/types/graphql';
 import { MIN_QUERY_LENGTH } from '../../../utils/constants';
 import { useInfiniteScroll } from '../../../utils/useInfiniteScroll';
-import { useLanguageContext } from '../../LanguageContext';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { Loader } from '../../common/Loader';
 import * as styles from './WordsList.css';
 import { WordsListItem, WordsListItemDivider } from './WordsListItem';
 import { isDivider, WordDateDivider } from './useWordsList';
-import { WordFieldsFragment } from '../../../api/types/graphql';
 
 export type WordsListProps = {
-  words: Array<WordFieldsFragment | WordDateDivider> | undefined,
+  words: Array<WordFieldsFragment | WordDateDivider> | undefined;
   wordsLoading: boolean;
   wordsSearchQuery: string;
   onFetchNextPage: () => void;
@@ -20,15 +18,14 @@ export type WordsListProps = {
   onCreateNew: () => void;
 };
 
-export const WordsList: React.FC<WordsListProps> = ({
+export const WordsList = ({
   words,
   wordsLoading,
   wordsSearchQuery,
   onFetchNextPage,
   onSelectWord,
   onCreateNew,
-}) => {
-  const [selectedLanguageId] = useLanguageContext();
+}: WordsListProps) => {
   const isSearch = wordsSearchQuery.length >= MIN_QUERY_LENGTH;
 
   const isEmpty = !words?.length && !wordsLoading;
@@ -85,7 +82,7 @@ type NoWordsProps = {
   isSearch: boolean;
 };
 
-const NoWords: React.FC<NoWordsProps> = ({ isSearch }) => {
+const NoWords = ({ isSearch }: NoWordsProps) => {
   const { t } = useTranslation();
 
   return (

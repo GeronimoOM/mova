@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { Main } from './Main';
 import { NavBar } from './NavBar/NavBar';
 
@@ -10,7 +10,7 @@ import { useLanguageContext } from './LanguageContext';
 import { LoginForm } from './LoginForm';
 import { useSettingsContext } from './SettingsContext';
 
-export const App: React.FC = () => {
+export const App = () => {
   const { authToken } = useAuthContext();
   const [, setLanguage] = useLanguageContext();
   const { font } = useSettingsContext();

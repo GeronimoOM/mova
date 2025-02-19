@@ -155,7 +155,9 @@ export class ExerciseService {
         currentWord.masteryAttemptAt.plus(MASTERY_ATTEMPT_DELAY) >=
           DateTime.utc())
     ) {
-      throw new Error(`Word mastery cannot be increased yet (wordId:${params.wordId})`);
+      throw new Error(
+        `Word mastery cannot be increased yet (wordId:${params.wordId})`,
+      );
     }
 
     const now = DateTime.utc();
@@ -176,13 +178,17 @@ export class ExerciseService {
 
     await this.connectionManager.transactionally(async () => {
       await this.wordRepository.update(word);
-      change && (await this.changeService.create(change));
-      params.success &&
-        (await this.progressService.saveProgress(word.languageId, {
+      if (change) {
+        await this.changeService.create(change);
+      }
+
+      if (params.success) {
+        await this.progressService.saveProgress(word.languageId, {
           id: uuid(),
           type: ProgressType.Mastery,
           date: change.changedAt,
-        }));
+        });
+      }
     });
 
     return word;

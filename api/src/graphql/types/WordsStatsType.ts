@@ -3,30 +3,30 @@ import { PartOfSpeech } from 'models/Word';
 
 @ObjectType('WordsStatsMastery')
 export class WordsStatsMasteryType {
-  @Field((type) => Int)
+  @Field(() => Int)
   total: number;
 
-  @Field((type) => Int)
+  @Field(() => Int)
   mastery: number;
 }
 
 @ObjectType('WordsStatsPartOfSpeech')
 export class WordsStatsPartOfSpeechType {
-  @Field((type) => Int)
+  @Field(() => Int)
   total: number;
 
-  @Field((type) => PartOfSpeech)
+  @Field(() => PartOfSpeech)
   partOfSpeech: PartOfSpeech;
 }
 
 @ObjectType('WordsStats')
 export class WordsStatsType {
-  @Field((type) => Int)
+  @Field(() => Int)
   total: number;
 
-  @Field((type) => [WordsStatsMasteryType])
+  @Field(() => [WordsStatsMasteryType])
   mastery: WordsStatsMasteryType[];
 
-  @Field((type) => [WordsStatsPartOfSpeechType])
+  @Field(() => [WordsStatsPartOfSpeechType])
   partsOfSpeech: WordsStatsPartOfSpeechType[];
 }

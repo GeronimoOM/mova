@@ -1,13 +1,15 @@
 import classNames from 'classnames';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { useTranslation } from 'react-i18next';
 import { FaFeatherPointed, FaFire } from 'react-icons/fa6';
+import { HiMiniXMark } from 'react-icons/hi2';
 import { IoReorderThree } from 'react-icons/io5';
 import { PartOfSpeech, PropertyFieldsFragment } from '../../api/types/graphql';
 import { ButtonIcon } from '../common/ButtonIcon';
 import { Icon } from '../common/Icon';
 import { Input } from '../common/Input';
+import { Modal } from '../common/Modal';
 import * as styles from './PropertyListItem.css';
 import { typeToIcon, typeToLabel } from './properties';
 import {
@@ -16,8 +18,6 @@ import {
   usePropertyDrop,
 } from './reorderProperties';
 import { useProperty } from './useProperty';
-import { Modal } from '../common/Modal';
-import { HiMiniXMark } from 'react-icons/hi2';
 
 export type PropertyListItemProps = {
   partOfSpeech: PartOfSpeech;
@@ -29,7 +29,7 @@ export type PropertyListItemProps = {
   onReorder: () => void;
 };
 
-export const PropertyListItem: React.FC<PropertyListItemProps> = ({
+export const PropertyListItem = ({
   partOfSpeech,
   property: currentProperty,
   selected,
@@ -37,7 +37,7 @@ export const PropertyListItem: React.FC<PropertyListItemProps> = ({
   onPropertyCreated,
   onSwapPreview,
   onReorder,
-}) => {
+}: PropertyListItemProps) => {
   const {
     isNewProperty,
     property,
@@ -122,10 +122,7 @@ export const PropertyListItem: React.FC<PropertyListItemProps> = ({
           ref={dragRef}
           className={classNames(styles.button, { hidden: !selected })}
         >
-          <ButtonIcon
-            icon={IoReorderThree}
-            disabled={!canDragProperty}
-          />
+          <ButtonIcon icon={IoReorderThree} disabled={!canDragProperty} />
         </div>
       </div>
 
@@ -146,10 +143,11 @@ export const PropertyListItem: React.FC<PropertyListItemProps> = ({
           />
         </div>
       </div>
-        {isDeleteConfirmOpen && <Modal onClose={() => setDeleteConfirmOpen(false)}>
+      {isDeleteConfirmOpen && (
+        <Modal onClose={() => setDeleteConfirmOpen(false)}>
           <div className={styles.deleteConfirm}>
             <div className={styles.deleteConfirmText}>
-            {t('properties.delete')}
+              {t('properties.delete')}
               <div className={styles.deleteConfirmProperty}>
                 {property.name}
               </div>
@@ -169,12 +167,13 @@ export const PropertyListItem: React.FC<PropertyListItemProps> = ({
               />
             </div>
           </div>
-        </Modal>}
+        </Modal>
+      )}
     </div>
   );
 };
 
-export const PropertyListItemOverlay: React.FC = () => {
+export const PropertyListItemOverlay = () => {
   const { isDragging, property, position } = usePropertyDragLayer();
 
   if (!isDragging || !position) {
@@ -195,10 +194,7 @@ export const PropertyListItemOverlay: React.FC = () => {
             </>
           )}
         </div>
-        <ButtonIcon
-          icon={FaFeatherPointed}
-          disabled={true}
-        />
+        <ButtonIcon icon={FaFeatherPointed} disabled={true} />
         <ButtonIcon icon={IoReorderThree} />
       </div>
 

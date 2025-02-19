@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/client';
 import classNames from 'classnames';
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsEraserFill } from 'react-icons/bs';
 import { FaFeatherPointed } from 'react-icons/fa6';
@@ -32,7 +32,7 @@ const cadenceToLabel: Record<ProgressCadence, string> = {
   [ProgressCadence.Weekly]: 'goals.weekly',
 };
 
-export const GoalsTab: React.FC = () => {
+export const GoalsTab = () => {
   const [selectedLanguageId] = useLanguageContext();
   const [goals, setGoals] = useState<Goal[] | null>(null);
 
@@ -128,11 +128,7 @@ type ProgressGoalProps = {
   onGoalChange: (goal: GoalFieldsFragment) => void;
 };
 
-const ProgressGoal: React.FC<ProgressGoalProps> = ({
-  type,
-  goal,
-  onGoalChange,
-}) => {
+const ProgressGoal = ({ type, goal, onGoalChange }: ProgressGoalProps) => {
   const { t } = useTranslation();
 
   const color = progressTypeToColor[type];

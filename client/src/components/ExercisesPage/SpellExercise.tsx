@@ -34,14 +34,14 @@ export type SpellExerciseProps = {
   advanced?: boolean;
 };
 
-export const SpellExercise: React.FC<SpellExerciseProps> = ({
+export const SpellExercise = ({
   word,
   properties,
   onSuccess,
   onFailure,
   onNext,
   advanced,
-}) => {
+}: SpellExerciseProps) => {
   const [revealPrefix, setRevealPrefix] = useState(
     advanced ? ADVANCED_REVEAL_PREFIX : NORMAL_REVEAL_PREFIX,
   );
@@ -160,14 +160,14 @@ type SpellTextExercisePropertyProps = {
   onResult: (result: boolean) => void;
 };
 
-const SpellTextExerciseProperty: React.FC<SpellTextExercisePropertyProps> = ({
+const SpellTextExerciseProperty = ({
   word,
   property,
   isSubmitted,
   revealPrefix,
   advanced,
   onResult,
-}) => {
+}: SpellTextExercisePropertyProps) => {
   const propertyValue = useMemo(() => {
     if (!property) {
       return word.original;
@@ -219,7 +219,6 @@ const SpellTextExerciseProperty: React.FC<SpellTextExercisePropertyProps> = ({
       setInput(verifiedInput);
       setHighlights(verifiedHighlights);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSubmitted]);
 
   return (

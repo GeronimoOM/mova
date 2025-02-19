@@ -16,7 +16,7 @@ export class AuthResolver {
   constructor(private authService: AuthService) {}
 
   @Public()
-  @Mutation((returns) => String, { nullable: true })
+  @Mutation(() => String, { nullable: true })
   async login(@Args('input') input: LoginInput): Promise<string | null> {
     try {
       return await this.authService.login(input.name, input.password);

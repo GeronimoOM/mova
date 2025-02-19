@@ -46,7 +46,7 @@ export function initTranslator() {
     });
 }
 
-export const LocaleProvider: React.FC<LocaleProviderProps> = ({ children }) => {
+export const LocaleProvider = ({ children }: LocaleProviderProps) => {
   const { authToken } = useAuthContext();
   const { i18n } = useTranslation();
 

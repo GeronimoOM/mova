@@ -60,7 +60,9 @@ export class LanguageService {
       (language) => language.userId === ctx.user.id,
     );
     if (languages.length < ids.length) {
-      const missingIds = ids.filter((id) => !languages.find((language) => language.id === id));
+      const missingIds = ids.filter(
+        (id) => !languages.find((language) => language.id === id),
+      );
       throw new Error(`Languages do not exist (ids:${missingIds.join(',')})`);
     }
 

@@ -1,11 +1,10 @@
 import { useQuery } from '@apollo/client';
-import React from 'react';
 import { GetProgressDocument, ProgressType } from '../../api/types/graphql';
 import { useLanguageContext } from '../LanguageContext';
 import { ProgressTypeBar } from '../ProgressPage/ProgressTypeBar';
 import * as styles from './ExerciseProgress.css';
 
-export const ExerciseProgress: React.FC = () => {
+export const ExerciseProgress = () => {
   const [selectedLanguageId] = useLanguageContext();
 
   const { data: progressQuery } = useQuery(GetProgressDocument, {

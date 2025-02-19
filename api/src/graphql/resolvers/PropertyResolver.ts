@@ -12,14 +12,14 @@ import {
   UpdatePropertyInput,
 } from '../types/PropertyType';
 
-@Resolver((of) => PropertyUnionType)
+@Resolver(() => PropertyUnionType)
 export class PropertyResolver {
   constructor(
     private propertyService: PropertyService,
     private propertyTypeMapper: PropertyTypeMapper,
   ) {}
 
-  @Query((type) => PropertyUnionType, { nullable: true })
+  @Query(() => PropertyUnionType, { nullable: true })
   async property(
     @ContextDec() ctx: Context,
     @Args('id', { type: () => ID }) id: PropertyId,
@@ -30,7 +30,7 @@ export class PropertyResolver {
     return property ? this.propertyTypeMapper.map(property) : null;
   }
 
-  @Mutation((returns) => PropertyUnionType)
+  @Mutation(() => PropertyUnionType)
   async createProperty(
     @ContextDec() ctx: Context,
     @Args('input') input: CreatePropertyInput,
@@ -39,7 +39,7 @@ export class PropertyResolver {
     return this.propertyTypeMapper.map(createdProperty);
   }
 
-  @Mutation((returns) => PropertyUnionType)
+  @Mutation(() => PropertyUnionType)
   async updateProperty(
     @ContextDec() ctx: Context,
     @Args('input') input: UpdatePropertyInput,
@@ -51,7 +51,7 @@ export class PropertyResolver {
     return this.propertyTypeMapper.map(updatedProperty);
   }
 
-  @Mutation((returns) => [PropertyUnionType])
+  @Mutation(() => [PropertyUnionType])
   async reorderProperties(
     @ContextDec() ctx: Context,
     @Args('input') input: ReorderPropertiesInput,
@@ -66,7 +66,7 @@ export class PropertyResolver {
     return properties.map((property) => this.propertyTypeMapper.map(property));
   }
 
-  @Mutation((returns) => PropertyUnionType)
+  @Mutation(() => PropertyUnionType)
   async deleteProperty(
     @ContextDec() ctx: Context,
     @Args('input') input: DeletePropertyInput,

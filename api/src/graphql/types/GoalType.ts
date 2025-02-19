@@ -19,33 +19,33 @@ registerEnumType(ProgressCadence, {
 
 @ObjectType('Goal')
 export class GoalType {
-  @Field((type) => ProgressType)
+  @Field(() => ProgressType)
   type: ProgressType;
 
-  @Field((type) => ProgressCadence)
+  @Field(() => ProgressCadence)
   cadence: ProgressCadence;
 
-  @Field((type) => Int)
+  @Field(() => Int)
   points: number;
 }
 
 @InputType('SetGoalsInput')
 export class SetGoalsInput {
-  @Field((type) => ID)
+  @Field(() => ID)
   languageId: LanguageId;
 
-  @Field((type) => [SetGoalInput])
+  @Field(() => [SetGoalInput])
   goals: SetGoalInput[];
 }
 
 @InputType('SetGoalInput')
 export class SetGoalInput {
-  @Field((type) => ProgressType)
+  @Field(() => ProgressType)
   type: ProgressType;
 
-  @Field((type) => ProgressCadence)
+  @Field(() => ProgressCadence)
   cadence: ProgressCadence;
 
-  @Field((type) => Int)
+  @Field(() => Int)
   points: number;
 }

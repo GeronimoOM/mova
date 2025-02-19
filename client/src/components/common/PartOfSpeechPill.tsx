@@ -1,5 +1,4 @@
 import classNames from 'classnames';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { PartOfSpeech } from '../../api/types/graphql';
 import { partOfSpeechToShortLabel } from '../../utils/partsOfSpeech';
@@ -11,11 +10,11 @@ export type PartOfSpeechPillProps = {
   active?: boolean;
 };
 
-export const PartOfSpeechPill: React.FC<PartOfSpeechPillProps> = ({
+export const PartOfSpeechPill = ({
   partOfSpeech,
   disabled,
   active,
-}) => {
+}: PartOfSpeechPillProps) => {
   const { t } = useTranslation();
 
   return (

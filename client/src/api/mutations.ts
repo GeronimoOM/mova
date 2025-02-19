@@ -1,4 +1,5 @@
 import { TypedDocumentNode, useMutation } from '@apollo/client';
+import { fromTimestamp, toTimestamp } from '../utils/datetime';
 import { MaxMastery } from '../utils/mastery';
 import { cache } from './cache';
 import {
@@ -27,7 +28,6 @@ import {
   WordFieldsFullFragment,
   WordFieldsFullFragmentDoc,
 } from './types/graphql';
-import { fromTimestamp, toTimestamp } from '../utils/datetime';
 
 type UseMutationResult<MDocument> =
   MDocument extends TypedDocumentNode<infer MData, infer MVariables>
@@ -211,7 +211,9 @@ export function useCreateWord(): UseMutationResult<typeof CreateWordDocument> {
         id: input.id!,
         addedAt: input.addedAt!,
         mastery: 0,
-        nextExerciseAt: toTimestamp(fromTimestamp(input.addedAt!)!.plus({ days: 1 }))!,
+        nextExerciseAt: toTimestamp(
+          fromTimestamp(input.addedAt!)!.plus({ days: 1 }),
+        )!,
         properties:
           input.properties?.map(({ id, text }) => ({
             property: {

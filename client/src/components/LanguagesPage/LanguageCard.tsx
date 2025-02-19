@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FaCircle } from 'react-icons/fa';
 
 import { LanguageFieldsFragment } from '../../api/types/graphql';
@@ -6,12 +6,12 @@ import { LanguageFieldsFragment } from '../../api/types/graphql';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { FaFeatherPointed, FaFire } from 'react-icons/fa6';
+import { HiMiniXMark } from 'react-icons/hi2';
 import { ButtonIcon } from '../common/ButtonIcon';
 import { Input } from '../common/Input';
+import { Modal } from '../common/Modal';
 import * as styles from './LanguageCard.css';
 import { useLanguage } from './useLanguage';
-import { Modal } from '../common/Modal';
-import { HiMiniXMark } from 'react-icons/hi2';
 
 export type LanguageCardProps = {
   language: LanguageFieldsFragment | null;
@@ -20,12 +20,12 @@ export type LanguageCardProps = {
   onLanguageCreated: () => void;
 };
 
-export const LanguageCard: React.FC<LanguageCardProps> = ({
+export const LanguageCard = ({
   language: currentLanguage,
   selected,
   onSelect,
   onLanguageCreated,
-}) => {
+}: LanguageCardProps) => {
   const {
     isNewLanguage,
     language,
@@ -86,30 +86,32 @@ export const LanguageCard: React.FC<LanguageCardProps> = ({
         />
       </div>
 
-      {isDeleteConfirmOpen && <Modal onClose={() => setDeleteConfirmOpen(false)}>
-        <div className={styles.deleteConfirm}>
-          <div className={styles.deleteConfirmText}>
-            {t('languages.delete')}
-            <div className={styles.deleteConfirmLanguage}>
-            {language.name}
+      {isDeleteConfirmOpen && (
+        <Modal onClose={() => setDeleteConfirmOpen(false)}>
+          <div className={styles.deleteConfirm}>
+            <div className={styles.deleteConfirmText}>
+              {t('languages.delete')}
+              <div className={styles.deleteConfirmLanguage}>
+                {language.name}
+              </div>
+            </div>
+
+            <div className={styles.deleteConfirmButtons}>
+              <ButtonIcon
+                icon={FaFire}
+                onClick={deleteLanguage}
+                color="negative"
+                loading={languageDeleting}
+              />
+
+              <ButtonIcon
+                icon={HiMiniXMark}
+                onClick={() => setDeleteConfirmOpen(false)}
+              />
             </div>
           </div>
-
-          <div className={styles.deleteConfirmButtons}>
-            <ButtonIcon
-              icon={FaFire}
-              onClick={deleteLanguage}
-              color="negative"
-              loading={languageDeleting}
-            />
-
-            <ButtonIcon
-              icon={HiMiniXMark}
-              onClick={() => setDeleteConfirmOpen(false)}
-            />
-          </div>
-        </div>
-      </Modal>}
+        </Modal>
+      )}
     </div>
   );
 };

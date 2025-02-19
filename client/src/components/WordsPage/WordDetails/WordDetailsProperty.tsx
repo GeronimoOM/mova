@@ -13,12 +13,12 @@ export type WordDetailsPropertyProps = {
   simplified?: boolean;
 };
 
-export const WordDetailsProperty: React.FC<WordDetailsPropertyProps> = ({
+export const WordDetailsProperty = ({
   property,
   wordProperty,
   onChange,
   simplified,
-}) => {
+}: WordDetailsPropertyProps) => {
   return (
     <div className={styles.row}>
       <div className={styles.label}>{property.name}</div>
@@ -40,9 +40,9 @@ type WordDetailsPropertySkeletonProps = {
   length?: 'small' | 'medium' | 'large';
 };
 
-export const WordDetailsPropertySkeleton: React.FC<
-  WordDetailsPropertySkeletonProps
-> = ({ length }) => {
+export const WordDetailsPropertySkeleton = ({
+  length,
+}: WordDetailsPropertySkeletonProps) => {
   return (
     <>
       <div className={styles.labelSkeleton({ length })} />
@@ -51,7 +51,7 @@ export const WordDetailsPropertySkeleton: React.FC<
   );
 };
 
-export const WordDetailsPropertiesSkeleton: React.FC = () => {
+export const WordDetailsPropertiesSkeleton = () => {
   return (
     <>
       <WordDetailsPropertySkeleton length={'medium'} />

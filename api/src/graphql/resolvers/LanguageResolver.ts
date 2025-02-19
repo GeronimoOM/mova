@@ -33,7 +33,7 @@ import { PageArgsType } from '../types/PageType';
 import { PropertyUnionType } from '../types/PropertyType';
 import { WordPageType, WordType } from '../types/WordType';
 
-@Resolver((of) => LanguageType)
+@Resolver(() => LanguageType)
 export class LanguageResolver {
   constructor(
     private languageService: LanguageService,
@@ -44,12 +44,12 @@ export class LanguageResolver {
     private wordTypeMapper: WordTypeMapper,
   ) {}
 
-  @Query((type) => [LanguageType])
+  @Query(() => [LanguageType])
   async languages(@ContextDec() ctx: Context): Promise<LanguageType[]> {
     return await this.languageService.getAll(ctx);
   }
 
-  @Query((type) => LanguageType, { nullable: true })
+  @Query(() => LanguageType, { nullable: true })
   async language(
     @ContextDec() ctx: Context,
     @Args('id', { type: () => ID }) id: LanguageId,
@@ -57,7 +57,7 @@ export class LanguageResolver {
     return this.languageService.getById(ctx, id).catch(() => null);
   }
 
-  @Mutation((returns) => LanguageType)
+  @Mutation(() => LanguageType)
   async createLanguage(
     @ContextDec() ctx: Context,
     @Args('input') input: CreateLanguageInput,
@@ -66,7 +66,7 @@ export class LanguageResolver {
     return createdLanguage;
   }
 
-  @Mutation((returns) => LanguageType)
+  @Mutation(() => LanguageType)
   async updateLanguage(
     @ContextDec() ctx: Context,
     @Args('input') input: UpdateLanguageInput,
@@ -75,7 +75,7 @@ export class LanguageResolver {
     return updatedLanguage;
   }
 
-  @Mutation((returns) => LanguageType)
+  @Mutation(() => LanguageType)
   async deleteLanguage(
     @ContextDec() ctx: Context,
     @Args('input') input: DeleteLanguageInput,
@@ -84,7 +84,7 @@ export class LanguageResolver {
     return deletedLanguage;
   }
 
-  @ResolveField((type) => [PropertyUnionType])
+  @ResolveField(() => [PropertyUnionType])
   async properties(
     @ContextDec() ctx: Context,
     @Parent() language: LanguageType,
@@ -100,7 +100,7 @@ export class LanguageResolver {
     return properties.map((property) => this.propertyTypeMapper.map(property));
   }
 
-  @ResolveField((type) => WordPageType)
+  @ResolveField(() => WordPageType)
   async words(
     @ContextDec() ctx: Context,
     @Parent() language: LanguageType,
@@ -130,7 +130,7 @@ export class LanguageResolver {
     );
   }
 
-  @ResolveField((type) => WordType, { nullable: true })
+  @ResolveField(() => WordType, { nullable: true })
   async word(
     @ContextDec() ctx: Context,
     @Parent() language: LanguageType,
@@ -140,7 +140,7 @@ export class LanguageResolver {
     return word ? this.wordTypeMapper.map(word) : null;
   }
 
-  @ResolveField((type) => WordsStatsType)
+  @ResolveField(() => WordsStatsType)
   async stats(@Parent() language: LanguageType): Promise<WordsStatsType> {
     const wordsStats = await this.progressService.getStats(language.id);
 
@@ -159,12 +159,12 @@ export class LanguageResolver {
     };
   }
 
-  @ResolveField((type) => [GoalType])
+  @ResolveField(() => [GoalType])
   async goals(@Parent() language: LanguageType): Promise<GoalType[]> {
     return await this.progressService.getGoals(language.id);
   }
 
-  @ResolveField((type) => ProgressType)
+  @ResolveField(() => ProgressType)
   async progress(
     @ContextDec() ctx: Context,
     @Parent() language: LanguageType,

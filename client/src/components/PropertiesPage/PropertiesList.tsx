@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { TbHexagonPlusFilled } from 'react-icons/tb';
@@ -13,9 +13,9 @@ export type PropertiesListProps = {
   selectedPartOfSpeech: PartOfSpeech;
 };
 
-export const PropertiesList: React.FC<PropertiesListProps> = ({
+export const PropertiesList = ({
   selectedPartOfSpeech,
-}) => {
+}: PropertiesListProps) => {
   const [selectedLanguageId] = useLanguageContext();
 
   const { orderedProperties, swapPropertiesPreview, reorderProperties } =

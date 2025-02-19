@@ -175,13 +175,14 @@ export class PropertyRepository {
     switch (row.type) {
       case PropertyType.Text:
         return baseProperty as TextProperty;
-      case PropertyType.Option:
+      case PropertyType.Option: {
         const options: Record<OptionId, string> =
           this.serializer.deserialize<OptionProperty>(row.data).options;
         return {
           ...baseProperty,
           options,
         } as OptionProperty;
+      }
     }
   }
 }

@@ -19,12 +19,12 @@ export type RecallExerciseProps = {
   onNext: () => void;
 };
 
-export const RecallExercise: React.FC<RecallExerciseProps> = ({
+export const RecallExercise = ({
   word,
   onSuccess,
   onFailure,
   onNext,
-}) => {
+}: RecallExerciseProps) => {
   const [isRevealed, setIsRevealed] = useState(false);
   const [result, setResult] = useState<boolean | null>(null);
   const isSubmitted = result !== null;

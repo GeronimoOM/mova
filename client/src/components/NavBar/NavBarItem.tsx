@@ -1,5 +1,4 @@
 import classNames from 'classnames';
-import React from 'react';
 import { IconType } from 'react-icons';
 import { NavLink } from 'react-router-dom';
 import { allowedNoLanguageRoutes, AppRoute } from '../../routes';
@@ -13,7 +12,7 @@ type NavBarItemProps = {
   text: string;
 };
 
-export const NavBarItem: React.FC<NavBarItemProps> = ({ href, icon, text }) => {
+export const NavBarItem = ({ href, icon, text }: NavBarItemProps) => {
   const [selectedLanguageId] = useLanguageContext();
   const disabled =
     !selectedLanguageId && !allowedNoLanguageRoutes.includes(href as AppRoute);

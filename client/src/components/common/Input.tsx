@@ -18,7 +18,7 @@ export type InputProps = {
   obscured?: boolean;
 };
 
-export const Input: React.FC<InputProps> = ({
+export const Input = ({
   value,
   onChange,
   onBlur,
@@ -32,7 +32,7 @@ export const Input: React.FC<InputProps> = ({
   right,
   loading,
   obscured,
-}) => {
+}: InputProps) => {
   return (
     <div className={styles.wrapper}>
       {left && <div className={styles.left}>{left}</div>}

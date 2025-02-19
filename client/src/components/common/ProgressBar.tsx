@@ -1,4 +1,3 @@
-import React from 'react';
 import { Color } from '../../index.css';
 import * as styles from './ProgressBar.css';
 
@@ -7,10 +6,7 @@ export type ProgressBarProps = {
   color?: Color;
 };
 
-export const ProgressBar: React.FC<ProgressBarProps> = ({
-  progress,
-  color,
-}) => {
+export const ProgressBar = ({ progress, color }: ProgressBarProps) => {
   return (
     <div className={styles.container}>
       <div

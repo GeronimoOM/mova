@@ -1,5 +1,5 @@
 import { NetworkStatus, useLazyQuery, useQuery } from '@apollo/client';
-import React, { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { FaInfo } from 'react-icons/fa';
 import { HiMiniXMark } from 'react-icons/hi2';
 
@@ -23,7 +23,7 @@ import { RecallExercise } from './RecallExercise';
 import { SpellExercise } from './SpellExercise';
 import { ExerciseType, masteryToExerciseType } from './exercises';
 
-export const ExerciseCard: React.FC = () => {
+export const ExerciseCard = () => {
   const [selectedLanguageId] = useLanguageContext();
 
   const [isStarted, setIsStarted] = useState(false);
@@ -80,7 +80,11 @@ export const ExerciseCard: React.FC = () => {
 
   const handleStart = () => {
     setIsStarted(true);
-    words ? refetchExerciseWords() : fetchExerciseWords();
+    if (words) {
+      refetchExerciseWords();
+    } else {
+      fetchExerciseWords();
+    }
     setWordIndex(0);
     setInfoOpen(false);
   };
@@ -179,11 +183,11 @@ type ExerciseStartProps = {
   onStart: () => void;
 };
 
-const ExerciseStart: React.FC<ExerciseStartProps> = ({
+const ExerciseStart = ({
   loading,
   exerciseCount,
   onStart,
-}) => {
+}: ExerciseStartProps) => {
   const { t } = useTranslation();
 
   if (loading) {
@@ -211,7 +215,7 @@ const ExerciseStart: React.FC<ExerciseStartProps> = ({
   );
 };
 
-const ExercisesNotReady: React.FC = () => {
+const ExercisesNotReady = () => {
   const { t } = useTranslation();
 
   return (
@@ -232,13 +236,13 @@ type ExerciseProps = {
   onNext: () => void;
 };
 
-const Exercise: React.FC<ExerciseProps> = ({
+const Exercise = ({
   word,
   properties,
   onSuccess,
   onFailure,
   onNext,
-}) => {
+}: ExerciseProps) => {
   const [mastery] = useState(word.mastery);
   const exerciseType = masteryToExerciseType[mastery];
   switch (exerciseType) {
@@ -271,10 +275,7 @@ type WordDetailsOverlayProps = {
   onClose: () => void;
 };
 
-const WordDetailsOverlay: React.FC<WordDetailsOverlayProps> = ({
-  wordId,
-  onClose,
-}) => {
+const WordDetailsOverlay = ({ wordId, onClose }: WordDetailsOverlayProps) => {
   const ref = useRef<HTMLDivElement>(null);
 
   return (

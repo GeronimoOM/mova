@@ -137,7 +137,7 @@ export class PropertyService {
       case PropertyType.Text:
         property = baseProperty as TextProperty;
         break;
-      case PropertyType.Option:
+      case PropertyType.Option: {
         const options = (params as CreateOptionPropertyParams).options;
         if (!options || options.length < 2) {
           throw new Error(`Options are required (propertyId:${params.id})`);
@@ -149,6 +149,7 @@ export class PropertyService {
           ),
         } as OptionProperty;
         break;
+      }
     }
 
     await this.connectionManager.transactionally(async () => {

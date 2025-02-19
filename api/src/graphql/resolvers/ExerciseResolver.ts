@@ -15,14 +15,14 @@ import { Context } from 'models/Context';
 import { WordId } from 'models/Word';
 import { ExerciseService } from 'services/ExerciseService';
 
-@Resolver((of) => LanguageType)
+@Resolver(() => LanguageType)
 export class ExerciseResolver {
   constructor(
     private exerciseService: ExerciseService,
     private wordTypeMapper: WordTypeMapper,
   ) {}
 
-  @ResolveField((type) => [WordType])
+  @ResolveField(() => [WordType])
   async exerciseWords(
     @ContextDec() ctx: Context,
     @Parent() language: LanguageType,
@@ -35,7 +35,7 @@ export class ExerciseResolver {
     return words.map((word) => this.wordTypeMapper.map(word));
   }
 
-  @ResolveField((type) => Int)
+  @ResolveField(() => Int)
   async exerciseCount(
     @ContextDec() ctx: Context,
     @Parent() language: LanguageType,
@@ -43,7 +43,7 @@ export class ExerciseResolver {
     return await this.exerciseService.getCount(ctx, language.id);
   }
 
-  @Mutation((returns) => WordType)
+  @Mutation(() => WordType)
   async attemptMastery(
     @ContextDec() ctx: Context,
     @Args('wordId', { type: () => ID }) wordId: WordId,

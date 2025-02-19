@@ -26,7 +26,7 @@ type AuthProviderProps = {
   children?: React.ReactNode;
 };
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [token, setToken] = useState<string | null>(() =>
     localStorage.getItem(LOCAL_STORAGE_TOKEN_KEY),
   );

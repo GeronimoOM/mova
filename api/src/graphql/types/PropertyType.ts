@@ -26,25 +26,25 @@ registerEnumType(PropertyTypeEnum, {
 
 @InterfaceType('IProperty')
 export abstract class PropertyInterface {
-  @Field((type) => ID)
+  @Field(() => ID)
   id: PropertyId;
 
   @Field()
   name: string;
 
-  @Field((type) => PropertyTypeEnum)
+  @Field(() => PropertyTypeEnum)
   type: PropertyTypeEnum;
 
-  @Field((type) => PartOfSpeech)
+  @Field(() => PartOfSpeech)
   partOfSpeech: PartOfSpeech;
 
-  @Field((type) => TimestampScalar)
+  @Field(() => TimestampScalar)
   addedAt: DateTime;
 
-  @Field((type) => Int)
+  @Field(() => Int)
   order: number;
 
-  @Field((type) => ID)
+  @Field(() => ID)
   languageId: LanguageId;
 }
 
@@ -85,55 +85,55 @@ export const PropertyUnionType = createUnionType({
 
 @InputType()
 export class CreatePropertyInput {
-  @Field((type) => ID, { nullable: true })
+  @Field(() => ID, { nullable: true })
   id?: PropertyId;
 
   @Field()
   name: string;
 
-  @Field((type) => PropertyType)
+  @Field(() => PropertyType)
   type: PropertyType;
 
-  @Field((type) => ID)
+  @Field(() => ID)
   languageId: LanguageId;
 
-  @Field((type) => PartOfSpeech)
+  @Field(() => PartOfSpeech)
   partOfSpeech: PartOfSpeech;
 
-  @Field((type) => TimestampScalar, { nullable: true })
+  @Field(() => TimestampScalar, { nullable: true })
   addedAt?: DateTime;
 
-  @Field((type) => [String], { nullable: true })
+  @Field(() => [String], { nullable: true })
   options: string[];
 }
 
 @InputType()
 export class UpdatePropertyInput {
-  @Field((type) => ID)
+  @Field(() => ID)
   id: PropertyId;
 
   @Field({ nullable: true })
   name: string;
 
-  @Field((type) => [UpdateOptionInput], { nullable: true })
+  @Field(() => [UpdateOptionInput], { nullable: true })
   options: UpdateOptionInput[];
 }
 
 @InputType()
 export class ReorderPropertiesInput {
-  @Field((type) => ID)
+  @Field(() => ID)
   languageId: LanguageId;
 
-  @Field((type) => PartOfSpeech)
+  @Field(() => PartOfSpeech)
   partOfSpeech: PartOfSpeech;
 
-  @Field((type) => [ID])
+  @Field(() => [ID])
   propertyIds: PropertyId[];
 }
 
 @InputType()
 export class UpdateOptionInput {
-  @Field((type) => ID)
+  @Field(() => ID)
   id: OptionId;
 
   @Field()
@@ -142,6 +142,6 @@ export class UpdateOptionInput {
 
 @InputType()
 export class DeletePropertyInput {
-  @Field((type) => ID)
+  @Field(() => ID)
   id: PropertyId;
 }

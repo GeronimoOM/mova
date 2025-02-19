@@ -1,5 +1,4 @@
 import { EE, FlagComponent, GB, UA } from 'country-flag-icons/react/1x1';
-import React from 'react';
 import { FaRepeat } from 'react-icons/fa6';
 import { MdLogout } from 'react-icons/md';
 
@@ -19,7 +18,7 @@ const translationLanguageToFlag: Record<Locale, FlagComponent> = {
   et: EE,
 };
 
-export const UserPage: React.FC = () => {
+export const UserPage = () => {
   const { t } = useTranslation();
   const [locale, setLocale] = useLocaleContext();
   const { font, setFont, includeMastered, setIncludeMastered } =
@@ -71,11 +70,7 @@ type FlagButtonProps = {
   onSelect: (language: Locale) => void;
 };
 
-const FlagButton: React.FC<FlagButtonProps> = ({
-  language,
-  selected,
-  onSelect,
-}) => {
+const FlagButton = ({ language, selected, onSelect }: FlagButtonProps) => {
   const Flag = translationLanguageToFlag[language];
 
   return (
@@ -94,11 +89,7 @@ type FontButtonProps = {
   onSelect: (font: Font) => void;
 };
 
-const FontButton: React.FC<FontButtonProps> = ({
-  font,
-  selected,
-  onSelect,
-}) => {
+const FontButton = ({ font, selected, onSelect }: FontButtonProps) => {
   return (
     <div
       className={classNames(styles.font, {
@@ -117,10 +108,10 @@ type IncludeMasteredButtonProps = {
   onSetIncludeMastered: (includeMastered: boolean) => void;
 };
 
-const IncludeMasteredButton: React.FC<IncludeMasteredButtonProps> = ({
+const IncludeMasteredButton = ({
   includeMastered,
   onSetIncludeMastered,
-}) => {
+}: IncludeMasteredButtonProps) => {
   const { t } = useTranslation();
 
   return (

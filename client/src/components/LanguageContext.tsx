@@ -29,9 +29,7 @@ type LanguageProviderProps = {
   children?: React.ReactNode;
 };
 
-export const LanguageProvider: React.FC<LanguageProviderProps> = ({
-  children,
-}) => {
+export const LanguageProvider = ({ children }: LanguageProviderProps) => {
   const { authToken } = useAuthContext();
 
   const [language, setLanguage] = useState<string | null>(() =>

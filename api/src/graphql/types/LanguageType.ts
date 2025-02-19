@@ -5,31 +5,31 @@ import { LanguageId } from 'models/Language';
 
 @ObjectType('Language')
 export class LanguageType {
-  @Field((type) => ID)
+  @Field(() => ID)
   id: LanguageId;
 
   @Field()
   name: string;
 
-  @Field((type) => TimestampScalar)
+  @Field(() => TimestampScalar)
   addedAt: DateTime;
 }
 
 @InputType()
 export class CreateLanguageInput {
-  @Field((type) => ID, { nullable: true })
+  @Field(() => ID, { nullable: true })
   id?: LanguageId;
 
   @Field()
   name: string;
 
-  @Field((type) => TimestampScalar, { nullable: true })
+  @Field(() => TimestampScalar, { nullable: true })
   addedAt?: DateTime;
 }
 
 @InputType()
 export class UpdateLanguageInput {
-  @Field((type) => ID)
+  @Field(() => ID)
   id: LanguageId;
 
   @Field()
@@ -38,6 +38,6 @@ export class UpdateLanguageInput {
 
 @InputType()
 export class DeleteLanguageInput {
-  @Field((type) => ID)
+  @Field(() => ID)
   id: LanguageId;
 }

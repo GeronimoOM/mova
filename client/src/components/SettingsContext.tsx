@@ -35,9 +35,7 @@ type SettingsProviderProps = {
   children?: React.ReactNode;
 };
 
-export const SettingsProvider: React.FC<SettingsProviderProps> = ({
-  children,
-}) => {
+export const SettingsProvider = ({ children }: SettingsProviderProps) => {
   const { authToken } = useAuthContext();
 
   const [font, setFont] = useState<Font | null>(

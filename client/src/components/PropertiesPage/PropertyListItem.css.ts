@@ -1,5 +1,5 @@
 import { globalStyle, style } from '@vanilla-extract/css';
-import { fontThemeVars, themeVars } from '../../index.css';
+import { themeVars } from '../../index.css';
 
 export const item = style({
   backgroundColor: themeVars.color.background,

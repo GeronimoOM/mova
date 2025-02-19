@@ -1,4 +1,3 @@
-import React from 'react';
 import { PartOfSpeech } from '../../api/types/graphql';
 import { partsOfSpeech } from '../../utils/partsOfSpeech';
 import { PartOfSpeechPill } from '../common/PartOfSpeechPill';
@@ -9,9 +8,10 @@ export type PropertiesPartsOfSpeechProps = {
   onSelectPartOfSpeech: (partOfSpeech: PartOfSpeech) => void;
 };
 
-export const PropertiesPartsOfSpeech: React.FC<
-  PropertiesPartsOfSpeechProps
-> = ({ selectedPartOfSpeech, onSelectPartOfSpeech }) => {
+export const PropertiesPartsOfSpeech = ({
+  selectedPartOfSpeech,
+  onSelectPartOfSpeech,
+}: PropertiesPartsOfSpeechProps) => {
   return (
     <div className={styles.wrapper}>
       {partsOfSpeech.map((partOfSpeech) => (

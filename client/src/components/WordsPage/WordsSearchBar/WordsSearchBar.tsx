@@ -1,4 +1,3 @@
-import React from 'react';
 import { BsEraserFill } from 'react-icons/bs';
 
 import classNames from 'classnames';
@@ -17,11 +16,11 @@ type WordsSearchBarProps = {
   disabled?: boolean;
 };
 
-export const WordsSearchBar: React.FC<WordsSearchBarProps> = ({
+export const WordsSearchBar = ({
   query,
   onQueryChange,
   onClear,
-}) => {
+}: WordsSearchBarProps) => {
   const { t } = useTranslation();
   const isSearch = query.length >= MIN_QUERY_LENGTH;
 

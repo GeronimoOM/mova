@@ -1,4 +1,3 @@
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ProgressCadence,
@@ -15,10 +14,7 @@ export type ProgressBarProps = {
   progress?: ProgressFieldsFragment;
 };
 
-export const ProgressTypeBar: React.FC<ProgressBarProps> = ({
-  type,
-  progress,
-}) => {
+export const ProgressTypeBar = ({ type, progress }: ProgressBarProps) => {
   const { t } = useTranslation();
 
   const currentPoints = progress?.current.points ?? 0;

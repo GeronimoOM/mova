@@ -3,7 +3,7 @@ import { ButtonIcon } from './ButtonIcon';
 
 import * as styles from './Loader.css';
 
-export const Loader: React.FC = () => {
+export const Loader = () => {
   return (
     <div className={styles.centered}>
       <ButtonIcon

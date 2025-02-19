@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 
 export type UseClickOutsideHandlerProps<H extends HTMLElement> = {
-  ref: React.RefObject<H>;
-  excludeRef?: React.RefObject<HTMLElement>;
+  ref: React.RefObject<H | null>;
+  excludeRef?: React.RefObject<HTMLElement | null>;
   onClick: () => void;
 };
 

@@ -123,15 +123,18 @@ export const useOrderedProperties = (
   ] = useLazyQuery(GetPropertiesDocument, {
     notifyOnNetworkStatusChange: true,
   });
-  const propertiesLoading = [NetworkStatus.loading, NetworkStatus.refetch].includes(
-    fetchingPropertiesStatus,
-  );
+  const propertiesLoading = [
+    NetworkStatus.loading,
+    NetworkStatus.refetch,
+  ].includes(fetchingPropertiesStatus);
 
   const properties = propertiesLoading
     ? undefined
     : propertiesQuery?.language?.properties;
 
-  const [orderedPropertyIds, setOrderedPropertyIds] = useState<string[] | null>(null);
+  const [orderedPropertyIds, setOrderedPropertyIds] = useState<string[] | null>(
+    null,
+  );
 
   const orderedProperties = useMemo(() => {
     if (!properties) {
@@ -154,7 +157,8 @@ export const useOrderedProperties = (
         return;
       }
 
-      const oldOrderedPropertyIds = orderedPropertyIds ?? properties.map((property) => property.id);
+      const oldOrderedPropertyIds =
+        orderedPropertyIds ?? properties.map((property) => property.id);
 
       const property1Index = oldOrderedPropertyIds.indexOf(property1Id);
       const property2Index = oldOrderedPropertyIds.indexOf(property2Id);

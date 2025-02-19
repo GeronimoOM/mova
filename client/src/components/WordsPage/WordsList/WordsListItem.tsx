@@ -1,5 +1,4 @@
 import { DateTime } from 'luxon';
-import React from 'react';
 import { WordFieldsFragment } from '../../../api/types/graphql';
 import { DISPLAY_DATE_FORMAT } from '../../../utils/constants';
 import { useLocaleContext } from '../../LocaleContext';
@@ -10,10 +9,10 @@ export type WordsListItemProps = {
   setSelectedWord: (selectedWord: string) => void;
 };
 
-export const WordsListItem: React.FC<WordsListItemProps> = ({
+export const WordsListItem = ({
   word,
   setSelectedWord,
-}) => {
+}: WordsListItemProps) => {
   return (
     <div className={styles.item} onClick={() => setSelectedWord(word.id)}>
       <div className={styles.original}>{word.original}</div>
@@ -30,11 +29,11 @@ export type WordsListItemDividerProps = {
 
 const MAX_DIVIDER_TOTAL = 99;
 
-export const WordsListItemDivider: React.FC<WordsListItemDividerProps> = ({
+export const WordsListItemDivider = ({
   date,
   total,
   isTotalComplete,
-}) => {
+}: WordsListItemDividerProps) => {
   const [locale] = useLocaleContext();
 
   return (

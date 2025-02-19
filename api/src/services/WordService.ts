@@ -264,7 +264,9 @@ export class WordService {
         (property) => property.id === propertyId,
       );
       if (!property) {
-        throw new Error(`Property is not valid for word (wordId:${word.id},propertyId:${propertyId})`);
+        throw new Error(
+          `Property is not valid for word (wordId:${word.id},propertyId:${propertyId})`,
+        );
       }
 
       if (isTextProperty(property)) {
