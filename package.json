@@ -6,6 +6,7 @@
   "license": "UNLICENSED",
   "devDependencies": {
     "husky": "9.1.7",
+    "lerna": "8.2.0",
     "lint-staged": "15.4.3"
   },
   "scripts": {
@@ -15,6 +16,8 @@
     "start:prod": "docker-compose -f docker-compose.prod.yml up",
     "stop:prod": "docker-compose -f docker-compose.prod.yml down",
     "prepare": "husky",
-    "lint-staged": "lint-staged"
+    "postinstall": "(cd api && pnpm install); (cd client && pnpm install)",
+    "lint-staged": "lint-staged",
+    "type-check": "lerna run type-check"
   }
 }
