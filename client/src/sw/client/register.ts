@@ -3,7 +3,7 @@ import { SwClientMessageType, sendMessageToServiceWorker } from './messages';
 
 const PERIODIC_SYNC_INTERVAL_MS = 120 * 1000;
 // const PERIODIC_BACKGROUND_SYNC_INTERVAL_MS = 30 * 60 * 1000;
-let periodicSyncInterval: NodeJS.Timeout | null = null;
+let periodicSyncInterval: number | null = null;
 
 export async function registerServiceWorker(
   messageHandler: SwWorkerMessageHandler,

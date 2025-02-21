@@ -8,7 +8,7 @@ export type UseInfiniteScrollProps = {
 export function useInfiniteScroll<H extends HTMLElement>({
   isFetching,
   fetchNextPage,
-}: UseInfiniteScrollProps): React.RefObject<H> {
+}: UseInfiniteScrollProps): React.RefObject<H | null> {
   const listEndRef = useRef<H>(null);
 
   useEffect(() => {

@@ -5,13 +5,16 @@
   "author": "GeronimoOM",
   "license": "UNLICENSED",
   "devDependencies": {
-    "lerna": "7.4.2"
+    "husky": "9.1.7",
+    "lint-staged": "15.4.3"
   },
   "scripts": {
     "start": "docker-compose -f docker-compose.dev.yml up",
     "start:build": "docker-compose -f docker-compose.dev.yml up --build",
     "stop": "docker-compose -f docker-compose.dev.yml down",
     "start:prod": "docker-compose -f docker-compose.prod.yml up",
-    "stop:prod": "docker-compose -f docker-compose.prod.yml down"
+    "stop:prod": "docker-compose -f docker-compose.prod.yml down",
+    "prepare": "husky",
+    "lint-staged": "lint-staged"
   }
 }

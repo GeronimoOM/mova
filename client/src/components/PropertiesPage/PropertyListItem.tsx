@@ -119,7 +119,9 @@ export const PropertyListItem = ({
           />
         </div>
         <div
-          ref={dragRef}
+          ref={(element) => {
+            dragRef(element);
+          }}
           className={classNames(styles.button, { hidden: !selected })}
         >
           <ButtonIcon icon={IoReorderThree} disabled={!canDragProperty} />

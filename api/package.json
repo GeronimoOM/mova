@@ -10,6 +10,9 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug 0.0.0.0:3001 --watch",
     "start:prod": "node --max-old-space-size=200 dist/main",
+    "format": "prettier --write .",
+    "lint": "eslint --fix .",
+    "type-check": "tsc --noEmit",
     "lint-staged": "lint-staged"
   },
   "dependencies": {
@@ -48,12 +51,17 @@
     "@types/stream-json": "1.7.8",
     "@types/uuid": "10.0.0",
     "eslint": "9.20.1",
-    "eslint-config-prettier": "10.0.1",
     "globals": "15.15.0",
     "lint-staged": "15.4.3",
     "prettier": "3.5.1",
     "prettier-plugin-organize-imports": "4.1.0",
     "typescript": "5.7.3",
     "typescript-eslint": "8.24.1"
+  },
+  "lint-staged": {
+    "**/*.ts": [
+      "prettier --write",
+      "eslint --fix"
+    ]
   }
 }

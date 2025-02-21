@@ -66,7 +66,7 @@ export class ProgressService {
     const goals = await this.progressRepository.getGoals(languageId);
 
     return ProgressTypes.map(
-      () =>
+      (type) =>
         goals.find((goal) => goal.type === type) ?? {
           ...DEFAULT_GOALS[type],
           languageId,

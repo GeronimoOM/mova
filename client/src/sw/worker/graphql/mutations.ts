@@ -22,6 +22,7 @@ import {
   UpdateWordMutation,
   UpdateWordMutationVariables,
 } from '../../../api/types/graphql';
+import { fromTimestamp, toTimestamp } from '../../../utils/datetime';
 import * as cache from '../cache';
 import { GraphQlRequest, response, tryFetch } from './common';
 
@@ -273,6 +274,9 @@ async function handleCreateWordMutation(
       id: input.id!,
       addedAt: input.addedAt!,
       mastery: 0,
+      nextExerciseAt: toTimestamp(
+        fromTimestamp(input.addedAt!)?.plus({ hour: 1 }) ?? null,
+      )!,
       properties:
         input.properties?.map(({ id, text }) => ({
           property: {

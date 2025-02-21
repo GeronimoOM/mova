@@ -8,9 +8,12 @@
     "start": "vite",
     "build": "vite build",
     "serve": "vite preview",
+    "format": "prettier --write .",
+    "lint": "eslint --fix .",
+    "type-check": "tsc --noEmit",
+    "lint-staged": "lint-staged",
     "graphql:codegen": "graphql-codegen -c ./src/api/codegen.ts",
-    "pwa:assets-gen": "pwa-assets-generator --preset minimal-2023 public/images/logo.svg",
-    "lint-staged": "lint-staged"
+    "pwa:assets-gen": "pwa-assets-generator --preset minimal-2023 public/images/logo.svg"
   },
   "dependencies": {
     "@apollo/client": "3.13.1",
@@ -18,6 +21,7 @@
     "@vanilla-extract/recipes": "0.5.5",
     "classnames": "2.5.1",
     "country-flag-icons": "1.5.18",
+    "dexie": "4.0.11",
     "i18next": "24.2.2",
     "i18next-http-backend": "3.0.2",
     "luxon": "3.5.0",
@@ -44,7 +48,6 @@
     "@vite-pwa/assets-generator": "0.2.6",
     "@vitejs/plugin-react": "4.3.4",
     "eslint": "9.20.1",
-    "eslint-config-prettier": "10.0.1",
     "eslint-plugin-react": "7.37.4",
     "globals": "15.15.0",
     "graphql": "16.10.0",
@@ -59,5 +62,14 @@
     "workbox-core": "7.3.0",
     "workbox-precaching": "7.3.0",
     "workbox-routing": "7.3.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.{html,graphql}": [
+      "prettier --write"
+    ]
   }
 }
