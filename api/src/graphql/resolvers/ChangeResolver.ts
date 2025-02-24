@@ -34,23 +34,27 @@ export class ChangeResolver {
     @Args('changedAt', { type: () => TimestampScalar, nullable: true })
     changedAt?: DateTime,
   ): Promise<ChangePageType> {
+    const cursor = pageArgs.cursor
+      ? decodeCursor(pageArgs.cursor, ChangeCursor)
+      : null;
+
     const changePage = await this.changeService.getPage(ctx, {
       syncType,
       changedAt,
-      cursor: pageArgs.cursor
-        ? decodeCursor(pageArgs.cursor, ChangeCursor)
-        : null,
+      ...(cursor && { cursor }),
       limit: pageArgs.limit,
       excludeClientId: ctx.clientId,
     });
+
+    const nextCursor = changePage.nextCursor
+      ? encodeCursor(changePage.nextCursor)
+      : null;
 
     return {
       items: changePage.items.map((change) =>
         this.changeTypeMapper.map(change),
       ),
-      nextCursor: changePage.nextCursor
-        ? encodeCursor(changePage.nextCursor)
-        : null,
+      ...(nextCursor && { nextCursor }),
       syncType: changePage.syncType,
     };
   }

@@ -155,12 +155,12 @@ export class ChangeService {
       languageId: languages.map((language) => language.id),
       order: WordOrder.Chronological,
       direction: Direction.Asc,
-      cursor: params.cursor
-        ? {
-            addedAt: params.cursor.changedAt,
-            id: params.cursor.id,
-          }
-        : null,
+      ...(params.cursor && {
+        cursor: {
+          addedAt: params.cursor.changedAt,
+          id: params.cursor.id,
+        },
+      }),
       limit: params.limit,
     });
 

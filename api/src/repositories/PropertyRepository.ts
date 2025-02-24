@@ -176,8 +176,9 @@ export class PropertyRepository {
       case PropertyType.Text:
         return baseProperty as TextProperty;
       case PropertyType.Option: {
-        const options: Record<OptionId, string> =
-          this.serializer.deserialize<OptionProperty>(row.data).options;
+        const options: Record<OptionId, string> = row.data
+          ? this.serializer.deserialize<OptionProperty>(row.data).options
+          : {};
         return {
           ...baseProperty,
           options,

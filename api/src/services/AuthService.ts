@@ -30,6 +30,10 @@ export class AuthService {
   async auth(token?: string): Promise<User | null> {
     let user: User | null = null;
     try {
+      if (!token) {
+        throw new Error('Authentication token is missing');
+      }
+
       const { userId } = await this.jwtService.verifyAsync<UserAuth>(token, {
         secret: this.configService.get<string>('jwt.secret'),
         ignoreExpiration: true,

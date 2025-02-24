@@ -57,10 +57,13 @@ export class PropertyTypeMapper {
     };
   }
 
-  private mapOptions(options: Record<OptionId, string>): OptionType[] {
-    return Object.entries(options).map(([optionId, optionValue]) => ({
-      id: optionId,
-      value: optionValue,
-    }));
+  private mapOptions(options: Record<OptionId, string | null>): OptionType[] {
+    return Object.entries(options).map(
+      ([optionId, optionValue]) =>
+        ({
+          id: optionId,
+          value: optionValue,
+        }) as OptionType,
+    );
   }
 }

@@ -1,11 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { WordCreateType, WordUpdateType } from 'graphql/types/ChangeType';
 import { PropertyId } from 'models/Property';
-import {
-  PropertyValue,
-  isOptionPropertyValue,
-  isTextPropertyValue,
-} from 'models/PropertyValue';
+import { PropertyValue, isTextPropertyValue } from 'models/PropertyValue';
 import { Word, WordCreate, WordUpdate } from 'models/Word';
 import { ExerciseService } from 'services/ExerciseService';
 import {
@@ -99,7 +95,7 @@ export class WordTypeMapper {
         property,
         text: propertyValue.text,
       } as TextPropertyValueType;
-    } else if (isOptionPropertyValue(propertyValue)) {
+    } else {
       const optionValue = propertyValue.property.options[propertyValue.option];
       return {
         property,

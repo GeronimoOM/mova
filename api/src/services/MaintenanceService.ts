@@ -85,6 +85,9 @@ export class MaintenanceService {
 
   async reindexLanguage(languageId: LanguageId): Promise<Language> {
     const language = await this.languageRepository.getById(languageId);
+    if (!language) {
+      throw new Error('Language does not exist');
+    }
 
     await this.wordService.indexLanguage(languageId);
 
@@ -96,7 +99,12 @@ export class MaintenanceService {
   }
 
   async initEstonian(ctx: Context, userId: UserId): Promise<void> {
-    ctx.user = await this.userService.getUser(userId);
+    const user = await this.userService.getUser(userId);
+    if (!user) {
+      throw new Error('User does not exist');
+    }
+
+    ctx.user = user;
     await this.dbConnectionManager.transactionally(async () => {
       const language = await this.languageService.create(ctx, {
         name: etPreset.name,

@@ -42,6 +42,9 @@ export class MaintenanceController {
   @Post('/import')
   async import(@Req() req: FastifyRequest) {
     const multipartFile = await req.file();
+    if (!multipartFile) {
+      throw new Error('No file to import');
+    }
     const recordStream = chain([multipartFile.file, jsonParser()]);
 
     await this.maintenanceService.import(recordStream);

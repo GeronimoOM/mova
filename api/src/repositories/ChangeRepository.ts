@@ -11,6 +11,7 @@ import {
 } from 'models/Change';
 import { mapPage, toPage } from 'models/Page';
 import { UserId } from 'models/User';
+import { DEFAULT_LIMIT } from 'utils/constants';
 import { fromTimestamp, toTimestamp } from 'utils/datetime';
 import { DbConnectionManager } from './DbConnectionManager';
 import { Serializer } from './Serializer';
@@ -36,11 +37,15 @@ export class ChangeRepository {
     userId,
     changedAt,
     cursor,
-    limit,
+    limit = DEFAULT_LIMIT,
     excludeClientId,
   }: GetChangePageParams): Promise<ChangePage> {
     const connection = this.connectionManager.getConnection();
-    const changedAtValue = cursor ? cursor.changedAt : toTimestamp(changedAt);
+    const changedAtValue = cursor
+      ? cursor.changedAt
+      : changedAt
+        ? toTimestamp(changedAt)
+        : null;
     const query = connection(TABLE_CHANGES)
       .limit(limit + 1)
       .where({ user_id: userId })
@@ -84,7 +89,7 @@ export class ChangeRepository {
   }
 
   async getOldestChangedAt(userId: UserId): Promise<DateTime | null> {
-    const change: ChangeTable | null = await this.connectionManager
+    const change = await this.connectionManager
       .getConnection()(TABLE_CHANGES)
       .where({ user_id: userId })
       .limit(1)
@@ -131,8 +136,8 @@ export class ChangeRepository {
       userId: row.user_id,
     };
 
-    const data = this.serializer.deserialize<Change>(row.data);
-    return { ...baseChange, ...data };
+    const data = row.data ? this.serializer.deserialize<Change>(row.data) : {};
+    return { ...baseChange, ...data } as Change;
   }
 
   private mapDataFromChange(change: Change): string {

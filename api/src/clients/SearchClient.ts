@@ -7,6 +7,7 @@ import { LanguageId } from 'models/Language';
 import { Page, StartCursor, emptyPage } from 'models/Page';
 import { TextPropertyValue, isTextPropertyValue } from 'models/PropertyValue';
 import { PartOfSpeech, Word, WordId } from 'models/Word';
+import { DEFAULT_LIMIT } from 'utils/constants';
 import { ElasticClientManager } from './ElasticClientManager';
 import {
   INDEX_SETTINGS,
@@ -36,7 +37,7 @@ export class SearchClient implements OnApplicationBootstrap {
     query,
     partsOfSpeech,
     cursor,
-    limit,
+    limit = DEFAULT_LIMIT,
   }: SearchWordsParams): Promise<Page<WordId, StartCursor>> {
     const indexExists = await this.indexExists(INDEX_WORDS);
     if (!indexExists) {
@@ -195,7 +196,7 @@ export class SearchClient implements OnApplicationBootstrap {
     limit: number,
   ): Page<string, StartCursor> {
     return {
-      items: searchResponse.hits.hits.map((doc) => doc._id),
+      items: searchResponse.hits.hits.map((doc) => doc._id as WordId),
       ...((searchResponse.hits.total as number) > start + limit && {
         nextCursor: {
           start: start + limit,

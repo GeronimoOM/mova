@@ -56,7 +56,7 @@ export function mapCursor<T, C, K>(
   mapping: (cursor: C) => K,
 ): Page<T, K> {
   return {
-    ...page,
+    items: page.items,
     ...(page.nextCursor && {
       nextCursor: mapping(page.nextCursor),
     }),

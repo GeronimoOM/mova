@@ -26,7 +26,7 @@ export class ElasticClientManager implements OnApplicationBootstrap {
 
   private initClient(): elastic.Client {
     const { host, port } =
-      this.configService.get<IndexServiceConfig>('env.index');
+      this.configService.getOrThrow<IndexServiceConfig>('env.index');
 
     return new elastic.Client({
       node: `http://${host}:${port}`,

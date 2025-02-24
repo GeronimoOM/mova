@@ -71,7 +71,7 @@ export class LanguageService {
 
   async exists(ctx: Context, id: LanguageId): Promise<boolean> {
     const language = await this.languageRepository.getById(id);
-    return language && language.userId === ctx.user.id;
+    return !!language && language.userId === ctx.user.id;
   }
 
   async create(ctx: Context, params: CreateLanguageParams): Promise<Language> {

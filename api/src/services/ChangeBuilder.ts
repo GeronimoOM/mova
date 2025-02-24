@@ -176,11 +176,11 @@ export class ChangeBuilder {
       changedAt: word.addedAt,
       created: {
         ...word,
-        ...(word.properties && {
-          properties: records.mapValues(word.properties, (propertyValue) =>
-            this.toPropertValueSave(propertyValue),
-          ),
-        }),
+        properties: word.properties
+          ? records.mapValues(word.properties, (propertyValue) =>
+              this.toPropertValueSave(propertyValue),
+            )
+          : undefined,
       },
     };
   }
@@ -191,8 +191,8 @@ export class ChangeBuilder {
     currentWord: Word,
   ): UpdateWordChange | null {
     const propertiesDiff = records.diff(
-      word.properties,
-      currentWord.properties,
+      word.properties ?? null,
+      currentWord.properties ?? null,
       (pv1, pv2) => {
         if (
           isTextPropertyValue(pv1) &&

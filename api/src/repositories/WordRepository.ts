@@ -101,7 +101,7 @@ export class WordRepository {
       if (order === WordOrder.Chronological) {
         cursorKey = 'added_at';
         cursorValue = (cursor as ChronologicalCursor)?.addedAt;
-      } else if (order === WordOrder.Alphabetical) {
+      } else {
         cursorKey = 'original';
         cursorValue = (cursor as AlphabeticalCursor)?.original;
         direction = Direction.Asc;
@@ -171,8 +171,10 @@ export class WordRepository {
             original: word.original,
             id: word.id,
           };
-        case WordOrder.Random:
-          return null;
+        default:
+          throw new Error(
+            'Current ordering does not support cursor pagination',
+          );
       }
     };
 
@@ -245,13 +247,15 @@ export class WordRepository {
         language_id: word.languageId,
         part_of_speech: word.partOfSpeech,
         added_at: toTimestamp(word.addedAt),
-        properties: this.mapFromWordProperties(word.properties),
+        properties: this.mapFromWordProperties(word.properties) ?? undefined,
       })
       .onConflict()
       .ignore();
   }
 
   async update(word: Word): Promise<void> {
+    const properties = this.mapFromWordProperties(word.properties);
+
     await this.connectionManager
       .getConnection()(TABLE_WORDS)
       .update({
@@ -264,7 +268,7 @@ export class WordRepository {
         ...(word.masteryAttemptAt && {
           mastery_attempt_at: toTimestamp(word.masteryAttemptAt),
         }),
-        properties: this.mapFromWordProperties(word.properties),
+        ...(properties && { properties }),
       })
       .where({ id: word.id });
   }

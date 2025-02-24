@@ -7,6 +7,14 @@ export const validationPlugin: MercuriusPlugin<MercuriusValidationOptions> = {
   plugin: mercuriusValidationPlugin,
   options: {
     schema: {
+      Query: {
+        words: {
+          limit: { type: 'integer', minimum: 1, maximum: 100 },
+        },
+        changes: {
+          limit: { type: 'integer', minimum: 1, maximum: 100 },
+        },
+      },
       CreateLanguageInput: {
         name: { type: 'string', minLength: 3, maxLength: 20 },
       },

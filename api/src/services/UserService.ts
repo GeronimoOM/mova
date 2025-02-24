@@ -17,7 +17,7 @@ export class UserService {
     private userRepository: UserRepository,
     private configService: ConfigService,
   ) {
-    this.users = this.configService.get<User[]>('users');
+    this.users = this.configService.get<User[]>('users') ?? [];
   }
 
   async getUser(userId: UserId): Promise<User | null> {
