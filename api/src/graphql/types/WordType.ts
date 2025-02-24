@@ -8,6 +8,7 @@ import {
 } from '@nestjs/graphql';
 import { TimestampScalar } from 'graphql/scalars/Timestamp';
 import { DateTime } from 'luxon';
+import { Color } from 'models/Color';
 import { LanguageId } from 'models/Language';
 import { OptionId, PropertyId } from 'models/Property';
 import { PartOfSpeech, WordId, WordOrder } from 'models/Word';
@@ -94,6 +95,18 @@ export class UpdateWordInput {
 }
 
 @InputType()
+export class UpdatePropertyValueOptionInput {
+  @Field(() => ID, { nullable: true })
+  id?: OptionId;
+
+  @Field({ nullable: true })
+  value?: string;
+
+  @Field(() => Color, { nullable: true })
+  color?: Color;
+}
+
+@InputType()
 export class UpdatePropertyValueInput {
   @Field(() => ID)
   id: PropertyId;
@@ -101,8 +114,8 @@ export class UpdatePropertyValueInput {
   @Field({ nullable: true })
   text?: string;
 
-  @Field(() => ID, { nullable: true })
-  option?: OptionId;
+  @Field(() => UpdatePropertyValueOptionInput, { nullable: true })
+  option?: UpdatePropertyValueOptionInput;
 }
 
 @InputType()

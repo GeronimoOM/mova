@@ -17,6 +17,7 @@ import {
   ChangeType as ChangeTypeEnum,
   SyncType,
 } from 'models/Change';
+import { Color } from 'models/Color';
 import { LanguageId } from 'models/Language';
 import {
   OptionId,
@@ -35,7 +36,6 @@ import {
 import {
   CreatePropertyInput,
   DeletePropertyInput,
-  OptionType,
   PropertyUnionType,
   ReorderPropertiesInput,
   UpdatePropertyInput,
@@ -124,8 +124,20 @@ export class TextPropertyUpdateType extends PropertyUpdateInterface {}
   implements: () => PropertyUpdateInterface,
 })
 export class OptionPropertyUpdateType extends PropertyUpdateInterface {
-  @Field(() => [OptionType], { nullable: true })
-  options?: OptionType[];
+  @Field(() => [OptionUpdateType], { nullable: true })
+  options?: OptionUpdateType[];
+}
+
+@ObjectType('OptionUpdate')
+export class OptionUpdateType {
+  @Field(() => ID)
+  id: OptionId;
+
+  @Field({ nullable: true })
+  value?: string;
+
+  @Field(() => Color, { nullable: true })
+  color?: Color;
 }
 
 export const PropertyUpdateUnionType = createUnionType({
@@ -200,6 +212,12 @@ export class TextPropertyValueSaveType extends PropertyValuesSaveInterface {
 export class OptionPropertyValueSaveType extends PropertyValuesSaveInterface {
   @Field(() => ID, { nullable: true })
   optionId?: OptionId;
+
+  @Field({ nullable: true })
+  value?: string;
+
+  @Field(() => Color, { nullable: true })
+  color?: Color;
 }
 
 export const PropertyValueSaveUnionType = createUnionType({

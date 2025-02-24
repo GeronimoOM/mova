@@ -1,7 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { WordCreateType, WordUpdateType } from 'graphql/types/ChangeType';
+import {
+  OptionPropertyType,
+  TextPropertyType,
+} from 'graphql/types/PropertyType';
 import { PropertyId } from 'models/Property';
-import { PropertyValue, isTextPropertyValue } from 'models/PropertyValue';
+import {
+  PropertyValue,
+  isIdOptionValue,
+  isTextPropertyValue,
+} from 'models/PropertyValue';
 import { Word, WordCreate, WordUpdate } from 'models/Word';
 import { ExerciseService } from 'services/ExerciseService';
 import {
@@ -10,9 +18,8 @@ import {
   UpdateWordParams,
 } from 'services/WordService';
 import {
-  OptionPropertyValueType,
+  OptionValueType,
   PropertyValueUnionType,
-  TextPropertyValueType,
 } from '../types/PropertyValueType';
 import {
   CreateWordInput,
@@ -91,19 +98,31 @@ export class WordTypeMapper {
   ): typeof PropertyValueUnionType {
     const property = this.propertyTypeMapper.map(propertyValue.property);
     if (isTextPropertyValue(propertyValue)) {
+      const textProperty = property as TextPropertyType;
+
       return {
-        property,
+        property: textProperty,
         text: propertyValue.text,
-      } as TextPropertyValueType;
+      };
     } else {
-      const optionValue = propertyValue.property.options[propertyValue.option];
+      const optionProperty = property as OptionPropertyType;
+
+      let option: OptionValueType;
+      if (isIdOptionValue(propertyValue.option)) {
+        const propertyOption =
+          propertyValue.property.options[propertyValue.option.id];
+        option = {
+          id: propertyValue.option.id,
+          ...propertyOption,
+        };
+      } else {
+        option = propertyValue.option;
+      }
+
       return {
-        property,
-        option: {
-          id: propertyValue.option,
-          value: optionValue,
-        },
-      } as OptionPropertyValueType;
+        property: optionProperty,
+        option,
+      };
     }
   }
 

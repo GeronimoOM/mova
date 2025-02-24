@@ -35,7 +35,10 @@ export class PropertyResolver {
     @ContextDec() ctx: Context,
     @Args('input') input: CreatePropertyInput,
   ): Promise<typeof PropertyUnionType> {
-    const createdProperty = await this.propertyService.create(ctx, input);
+    const createdProperty = await this.propertyService.create(
+      ctx,
+      this.propertyTypeMapper.mapFromCreateInput(input),
+    );
     return this.propertyTypeMapper.map(createdProperty);
   }
 
@@ -44,10 +47,7 @@ export class PropertyResolver {
     @ContextDec() ctx: Context,
     @Args('input') input: UpdatePropertyInput,
   ): Promise<typeof PropertyUnionType> {
-    const updatedProperty = await this.propertyService.update(
-      ctx,
-      this.propertyTypeMapper.mapFromUpdateInput(input),
-    );
+    const updatedProperty = await this.propertyService.update(ctx, input);
     return this.propertyTypeMapper.map(updatedProperty);
   }
 

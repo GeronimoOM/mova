@@ -13,7 +13,8 @@ import { DateTime } from 'luxon';
 import { ContextDec } from 'middleware/ContextMiddleware';
 import { ChangeCursor, SyncType } from 'models/Change';
 import { Context } from 'models/Context';
-import { ChangeService } from 'services/ChangeService';
+import { ApplyChangesParams, ChangeService } from 'services/ChangeService';
+
 import { decodeCursor, encodeCursor } from 'utils/cursors';
 
 @Resolver(() => ChangeUnionType)
@@ -21,7 +22,7 @@ export class ChangeResolver {
   constructor(
     private changeService: ChangeService,
     private changeTypeMapper: ChangeTypeMapper,
-    private propertyTypeMapper: PropertyTypeMapper,
+    private propertyMapper: PropertyTypeMapper,
     private wordTypeMapper: WordTypeMapper,
   ) {}
 
@@ -65,24 +66,25 @@ export class ChangeResolver {
     @Args('changes', { type: () => [ApplyChangeInput] })
     changes: ApplyChangeInput[],
   ): Promise<boolean> {
-    await this.changeService.apply(
-      ctx,
-      changes.map((change) => ({
-        ...change,
-        ...(change.updateProperty && {
-          updateProperty: this.propertyTypeMapper.mapFromUpdateInput(
-            change.updateProperty,
-          ),
-        }),
-        ...(change.createWord && {
-          createWord: this.wordTypeMapper.mapFromCreateInput(change.createWord),
-        }),
-        ...(change.updateWord && {
-          updateWord: this.wordTypeMapper.mapFromUpdateInput(change.updateWord),
-        }),
-      })),
-    );
+    await this.changeService.apply(ctx, this.mapChangeToParams(changes));
 
     return true;
+  }
+
+  private mapChangeToParams(changes: ApplyChangeInput[]): ApplyChangesParams {
+    return changes.map((change) => ({
+      ...change,
+      ...(change.createProperty && {
+        createProperty: this.propertyMapper.mapFromCreateInput(
+          change.createProperty,
+        ),
+      }),
+      ...(change.createWord && {
+        createWord: this.wordTypeMapper.mapFromCreateInput(change.createWord),
+      }),
+      ...(change.updateWord && {
+        updateWord: this.wordTypeMapper.mapFromUpdateInput(change.updateWord),
+      }),
+    }));
   }
 }

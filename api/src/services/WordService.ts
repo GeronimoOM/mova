@@ -1,6 +1,7 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { SearchClient, SearchWordsParams } from 'clients/SearchClient';
 import { DateTime } from 'luxon';
+import { Color } from 'models/Color';
 import { Context } from 'models/Context';
 import { LanguageId } from 'models/Language';
 import { Direction, mapPage, Page } from 'models/Page';
@@ -59,7 +60,11 @@ export interface UpdateWordParams {
 
 export interface UpdatePropertyValueParams {
   text?: string;
-  option?: OptionId;
+  option?: {
+    id?: OptionId;
+    value?: string;
+    color?: Color;
+  };
 }
 
 export interface DeleteWordParams {
@@ -281,12 +286,30 @@ export class WordService {
       } else if (isOptionProperty(property)) {
         if (!propertyValue.option) {
           delete word.properties[propertyId];
-        } else if (!property.options[propertyValue.option]) {
-          throw new Error('Option is not valid for property');
-        } else {
+        } else if (propertyValue.option?.id) {
+          if (!property.options[propertyValue.option.id]) {
+            throw new Error('Option ID is not valid for property');
+          }
+
           word.properties[propertyId] = {
             property,
-            option: propertyValue.option,
+            option: {
+              id: propertyValue.option.id,
+            },
+          };
+        } else {
+          const { value, color } = propertyValue.option;
+
+          if (!value?.trim().length) {
+            throw new Error('Option value cannot be empty');
+          }
+
+          word.properties[propertyId] = {
+            property,
+            option: {
+              value: value.trim(),
+              color,
+            },
           };
         }
       }

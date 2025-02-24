@@ -7,7 +7,7 @@ type Language {
   name: String!
   addedAt: Timestamp!
   properties(partOfSpeech: PartOfSpeech): [Property!]!
-  words(cursor: String, limit: Int, query: String, partsOfSpeech: [PartOfSpeech!], order: WordOrder, direction: Direction): WordPage!
+  words(cursor: String, limit: Int = 20, query: String, partsOfSpeech: [PartOfSpeech!], order: WordOrder, direction: Direction): WordPage!
   word(original: String!): Word
   stats: WordsStats!
   goals: [Goal!]!
@@ -87,6 +87,25 @@ type OptionProperty implements IProperty {
 type Option {
   id: ID!
   value: String!
+  color: Color
+}
+
+enum Color {
+  Red
+  Orange
+  Yellow
+  Green
+  Teal
+  Blue
+  Purple
+  Pink
+  Brown
+}
+
+type OptionValue {
+  id: ID
+  value: String!
+  color: Color
 }
 
 type Word {
@@ -110,7 +129,7 @@ type TextPropertyValue {
 
 type OptionPropertyValue {
   property: OptionProperty!
-  option: Option!
+  option: OptionValue!
 }
 
 type WordPage {
@@ -121,6 +140,12 @@ type WordPage {
 type LanguageUpdate {
   id: ID!
   name: String!
+}
+
+type OptionUpdate {
+  id: ID!
+  value: String
+  color: Color
 }
 
 type PropertiesReorder {
@@ -158,6 +183,8 @@ type OptionPropertyValueSave implements IPropertyValueSave {
   propertyId: ID!
   type: PropertyType!
   optionId: ID
+  value: String
+  color: Color
 }
 
 type WordUpdate {
@@ -249,7 +276,7 @@ type OptionPropertyUpdate implements IPropertyUpdate {
   id: ID!
   type: PropertyType!
   name: String
-  options: [Option!]
+  options: [OptionUpdate!]
 }
 
 type ReorderPropertiesChange implements IChange {
@@ -351,7 +378,7 @@ type Query {
   languages: [Language!]!
   language(id: ID!): Language
   property(id: ID!): Property
-  changes(cursor: String, limit: Int, syncType: SyncType, changedAt: Timestamp): ChangePage!
+  changes(cursor: String, limit: Int = 20, syncType: SyncType, changedAt: Timestamp): ChangePage!
   word(id: ID!): Word
   settings: UserSettings!
 }
@@ -401,7 +428,13 @@ input CreatePropertyInput {
   languageId: ID!
   partOfSpeech: PartOfSpeech!
   addedAt: Timestamp
-  options: [String!]
+  options: [CreateOptionInput!]
+}
+
+input CreateOptionInput {
+  id: ID
+  value: String!
+  color: Color
 }
 
 input UpdatePropertyInput {
@@ -411,8 +444,9 @@ input UpdatePropertyInput {
 }
 
 input UpdateOptionInput {
-  id: ID!
-  value: String!
+  id: ID
+  value: String
+  color: Color
 }
 
 input ReorderPropertiesInput {
@@ -451,7 +485,13 @@ input CreateWordInput {
 input UpdatePropertyValueInput {
   id: ID!
   text: String
-  option: ID
+  option: UpdatePropertyValueOptionInput
+}
+
+input UpdatePropertyValueOptionInput {
+  id: ID
+  value: String
+  color: Color
 }
 
 input UpdateWordInput {
