@@ -1,22 +1,34 @@
-import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  ID,
+  Int,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
 import { ContextDec } from 'middleware/ContextMiddleware';
 import { Context } from 'models/Context';
 import { PropertyId } from 'models/Property';
 import { PropertyService } from 'services/PropertyService';
+import { WordService } from 'services/WordService';
 import { PropertyTypeMapper } from '../mappers/PropertyTypeMapper';
 import {
   CreatePropertyInput,
   DeletePropertyInput,
+  PropertyInterface,
   PropertyUnionType,
   ReorderPropertiesInput,
   UpdatePropertyInput,
 } from '../types/PropertyType';
 
-@Resolver(() => PropertyUnionType)
+@Resolver(() => PropertyInterface)
 export class PropertyResolver {
   constructor(
     private propertyService: PropertyService,
     private propertyTypeMapper: PropertyTypeMapper,
+    private wordService: WordService,
   ) {}
 
   @Query(() => PropertyUnionType, { nullable: true })
@@ -28,6 +40,15 @@ export class PropertyResolver {
       .getById(ctx, id)
       .catch(() => null);
     return property ? this.propertyTypeMapper.map(property) : null;
+  }
+
+  @ResolveField(() => Int)
+  async usage(@Parent() property: typeof PropertyUnionType): Promise<number> {
+    return await this.wordService.getCountByProperty(
+      property.languageId,
+      property.id,
+      property.partOfSpeech,
+    );
   }
 
   @Mutation(() => PropertyUnionType)

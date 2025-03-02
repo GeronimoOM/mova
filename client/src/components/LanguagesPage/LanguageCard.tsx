@@ -60,6 +60,7 @@ export const LanguageCard = ({
           onChange={setName}
           size="large"
           placeholder={t('languages.name')}
+          maxLength={20}
         />
       </div>
       <div className={styles.buttons}>

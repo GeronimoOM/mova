@@ -18,7 +18,7 @@ export const list = style({
 });
 
 export const listEnd = style({
-  minHeight: 50,
+  minHeight: 60,
 });
 
 export const buttons = style({

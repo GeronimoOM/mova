@@ -23,7 +23,7 @@ import {
 } from '../types/PropertyValueType';
 import {
   CreateWordInput,
-  UpdatePropertyValueInput,
+  SavePropertyValueInput,
   UpdateWordInput,
   WordType,
 } from '../types/WordType';
@@ -127,7 +127,7 @@ export class WordTypeMapper {
   }
 
   private mapFromUpdateValuesInput(
-    input?: UpdatePropertyValueInput[],
+    input?: SavePropertyValueInput[],
   ): Record<PropertyId, UpdatePropertyValueParams> | undefined {
     if (!input) {
       return;
@@ -141,7 +141,7 @@ export class WordTypeMapper {
   }
 
   private mapFromUpdateValueInput(
-    input: UpdatePropertyValueInput,
+    input: SavePropertyValueInput,
   ): UpdatePropertyValueParams {
     return {
       ...(input.text && { text: input.text }),

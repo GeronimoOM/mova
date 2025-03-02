@@ -168,3 +168,12 @@ export class DeletePropertyInput {
   @Field(() => ID)
   id: PropertyId;
 }
+
+@ObjectType('OptionUsage')
+export class OptionUsageType {
+  @Field(() => ID)
+  id: OptionId;
+
+  @Field(() => Int)
+  count: number;
+}

@@ -28,7 +28,7 @@ export const validationPlugin: MercuriusPlugin<MercuriusValidationOptions> = {
         name: { type: 'string', minLength: 3, maxLength: 30 },
       },
       CreateOptionInput: {
-        value: { type: 'string', minLength: 3, maxLength: 30 },
+        value: { type: 'string', minLength: 1, maxLength: 30 },
       },
       UpdateOptionInput: {
         value: { type: 'string', maxLength: 30 },

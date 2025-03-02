@@ -1,12 +1,17 @@
 import { TypedDocumentNode, useMutation } from '@apollo/client';
 import { fromTimestamp, toTimestamp } from '../utils/datetime';
 import { MaxMastery } from '../utils/mastery';
+import { isOptionPropertyFragment } from '../utils/properties';
 import { cache } from './cache';
 import {
   AttemptWordMasteryDocument,
   CreateLanguageDocument,
   CreatePropertyDocument,
+  CreatePropertyMutation,
+  CreatePropertyMutationVariables,
   CreateWordDocument,
+  CreateWordMutation,
+  CreateWordMutationVariables,
   DeleteLanguageDocument,
   DeletePropertyDocument,
   DeleteWordDocument,
@@ -14,15 +19,22 @@ import {
   GetProgressDocument,
   LanguagePropertiesFragmentDoc,
   LanguageWordsFragmentDoc,
+  OptionFieldsFragment,
   PartOfSpeech,
   ProgressType,
   PropertyFieldsFragment,
   PropertyFieldsFragmentDoc,
+  PropertyType,
+  PropertyValueFieldsFragment,
   ReorderPropertiesDocument,
   SetGoalsDocument,
   UpdateLanguageDocument,
   UpdatePropertyDocument,
+  UpdatePropertyMutation,
+  UpdatePropertyMutationVariables,
   UpdateWordDocument,
+  UpdateWordMutation,
+  UpdateWordMutationVariables,
   WordFieldsFragment,
   WordFieldsFragmentDoc,
   WordFieldsFullFragment,
@@ -98,27 +110,7 @@ export function useCreateProperty(): UseMutationResult<
   typeof CreatePropertyDocument
 > {
   return useMutation(CreatePropertyDocument, {
-    optimisticResponse: ({ input }) => {
-      const properties = readPartOfSpeechProperties(
-        input.languageId,
-        input.partOfSpeech,
-      );
-      const order =
-        properties.reduce(
-          (maxOrder, { order }) => (order > maxOrder ? order : maxOrder),
-          0,
-        ) + 1;
-
-      return {
-        createProperty: {
-          ...input,
-          id: input.id!,
-          addedAt: input.addedAt!,
-          order,
-          __typename: 'TextProperty',
-        },
-      };
-    },
+    optimisticResponse: createPropertyOptimisticResponse,
     update: (cache, { data }, { variables }) => {
       cache.updateFragment(
         {
@@ -136,17 +128,94 @@ export function useCreateProperty(): UseMutationResult<
   });
 }
 
+function createPropertyOptimisticResponse({
+  input,
+}: CreatePropertyMutationVariables): CreatePropertyMutation {
+  const properties = readPartOfSpeechProperties(
+    input.languageId,
+    input.partOfSpeech,
+  );
+  const order =
+    properties.reduce(
+      (maxOrder, { order }) => (order > maxOrder ? order : maxOrder),
+      0,
+    ) + 1;
+
+  const baseProperty = {
+    ...input,
+    id: input.id!,
+    addedAt: input.addedAt!,
+    order,
+  };
+
+  let property: PropertyFieldsFragment;
+  if (input.type === PropertyType.Text) {
+    property = {
+      ...baseProperty,
+      __typename: 'TextProperty',
+    };
+  } else {
+    property = {
+      ...baseProperty,
+      options: (input.options ?? []).map((option) => ({
+        id: option.id!,
+        value: option.value,
+        color: option.color,
+        __typename: 'Option',
+      })),
+      __typename: 'OptionProperty',
+    };
+  }
+
+  return {
+    createProperty: property,
+  };
+}
+
 export function useUpdateProperty(): UseMutationResult<
   typeof UpdatePropertyDocument
 > {
   return useMutation(UpdatePropertyDocument, {
-    optimisticResponse: ({ input }) => ({
-      updateProperty: {
-        ...readProperty(input.id)!,
-        ...(input.name && { name: input.name }),
-      },
-    }),
+    optimisticResponse: updatePropertyOptimisticResponse,
   });
+}
+
+function updatePropertyOptimisticResponse({
+  input,
+}: UpdatePropertyMutationVariables): UpdatePropertyMutation {
+  const currentProperty = readProperty(input.id)!;
+  const currentOptions = isOptionPropertyFragment(currentProperty)
+    ? currentProperty.options
+    : undefined;
+
+  const options: OptionFieldsFragment[] | undefined = input.options
+    ? input.options.reduce((current, { id, value, color }) => {
+        if (!value) {
+          return current.filter((opt) => opt.id !== id);
+        }
+
+        const newOption: OptionFieldsFragment = {
+          id: id!,
+          value,
+          color,
+          __typename: 'Option',
+        };
+        const currentOptionIdx = current.findIndex((opt) => opt.id === id);
+        if (currentOptionIdx === -1) {
+          return [...current, newOption];
+        }
+
+        return current.toSpliced(currentOptionIdx, 1, newOption);
+      }, currentOptions ?? [])
+    : undefined;
+
+  return {
+    updateProperty: {
+      ...currentProperty,
+      ...(input.name && { name: input.name }),
+      ...(options && { options }),
+    },
+  };
 }
 
 export function useReorderProperties(): UseMutationResult<
@@ -205,27 +274,7 @@ export function useDeleteProperty(): UseMutationResult<
 
 export function useCreateWord(): UseMutationResult<typeof CreateWordDocument> {
   return useMutation(CreateWordDocument, {
-    optimisticResponse: ({ input }) => ({
-      createWord: {
-        ...input,
-        id: input.id!,
-        addedAt: input.addedAt!,
-        mastery: 0,
-        nextExerciseAt: toTimestamp(
-          fromTimestamp(input.addedAt!)!.plus({ days: 1 }),
-        )!,
-        properties:
-          input.properties?.map(({ id, text }) => ({
-            property: {
-              id,
-              __typename: 'TextProperty',
-            },
-            text: text!,
-            __typename: 'TextPropertyValue',
-          })) ?? [],
-        __typename: 'Word',
-      },
-    }),
+    optimisticResponse: createWordOptimisticResponse,
     update: (cache, { data }, { variables }) => {
       cache.updateFragment(
         {
@@ -245,36 +294,114 @@ export function useCreateWord(): UseMutationResult<typeof CreateWordDocument> {
   });
 }
 
-export function useUpdateWord(): UseMutationResult<typeof UpdateWordDocument> {
-  return useMutation(UpdateWordDocument, {
-    optimisticResponse: ({ input }) => {
-      const word = readWordFull(input.id)!;
+function createWordOptimisticResponse({
+  input,
+}: CreateWordMutationVariables): CreateWordMutation {
+  const properties: PropertyValueFieldsFragment[] =
+    input.properties?.map(({ id, text, option }) => {
+      if (text) {
+        return {
+          property: {
+            id,
+            __typename: 'TextProperty',
+          },
+          text,
+          __typename: 'TextPropertyValue',
+        };
+      }
 
       return {
-        updateWord: {
-          ...word,
-          ...(input.original && { name: input.original }),
-          ...(input.translation && { name: input.translation }),
-          ...(input.properties && {
-            properties: input.properties.reduce((props, { id, text }) => {
-              props = props.filter((prop) => prop.property.id !== id);
-              if (text) {
-                props.push({
-                  property: {
-                    id,
-                    __typename: 'TextProperty',
-                  },
-                  text: text!,
-                  __typename: 'TextPropertyValue',
-                });
-              }
-              return props;
-            }, word.properties),
-          }),
+        property: {
+          id,
+          __typename: 'OptionProperty',
         },
+        option: {
+          id: option!.id,
+          value: option!.value!,
+          color: option!.color,
+          __typename: 'OptionValue',
+        },
+        __typename: 'OptionPropertyValue',
       };
+    }) ?? [];
+
+  return {
+    createWord: {
+      ...input,
+      id: input.id!,
+      addedAt: input.addedAt!,
+      mastery: 0,
+      nextExerciseAt: toTimestamp(
+        fromTimestamp(input.addedAt!)!.plus({ days: 1 }),
+      )!,
+      properties,
+      __typename: 'Word',
     },
+  };
+}
+
+export function useUpdateWord(): UseMutationResult<typeof UpdateWordDocument> {
+  return useMutation(UpdateWordDocument, {
+    optimisticResponse: updateWordOptimisticResponse,
   });
+}
+
+function updateWordOptimisticResponse({
+  input,
+}: UpdateWordMutationVariables): UpdateWordMutation {
+  const word = readWordFull(input.id)!;
+  let properties = word.properties;
+  if (input.properties) {
+    properties = input.properties.reduce((current, { id, text, option }) => {
+      if (!text && !option) {
+        return current.filter((prop) => prop.property.id !== id);
+      }
+
+      let newPropValue: PropertyValueFieldsFragment;
+      if (text) {
+        newPropValue = {
+          property: {
+            id,
+            __typename: 'TextProperty',
+          },
+          text,
+          __typename: 'TextPropertyValue',
+        };
+      } else {
+        newPropValue = {
+          property: {
+            id,
+            __typename: 'OptionProperty',
+          },
+          option: {
+            id: option!.id ?? null,
+            value: option!.value!,
+            color: option!.color ?? null,
+            __typename: 'OptionValue',
+          },
+          __typename: 'OptionPropertyValue',
+        };
+      }
+
+      const currentPropIdx = current.findIndex(
+        (propValue) => propValue.property.id === id,
+      );
+      if (currentPropIdx === -1) {
+        return [...current, newPropValue];
+      }
+
+      return current.toSpliced(currentPropIdx, 1, newPropValue);
+    }, properties);
+  }
+
+  return {
+    updateWord: {
+      ...word,
+      ...(input.original && { name: input.original }),
+      ...(input.translation && { name: input.translation }),
+      properties,
+    },
+  };
 }
 
 export function useDeleteWord(): UseMutationResult<typeof DeleteWordDocument> {

@@ -1,14 +1,15 @@
 import { TbRectangle, TbRectangleFilled } from 'react-icons/tb';
 
 import { DateTime } from 'luxon';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { breakpoints } from '../../../index.css';
+import { hover } from '../../../index.css';
 import { DISPLAY_DATE_TIME_FORMAT } from '../../../utils/constants';
 import { fromTimestamp } from '../../../utils/datetime';
 import { useMediaQuery } from '../../../utils/useMediaQuery';
 import { useLocaleContext } from '../../LocaleContext';
+import { Dropdown } from '../../common/Dropdown';
 import { Icon } from '../../common/Icon';
-import { Tooltip } from '../../common/Tooltip';
 import * as styles from './WordMastery.css';
 
 const MAX_PROGRESS = 3;
@@ -19,14 +20,22 @@ type WordMasteryProps = {
 };
 
 export const WordMastery = ({ mastery, nextExerciseAt }: WordMasteryProps) => {
-  const isSmall = useMediaQuery(breakpoints.small);
+  const [isOpen, setOpen] = useState(false);
+  const canHover = useMediaQuery(hover.enabled);
 
   return (
-    <Tooltip
+    <Dropdown
+      isOpen={isOpen}
+      onOpen={setOpen}
       content={<WordMasteryTooltip nextExerciseAt={nextExerciseAt} />}
-      side={isSmall ? 'left' : 'bottomLeft'}
+      alignment={'end'}
     >
-      <div className={styles.mastery}>
+      <div
+        className={styles.mastery}
+        onClick={(e) => canHover && e.stopPropagation()}
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+      >
         {Array(MAX_PROGRESS)
           .fill(null)
           .map((_, index) =>
@@ -37,7 +46,7 @@ export const WordMastery = ({ mastery, nextExerciseAt }: WordMasteryProps) => {
             ),
           )}
       </div>
-    </Tooltip>
+    </Dropdown>
   );
 };
 

@@ -29,8 +29,8 @@ export class OptionPropertyValueType {
   @Field()
   property: OptionPropertyType;
 
-  @Field(() => OptionValueType)
-  option: OptionValueType;
+  @Field(() => OptionValueType, { nullable: true })
+  option?: OptionValueType;
 }
 
 export const PropertyValueUnionType = createUnionType({

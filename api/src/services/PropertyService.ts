@@ -25,7 +25,6 @@ import { ChangeService } from './ChangeService';
 import { LanguageService } from './LanguageService';
 import { WordService } from './WordService';
 
-const PROPERTY_DELETION_WORDS_THRESHOLD = 50;
 const MAX_OPTIONS_LENGTH = 20;
 
 export interface CreateBasePropertyParams {
@@ -192,6 +191,7 @@ export class PropertyService {
       property.name = params.name.trim();
     }
 
+    const deletedOptions: Record<OptionId, Option> = {};
     if (isOptionProperty(property) && params.options) {
       for (const { id, value, color } of params.options) {
         if (!id || !property.options[id]) {
@@ -204,12 +204,13 @@ export class PropertyService {
             color: color,
           };
         } else if (!value) {
+          deletedOptions[id] = property.options[id];
           delete property.options[id];
         } else {
           property.options[id] = {
             ...property.options[id],
             value: value.trim(),
-            ...(color && { color }),
+            ...(color !== undefined && { color }),
           };
         }
       }
@@ -228,11 +229,29 @@ export class PropertyService {
     if (change) {
       await this.connectionManager.transactionally(async () => {
         await this.propertyRepository.update(property);
+        await this.detachDeletedOptions(property, deletedOptions);
         await this.changeService.create(change);
       });
     }
 
     return property;
+  }
+
+  private async detachDeletedOptions(
+    property: Property,
+    deletedOptions: Record<OptionId, Option>,
+  ) {
+    for (const [deletedOptionId, deletedOption] of Object.entries(
+      deletedOptions,
+    )) {
+      await this.wordService.detachOption(
+        property.languageId,
+        property.id,
+        property.partOfSpeech,
+        deletedOptionId,
+        deletedOption,
+      );
+    }
   }
 
   async reorder(
@@ -268,15 +287,6 @@ export class PropertyService {
 
   async delete(ctx: Context, { id }: DeletePropertyParams): Promise<Property> {
     const property = await this.getById(ctx, id);
-
-    const wordCount = await this.wordService.getCountByProperty(
-      property.languageId,
-      property.id,
-      property.partOfSpeech,
-    );
-    if (wordCount > PROPERTY_DELETION_WORDS_THRESHOLD) {
-      throw new Error(`Property has too many words (id:${id})`);
-    }
 
     await this.connectionManager.transactionally(async () => {
       await this.propertyRepository.delete(id);

@@ -3,7 +3,7 @@ import { WordTable } from 'knex/types/tables';
 import { DateTime, Duration } from 'luxon';
 import { LanguageId } from 'models/Language';
 import { Direction, Page, toPage } from 'models/Page';
-import { Property, PropertyId } from 'models/Property';
+import { Option, OptionId, Property, PropertyId } from 'models/Property';
 import { PropertyValue } from 'models/PropertyValue';
 import {
   AlphabeticalCursor,
@@ -364,6 +364,29 @@ export class WordRepository {
     return Number(count);
   }
 
+  async getCountByPropertyOptions(
+    languageId: LanguageId,
+    propertyId: PropertyId,
+    partOfSpeech: PartOfSpeech,
+  ): Promise<Record<OptionId, number>> {
+    const connection = this.connectionManager.getConnection();
+    const counts: Array<{ option_id: string; count: number }> =
+      await connection(TABLE_WORDS)
+        .where({ language_id: languageId, part_of_speech: partOfSpeech })
+        .whereRaw(`properties->'$."${propertyId}".option.id' is not null`)
+        .select(
+          connection.raw(
+            `properties->>'$."${propertyId}".option.id' as option_id`,
+          ),
+        )
+        .count('id', { as: 'count' })
+        .groupBy('option_id');
+
+    return Object.fromEntries(
+      counts.map(({ option_id: optionId, count }) => [optionId, Number(count)]),
+    );
+  }
+
   streamRecords(): AsyncIterable<WordTable> {
     return this.connectionManager.getConnection()(TABLE_WORDS).stream();
   }
@@ -378,6 +401,26 @@ export class WordRepository {
 
   async deleteAll(): Promise<void> {
     await this.connectionManager.getConnection()(TABLE_WORDS).delete();
+  }
+
+  async detachOption(
+    languageId: LanguageId,
+    propertyId: PropertyId,
+    partOfSpeech: PartOfSpeech,
+    optionId: OptionId,
+    option: Option,
+  ): Promise<void> {
+    const connection = this.connectionManager.getConnection();
+
+    await connection(TABLE_WORDS)
+      .where({ language_id: languageId, part_of_speech: partOfSpeech })
+      .whereRaw(`properties->'$."${propertyId}".option.id' = '${optionId}'`)
+      .update(
+        'properties',
+        connection.raw(
+          `JSON_SET(properties, '$."${propertyId}".option', CAST('${this.serializer.serialize(option)}' AS JSON))`,
+        ),
+      );
   }
 
   private async mapToWord(row: WordTable): Promise<Word> {

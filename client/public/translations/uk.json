@@ -23,6 +23,9 @@
       "exerciseReady": "вправа готова"
     },
     "existing": "уже додано",
+    "options": {
+      "custom": "інше"
+    },
     "delete": "видалити слово"
   },
   "exercise": {
@@ -46,7 +49,12 @@
     "name": "поле",
     "text": "текст",
     "option": "варіанти",
-    "delete": "видалити поле"
+    "options": {
+      "new": "новий"
+    },
+    "delete": "видалити поле",
+    "deleteOptions": "видалити варіанти поля",
+    "usage": "використано в словах:"
   },
   "progress": {
     "progress": "Прогрес",

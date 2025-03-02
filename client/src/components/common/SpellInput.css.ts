@@ -1,6 +1,7 @@
-import { globalStyle, style, StyleRule } from '@vanilla-extract/css';
+import { globalStyle, style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
-import { Color, colors, fontThemeVars, themeVars } from '../../index.css';
+import { fontThemeVars, themeVars } from '../../index.css';
+import { accentColorStyle } from '../../utils/colors';
 
 export const container = style({
   display: 'flex',
@@ -44,16 +45,9 @@ export const cell = recipe({
       },
     },
 
-    highlight: {
-      ...(Object.fromEntries(
-        colors.map((color) => [
-          color,
-          {
-            color: themeVars.color[color],
-          },
-        ]),
-      ) as unknown as Record<Color, StyleRule>),
-    },
+    highlight: accentColorStyle((colorVar) => ({
+      color: colorVar,
+    })),
   },
 });
 

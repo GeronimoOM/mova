@@ -19,6 +19,10 @@ import type {
   WordFieldsFullFragment,
   WordUpdate,
 } from '../../api/types/graphql';
+import {
+  getPropertyTypeName,
+  getPropertyValueTypeName,
+} from '../../utils/properties';
 import { SyncState } from './sync';
 
 export class MovaDb extends Dexie {
@@ -139,8 +143,8 @@ export async function saveProperty(
 ): Promise<void> {
   await db.properties.put({
     ...property,
-    __typename: 'TextProperty',
-  });
+    __typename: getPropertyTypeName(property.type),
+  } as PropertyFieldsFragment);
 }
 
 export async function updateProperty(
@@ -239,20 +243,20 @@ export async function saveWord(
   await db.words.put(
     word.__typename === 'Word'
       ? word
-      : {
+      : ({
           ...word,
           properties: (word.properties as WordCreate['properties']).map(
             (propertyValue) => ({
               property: {
                 id: propertyValue.propertyId,
-                __typename: 'TextProperty',
+                __typename: getPropertyTypeName(propertyValue.type),
               },
               text: (propertyValue as TextPropertyValueSave).text!,
-              __typename: 'TextPropertyValue',
+              __typename: getPropertyValueTypeName(propertyValue.type),
             }),
           ),
           __typename: 'Word',
-        },
+        } as WordFieldsFullFragment),
   );
 }
 

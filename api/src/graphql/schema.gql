@@ -56,6 +56,7 @@ type TextProperty implements IProperty {
   addedAt: Timestamp!
   order: Int!
   languageId: ID!
+  usage: Int!
 }
 
 interface IProperty {
@@ -66,6 +67,7 @@ interface IProperty {
   addedAt: Timestamp!
   order: Int!
   languageId: ID!
+  usage: Int!
 }
 
 enum PropertyType {
@@ -81,7 +83,9 @@ type OptionProperty implements IProperty {
   addedAt: Timestamp!
   order: Int!
   languageId: ID!
+  usage: Int!
   options: [Option!]!
+  optionsUsage: [OptionUsage!]!
 }
 
 type Option {
@@ -100,6 +104,11 @@ enum Color {
   Purple
   Pink
   Brown
+}
+
+type OptionUsage {
+  id: ID!
+  count: Int!
 }
 
 type OptionValue {
@@ -129,7 +138,7 @@ type TextPropertyValue {
 
 type OptionPropertyValue {
   property: OptionProperty!
-  option: OptionValue!
+  option: OptionValue
 }
 
 type WordPage {
@@ -479,10 +488,10 @@ input CreateWordInput {
   languageId: ID!
   partOfSpeech: PartOfSpeech!
   addedAt: Timestamp
-  properties: [UpdatePropertyValueInput!]
+  properties: [SavePropertyValueInput!]
 }
 
-input UpdatePropertyValueInput {
+input SavePropertyValueInput {
   id: ID!
   text: String
   option: UpdatePropertyValueOptionInput
@@ -498,7 +507,7 @@ input UpdateWordInput {
   id: ID!
   original: String
   translation: String
-  properties: [UpdatePropertyValueInput!]
+  properties: [SavePropertyValueInput!]
 }
 
 input DeleteWordInput {

@@ -60,6 +60,7 @@ fragment OptionPropertyValueFields on OptionPropertyValue {
   option {
     id
     value
+    color
   }
 }
 
@@ -89,9 +90,14 @@ fragment TextPropertyFields on TextProperty {
 fragment OptionPropertyFields on OptionProperty {
   ...IPropertyFields
   options {
-    id
-    value
+    ...OptionFields
   }
+}
+
+fragment OptionFields on Option {
+  id
+  value
+  color
 }
 
 fragment ChangeFields on Change {

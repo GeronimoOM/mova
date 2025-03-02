@@ -9,6 +9,7 @@ import { ProgressType } from 'models/Progress';
 import {
   isOptionProperty,
   isTextProperty,
+  Option,
   OptionId,
   Property,
   PropertyId,
@@ -254,6 +255,34 @@ export class WordService {
       languageId,
       propertyId,
       partOfSpeech,
+    );
+  }
+
+  async getCountByPropertyOptions(
+    languageId: LanguageId,
+    propertyId: PropertyId,
+    partOfSpeech: PartOfSpeech,
+  ): Promise<Record<OptionId, number>> {
+    return await this.wordRepository.getCountByPropertyOptions(
+      languageId,
+      propertyId,
+      partOfSpeech,
+    );
+  }
+
+  async detachOption(
+    languageId: LanguageId,
+    propertyId: PropertyId,
+    partOfSpeech: PartOfSpeech,
+    optionId: OptionId,
+    option: Option,
+  ): Promise<void> {
+    await this.wordRepository.detachOption(
+      languageId,
+      propertyId,
+      partOfSpeech,
+      optionId,
+      option,
     );
   }
 

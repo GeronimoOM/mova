@@ -23,6 +23,9 @@
       "exerciseReady": "harjutus on valmis"
     },
     "existing": "on juba lisatud",
+    "options": {
+      "custom": "muu"
+    },
     "delete": "kustutada sõna"
   },
   "exercise": {
@@ -45,7 +48,12 @@
     "name": "omadus",
     "text": "tekst",
     "option": "variantid",
-    "delete": "kustutada omaduse"
+    "options": {
+      "new": "uus"
+    },
+    "delete": "kustutada omaduse",
+    "deleteOptions": "kustutada omaduse variandid",
+    "usage": "kasutatud sõnades:"
   },
   "progress": {
     "progress": "Progress",

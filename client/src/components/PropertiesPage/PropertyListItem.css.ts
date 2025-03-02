@@ -12,6 +12,9 @@ export const item = style({
     '&.selected': {
       outline: `2px solid ${themeVars.color.text}`,
     },
+    '&.selected.new': {
+      outline: `2px dashed ${themeVars.color.text}`,
+    },
     '&:not(.selected):not(.droppable):hover': {
       cursor: 'pointer',
       outline: `2px solid ${themeVars.color.backgroundLightest}`,
@@ -43,26 +46,11 @@ export const main = style({
   gap: 10,
 });
 
-export const header = style({
+export const section = style({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
   gap: 10,
-});
-
-export const content = style({
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  gap: 10,
-});
-
-export const typeIcon = style({
-  display: 'flex',
-  flexDirection: 'row',
-  gap: 5,
-  padding: 5,
-  color: themeVars.color.muted,
 });
 
 export const button = style({
@@ -73,21 +61,17 @@ export const button = style({
   },
 });
 
-export const typeLabel = style({
-  textTransform: 'lowercase',
-});
-
 export const sidebar = style({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
 });
 
-globalStyle(`${header} > *:first-child`, {
+globalStyle(`${section} > *:first-child`, {
   marginRight: 'auto',
 });
 
-globalStyle(`${content} input`, {
+globalStyle(`${section} input`, {
   textTransform: 'lowercase',
 });
 
@@ -100,33 +84,3 @@ export const overlay = style([
     opacity: 0.5,
   },
 ]);
-
-export const deleteConfirm = style({
-  minWidth: '200px',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  padding: 10,
-  gap: 30,
-});
-
-export const deleteConfirmText = style({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  gap: 10,
-});
-
-export const deleteConfirmProperty = style({
-  textTransform: 'lowercase',
-  fontSize: '1.25rem',
-  padding: '5px 10px',
-  borderRadius: 5,
-  backgroundColor: themeVars.color.backgroundLighter,
-});
-
-export const deleteConfirmButtons = style({
-  display: 'flex',
-  flexDirection: 'row',
-  gap: 10,
-});

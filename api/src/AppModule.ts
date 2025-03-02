@@ -7,6 +7,7 @@ import { ChangeTypeMapper } from 'graphql/mappers/ChangeTypeMapper';
 import { AuthResolver } from 'graphql/resolvers/AuthResolver';
 import { ChangeResolver } from 'graphql/resolvers/ChangeResolver';
 import { ExerciseResolver } from 'graphql/resolvers/ExerciseResolver';
+import { OptionPropertyResolver } from 'graphql/resolvers/OptionPropertyResolver';
 import { ProgressResolver } from 'graphql/resolvers/ProgressResolver';
 import { UserResolver } from 'graphql/resolvers/UserResolver';
 import { AuthGuard } from 'guards/AuthGuard';
@@ -61,6 +62,7 @@ import { WordService } from './services/WordService';
     AuthResolver,
     LanguageResolver,
     PropertyResolver,
+    OptionPropertyResolver,
     ChangeResolver,
     WordResolver,
     ExerciseResolver,

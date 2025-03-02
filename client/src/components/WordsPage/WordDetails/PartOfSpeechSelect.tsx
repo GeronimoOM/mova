@@ -59,18 +59,18 @@ type PartOfSpeechSelectButtonProps = {
 
 const PartOfSpeechSelectButton = ({
   partOfSpeech,
-  onOpenDropdown: onOpen,
+  onOpenDropdown,
   disabled,
 }: PartOfSpeechSelectButtonProps) => {
   const { t } = useTranslation();
 
   return (
-    <div className={styles.button({ disabled })} onClick={onOpen}>
+    <div className={styles.button({ disabled })} onClick={onOpenDropdown}>
       <Icon icon={PiGraphBold} size="small" />
       {partOfSpeech ? (
-        <span> {t(partOfSpeechToShortLabel[partOfSpeech])}</span>
+        <div>{t(partOfSpeechToShortLabel[partOfSpeech])}</div>
       ) : (
-        <span className={styles.placeholder}>{t('pos.select')}</span>
+        <div className={styles.placeholder}>{t('pos.select')}</div>
       )}
     </div>
   );

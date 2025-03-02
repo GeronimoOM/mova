@@ -1,13 +1,17 @@
 import { globalStyle, style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
-import { animations, colors, themeVars } from '../../index.css';
+import { animations, themeVars } from '../../index.css';
+import { accentAndOptionColorStyle } from '../../utils/colors';
 
 export const button = recipe({
   base: {
+    width: 'min-content',
+    height: 'min-content',
     padding: 6,
     display: 'flex',
     cursor: 'pointer',
     borderRadius: 30,
+    color: themeVars.color.text,
     backgroundColor: themeVars.color.background,
     border: `2px solid ${themeVars.color.text}`,
     transition: 'color 0.2s ease, background-color 0.2s ease, border 0.2s ease',
@@ -25,29 +29,27 @@ export const button = recipe({
   },
 
   variants: {
-    color: Object.fromEntries(
-      colors.map((color) => [
-        color,
-        {
-          selectors: {
-            '&:hover': {
-              color: themeVars.color[color],
-              border: `2px solid ${themeVars.color[color]}`,
-              backgroundColor: themeVars.color.background,
-            },
-            '&.highlighted': {
-              color: themeVars.color[color],
-              border: `2px solid ${themeVars.color[color]}`,
-            },
-            '&.highlighted:hover, &.toggled': {
-              backgroundColor: themeVars.color[color],
-              color: themeVars.color.background,
-              border: `2px solid ${themeVars.color[color]}`,
-            },
-          },
+    color: accentAndOptionColorStyle((colorVar) => ({
+      selectors: {
+        '&:hover': {
+          color: colorVar,
+          border: `2px solid ${colorVar}`,
+          backgroundColor: themeVars.color.background,
         },
-      ]),
-    ),
+        '&.highlighted, &.highlightedAlt': {
+          color: colorVar,
+          border: `2px solid ${colorVar}`,
+        },
+        '&.highlighted:hover, &.toggled': {
+          backgroundColor: colorVar,
+          color: themeVars.color.background,
+          border: `2px solid ${colorVar}`,
+        },
+        '&.highlightedAlt:hover:not(.toggled)': {
+          backgroundColor: themeVars.color.backgroundLighter,
+        },
+      },
+    })),
 
     disabled: {
       true: {
@@ -83,4 +85,8 @@ export const wrapper = style({
 
 globalStyle(`${button}.empty svg`, {
   opacity: 0,
+});
+
+globalStyle(`${button}.borderless`, {
+  border: 'none !important',
 });

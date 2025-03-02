@@ -75,8 +75,8 @@ export class CreateWordInput {
   @Field(() => TimestampScalar, { nullable: true })
   addedAt?: DateTime;
 
-  @Field(() => [UpdatePropertyValueInput], { nullable: true })
-  properties?: UpdatePropertyValueInput[];
+  @Field(() => [SavePropertyValueInput], { nullable: true })
+  properties?: SavePropertyValueInput[];
 }
 
 @InputType()
@@ -90,8 +90,8 @@ export class UpdateWordInput {
   @Field({ nullable: true })
   translation?: string;
 
-  @Field(() => [UpdatePropertyValueInput], { nullable: true })
-  properties?: UpdatePropertyValueInput[];
+  @Field(() => [SavePropertyValueInput], { nullable: true })
+  properties?: SavePropertyValueInput[];
 }
 
 @InputType()
@@ -107,7 +107,7 @@ export class UpdatePropertyValueOptionInput {
 }
 
 @InputType()
-export class UpdatePropertyValueInput {
+export class SavePropertyValueInput {
   @Field(() => ID)
   id: PropertyId;
 
