@@ -1,28 +1,25 @@
 import Dexie from 'dexie';
 import { v1 as uuid } from 'uuid';
-import type {
-  ApplyChangeInput,
-  AttemptWordMasteryMutation,
-  Language,
-  LanguageFieldsFragment,
-  LanguageUpdate,
-  PartOfSpeech,
-  PropertyFieldsFragment,
-  PropertyUpdate,
-  TextPropertyValue,
-  TextPropertyValueSave,
-  UpdateLanguageMutation,
-  UpdatePropertyMutation,
-  UpdateWordMutation,
-  WordCreate,
-  WordFieldsFragment,
-  WordFieldsFullFragment,
-  WordUpdate,
-} from '../../api/types/graphql';
 import {
-  getPropertyTypeName,
-  getPropertyValueTypeName,
-} from '../../utils/properties';
+  type ApplyChangeInput,
+  type AttemptWordMasteryMutation,
+  type Language,
+  type LanguageFieldsFragment,
+  type LanguageUpdate,
+  type OptionFieldsFragment,
+  type OptionPropertyFieldsFragment,
+  type PartOfSpeech,
+  type PropertyFieldsFragment,
+  type PropertyUpdate,
+  type UpdateLanguageMutation,
+  type UpdateWordMutation,
+  type WordCreate,
+  type WordFieldsFragment,
+  type WordFieldsFullFragment,
+  type WordUpdate,
+} from '../../api/types/graphql';
+import { updatedOptions } from '../../utils/options';
+import { updatedWordProperties } from '../../utils/properties';
 import { SyncState } from './sync';
 
 export class MovaDb extends Dexie {
@@ -91,10 +88,7 @@ export async function getLanguages(): Promise<LanguageFieldsFragment[]> {
 export async function saveLanguage(
   language: LanguageFieldsFragment,
 ): Promise<void> {
-  await db.languages.put({
-    ...language,
-    __typename: 'Language',
-  });
+  await db.languages.put(language);
 }
 
 export async function saveLanguages(
@@ -141,18 +135,28 @@ export async function saveProperties(
 export async function saveProperty(
   property: PropertyFieldsFragment,
 ): Promise<void> {
-  await db.properties.put({
-    ...property,
-    __typename: getPropertyTypeName(property.type),
-  } as PropertyFieldsFragment);
+  await db.properties.put(property);
 }
 
 export async function updateProperty(
-  propertyUpdate: UpdatePropertyMutation['updateProperty'] | PropertyUpdate,
+  propertyUpdate: PropertyFieldsFragment | PropertyUpdate,
 ): Promise<void> {
+  let options: OptionFieldsFragment[] | undefined;
+  if (propertyUpdate.__typename === 'OptionProperty') {
+    options = propertyUpdate.options;
+  } else if (
+    propertyUpdate.__typename === 'OptionPropertyUpdate' &&
+    propertyUpdate.options
+  ) {
+    const currentProperty = (await getProperty(propertyUpdate.id))!;
+    const currentOptions =
+      (currentProperty as OptionPropertyFieldsFragment).options ?? [];
+    options = updatedOptions(currentOptions, propertyUpdate.options);
+  }
+
   await db.properties.update(propertyUpdate.id, {
     ...(propertyUpdate.name && { name: propertyUpdate.name }),
-    // TODO options
+    ...(options && { options }),
   });
 }
 
@@ -240,24 +244,22 @@ export async function updateWords(words: WordFieldsFragment[]): Promise<void> {
 export async function saveWord(
   word: WordFieldsFullFragment | WordCreate,
 ): Promise<void> {
-  await db.words.put(
-    word.__typename === 'Word'
-      ? word
-      : ({
-          ...word,
-          properties: (word.properties as WordCreate['properties']).map(
-            (propertyValue) => ({
-              property: {
-                id: propertyValue.propertyId,
-                __typename: getPropertyTypeName(propertyValue.type),
-              },
-              text: (propertyValue as TextPropertyValueSave).text!,
-              __typename: getPropertyValueTypeName(propertyValue.type),
-            }),
-          ),
-          __typename: 'Word',
-        } as WordFieldsFullFragment),
-  );
+  let properties: WordFieldsFullFragment['properties'];
+  if (word.__typename === 'Word') {
+    properties = word.properties;
+  } else {
+    const currentWord = (await getWord(word.id))!;
+    properties = updatedWordProperties(
+      currentWord.properties,
+      word.properties as WordCreate['properties'],
+    );
+  }
+
+  await db.words.put({
+    ...word,
+    properties,
+    __typename: 'Word',
+  });
 }
 
 export async function updateWord(
@@ -268,31 +270,17 @@ export async function updateWord(
 ): Promise<void> {
   if (wordUpdate.__typename === 'Word') {
     await db.words.update(wordUpdate.id, wordUpdate);
-  } else {
+  } else if (wordUpdate.__typename === 'WordUpdate') {
     await db.transaction('rw', 'words', async () => {
-      const word = await getWord(wordUpdate.id);
+      const currentWord = (await getWord(wordUpdate.id))!;
       let properties: WordFieldsFullFragment['properties'] | undefined;
-      if (wordUpdate.__typename === 'WordUpdate' && wordUpdate.properties) {
-        properties = [...word!.properties];
-        for (const propertyValueSave of wordUpdate.properties) {
-          const textPropertyValueSave =
-            propertyValueSave as TextPropertyValueSave;
-
-          if (textPropertyValueSave.text) {
-            (
-              properties.find(
-                (propertValue) =>
-                  propertValue.property.id !== propertyValueSave.propertyId,
-              ) as TextPropertyValue
-            ).text = textPropertyValueSave.text;
-          } else {
-            properties = properties?.filter(
-              (propertValue) =>
-                propertValue.property.id !== propertyValueSave.propertyId,
-            );
-          }
-        }
+      if (wordUpdate.properties) {
+        properties = updatedWordProperties(
+          currentWord.properties,
+          wordUpdate.properties,
+        );
       }
+
       await db.words.update(wordUpdate.id, {
         ...(wordUpdate.original && { original: wordUpdate.original }),
         ...(wordUpdate.translation && { translation: wordUpdate.translation }),

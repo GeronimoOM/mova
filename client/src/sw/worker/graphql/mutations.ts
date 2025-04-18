@@ -1,6 +1,20 @@
 import {
+  optimisticAttemptWordMastery,
+  optimisticCreateLanguage,
+  optimisticCreateProperty,
+  optimisticCreateWord,
+  optimisticDeleteLanguage,
+  optimisticDeleteProperty,
+  optimisticDeleteWord,
+  optimisticReorderProperties,
+  optimisticUpdateLanguage,
+  optimisticUpdateProperty,
+  optimisticUpdateWord,
+} from '../../../api/optimistic';
+import {
   ApplyChangeInput,
   AttemptWordMasteryMutation,
+  AttemptWordMasteryMutationVariables,
   CreateLanguageMutation,
   CreateLanguageMutationVariables,
   CreatePropertyMutation,
@@ -22,7 +36,6 @@ import {
   UpdateWordMutation,
   UpdateWordMutationVariables,
 } from '../../../api/types/graphql';
-import { fromTimestamp, toTimestamp } from '../../../utils/datetime';
 import * as cache from '../cache';
 import { GraphQlRequest, response, tryFetch } from './common';
 
@@ -121,223 +134,6 @@ function buildChange(request: GraphQlRequest): ApplyChangeInput {
   }
 }
 
-async function handleGraphQlMutationOptimistically(
-  request: GraphQlRequest,
-): Promise<Response> {
-  switch (request.operationName) {
-    case GraphQlMutation.CreateLanguage:
-      return handleCreateLanguageMutation(request);
-    case GraphQlMutation.UpdateLanguage:
-      return handleUpdateLanguageMutation(request);
-    case GraphQlMutation.DeleteLanguage:
-      return handleDeleteLanguageMutation(request);
-    case GraphQlMutation.CreateProperty:
-      return handleCreatePropertyMutation(request);
-    case GraphQlMutation.UpdateProperty:
-      return handleUpdatePropertyMutation(request);
-    case GraphQlMutation.ReorderProperties:
-      return handleReorderPropertiesMutation(request);
-    case GraphQlMutation.DeleteProperty:
-      return handleDeletePropertyMutation(request);
-    case GraphQlMutation.CreateWord:
-      return handleCreateWordMutation(request);
-    case GraphQlMutation.UpdateWord:
-      return handleUpdateWordMutation(request);
-    case GraphQlMutation.DeleteWord:
-      return handleDeleteWordMutation(request);
-    default:
-      throw new Error(`Unsupported operation name ${request.operationName}`);
-  }
-}
-
-async function handleCreateLanguageMutation(
-  request: GraphQlRequest,
-): Promise<Response> {
-  const { input } = request.variables as CreateLanguageMutationVariables;
-
-  return response<CreateLanguageMutation>({
-    createLanguage: {
-      ...input,
-      id: input.id!,
-      addedAt: input.addedAt!,
-      __typename: 'Language',
-    },
-  });
-}
-
-async function handleUpdateLanguageMutation(
-  request: GraphQlRequest,
-): Promise<Response> {
-  const { input } = request.variables as UpdateLanguageMutationVariables;
-
-  return response<UpdateLanguageMutation>({
-    updateLanguage: {
-      ...input,
-      __typename: 'Language',
-    },
-  });
-}
-
-async function handleDeleteLanguageMutation(
-  request: GraphQlRequest,
-): Promise<Response> {
-  const { input } = request.variables as DeleteLanguageMutationVariables;
-
-  return response<DeleteLanguageMutation>({
-    deleteLanguage: {
-      ...input,
-      __typename: 'Language',
-    },
-  });
-}
-
-async function handleCreatePropertyMutation(
-  request: GraphQlRequest,
-): Promise<Response> {
-  const { input } = request.variables as CreatePropertyMutationVariables;
-  const properties = await cache.getProperties(
-    input.languageId,
-    input.partOfSpeech,
-  );
-  const order =
-    properties.reduce(
-      (maxOrder, { order }) => (order > maxOrder ? order : maxOrder),
-      0,
-    ) + 1;
-
-  return response<CreatePropertyMutation>({
-    createProperty: {
-      ...input,
-      id: input.id!,
-      addedAt: input.addedAt!,
-      order,
-      __typename: 'TextProperty',
-    },
-  });
-}
-
-async function handleUpdatePropertyMutation(
-  request: GraphQlRequest,
-): Promise<Response> {
-  const { input } = request.variables as UpdatePropertyMutationVariables;
-  const property = (await cache.getProperty(input.id))!;
-
-  return response<UpdatePropertyMutation>({
-    updateProperty: {
-      ...property,
-      ...(input.name && { name: input.name }),
-      __typename: 'TextProperty',
-    },
-  });
-}
-
-async function handleReorderPropertiesMutation(
-  request: GraphQlRequest,
-): Promise<Response> {
-  const { input } = request.variables as ReorderPropertiesMutationVariables;
-  const properties = await cache.getProperties(
-    input.languageId,
-    input.partOfSpeech,
-  );
-
-  return response<ReorderPropertiesMutation>({
-    reorderProperties: input.propertyIds.map(
-      (propertyId) => properties.find((prop) => prop.id === propertyId)!,
-    ),
-  });
-}
-
-async function handleDeletePropertyMutation(
-  request: GraphQlRequest,
-): Promise<Response> {
-  const { input } = request.variables as DeletePropertyMutationVariables;
-  const property = (await cache.getProperty(input.id))!;
-
-  return response<DeletePropertyMutation>({
-    deleteProperty: {
-      id: property.id,
-      languageId: property.languageId,
-      partOfSpeech: property.partOfSpeech,
-      __typename: 'TextProperty',
-    },
-  });
-}
-
-async function handleCreateWordMutation(
-  request: GraphQlRequest,
-): Promise<Response> {
-  const { input } = request.variables as CreateWordMutationVariables;
-
-  return response<CreateWordMutation>({
-    createWord: {
-      ...input,
-      id: input.id!,
-      addedAt: input.addedAt!,
-      mastery: 0,
-      nextExerciseAt: toTimestamp(
-        fromTimestamp(input.addedAt!)?.plus({ hour: 1 }) ?? null,
-      )!,
-      properties:
-        input.properties?.map(({ id, text }) => ({
-          property: {
-            id,
-            __typename: 'TextProperty',
-          },
-          text: text!,
-          __typename: 'TextPropertyValue',
-        })) ?? [],
-      __typename: 'Word',
-    },
-  });
-}
-
-async function handleUpdateWordMutation(
-  request: GraphQlRequest,
-): Promise<Response> {
-  const { input } = request.variables as UpdateWordMutationVariables;
-  const word = (await cache.getWord(input.id))!;
-
-  return response<UpdateWordMutation>({
-    updateWord: {
-      ...word,
-      ...(input.original && { original: input.original }),
-      ...(input.translation && { translation: input.translation }),
-      ...(input.properties && {
-        properties: input.properties.reduce((props, { id, text }) => {
-          props = props.filter((prop) => prop.property.id !== id);
-          if (text) {
-            props.push({
-              property: {
-                id,
-                __typename: 'TextProperty',
-              },
-              text: text!,
-              __typename: 'TextPropertyValue',
-            });
-          }
-          return props;
-        }, word.properties),
-      }),
-      __typename: 'Word',
-    },
-  });
-}
-
-async function handleDeleteWordMutation(
-  request: GraphQlRequest,
-): Promise<Response> {
-  const { input } = request.variables as DeleteWordMutationVariables;
-  const word = (await cache.getWord(input.id))!;
-
-  return response<DeleteWordMutation>({
-    deleteWord: {
-      id: word.id,
-      languageId: word.languageId,
-      __typename: 'Word',
-    },
-  });
-}
-
 async function cacheGraphQlMutationResponse(
   request: GraphQlRequest,
   response: Response,
@@ -405,5 +201,86 @@ async function cacheGraphQlMutationResponse(
     }
   } catch (err) {
     console.error('Failed to cache response', err);
+  }
+}
+
+async function handleGraphQlMutationOptimistically(
+  request: GraphQlRequest,
+): Promise<Response> {
+  switch (request.operationName) {
+    case GraphQlMutation.CreateLanguage:
+      return response(
+        optimisticCreateLanguage(
+          request.variables as CreateLanguageMutationVariables,
+        ),
+      );
+    case GraphQlMutation.UpdateLanguage:
+      return response(
+        optimisticUpdateLanguage(
+          request.variables as UpdateLanguageMutationVariables,
+        ),
+      );
+    case GraphQlMutation.DeleteLanguage:
+      return response(
+        optimisticDeleteLanguage(
+          request.variables as DeleteWordMutationVariables,
+        ),
+      );
+    case GraphQlMutation.CreateProperty: {
+      const variables = request.variables as CreatePropertyMutationVariables;
+      const properties = await cache.getProperties(
+        variables.input.languageId,
+        variables.input.partOfSpeech,
+      );
+
+      return response(optimisticCreateProperty(variables, properties));
+    }
+    case GraphQlMutation.UpdateProperty: {
+      const variables = request.variables as UpdatePropertyMutationVariables;
+      const currentProperty = (await cache.getProperty(variables.input.id))!;
+
+      return response(optimisticUpdateProperty(variables, currentProperty));
+    }
+    case GraphQlMutation.ReorderProperties: {
+      const variables = request.variables as ReorderPropertiesMutationVariables;
+      const properties = await cache.getProperties(
+        variables.input.languageId,
+        variables.input.partOfSpeech,
+      );
+
+      return response(optimisticReorderProperties(variables, properties));
+    }
+    case GraphQlMutation.DeleteProperty: {
+      const variables = request.variables as DeletePropertyMutationVariables;
+      const currentProperty = (await cache.getProperty(variables.input.id))!;
+
+      return response(optimisticDeleteProperty(currentProperty));
+    }
+    case GraphQlMutation.CreateWord:
+      return response(
+        optimisticCreateWord(request.variables as CreateWordMutationVariables),
+      );
+    case GraphQlMutation.UpdateWord: {
+      const variables = request.variables as UpdateWordMutationVariables;
+      const currentWord = (await cache.getWord(variables.input.id))!;
+
+      return response(optimisticUpdateWord(variables, currentWord));
+    }
+    case GraphQlMutation.DeleteWord: {
+      const variables = request.variables as UpdateWordMutationVariables;
+      const currentWord = (await cache.getWord(variables.input.id))!;
+
+      return response(optimisticDeleteWord(currentWord));
+    }
+
+    case GraphQlMutation.AttemptMastery: {
+      const variables =
+        request.variables as AttemptWordMasteryMutationVariables;
+      const currentWord = (await cache.getWord(variables.wordId))!;
+
+      return response(optimisticAttemptWordMastery(variables, currentWord));
+    }
+    default:
+      throw new Error(`Unsupported operation name ${request.operationName}`);
   }
 }

@@ -2,25 +2,25 @@ import { ApolloProvider } from '@apollo/client';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-import { client } from './api/client';
+import { client, setClientId } from './api/client';
 import { App } from './components/App';
 import { AuthProvider } from './components/AuthContext';
 import { LanguageProvider } from './components/LanguageContext';
 import { LocaleProvider, initTranslator } from './components/LocaleContext';
 import { SettingsProvider } from './components/SettingsContext';
 import './index.css';
+import { registerServiceWorker } from './sw/client/register';
+import { SwWorkerMessageType } from './sw/worker/messages';
 
-// TODO
-
-// registerServiceWorker((message) => {
-//   if (message.type === SwWorkerMessageType.Initialized) {
-//     setClientId(message.clientId);
-//   } else if (message.type === SwWorkerMessageType.SyncOver) {
-//     if (message.isSuccess && message.hasChanges) {
-//       // cacheEvict();
-//     }
-//   }
-// });
+registerServiceWorker((message) => {
+  if (message.type === SwWorkerMessageType.Initialized) {
+    setClientId(message.clientId);
+  } else if (message.type === SwWorkerMessageType.SyncOver) {
+    if (message.isSuccess && message.hasChanges) {
+      // cacheEvict();
+    }
+  }
+});
 
 initTranslator();
 

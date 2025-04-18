@@ -65,16 +65,16 @@ export class PropertyRepository {
     return propertyRows.map((propertyRow) => this.mapToProperty(propertyRow));
   }
 
-  async getCount(
+  async getMaxOrder(
     languageId: LanguageId,
     partOfSpeech: PartOfSpeech,
   ): Promise<number> {
-    const [{ count }] = (await this.connectionManager
+    const [{ max_order: maxOrder }] = (await this.connectionManager
       .getConnection()(TABLE_PROPERTIES)
       .where({ language_id: languageId, part_of_speech: partOfSpeech })
-      .count('id as count')) as [{ count: string }];
+      .max('order as max_order')) as [{ max_order: number | null }];
 
-    return Number(count);
+    return maxOrder ?? 0;
   }
 
   async create(property: Property): Promise<void> {

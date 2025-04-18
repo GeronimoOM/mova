@@ -131,10 +131,11 @@ export class PropertyService {
   async create(ctx: Context, params: CreatePropertyParams): Promise<Property> {
     await this.languageService.getById(ctx, params.languageId);
 
-    const order = await this.propertyRepository.getCount(
-      params.languageId,
-      params.partOfSpeech,
-    );
+    const order =
+      (await this.propertyRepository.getMaxOrder(
+        params.languageId,
+        params.partOfSpeech,
+      )) + 1;
 
     const baseProperty: BaseProperty = {
       id: params.id ?? uuid(),

@@ -150,6 +150,13 @@ fragment UpdatePropertyChangeFields on UpdatePropertyChange {
       name
       type
     }
+    ... on OptionPropertyUpdate {
+      options {
+        id
+        value
+        color
+      }
+    }
   }
 }
 
