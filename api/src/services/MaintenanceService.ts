@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { SearchClient } from 'clients/SearchClient';
-import { Admin } from 'guards/metadata';
 import {
   GoalTable,
   LanguageTable,
   ProgressTable,
   PropertyTable,
+  UserTable,
   WordTable,
 } from 'knex/types/tables';
 import { Context } from 'models/Context';
@@ -16,34 +16,35 @@ import {
   MigrationRecordTypes,
 } from 'models/Migration';
 import { PropertyType } from 'models/Property';
-import { UserId } from 'models/User';
+import { User, UserId } from 'models/User';
 import { PartOfSpeech } from 'models/Word';
 import { ChangeRepository } from 'repositories/ChangeRepository';
 import { DbConnectionManager } from 'repositories/DbConnectionManager';
 import { LanguageRepository } from 'repositories/LanguageRepository';
 import { ProgressRepository } from 'repositories/ProgressRepository';
 import { PropertyRepository } from 'repositories/PropertyRepository';
+import { UserRepository } from 'repositories/UserRepository';
 import { WordRepository } from 'repositories/WordRepository';
 import { Readable } from 'stream';
+import * as etPreset from '../utils/presets/et';
 import { LanguageService } from './LanguageService';
-import * as etPreset from './presets/et';
 import { ProgressService } from './ProgressService';
 import { PropertyService } from './PropertyService';
-import { UserService } from './UserService';
+import { CreateUserParams, UserService } from './UserService';
 import { WordService } from './WordService';
 
 const RECORDS_BATCH = 1000;
 
-@Admin()
 @Injectable()
 export class MaintenanceService {
   constructor(
+    private userService: UserService,
     private wordService: WordService,
     private progressService: ProgressService,
     private propertyService: PropertyService,
     private languageService: LanguageService,
-    private userService: UserService,
 
+    private userRepository: UserRepository,
     private languageRepository: LanguageRepository,
     private propertyRepository: PropertyRepository,
     private wordRepository: WordRepository,
@@ -80,7 +81,17 @@ export class MaintenanceService {
     await this.propertyRepository.deleteAll();
     await this.languageRepository.deleteAll();
     await this.changeRepository.deleteAll();
+    await this.userRepository.deleteAll();
+    await this.userRepository.deleteAllSettings();
     await this.searchClient.deleteIndices();
+  }
+
+  async createUser(params: CreateUserParams): Promise<User> {
+    return await this.userService.create(params);
+  }
+
+  async deleteUser(id: UserId): Promise<User> {
+    return await this.userService.delete(id);
   }
 
   async reindexLanguage(languageId: LanguageId): Promise<Language> {
@@ -99,7 +110,7 @@ export class MaintenanceService {
   }
 
   async initEstonian(ctx: Context, userId: UserId): Promise<void> {
-    const user = await this.userService.getUser(userId);
+    const user = await this.userService.getById(userId);
     if (!user) {
       throw new Error('User does not exist');
     }
@@ -125,6 +136,10 @@ export class MaintenanceService {
   }
 
   private async *exportRecords(): AsyncGenerator<MigrationRecord> {
+    for await (const user of this.userRepository.streamRecords()) {
+      yield { type: MigrationRecordType.User, record: user };
+    }
+
     for await (const language of this.languageRepository.streamRecords()) {
       yield { type: MigrationRecordType.Language, record: language };
     }
@@ -150,6 +165,12 @@ export class MaintenanceService {
     const recordBatches = this.batchRecords(recordStream);
     for await (const [type, records] of recordBatches) {
       switch (type) {
+        case MigrationRecordType.User:
+          await this.userRepository.insertBatch(
+            records.map(({ record }) => record) as UserTable[],
+          );
+          break;
+
         case MigrationRecordType.Language:
           await this.languageRepository.insertBatch(
             records.map(({ record }) => record) as LanguageTable[],

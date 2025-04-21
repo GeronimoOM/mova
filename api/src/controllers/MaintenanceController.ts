@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   Post,
   Put,
   Query,
@@ -10,17 +11,20 @@ import {
   StreamableFile,
 } from '@nestjs/common';
 import { FastifyRequest } from 'fastify';
+import { Admin } from 'guards/metadata';
 import { DateTime } from 'luxon';
 import { ContextDec } from 'middleware/ContextMiddleware';
 import { Context } from 'models/Context';
 import { LanguageId } from 'models/Language';
 import { UserId } from 'models/User';
 import { MaintenanceService } from 'services/MaintenanceService';
+import { CreateUserParams } from 'services/UserService';
 import { chain } from 'stream-chain';
 import { parser as jsonParser } from 'stream-json/jsonl/Parser';
 import { stringer as jsonStringer } from 'stream-json/jsonl/Stringer';
 import { DATE_FORMAT } from 'utils/constants';
 
+@Admin()
 @Controller('/api/tools')
 export class MaintenanceController {
   constructor(private maintenanceService: MaintenanceService) {}
@@ -65,6 +69,16 @@ export class MaintenanceController {
   async resyncProgress(@Query('id') languageId: LanguageId) {
     const language = await this.maintenanceService.resyncProgress(languageId);
     return language;
+  }
+
+  @Post('/users')
+  async createUser(@Body() params: CreateUserParams) {
+    return await this.maintenanceService.createUser(params);
+  }
+
+  @Delete('/users/:id')
+  async deleteUser(@Param('id') id: UserId) {
+    return await this.maintenanceService.deleteUser(id);
   }
 
   @Post('/init/et')

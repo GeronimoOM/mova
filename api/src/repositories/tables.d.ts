@@ -2,6 +2,7 @@ import { ChangeId } from 'models/Change';
 import { LanguageId } from 'models/Language';
 import { ProgressId } from 'models/Progress';
 import { PropertyId, PropertyType } from 'models/Property';
+import { UserId } from 'models/User';
 import { PartOfSpeech, WordId } from 'models/Word';
 
 declare module 'knex/types/tables' {
@@ -50,11 +51,6 @@ declare module 'knex/types/tables' {
     language_id: LanguageId;
   }
 
-  interface UserSettingsTable {
-    user_id: UserId;
-    settings?: string;
-  }
-
   interface ChangeTable {
     id: ChangeId;
     changed_at: string;
@@ -64,6 +60,17 @@ declare module 'knex/types/tables' {
     user_id: string;
   }
 
+  interface UserTable {
+    id: UserId;
+    name: string;
+    password: string;
+  }
+
+  interface UserSettingsTable {
+    user_id: UserId;
+    settings?: string;
+  }
+
   interface Tables {
     languages: LanguageTable;
     properties: PropertyTable;
@@ -71,5 +78,7 @@ declare module 'knex/types/tables' {
     progress: ProgressTable;
     goals: GoalTable;
     changes: ChangeTable;
+    users: UserTable;
+    user_settings: UserSettingsTable;
   }
 }

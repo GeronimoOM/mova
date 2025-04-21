@@ -2,6 +2,7 @@ import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { User, UserAuth } from 'models/User';
+import { EncryptionService } from './EncryptionService';
 import { UserService } from './UserService';
 
 @Injectable()
@@ -10,12 +11,14 @@ export class AuthService {
     private jwtService: JwtService,
     private userService: UserService,
     private configService: ConfigService,
+    private cryptService: EncryptionService,
   ) {}
 
-  async login(username: string, password: string): Promise<string> {
-    const user = await this.userService.getUserByUsername(username);
+  async login(name: string, password: string): Promise<string> {
+    const user = await this.userService.getUserByName(name);
+    const isValid = user && (await this.verifyPassword(user, password));
 
-    if (!user || user.password !== password) {
+    if (!isValid) {
       throw new UnauthorizedException();
     }
 
@@ -39,11 +42,19 @@ export class AuthService {
         ignoreExpiration: true,
       });
 
-      user = await this.userService.getUser(userId);
+      user = await this.userService.getById(userId);
     } catch (e) {
       Logger.warn('Failed to authenticate:', e);
     }
 
     return user;
+  }
+
+  private async verifyPassword(user: User, password: string): Promise<boolean> {
+    if (user.isAdmin) {
+      return user.password === password;
+    }
+
+    return this.cryptService.verify(user.password, password);
   }
 }

@@ -20,6 +20,7 @@ import { UserRepository } from 'repositories/UserRepository';
 import { AuthService } from 'services/AuthService';
 import { ChangeBuilder } from 'services/ChangeBuilder';
 import { ChangeService } from 'services/ChangeService';
+import { EncryptionService } from 'services/EncryptionService';
 import { ExerciseService } from 'services/ExerciseService';
 import { ProgressService } from 'services/ProgressService';
 import { UserService } from 'services/UserService';
@@ -80,6 +81,7 @@ import { WordService } from './services/WordService';
     ProgressService,
     UserService,
     MaintenanceService,
+    EncryptionService,
     SearchClient,
     ChangeBuilder,
     LanguageRepository,
