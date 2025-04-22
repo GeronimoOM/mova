@@ -213,6 +213,8 @@ fragment PropertyValueSaveFields on PropertyValueSave {
   }
   ... on OptionPropertyValueSave {
     optionId
+    value
+    color
   }
 }
 

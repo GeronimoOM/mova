@@ -19,7 +19,10 @@ import {
   type WordUpdate,
 } from '../../api/types/graphql';
 import { updatedOptions } from '../../utils/options';
-import { updatedWordProperties } from '../../utils/properties';
+import {
+  isTextPropertyFragment,
+  updatedWordProperties,
+} from '../../utils/properties';
 import { SyncState } from './sync';
 
 export class MovaDb extends Dexie {
@@ -88,7 +91,10 @@ export async function getLanguages(): Promise<LanguageFieldsFragment[]> {
 export async function saveLanguage(
   language: LanguageFieldsFragment,
 ): Promise<void> {
-  await db.languages.put(language);
+  await db.languages.put({
+    ...language,
+    __typename: 'Language',
+  });
 }
 
 export async function saveLanguages(
@@ -135,6 +141,24 @@ export async function saveProperties(
 export async function saveProperty(
   property: PropertyFieldsFragment,
 ): Promise<void> {
+  if (isTextPropertyFragment(property)) {
+    property = {
+      ...property,
+      __typename: 'TextProperty',
+    };
+  } else {
+    property = {
+      ...property,
+      ...(property.options && {
+        options: property.options.map((option) => ({
+          ...option,
+          __typename: 'Option',
+        })),
+      }),
+      __typename: 'OptionProperty',
+    };
+  }
+
   await db.properties.put(property);
 }
 
@@ -235,12 +259,6 @@ export async function getWordByOriginal(
   })) as WordFieldsFullFragment;
 }
 
-export async function updateWords(words: WordFieldsFragment[]): Promise<void> {
-  await db.transaction('rw', 'words', async () => {
-    await Promise.all(words.map((word) => db.words.update(word.id, word)));
-  });
-}
-
 export async function saveWord(
   word: WordFieldsFullFragment | WordCreate,
 ): Promise<void> {
@@ -248,9 +266,9 @@ export async function saveWord(
   if (word.__typename === 'Word') {
     properties = word.properties;
   } else {
-    const currentWord = (await getWord(word.id))!;
+    const currentWord = await getWord(word.id);
     properties = updatedWordProperties(
-      currentWord.properties,
+      currentWord?.properties,
       word.properties as WordCreate['properties'],
     );
   }
@@ -292,6 +310,12 @@ export async function updateWord(
       });
     });
   }
+}
+
+export async function updateWords(words: WordFieldsFragment[]): Promise<void> {
+  await db.transaction('rw', 'words', async () => {
+    await Promise.all(words.map((word) => db.words.update(word.id, word)));
+  });
 }
 
 export async function deleteWords(): Promise<void> {

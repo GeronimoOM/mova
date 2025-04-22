@@ -39,7 +39,13 @@ export function updatedWordProperties(
 
     const id = input.id || (textSave || optionSave).propertyId;
 
-    if (!input.text && !input.option && !textSave.text && !optionSave.value) {
+    if (
+      !input.text &&
+      !input.option &&
+      !textSave.text &&
+      !optionSave.optionId &&
+      !optionSave.value
+    ) {
       return current.filter((prop) => prop.property.id !== id);
     }
 

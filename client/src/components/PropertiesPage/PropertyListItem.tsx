@@ -209,7 +209,7 @@ export const PropertyListItem = ({
         </div>
       </div>
 
-      {selected && property.type === PropertyType.Option && (
+      {property.type === PropertyType.Option && (
         <OptionPropertyDetails
           property={property}
           addOption={addOption}

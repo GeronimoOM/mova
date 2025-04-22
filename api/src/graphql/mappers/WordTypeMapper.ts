@@ -1,12 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { WordCreateType, WordUpdateType } from 'graphql/types/ChangeType';
+import {
+  PropertyValueSaveUnionType,
+  WordCreateType,
+  WordUpdateType,
+} from 'graphql/types/ChangeType';
 import {
   OptionPropertyType,
   TextPropertyType,
 } from 'graphql/types/PropertyType';
-import { PropertyId } from 'models/Property';
+import { PropertyId, PropertyType } from 'models/Property';
 import {
   PropertyValue,
+  PropertyValueSave,
   isIdOptionValue,
   isTextPropertyValue,
 } from 'models/PropertyValue';
@@ -62,7 +67,9 @@ export class WordTypeMapper {
       mastery: wordCreate.mastery,
       nextExerciseAt: this.exerciseService.getNextExerciseAt(wordCreate),
       languageId: wordCreate.languageId,
-      properties: Object.values(wordCreate.properties ?? {}),
+      properties: Object.values(wordCreate.properties ?? {}).map(
+        (propertyValue) => this.mapPropertyValueSave(propertyValue),
+      ),
     };
   }
 
@@ -147,5 +154,31 @@ export class WordTypeMapper {
       ...(input.text && { text: input.text }),
       ...(input.option && { option: input.option }),
     };
+  }
+
+  private mapPropertyValueSave(
+    propertyValueSave: PropertyValueSave,
+  ): typeof PropertyValueSaveUnionType {
+    if (propertyValueSave.type === PropertyType.Text) {
+      return {
+        propertyId: propertyValueSave.propertyId,
+        type: propertyValueSave.type,
+        text: propertyValueSave.text ?? undefined,
+      };
+    } else {
+      return {
+        propertyId: propertyValueSave.propertyId,
+        type: propertyValueSave.type,
+        ...(propertyValueSave.option &&
+          (isIdOptionValue(propertyValueSave.option)
+            ? {
+                optionId: propertyValueSave.option.id,
+              }
+            : {
+                value: propertyValueSave.option.value,
+                color: propertyValueSave.option.color,
+              })),
+      };
+    }
   }
 }

@@ -11,7 +11,7 @@ const DEFAULT_SETTINGS: UserSettings = {
   includeMastered: true,
 };
 
-const ADMIN_ID = 'admin_id';
+const ADMIN_ID = 'admin-id';
 const ADMIN_USER = 'admin';
 
 export interface CreateUserParams {
@@ -22,27 +22,25 @@ export interface CreateUserParams {
 
 @Injectable()
 export class UserService {
-  private adminSecret: string;
+  private adminUser: User;
 
   constructor(
     private userRepository: UserRepository,
     private configService: ConfigService,
     private cryptService: EncryptionService,
-  ) {
-    this.adminSecret = this.configService.getOrThrow<string>('admin.secret');
-  }
+  ) {}
 
   async getById(userId: UserId): Promise<User | null> {
     if (userId === ADMIN_ID) {
-      return this.adminUser();
+      return await this.getAdminUser();
     }
 
     return await this.userRepository.getById(userId);
   }
 
-  async getUserByName(name: string): Promise<User | null> {
+  async getByName(name: string): Promise<User | null> {
     if (name === ADMIN_USER) {
-      return this.adminUser();
+      return await this.getAdminUser();
     }
 
     return await this.userRepository.getByName(name);
@@ -57,7 +55,7 @@ export class UserService {
     }
 
     const name = params.name.trim();
-    const sameNameUser = await this.getUserByName(name);
+    const sameNameUser = await this.getByName(name);
     if (sameNameUser) {
       throw new Error(`User with name already exists (name:${name})`);
     }
@@ -101,12 +99,19 @@ export class UserService {
     };
   }
 
-  private adminUser(): User {
-    return {
-      id: ADMIN_ID,
-      name: ADMIN_USER,
-      password: this.adminSecret,
-      isAdmin: true,
-    };
+  private async getAdminUser(): Promise<User> {
+    if (!this.adminUser) {
+      const adminPassword =
+        this.configService.getOrThrow<string>('admin.secret');
+
+      this.adminUser = {
+        id: ADMIN_ID,
+        name: ADMIN_USER,
+        password: await this.cryptService.hash(adminPassword),
+        isAdmin: true,
+      };
+    }
+
+    return this.adminUser;
   }
 }

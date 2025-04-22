@@ -15,8 +15,9 @@ export class AuthService {
   ) {}
 
   async login(name: string, password: string): Promise<string> {
-    const user = await this.userService.getUserByName(name);
-    const isValid = user && (await this.verifyPassword(user, password));
+    const user = await this.userService.getByName(name);
+    const isValid =
+      user && (await this.cryptService.verify(user.password, password));
 
     if (!isValid) {
       throw new UnauthorizedException();
@@ -48,13 +49,5 @@ export class AuthService {
     }
 
     return user;
-  }
-
-  private async verifyPassword(user: User, password: string): Promise<boolean> {
-    if (user.isAdmin) {
-      return user.password === password;
-    }
-
-    return this.cryptService.verify(user.password, password);
   }
 }
