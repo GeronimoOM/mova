@@ -10,13 +10,9 @@ import {
 } from 'knex/types/tables';
 import { Context } from 'models/Context';
 import { Language, LanguageId } from 'models/Language';
-import {
-  MigrationRecord,
-  MigrationRecordType,
-  MigrationRecordTypes,
-} from 'models/Migration';
+import { MigrationRecord, MigrationRecordType } from 'models/Migration';
 import { PropertyType } from 'models/Property';
-import { User, UserId } from 'models/User';
+import { UserId } from 'models/User';
 import { PartOfSpeech } from 'models/Word';
 import { ChangeRepository } from 'repositories/ChangeRepository';
 import { DbConnectionManager } from 'repositories/DbConnectionManager';
@@ -30,7 +26,7 @@ import * as etPreset from '../utils/presets/et';
 import { LanguageService } from './LanguageService';
 import { ProgressService } from './ProgressService';
 import { PropertyService } from './PropertyService';
-import { CreateUserParams, UserService } from './UserService';
+import { UserService } from './UserService';
 import { WordService } from './WordService';
 
 const RECORDS_BATCH = 1000;
@@ -84,14 +80,6 @@ export class MaintenanceService {
     await this.userRepository.deleteAll();
     await this.userRepository.deleteAllSettings();
     await this.searchClient.deleteIndices();
-  }
-
-  async createUser(params: CreateUserParams): Promise<User> {
-    return await this.userService.create(params);
-  }
-
-  async deleteUser(id: UserId): Promise<User> {
-    return await this.userService.delete(id);
   }
 
   async reindexLanguage(languageId: LanguageId): Promise<Language> {
@@ -163,7 +151,7 @@ export class MaintenanceService {
 
   private async insertRecords(recordStream: Readable) {
     const recordBatches = this.batchRecords(recordStream);
-    for await (const [type, records] of recordBatches) {
+    for await (const { type, batch: records } of recordBatches) {
       switch (type) {
         case MigrationRecordType.User:
           await this.userRepository.insertBatch(
@@ -206,30 +194,34 @@ export class MaintenanceService {
 
   private async *batchRecords(
     recordStream: Readable,
-  ): AsyncGenerator<[MigrationRecordType, MigrationRecord[]]> {
+  ): AsyncGenerator<{ type: MigrationRecordType; batch: MigrationRecord[] }> {
+    let type: MigrationRecordType | null = null;
     let batch: MigrationRecord[] = [];
-    const types = MigrationRecordTypes[Symbol.iterator]();
-    let type: MigrationRecordType = types.next().value;
     for await (const { value } of recordStream) {
       const record = value as MigrationRecord;
-      if (record.type !== type) {
-        if (batch.length) {
-          yield [type, batch];
-        }
+      if (!type) {
+        type = record.type;
+      }
 
-        batch = [];
-        type = types.next().value;
-      } else {
+      if (record.type === type) {
         batch.push(record);
 
         if (batch.length === RECORDS_BATCH) {
-          yield [type, batch];
+          yield { type, batch };
           batch = [];
         }
+      } else {
+        if (type && batch.length) {
+          yield { type, batch };
+        }
+
+        batch = [record];
+        type = record.type;
       }
     }
-    if (batch.length) {
-      yield [type, batch];
+
+    if (type && batch.length) {
+      yield { type, batch };
     }
   }
 }

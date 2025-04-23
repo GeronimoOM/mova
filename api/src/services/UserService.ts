@@ -12,7 +12,6 @@ const DEFAULT_SETTINGS: UserSettings = {
 };
 
 const ADMIN_ID = 'admin-id';
-const ADMIN_USER = 'admin';
 
 export interface CreateUserParams {
   id?: UserId;
@@ -22,13 +21,16 @@ export interface CreateUserParams {
 
 @Injectable()
 export class UserService {
+  private adminUserName: string;
   private adminUser: User;
 
   constructor(
     private userRepository: UserRepository,
     private configService: ConfigService,
     private cryptService: EncryptionService,
-  ) {}
+  ) {
+    this.adminUserName = this.configService.getOrThrow<string>('admin.name');
+  }
 
   async getById(userId: UserId): Promise<User | null> {
     if (userId === ADMIN_ID) {
@@ -39,7 +41,7 @@ export class UserService {
   }
 
   async getByName(name: string): Promise<User | null> {
-    if (name === ADMIN_USER) {
+    if (name === this.adminUserName) {
       return await this.getAdminUser();
     }
 
@@ -102,11 +104,11 @@ export class UserService {
   private async getAdminUser(): Promise<User> {
     if (!this.adminUser) {
       const adminPassword =
-        this.configService.getOrThrow<string>('admin.secret');
+        this.configService.getOrThrow<string>('admin.password');
 
       this.adminUser = {
         id: ADMIN_ID,
-        name: ADMIN_USER,
+        name: this.adminUserName,
         password: await this.cryptService.hash(adminPassword),
         isAdmin: true,
       };

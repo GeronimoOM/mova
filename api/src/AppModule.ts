@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { ScheduleModule } from '@nestjs/schedule';
+import { AuthController } from 'controllers/AuthController';
 import { ChangeTypeMapper } from 'graphql/mappers/ChangeTypeMapper';
 import { AuthResolver } from 'graphql/resolvers/AuthResolver';
 import { ChangeResolver } from 'graphql/resolvers/ChangeResolver';
@@ -101,7 +102,7 @@ import { WordService } from './services/WordService';
       useValue: new AsyncLocalStorage(),
     },
   ],
-  controllers: [MaintenanceController],
+  controllers: [AuthController, MaintenanceController],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

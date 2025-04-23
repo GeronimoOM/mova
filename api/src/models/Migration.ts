@@ -8,22 +8,13 @@ import {
 } from 'knex/types/tables';
 
 export enum MigrationRecordType {
+  User = 'u',
   Language = 'l',
   Property = 'p',
   Word = 'w',
   Goal = 'g',
   Progress = 'r',
-  User = 'u',
 }
-
-export const MigrationRecordTypes = [
-  MigrationRecordType.Language,
-  MigrationRecordType.Property,
-  MigrationRecordType.Word,
-  MigrationRecordType.Goal,
-  MigrationRecordType.Progress,
-  MigrationRecordType.User,
-];
 
 export type MigrationRecord =
   | MigrationLanguageRecord

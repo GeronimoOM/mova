@@ -1,4 +1,4 @@
-import { useLazyQuery, useMutation } from '@apollo/client';
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import React, {
   createContext,
   useCallback,
@@ -8,6 +8,7 @@ import React, {
   useState,
 } from 'react';
 import {
+  GetLanguagesDocument,
   GetUserSettingsDocument,
   UpdateSettingsDocument,
 } from '../api/types/graphql';
@@ -35,6 +36,9 @@ export const LanguageProvider = ({ children }: LanguageProviderProps) => {
   const [language, setLanguage] = useState<string | null>(() =>
     localStorage.getItem(LOCAL_STORAGE_LANGUAGE_KEY),
   );
+
+  const { data: languagesQuery } = useQuery(GetLanguagesDocument);
+  const languages = languagesQuery?.languages;
 
   const [fetchUserSettings] = useLazyQuery(GetUserSettingsDocument, {
     fetchPolicy: 'no-cache',
@@ -74,6 +78,12 @@ export const LanguageProvider = ({ children }: LanguageProviderProps) => {
       });
     }
   }, [authToken, language, fetchUserSettings, setLanguageAndSave]);
+
+  useEffect(() => {
+    if (!language && languages?.length) {
+      setLanguageAndSave(languages[0].id);
+    }
+  }, [language, languages, setLanguageAndSave]);
 
   return (
     <LanguageContext.Provider value={contextValue}>
