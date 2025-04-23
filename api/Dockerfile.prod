@@ -1,14 +1,12 @@
 FROM node:23-alpine
 
-RUN ["npm", "install", "-g", "pnpm"]
-
 EXPOSE 9000
 
 WORKDIR /app
 
 COPY . .
 
-RUN ["pnpm", "install"]
-RUN ["pnpm", "run", "build"]
+RUN ["yarn", "install"]
+RUN ["yarn", "run", "build"]
 
-CMD ["pnpm", "run", "start:prod"]
+CMD ["yarn", "run", "start:prod"]

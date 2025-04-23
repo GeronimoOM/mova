@@ -16,7 +16,7 @@
     "start:prod": "docker-compose -f docker-compose.prod.yml up",
     "stop:prod": "docker-compose -f docker-compose.prod.yml down",
     "prepare": "husky",
-    "postinstall": "(cd api && pnpm install); (cd client && pnpm install)",
+    "postinstall": "(cd api && yarn install); (cd client && yarn install)",
     "lint-staged": "lint-staged",
     "type-check": "lerna run type-check"
   }
