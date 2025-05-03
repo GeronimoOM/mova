@@ -7,6 +7,7 @@ import {
   registerEnumType,
 } from '@nestjs/graphql';
 import { Direction, Page } from 'models/Page';
+import { DEFAULT_LIMIT } from 'utils/constants';
 
 registerEnumType(Direction, {
   name: 'Direction',
@@ -33,6 +34,6 @@ export class PageArgsType {
   @Field({ nullable: true })
   cursor?: string;
 
-  @Field(() => Int, { nullable: true })
-  limit?: number;
+  @Field(() => Int, { nullable: true, defaultValue: DEFAULT_LIMIT })
+  limit: number;
 }

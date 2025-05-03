@@ -81,7 +81,7 @@ export function useWordsList(wordsSearchQuery: string): WordsListReturn {
       wordsLoading,
       fetchNextWordsPage,
     }),
-    [dividedWords, wordsLoading, fetchNextWordsPage],
+    [words, dividedWords, wordsLoading, fetchNextWordsPage],
   );
 }
 

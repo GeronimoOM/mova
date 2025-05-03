@@ -5,7 +5,7 @@ export type UserId = Flavor<string, 'User'>;
 
 export interface User {
   id: UserId;
-  username: string;
+  name: string;
   password: string;
   isAdmin?: boolean;
 }

@@ -1,23 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import {
-  OptionPropertyUpdateType,
+  OptionUpdateType,
   PropertyUpdateUnionType,
   TextPropertyUpdateType,
 } from 'graphql/types/ChangeType';
 import {
+  Option,
   OptionId,
   Property,
+  PropertyType,
   PropertyUpdate,
   isTextProperty,
   isTextPropertyUpdate,
 } from 'models/Property';
-import { UpdatePropertyParams } from 'services/PropertyService';
 import {
-  OptionPropertyType,
+  CreateOptionPropertyParams,
+  CreatePropertyParams,
+  CreateTextPropertyParams,
+} from 'services/PropertyService';
+import {
+  CreatePropertyInput,
   OptionType,
   PropertyUnionType,
   TextPropertyType,
-  UpdatePropertyInput,
 } from '../types/PropertyType';
 
 @Injectable()
@@ -29,7 +34,15 @@ export class PropertyTypeMapper {
       return {
         ...property,
         options: this.mapOptions(property.options),
-      } as OptionPropertyType;
+      };
+    }
+  }
+
+  mapFromCreateInput(input: CreatePropertyInput): CreatePropertyParams {
+    if (input.type === PropertyType.Text) {
+      return input as CreateTextPropertyParams;
+    } else {
+      return input as CreateOptionPropertyParams;
     }
   }
 
@@ -40,27 +53,27 @@ export class PropertyTypeMapper {
       return {
         ...propertyUpdate,
         ...(propertyUpdate.options && {
-          options: this.mapOptions(propertyUpdate.options),
+          options: this.mapOptionsUpdate(propertyUpdate.options),
         }),
-      } as OptionPropertyUpdateType;
+      };
     }
   }
 
-  mapFromUpdateInput(input: UpdatePropertyInput): UpdatePropertyParams {
-    return {
-      ...input,
-      ...(input.options && {
-        options: Object.fromEntries(
-          input.options.map(({ id, value }) => [id, value]),
-        ),
-      }),
-    };
+  private mapOptions(options: Record<OptionId, Option>): OptionType[] {
+    return Object.entries(options).map(([optionId, option]) => ({
+      id: optionId,
+      value: option.value,
+      color: option.color,
+    }));
   }
 
-  private mapOptions(options: Record<OptionId, string>): OptionType[] {
-    return Object.entries(options).map(([optionId, optionValue]) => ({
+  private mapOptionsUpdate(
+    options: Record<OptionId, Option | null>,
+  ): OptionUpdateType[] {
+    return Object.entries(options).map(([optionId, option]) => ({
       id: optionId,
-      value: optionValue,
+      value: option?.value,
+      color: option?.color,
     }));
   }
 }

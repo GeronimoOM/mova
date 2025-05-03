@@ -20,6 +20,7 @@ export const LoginForm = () => {
 
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
+  const [isError, setError] = useState(false);
 
   const [loginMutation, { data: loginResult, loading }] =
     useMutation(LoginDocument);
@@ -46,6 +47,10 @@ export const LoginForm = () => {
     } else {
       setName('');
       setPassword('');
+
+      if (loginResult) {
+        setError(true);
+      }
     }
   }, [loginResult, setAuthToken, navigate]);
 
@@ -59,21 +64,27 @@ export const LoginForm = () => {
       <div className={styles.form}>
         <div className={styles.label}>{t('login.user')}</div>
         <div>
-          <Input value={name} onChange={setName} />
+          <Input value={name} onChange={setName} dataTestId="login-user" />
         </div>
 
         <div className={styles.label}>{t('login.password')}</div>
         <div>
-          <Input value={password} onChange={setPassword} type="password" />
+          <Input
+            value={password}
+            onChange={setPassword}
+            type="password"
+            dataTestId="login-password"
+          />
         </div>
 
         <div className={styles.button}>
           <ButtonIcon
             icon={FaCheck}
             onClick={login}
-            color="primary"
+            color={isError ? 'negative' : 'primary'}
             highlighted={true}
             loading={loading}
+            dataTestId="login-submit-btn"
           />
         </div>
       </div>

@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   Post,
   Put,
   Query,
@@ -10,6 +11,7 @@ import {
   StreamableFile,
 } from '@nestjs/common';
 import { FastifyRequest } from 'fastify';
+import { Admin } from 'guards/metadata';
 import { DateTime } from 'luxon';
 import { ContextDec } from 'middleware/ContextMiddleware';
 import { Context } from 'models/Context';
@@ -20,12 +22,14 @@ import { chain } from 'stream-chain';
 import { parser as jsonParser } from 'stream-json/jsonl/Parser';
 import { stringer as jsonStringer } from 'stream-json/jsonl/Stringer';
 import { DATE_FORMAT } from 'utils/constants';
+import { Preset } from 'utils/presets';
 
-@Controller('/api/tools')
+@Admin()
+@Controller('/api/data')
 export class MaintenanceController {
   constructor(private maintenanceService: MaintenanceService) {}
 
-  @Get('/export')
+  @Get()
   export(): StreamableFile {
     const jsonStream = chain([
       this.maintenanceService.export(),
@@ -39,15 +43,18 @@ export class MaintenanceController {
     });
   }
 
-  @Post('/import')
+  @Post()
   async import(@Req() req: FastifyRequest) {
     const multipartFile = await req.file();
+    if (!multipartFile) {
+      throw new Error('No file to import');
+    }
     const recordStream = chain([multipartFile.file, jsonParser()]);
 
     await this.maintenanceService.import(recordStream);
   }
 
-  @Delete('/destroy')
+  @Delete()
   async destroy() {
     await this.maintenanceService.destroy();
   }
@@ -64,11 +71,16 @@ export class MaintenanceController {
     return language;
   }
 
-  @Post('/init/et')
-  async initEstonian(
+  @Post('/init/:preset')
+  async initPreset(
     @ContextDec() ctx: Context,
     @Body('userId') userId: UserId,
+    @Param('preset') preset: string,
   ) {
-    await this.maintenanceService.initEstonian(ctx, userId);
+    if (!Object.values(Preset).includes(preset as Preset)) {
+      throw new Error('Preset does not exist');
+    }
+
+    await this.maintenanceService.initPreset(ctx, userId, preset as Preset);
   }
 }

@@ -12,7 +12,7 @@ import { useLanguageContext } from '../LanguageContext';
 
 const MIN_LANGUAGE_NAME_LENGTH = 3;
 
-export type LanguageReturn = {
+export type UseLanguageReturn = {
   isNewLanguage: boolean;
   language: Partial<LanguageFieldsFragment>;
   setName: (name: string) => void;
@@ -35,9 +35,9 @@ export type LanguageReturn = {
 
 export function useLanguage(
   language: LanguageFieldsFragment | null,
-): LanguageReturn {
+): UseLanguageReturn {
   const [selectedLanguageId] = useLanguageContext();
-  const [nameInput, setNameInput] = useState(language?.name ?? '');
+  const [name, setName] = useState(language?.name ?? '');
 
   const [
     createLanguageMutate,
@@ -58,13 +58,13 @@ export function useLanguage(
   const deletedLanguage = deleteLanguageResult?.deleteLanguage;
 
   const canCreateLanguage = Boolean(
-    isNewLanguage && nameInput.length >= MIN_LANGUAGE_NAME_LENGTH,
+    isNewLanguage && name.length >= MIN_LANGUAGE_NAME_LENGTH,
   );
   const canUpdateLanguage = Boolean(
     selectedLanguageId &&
       !isNewLanguage &&
-      nameInput.length >= MIN_LANGUAGE_NAME_LENGTH &&
-      nameInput !== language.name,
+      name.length >= MIN_LANGUAGE_NAME_LENGTH &&
+      name !== language.name,
   );
   const canDeleteLanguage = Boolean(selectedLanguageId && !isNewLanguage);
 
@@ -74,14 +74,13 @@ export function useLanguage(
         variables: {
           input: {
             id: uuid(),
-            name: nameInput.trim(),
+            name: name,
             addedAt: toTimestamp(DateTime.utc()),
           },
         },
       });
-      setNameInput(nameInput.trim());
     }
-  }, [nameInput, canCreateLanguage, createLanguageMutate]);
+  }, [name, canCreateLanguage, createLanguageMutate]);
 
   const updateLanguage = useCallback(() => {
     if (canUpdateLanguage) {
@@ -89,13 +88,12 @@ export function useLanguage(
         variables: {
           input: {
             id: language!.id,
-            name: nameInput.trim(),
+            name: name,
           },
         },
       });
-      setNameInput(nameInput.trim());
     }
-  }, [language, nameInput, canUpdateLanguage, updateLanguageMutate]);
+  }, [language, name, canUpdateLanguage, updateLanguageMutate]);
 
   const deleteLanguage = useCallback(() => {
     if (canDeleteLanguage) {
@@ -109,14 +107,14 @@ export function useLanguage(
     }
   }, [language, canDeleteLanguage, deleteLanguageMutate]);
 
-  return useMemo<LanguageReturn>(
+  return useMemo<UseLanguageReturn>(
     () => ({
       isNewLanguage,
       language: {
         ...language,
-        name: nameInput,
+        name,
       },
-      setName: setNameInput,
+      setName,
 
       canCreateLanguage,
       createLanguage,
@@ -136,7 +134,7 @@ export function useLanguage(
     [
       isNewLanguage,
       language,
-      nameInput,
+      name,
       canCreateLanguage,
       createLanguage,
       languageCreating,

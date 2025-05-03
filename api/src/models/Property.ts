@@ -1,4 +1,5 @@
 import { DateTime } from 'luxon';
+import { Color } from 'models/Color';
 import { Flavor } from '../utils/flavor';
 import { LanguageId } from './Language';
 import { PartOfSpeech } from './Word';
@@ -28,7 +29,12 @@ export interface TextProperty extends BaseProperty {
 
 export interface OptionProperty extends BaseProperty {
   type: PropertyType.Option;
-  options: Record<OptionId, string>;
+  options: Record<OptionId, Option>;
+}
+
+export interface Option {
+  value: string;
+  color?: Color;
 }
 
 export type Property = TextProperty | OptionProperty;
@@ -55,7 +61,7 @@ export interface TextPropertyUpdate extends BasePropertyUpdate {
 
 export interface OptionPropertyUpdate extends BasePropertyUpdate {
   type: PropertyType.Option;
-  options?: Record<OptionId, string | null>;
+  options?: Record<OptionId, Option | null>;
 }
 
 export type PropertyUpdate = TextPropertyUpdate | OptionPropertyUpdate;

@@ -113,15 +113,17 @@ export class LanguageResolver {
     @Args('direction', { type: () => Direction, nullable: true })
     direction?: Direction,
   ): Promise<Page<WordType, string>> {
+    const cursor = pageArgs.cursor
+      ? decodeCursor(pageArgs.cursor, WordCursor)
+      : null;
+
     const wordPage = await this.wordService.getPage(ctx, {
       languageId: language.id,
       query,
       partsOfSpeech,
       order,
       direction,
-      cursor: pageArgs.cursor
-        ? decodeCursor(pageArgs.cursor, WordCursor)
-        : null,
+      ...(cursor && { cursor }),
       limit: pageArgs.limit,
     });
 

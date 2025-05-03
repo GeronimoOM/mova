@@ -1,10 +1,7 @@
-import { createUnionType, Field, ObjectType } from '@nestjs/graphql';
-import { PropertyType } from 'models/Property';
-import {
-  OptionPropertyType,
-  OptionType,
-  TextPropertyType,
-} from './PropertyType';
+import { createUnionType, Field, ID, ObjectType } from '@nestjs/graphql';
+import { Color } from 'models/Color';
+import { OptionId, PropertyType } from 'models/Property';
+import { OptionPropertyType, TextPropertyType } from './PropertyType';
 
 @ObjectType('TextPropertyValue')
 export class TextPropertyValueType {
@@ -15,13 +12,25 @@ export class TextPropertyValueType {
   text: string;
 }
 
+@ObjectType('OptionValue')
+export class OptionValueType {
+  @Field(() => ID, { nullable: true })
+  id?: OptionId;
+
+  @Field()
+  value: string;
+
+  @Field(() => Color, { nullable: true })
+  color?: Color;
+}
+
 @ObjectType('OptionPropertyValue')
 export class OptionPropertyValueType {
   @Field()
   property: OptionPropertyType;
 
-  @Field()
-  option: OptionType;
+  @Field(() => OptionValueType, { nullable: true })
+  option?: OptionValueType;
 }
 
 export const PropertyValueUnionType = createUnionType({

@@ -2,7 +2,7 @@ import { GraphQLScalarType, Kind } from 'graphql';
 import { DateTime } from 'luxon';
 import { fromTimestamp, toTimestamp } from 'utils/datetime';
 
-export const TimestampScalar = new GraphQLScalarType<DateTime, string>({
+export const TimestampScalar = new GraphQLScalarType<DateTime<true>, string>({
   name: 'Timestamp',
   description:
     'The `Timestamp` scalar type represents a timepoint as a string in the format `YYYY-MM-DD hh:mm:ss` .',
@@ -12,6 +12,6 @@ export const TimestampScalar = new GraphQLScalarType<DateTime, string>({
     if (ast.kind === Kind.STRING) {
       return fromTimestamp(ast.value);
     }
-    return null;
+    throw new Error('Invalid timestamp');
   },
 });

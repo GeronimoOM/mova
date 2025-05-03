@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { GqlContextType, GqlExecutionContext } from '@nestjs/graphql';
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { Context } from 'models/Context';
+import { BaseContext } from 'models/Context';
 import { AuthService } from 'services/AuthService';
 import {
   HEADER_AUTHORIZATION,
@@ -14,7 +14,7 @@ import {
   HEADER_TIMEZONE,
 } from 'utils/constants';
 
-export function getContext(context: ExecutionContext) {
+export function getContext(context: ExecutionContext): BaseContext {
   let request: FastifyRequest;
   if (context.getType() === 'http') {
     request = context.switchToHttp().getRequest();
@@ -22,7 +22,7 @@ export function getContext(context: ExecutionContext) {
     request = GqlExecutionContext.create(context).getContext().req;
   }
 
-  return (request['raw'] as FastifyRequest['raw'] & { ctx: Context }).ctx;
+  return (request!['raw'] as FastifyRequest['raw'] & { ctx: BaseContext }).ctx;
 }
 
 export const ContextDec = createParamDecorator(
@@ -36,14 +36,14 @@ export class ContextMiddleware implements NestMiddleware {
   constructor(private readonly authService: AuthService) {}
 
   async use(
-    request: FastifyRequest['raw'] & { ctx: Context },
+    request: FastifyRequest['raw'] & { ctx: BaseContext },
     _: FastifyReply['raw'],
     next: () => void,
   ) {
     const [type, token] =
       request.headers[HEADER_AUTHORIZATION]?.split(' ') ?? [];
     const jwtToken = type === 'Bearer' ? token : undefined;
-    const user = await this.authService.auth(jwtToken);
+    const user = (await this.authService.auth(jwtToken)) ?? undefined;
 
     request.ctx = {
       user,

@@ -17,6 +17,8 @@ import {
 import { Context } from 'models/Context';
 import { Language, LanguageId } from 'models/Language';
 import {
+  Option,
+  OptionId,
   OptionProperty,
   Property,
   PropertyId,
@@ -28,6 +30,7 @@ import {
   PropertyValue,
   PropertyValueSave,
   TextPropertyValueSave,
+  arePropertyValuesOptionsEqual,
   isOptionPropertyValue,
   isTextPropertyValue,
 } from 'models/PropertyValue';
@@ -105,14 +108,24 @@ export class ChangeBuilder {
     property: Property,
     currentProperty: Property,
   ): UpdatePropertyChange | null {
-    const isOptionsChange =
-      isOptionProperty(property) &&
-      records.diff(
+    let optionsChange: Record<OptionId, Option | null> | null = null;
+    if (isOptionProperty(property)) {
+      const optionsDiff = records.diff(
         property.options,
         (currentProperty as OptionProperty).options,
+        (opt1, opt2) => opt1.value === opt2.value && opt1.color === opt2.color,
       );
 
-    if (property.name === currentProperty.name && !isOptionsChange) {
+      if (optionsDiff) {
+        optionsChange = {
+          ...optionsDiff.added,
+          ...optionsDiff.updated,
+          ...records.mapValues(optionsDiff.deleted, () => null),
+        };
+      }
+    }
+
+    if (property.name === currentProperty.name && !optionsChange) {
       return null;
     }
 
@@ -124,7 +137,7 @@ export class ChangeBuilder {
         id: property.id,
         type: property.type,
         ...(property.name !== currentProperty.name && { name: property.name }),
-        ...(isOptionsChange && { options: property.options }),
+        ...(optionsChange && { options: optionsChange }),
       },
     };
   }
@@ -176,11 +189,11 @@ export class ChangeBuilder {
       changedAt: word.addedAt,
       created: {
         ...word,
-        ...(word.properties && {
-          properties: records.mapValues(word.properties, (propertyValue) =>
-            this.toPropertValueSave(propertyValue),
-          ),
-        }),
+        properties: word.properties
+          ? records.mapValues(word.properties, (propertyValue) =>
+              this.toPropertyValueSave(propertyValue),
+            )
+          : undefined,
       },
     };
   }
@@ -191,8 +204,8 @@ export class ChangeBuilder {
     currentWord: Word,
   ): UpdateWordChange | null {
     const propertiesDiff = records.diff(
-      word.properties,
-      currentWord.properties,
+      word.properties ?? null,
+      currentWord.properties ?? null,
       (pv1, pv2) => {
         if (
           isTextPropertyValue(pv1) &&
@@ -203,7 +216,7 @@ export class ChangeBuilder {
         } else if (
           isOptionPropertyValue(pv1) &&
           isOptionPropertyValue(pv2) &&
-          pv1.option === pv2.option
+          arePropertyValuesOptionsEqual(pv1.option, pv2.option)
         ) {
           return true;
         }
@@ -239,13 +252,13 @@ export class ChangeBuilder {
         ...(propertiesDiff && {
           properties: {
             ...records.mapValues(propertiesDiff.added, (propertyValue) =>
-              this.toPropertValueSave(propertyValue),
+              this.toPropertyValueSave(propertyValue),
             ),
             ...records.mapValues(propertiesDiff.updated, (propertyValue) =>
-              this.toPropertValueSave(propertyValue),
+              this.toPropertyValueSave(propertyValue),
             ),
             ...records.mapValues(propertiesDiff.deleted, (propertyValue) =>
-              this.toPropertValueSave(propertyValue, true),
+              this.toPropertyValueSave(propertyValue, true),
             ),
           },
         }),
@@ -278,7 +291,7 @@ export class ChangeBuilder {
     };
   }
 
-  private toPropertValueSave(
+  private toPropertyValueSave(
     propertyValue: PropertyValue,
     isDelete?: boolean,
   ): PropertyValueSave {

@@ -32,8 +32,14 @@ export const WordsSearchBar = ({
         text="original"
         placeholder={t('words.search')}
         left={<Icon icon={PiMagnifyingGlassBold} />}
+        dataTestId="words-search-bar"
       />
-      <ButtonIcon icon={BsEraserFill} onClick={onClear} disabled={!query} />
+      <ButtonIcon
+        icon={BsEraserFill}
+        onClick={onClear}
+        disabled={!query}
+        dataTestId="words-search-clear-btn"
+      />
     </div>
   );
 };

@@ -2,6 +2,7 @@ import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { User, UserAuth } from 'models/User';
+import { EncryptionService } from './EncryptionService';
 import { UserService } from './UserService';
 
 @Injectable()
@@ -10,12 +11,15 @@ export class AuthService {
     private jwtService: JwtService,
     private userService: UserService,
     private configService: ConfigService,
+    private cryptService: EncryptionService,
   ) {}
 
-  async login(username: string, password: string): Promise<string> {
-    const user = await this.userService.getUserByUsername(username);
+  async login(name: string, password: string): Promise<string> {
+    const user = await this.userService.getByName(name);
+    const isValid =
+      user && (await this.cryptService.verify(user.password, password));
 
-    if (!user || user.password !== password) {
+    if (!isValid) {
       throw new UnauthorizedException();
     }
 
@@ -30,12 +34,16 @@ export class AuthService {
   async auth(token?: string): Promise<User | null> {
     let user: User | null = null;
     try {
+      if (!token) {
+        throw new Error('Authentication token is missing');
+      }
+
       const { userId } = await this.jwtService.verifyAsync<UserAuth>(token, {
         secret: this.configService.get<string>('jwt.secret'),
         ignoreExpiration: true,
       });
 
-      user = await this.userService.getUser(userId);
+      user = await this.userService.getById(userId);
     } catch (e) {
       Logger.warn('Failed to authenticate:', e);
     }

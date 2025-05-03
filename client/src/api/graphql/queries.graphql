@@ -38,7 +38,7 @@ query GetWord($id: ID!) {
 query GetWordByOriginal($languageId: ID!, $original: String!) {
   language(id: $languageId) {
     word(original: $original) {
-      ...WordFieldsFull
+      ...WordFields
     }
   }
 }
@@ -48,6 +48,27 @@ query GetProperties($languageId: ID!, $partOfSpeech: PartOfSpeech) {
     id
     properties(partOfSpeech: $partOfSpeech) {
       ...PropertyFields
+    }
+  }
+}
+
+query GetPropertyUsage($propertyId: ID!) {
+  property(id: $propertyId) {
+    ... on IProperty {
+      id
+      usage
+    }
+  }
+}
+
+query GetPropertyOptionsUsage($propertyId: ID!) {
+  property(id: $propertyId) {
+    ... on OptionProperty {
+      id
+      optionsUsage {
+        id
+        count
+      }
     }
   }
 }

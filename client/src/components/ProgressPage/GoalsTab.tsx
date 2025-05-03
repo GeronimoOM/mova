@@ -183,6 +183,7 @@ const ProgressGoal = ({ type, goal, onGoalChange }: ProgressGoalProps) => {
           value={String(goal?.points ?? '0')}
           onChange={handlePointsChange}
           disabled={!goal}
+          maxLength={4}
         />
       </div>
     </div>

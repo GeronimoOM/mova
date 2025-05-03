@@ -1,6 +1,7 @@
 import { style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
-import { animations, colors, fontThemeVars, themeVars } from '../../index.css';
+import { animations, fontThemeVars, themeVars } from '../../index.css';
+import { accentAndOptionColorStyle } from '../../utils/colors';
 
 export const wrapper = style({
   position: 'relative',
@@ -70,14 +71,9 @@ export const input = recipe({
       },
     },
 
-    textColor: Object.fromEntries(
-      colors.map((color) => [
-        color,
-        {
-          color: themeVars.color[color],
-        },
-      ]),
-    ),
+    textColor: accentAndOptionColorStyle((colorVar) => ({
+      color: colorVar,
+    })),
 
     size: {
       medium: {
@@ -90,18 +86,6 @@ export const input = recipe({
     disabled: {
       true: {
         pointerEvents: 'none',
-      },
-    },
-
-    left: {
-      true: {
-        paddingLeft: 45,
-      },
-    },
-
-    right: {
-      true: {
-        paddingRight: 45,
       },
     },
 
@@ -120,6 +104,28 @@ export const input = recipe({
       true: {
         color: 'transparent',
         backgroundColor: themeVars.color.backgroundLightest,
+      },
+    },
+
+    ghost: {
+      true: {
+        backgroundColor: 'transparent',
+
+        '&:hover, &:focus': {
+          backgroundColor: 'transparent',
+        },
+      },
+    },
+
+    left: {
+      true: {
+        paddingLeft: 45,
+      },
+    },
+
+    right: {
+      true: {
+        paddingRight: 45,
       },
     },
   },

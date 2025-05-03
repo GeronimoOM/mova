@@ -75,11 +75,11 @@ export const usePropertyDrop = (
       return Boolean(propertyId);
     },
     hover: (item) => {
-      if (item.property.id === propertyId) {
+      if (item.property.id === propertyId || !propertyId) {
         return;
       }
 
-      onSwapPreview(item.property.id!, propertyId!);
+      onSwapPreview(item.property.id!, propertyId);
     },
     drop: (item) => {
       onReorder();

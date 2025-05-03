@@ -1,9 +1,9 @@
 import { IconType } from 'react-icons';
 import { FaBook, FaBrain } from 'react-icons/fa6';
 import { ProgressCadence, ProgressType } from '../../api/types/graphql';
-import { Color } from '../../index.css';
+import { AccentColor } from '../../index.css';
 
-export const progressTypeToColor: Record<ProgressType, Color> = {
+export const progressTypeToColor: Record<ProgressType, AccentColor> = {
   [ProgressType.Mastery]: 'secondary1',
   [ProgressType.Words]: 'secondary2',
 };

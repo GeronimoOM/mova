@@ -23,6 +23,9 @@
       "exerciseReady": "exercise is ready"
     },
     "existing": "already added",
+    "options": {
+      "custom": "custom"
+    },
     "delete": "delete word"
   },
   "exercise": {
@@ -45,7 +48,12 @@
     "name": "property",
     "text": "text",
     "option": "options",
-    "delete": "delete property"
+    "options": {
+      "new": "new"
+    },
+    "delete": "delete property",
+    "deleteOptions": "delete property options",
+    "usage": "used in words:"
   },
   "progress": {
     "progress": "Progress",

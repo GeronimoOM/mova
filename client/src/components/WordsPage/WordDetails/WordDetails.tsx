@@ -12,13 +12,15 @@ import {
   GetWordByOriginalDocument,
   WordFieldsFragment,
 } from '../../../api/types/graphql';
+import { hover } from '../../../index.css';
 import { useDebouncedValue } from '../../../utils/useDebouncedValue';
+import { useMediaQuery } from '../../../utils/useMediaQuery';
 import { useLanguageContext } from '../../LanguageContext';
 import { ButtonIcon } from '../../common/ButtonIcon';
+import { Dropdown } from '../../common/Dropdown';
 import { Icon } from '../../common/Icon';
 import { Input } from '../../common/Input';
 import { Modal } from '../../common/Modal';
-import { Tooltip } from '../../common/Tooltip';
 import { WordMastery } from '../WordsList/WordMastery';
 import { PartOfSpeechSelect } from './PartOfSpeechSelect';
 import * as styles from './WordDetails.css';
@@ -89,7 +91,7 @@ export const WordDetails = ({
   ].includes(existingWordStatus);
 
   const { t } = useTranslation();
-  const debouncedOriginal = useDebouncedValue(word?.original, EXISTS_DELAY_MS);
+  const debouncedOriginal = useDebouncedValue(word.original, EXISTS_DELAY_MS);
   const existingWord =
     isNewWord && debouncedOriginal && !existingWordLoading
       ? existingWordQuery?.language?.word
@@ -127,7 +129,12 @@ export const WordDetails = ({
       <div className={styles.innerWrapper}>
         {!simplified && (
           <div className={styles.buttons}>
-            <ButtonIcon icon={HiMiniXMark} onClick={onClose} wrapped={true} />
+            <ButtonIcon
+              icon={HiMiniXMark}
+              onClick={onClose}
+              wrapped={true}
+              dataTestId="word-details-close-btn"
+            />
 
             <ButtonIcon
               icon={FaFeatherPointed}
@@ -137,6 +144,7 @@ export const WordDetails = ({
               disabled={!canCreateWord && !canUpdateWord}
               loading={isNewWord ? wordCreating : wordUpdating}
               wrapped={true}
+              dataTestId="word-details-save-btn"
             />
 
             <div className={styles.bottomButton}>
@@ -146,6 +154,7 @@ export const WordDetails = ({
                   onClick={onSelectPrev}
                   disabled={!hasPrev}
                   wrapped={true}
+                  dataTestId="word-details-up-btn"
                 />
               )}
 
@@ -155,6 +164,7 @@ export const WordDetails = ({
                   onClick={onSelectNext}
                   disabled={!hasNext}
                   wrapped={true}
+                  dataTestId="word-details-down-btn"
                 />
               )}
 
@@ -164,6 +174,7 @@ export const WordDetails = ({
                 color="negative"
                 disabled={!canDeleteWord}
                 wrapped={true}
+                dataTestId="word-details-delete-btn"
               />
             </div>
           </div>
@@ -185,10 +196,11 @@ export const WordDetails = ({
           <div className={classNames(styles.originalRow, { simplified })}>
             <Input
               text="original"
-              value={word?.original ?? ''}
+              value={word.original ?? ''}
               onChange={setOriginal}
               loading={wordLoading}
               disabled={simplified}
+              maxLength={100}
               right={
                 existingWord && (
                   <ExistingWordWarningIcon
@@ -197,6 +209,7 @@ export const WordDetails = ({
                   />
                 )
               }
+              dataTestId="word-details-original"
             />
           </div>
 
@@ -212,10 +225,12 @@ export const WordDetails = ({
               <Input
                 text="translation"
                 size="medium"
-                value={word?.translation ?? ''}
+                value={word.translation ?? ''}
                 onChange={setTranslation}
                 loading={wordLoading}
                 disabled={simplified}
+                maxLength={100}
+                dataTestId="word-details-translation"
               />
             </div>
           </div>
@@ -225,7 +240,7 @@ export const WordDetails = ({
               <WordDetailsProperty
                 key={property.id}
                 property={property}
-                wordProperty={word.properties?.[property.id] ?? null}
+                propertyValue={word.properties?.[property.id] ?? null}
                 onChange={setPropertyValue}
                 simplified={simplified}
               />
@@ -252,11 +267,13 @@ export const WordDetails = ({
                 onClick={deleteWord}
                 color="negative"
                 loading={wordDeleting}
+                dataTestId="word-details-delete-confirm-btn"
               />
 
               <ButtonIcon
                 icon={HiMiniXMark}
                 onClick={() => setDeleteConfirmOpen(false)}
+                dataTestId="word-details-delete-cancel-btn"
               />
             </div>
           </div>
@@ -275,17 +292,27 @@ const ExistingWordWarningIcon = ({
   word,
   onSelectWord,
 }: ExistingWarningProps) => {
+  const [isOpen, setOpen] = useState(false);
+  const canHover = useMediaQuery(hover.enabled);
+
   return (
-    <Tooltip
+    <Dropdown
+      isOpen={isOpen}
+      onOpen={setOpen}
       content={
         <ExistingWordWarningTooltip word={word} onSelectWord={onSelectWord} />
       }
-      side="bottomLeft"
+      alignment="end"
     >
-      <div className={styles.existingWarningIcon}>
+      <div
+        className={styles.existingWarningIcon}
+        onClick={(e) => canHover && e.stopPropagation()}
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+      >
         <Icon icon={BsFillExclamationDiamondFill} />
       </div>
-    </Tooltip>
+    </Dropdown>
   );
 };
 

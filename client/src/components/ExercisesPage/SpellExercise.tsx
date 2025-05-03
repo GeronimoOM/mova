@@ -15,7 +15,7 @@ import { Input } from '../common/Input';
 import { SpellInput } from '../common/SpellInput';
 
 import { useTranslation } from 'react-i18next';
-import { Color } from '../../index.css';
+import { AccentColor } from '../../index.css';
 import { ButtonIcon } from '../common/ButtonIcon';
 import { Icon } from '../common/Icon';
 import * as styles from './SpellExercise.css';
@@ -180,7 +180,7 @@ const SpellTextExerciseProperty = ({
   }, [word, property]);
 
   const [input, setInput] = useState(propertyValue.slice(0, revealPrefix));
-  const [highlights, setHighlights] = useState<Array<Color | null>>(
+  const [highlights, setHighlights] = useState<Array<AccentColor | null>>(
     Array(revealPrefix).fill('primary'),
   );
 
@@ -219,7 +219,7 @@ const SpellTextExerciseProperty = ({
       setInput(verifiedInput);
       setHighlights(verifiedHighlights);
     }
-  }, [isSubmitted]);
+  }, [input, isSubmitted, propertyValue, onResult]);
 
   return (
     <div className={styles.property}>
@@ -243,7 +243,9 @@ function getExerciseProperties(
   word: WordFieldsFullFragment,
   allProperties: PropertyFieldsFragment[],
 ): PropertyFieldsFragment[] {
-  const wordPropertyIds = word.properties.map((prop) => prop.property.id);
+  const wordPropertyIds = word.properties
+    .filter((prop) => prop.__typename === 'TextPropertyValue')
+    .map((prop) => prop.property.id);
   const selectedPropertyIds: string[] = [];
   while (
     wordPropertyIds.length &&

@@ -1,10 +1,12 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { DateTime } from 'luxon';
+import { Color } from 'models/Color';
 import { Context } from 'models/Context';
 import { LanguageId } from 'models/Language';
 import {
   BaseProperty,
   isOptionProperty,
+  Option,
   OptionId,
   OptionProperty,
   Property,
@@ -23,7 +25,7 @@ import { ChangeService } from './ChangeService';
 import { LanguageService } from './LanguageService';
 import { WordService } from './WordService';
 
-const PROPERTY_DELETION_WORDS_THRESHOLD = 50;
+const MAX_OPTIONS_LENGTH = 20;
 
 export interface CreateBasePropertyParams {
   id?: PropertyId;
@@ -40,7 +42,13 @@ export interface CreateTextPropertyParams extends CreateBasePropertyParams {
 
 export interface CreateOptionPropertyParams extends CreateBasePropertyParams {
   type: PropertyType.Option;
-  options: string[];
+  options: CreateOptionParams[];
+}
+
+export interface CreateOptionParams {
+  id?: OptionId;
+  value: string;
+  color?: Color;
 }
 
 export type CreatePropertyParams =
@@ -50,7 +58,13 @@ export type CreatePropertyParams =
 export interface UpdatePropertyParams {
   id: PropertyId;
   name?: string;
-  options?: Record<OptionId, string>;
+  options?: UpdateOptionParams[];
+}
+
+export interface UpdateOptionParams {
+  id?: OptionId;
+  value?: string;
+  color?: Color;
 }
 
 export interface ReorderPropertiesParams {
@@ -117,10 +131,11 @@ export class PropertyService {
   async create(ctx: Context, params: CreatePropertyParams): Promise<Property> {
     await this.languageService.getById(ctx, params.languageId);
 
-    const order = await this.propertyRepository.getCount(
-      params.languageId,
-      params.partOfSpeech,
-    );
+    const order =
+      (await this.propertyRepository.getMaxOrder(
+        params.languageId,
+        params.partOfSpeech,
+      )) + 1;
 
     const baseProperty: BaseProperty = {
       id: params.id ?? uuid(),
@@ -138,15 +153,22 @@ export class PropertyService {
         property = baseProperty as TextProperty;
         break;
       case PropertyType.Option: {
-        const options = (params as CreateOptionPropertyParams).options;
-        if (!options || options.length < 2) {
-          throw new Error(`Options are required (propertyId:${params.id})`);
+        const inputOptions = (params as CreateOptionPropertyParams).options;
+        if (inputOptions.length > MAX_OPTIONS_LENGTH) {
+          throw new Error('Too many options');
         }
+
+        const options: Record<OptionId, Option> = {};
+        for (const { id, value, color } of inputOptions) {
+          options[id ?? uuid()] = {
+            value: value.trim(),
+            color,
+          };
+        }
+
         property = {
           ...baseProperty,
-          options: Object.fromEntries(
-            options.map((option) => [uuid(), option]),
-          ),
+          options,
         } as OptionProperty;
         break;
       }
@@ -170,17 +192,32 @@ export class PropertyService {
       property.name = params.name.trim();
     }
 
-    if (isOptionProperty(property)) {
-      if (params.options) {
-        for (const [optionId, optionValue] of Object.entries(params.options)) {
-          if (!property.options[optionId]) {
-            throw new Error(`Option does not exist (optionId:${optionId})`);
-          } else if (!optionValue) {
-            delete property[optionId];
-          } else {
-            property.options[optionId] = optionValue;
+    const deletedOptions: Record<OptionId, Option> = {};
+    if (isOptionProperty(property) && params.options) {
+      for (const { id, value, color } of params.options) {
+        if (!id || !property.options[id]) {
+          if (!value) {
+            throw new Error('Option value cannot be empty');
           }
+
+          property.options[id ?? uuid()] = {
+            value: value.trim(),
+            color: color,
+          };
+        } else if (!value) {
+          deletedOptions[id] = property.options[id];
+          delete property.options[id];
+        } else {
+          property.options[id] = {
+            ...property.options[id],
+            value: value.trim(),
+            ...(color !== undefined && { color }),
+          };
         }
+      }
+
+      if (Object.values(property.options).length > MAX_OPTIONS_LENGTH) {
+        throw new Error('Too many options');
       }
     }
 
@@ -193,11 +230,29 @@ export class PropertyService {
     if (change) {
       await this.connectionManager.transactionally(async () => {
         await this.propertyRepository.update(property);
+        await this.detachDeletedOptions(property, deletedOptions);
         await this.changeService.create(change);
       });
     }
 
     return property;
+  }
+
+  private async detachDeletedOptions(
+    property: Property,
+    deletedOptions: Record<OptionId, Option>,
+  ) {
+    for (const [deletedOptionId, deletedOption] of Object.entries(
+      deletedOptions,
+    )) {
+      await this.wordService.detachOption(
+        property.languageId,
+        property.id,
+        property.partOfSpeech,
+        deletedOptionId,
+        deletedOption,
+      );
+    }
   }
 
   async reorder(
@@ -233,15 +288,6 @@ export class PropertyService {
 
   async delete(ctx: Context, { id }: DeletePropertyParams): Promise<Property> {
     const property = await this.getById(ctx, id);
-
-    const wordCount = await this.wordService.getCountByProperty(
-      property.languageId,
-      property.id,
-      property.partOfSpeech,
-    );
-    if (wordCount > PROPERTY_DELETION_WORDS_THRESHOLD) {
-      throw new Error(`Property has too many words (id:${id})`);
-    }
 
     await this.connectionManager.transactionally(async () => {
       await this.propertyRepository.delete(id);

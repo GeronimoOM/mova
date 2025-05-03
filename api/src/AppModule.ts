@@ -3,10 +3,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { ScheduleModule } from '@nestjs/schedule';
+import { AuthController } from 'controllers/AuthController';
 import { ChangeTypeMapper } from 'graphql/mappers/ChangeTypeMapper';
 import { AuthResolver } from 'graphql/resolvers/AuthResolver';
 import { ChangeResolver } from 'graphql/resolvers/ChangeResolver';
 import { ExerciseResolver } from 'graphql/resolvers/ExerciseResolver';
+import { OptionPropertyResolver } from 'graphql/resolvers/OptionPropertyResolver';
 import { ProgressResolver } from 'graphql/resolvers/ProgressResolver';
 import { UserResolver } from 'graphql/resolvers/UserResolver';
 import { AuthGuard } from 'guards/AuthGuard';
@@ -19,6 +21,7 @@ import { UserRepository } from 'repositories/UserRepository';
 import { AuthService } from 'services/AuthService';
 import { ChangeBuilder } from 'services/ChangeBuilder';
 import { ChangeService } from 'services/ChangeService';
+import { EncryptionService } from 'services/EncryptionService';
 import { ExerciseService } from 'services/ExerciseService';
 import { ProgressService } from 'services/ProgressService';
 import { UserService } from 'services/UserService';
@@ -61,6 +64,7 @@ import { WordService } from './services/WordService';
     AuthResolver,
     LanguageResolver,
     PropertyResolver,
+    OptionPropertyResolver,
     ChangeResolver,
     WordResolver,
     ExerciseResolver,
@@ -78,6 +82,7 @@ import { WordService } from './services/WordService';
     ProgressService,
     UserService,
     MaintenanceService,
+    EncryptionService,
     SearchClient,
     ChangeBuilder,
     LanguageRepository,
@@ -97,7 +102,7 @@ import { WordService } from './services/WordService';
       useValue: new AsyncLocalStorage(),
     },
   ],
-  controllers: [MaintenanceController],
+  controllers: [AuthController, MaintenanceController],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

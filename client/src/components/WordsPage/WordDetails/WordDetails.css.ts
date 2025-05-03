@@ -31,7 +31,6 @@ export const detailsHeader = style({
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'space-between',
-  padding: 5,
   paddingRight: 0,
   selectors: {
     '&:not(.simplified)': {

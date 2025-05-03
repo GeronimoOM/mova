@@ -4,6 +4,7 @@ import { LanguageId } from 'models/Language';
 import {
   BaseProperty,
   isOptionProperty,
+  Option,
   OptionId,
   OptionProperty,
   Property,
@@ -17,6 +18,10 @@ import { DbConnectionManager } from './DbConnectionManager';
 import { Serializer } from './Serializer';
 
 const TABLE_PROPERTIES = 'properties';
+
+type DbOption = Option & {
+  id: OptionId;
+};
 
 @Injectable()
 export class PropertyRepository {
@@ -66,16 +71,16 @@ export class PropertyRepository {
     return propertyRows.map((propertyRow) => this.mapToProperty(propertyRow));
   }
 
-  async getCount(
+  async getMaxOrder(
     languageId: LanguageId,
     partOfSpeech: PartOfSpeech,
   ): Promise<number> {
-    const [{ count }] = (await this.connectionManager
+    const [{ max_order: maxOrder }] = (await this.connectionManager
       .getConnection()(TABLE_PROPERTIES)
       .where({ language_id: languageId, part_of_speech: partOfSpeech })
-      .count('id as count')) as [{ count: string }];
+      .max('order as max_order')) as [{ max_order: number | null }];
 
-    return Number(count);
+    return maxOrder ?? 0;
   }
 
   async create(property: Property): Promise<void> {
@@ -90,8 +95,15 @@ export class PropertyRepository {
     };
 
     if (isOptionProperty(property)) {
-      propertyRow.data = this.serializer.serialize({
-        options: property.options,
+      propertyRow.data = this.serializer.serialize<{
+        options: DbOption[];
+      }>({
+        options: Object.entries(property.options).map(
+          ([optionId, optionValue]) => ({
+            id: optionId,
+            ...optionValue,
+          }),
+        ),
       });
     }
 
@@ -108,8 +120,15 @@ export class PropertyRepository {
     };
 
     if (isOptionProperty(property)) {
-      propertyRow.data = this.serializer.serialize({
-        options: property.options,
+      propertyRow.data = this.serializer.serialize<{
+        options: DbOption[];
+      }>({
+        options: Object.entries(property.options).map(
+          ([optionId, optionValue]) => ({
+            id: optionId,
+            ...optionValue,
+          }),
+        ),
       });
     }
 
@@ -176,8 +195,16 @@ export class PropertyRepository {
       case PropertyType.Text:
         return baseProperty as TextProperty;
       case PropertyType.Option: {
-        const options: Record<OptionId, string> =
-          this.serializer.deserialize<OptionProperty>(row.data).options;
+        const options = row.data
+          ? Object.fromEntries(
+              this.serializer
+                .deserialize<{
+                  options: DbOption[];
+                }>(row.data)
+                .options.map(({ id, ...rest }) => [id, rest]),
+            )
+          : {};
+
         return {
           ...baseProperty,
           options,

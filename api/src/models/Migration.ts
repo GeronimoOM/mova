@@ -3,10 +3,12 @@ import {
   LanguageTable,
   ProgressTable,
   PropertyTable,
+  UserTable,
   WordTable,
 } from 'knex/types/tables';
 
 export enum MigrationRecordType {
+  User = 'u',
   Language = 'l',
   Property = 'p',
   Word = 'w',
@@ -14,20 +16,13 @@ export enum MigrationRecordType {
   Progress = 'r',
 }
 
-export const MigrationRecordTypes = [
-  MigrationRecordType.Language,
-  MigrationRecordType.Property,
-  MigrationRecordType.Word,
-  MigrationRecordType.Goal,
-  MigrationRecordType.Progress,
-];
-
 export type MigrationRecord =
   | MigrationLanguageRecord
   | MigrationPropertyRecord
   | MigrationWordRecord
   | MigrationGoalRecord
-  | MigrationProgressRecord;
+  | MigrationProgressRecord
+  | MigrationUserRecord;
 
 export type MigrationLanguageRecord = {
   type: MigrationRecordType.Language;
@@ -52,4 +47,9 @@ export type MigrationGoalRecord = {
 export type MigrationProgressRecord = {
   type: MigrationRecordType.Progress;
   record: ProgressTable;
+};
+
+export type MigrationUserRecord = {
+  type: MigrationRecordType.User;
+  record: UserTable;
 };

@@ -1,9 +1,9 @@
-import { Color } from '../../index.css';
+import { AccentColor } from '../../index.css';
 import * as styles from './ProgressBar.css';
 
 export type ProgressBarProps = {
   progress: number;
-  color?: Color;
+  color?: AccentColor;
 };
 
 export const ProgressBar = ({ progress, color }: ProgressBarProps) => {

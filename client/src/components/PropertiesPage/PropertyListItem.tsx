@@ -1,17 +1,24 @@
 import classNames from 'classnames';
-import { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { useTranslation } from 'react-i18next';
 import { FaFeatherPointed, FaFire } from 'react-icons/fa6';
-import { HiMiniXMark } from 'react-icons/hi2';
+
 import { IoReorderThree } from 'react-icons/io5';
-import { PartOfSpeech, PropertyFieldsFragment } from '../../api/types/graphql';
+import {
+  PartOfSpeech,
+  PropertyFieldsFragment,
+  PropertyType,
+} from '../../api/types/graphql';
 import { ButtonIcon } from '../common/ButtonIcon';
-import { Icon } from '../common/Icon';
 import { Input } from '../common/Input';
-import { Modal } from '../common/Modal';
+
+import { waitAtLeast } from '../../utils/promises';
+import { OptionPropertyDetails } from './OptionPropertyDetails';
+import { PropertyDeleteConfirmModal } from './PropertyDeleteConfirmModal';
 import * as styles from './PropertyListItem.css';
-import { typeToIcon, typeToLabel } from './properties';
+import { PropertyOptionDeleteConfirmModal } from './PropertyOptionDeleteConfirmModal';
+import { PropertyTypeSelect } from './PropertyTypeSelect';
 import {
   usePropertyDrag,
   usePropertyDragLayer,
@@ -22,26 +29,35 @@ import { useProperty } from './useProperty';
 export type PropertyListItemProps = {
   partOfSpeech: PartOfSpeech;
   property: PropertyFieldsFragment | null;
+  newPropertyId?: string;
   selected: boolean;
   onSelect: () => void;
   onPropertyCreated?: () => void;
   onSwapPreview: (property1Id: string, property2Id: string) => void;
   onReorder: () => void;
+  onRef?: (ref: React.RefObject<HTMLDivElement | null>) => void;
 };
 
 export const PropertyListItem = ({
   partOfSpeech,
   property: currentProperty,
+  newPropertyId,
   selected,
   onSelect,
   onPropertyCreated,
   onSwapPreview,
   onReorder,
+  onRef,
 }: PropertyListItemProps) => {
   const {
     isNewProperty,
     property,
     setName,
+    setType,
+    addOption,
+    editOption,
+    removeOption,
+    restoreOption,
 
     canCreateProperty,
     createProperty,
@@ -55,7 +71,14 @@ export const PropertyListItem = ({
     canDeleteProperty,
     deleteProperty,
     propertyDeleting,
-  } = useProperty(partOfSpeech, currentProperty);
+
+    fetchPropertyUsage,
+    propertyUsage,
+
+    deletedOptions,
+    fetchPropertyOptionsUsage,
+    propertyOptionsUsage,
+  } = useProperty(partOfSpeech, currentProperty, newPropertyId);
 
   const { t } = useTranslation();
 
@@ -67,7 +90,7 @@ export const PropertyListItem = ({
     onReorder,
   );
 
-  const ref = useRef<HTMLDivElement | null>(null);
+  const ref = useRef<HTMLDivElement>(null);
   dropRef(ref);
 
   const [{ isDragging }, dragRef, dragPreviewRef] = usePropertyDrag(
@@ -75,7 +98,12 @@ export const PropertyListItem = ({
     ref.current ?? null,
   );
 
+  const [isOptionDeleteConfirmOpen, setOptionDeleteConfirmOpen] =
+    useState(false);
+  const [isLoadingUpdateConfirm, setIsLoadingUpdateConfirm] = useState(false);
+
   const [isDeleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [isLoadingDeleteConfirm, setIsLoadingDeleteConfirm] = useState(false);
 
   useEffect(() => {
     dragPreviewRef(getEmptyImage(), { captureDraggingState: true });
@@ -87,35 +115,70 @@ export const PropertyListItem = ({
     }
   }, [createdProperty, onPropertyCreated]);
 
+  const hasDeletedOptions = deletedOptions.length;
+  const isUpdateLoading = hasDeletedOptions
+    ? isLoadingUpdateConfirm
+    : propertyUpdating;
+
+  const handleUpdateProperty = useCallback(async () => {
+    if (!hasDeletedOptions) {
+      return updateProperty();
+    }
+
+    setIsLoadingUpdateConfirm(true);
+    try {
+      await waitAtLeast(fetchPropertyOptionsUsage(), 100);
+    } finally {
+      setIsLoadingUpdateConfirm(false);
+      setOptionDeleteConfirmOpen(true);
+    }
+  }, [fetchPropertyOptionsUsage, hasDeletedOptions, updateProperty]);
+
+  const handleDeleteProperty = useCallback(async () => {
+    setIsLoadingDeleteConfirm(true);
+    try {
+      await waitAtLeast(fetchPropertyUsage(), 100);
+    } finally {
+      setIsLoadingDeleteConfirm(false);
+      setDeleteConfirmOpen(true);
+    }
+  }, [fetchPropertyUsage]);
+
+  const updateAndCloseModal = useCallback(async () => {
+    await updateProperty();
+    setOptionDeleteConfirmOpen(false);
+  }, [updateProperty]);
+
   return (
     <div
       className={classNames(styles.item, {
         selected,
+        new: isNewProperty,
         droppable: canDrop,
         dragging: isDragging,
       })}
       onClick={onSelect}
-      ref={ref}
+      ref={(elem) => {
+        ref.current = elem;
+        onRef?.(ref);
+      }}
+      data-testid="properties-list-item"
     >
-      <div className={styles.header}>
-        <div className={styles.typeIcon}>
-          {property.type && (
-            <>
-              <Icon icon={typeToIcon[property.type]} size="medium" />
-              <span className={styles.typeLabel}>
-                {property.type ? t(typeToLabel[property.type]) : ''}
-              </span>
-            </>
-          )}
-        </div>
+      <div className={styles.section}>
+        <PropertyTypeSelect
+          propertyType={property?.type ?? PropertyType.Text}
+          onPropertyTypeSelect={setType}
+          disabled={!isNewProperty}
+        />
         <div className={classNames(styles.button, { hidden: !selected })}>
           <ButtonIcon
             icon={FaFeatherPointed}
-            onClick={isNewProperty ? createProperty : updateProperty}
+            onClick={isNewProperty ? createProperty : handleUpdateProperty}
             color="primary"
             highlighted={true}
             disabled={!canCreateProperty && !canUpdateProperty}
-            loading={isNewProperty ? propertyCreating : propertyUpdating}
+            loading={isNewProperty ? propertyCreating : isUpdateLoading}
+            dataTestId="properties-list-item-save-btn"
           />
         </div>
         <div
@@ -124,52 +187,65 @@ export const PropertyListItem = ({
           }}
           className={classNames(styles.button, { hidden: !selected })}
         >
-          <ButtonIcon icon={IoReorderThree} disabled={!canDragProperty} />
+          <ButtonIcon
+            icon={IoReorderThree}
+            disabled={!canDragProperty}
+            dataTestId="properties-list-item-reorder-btn"
+          />
         </div>
       </div>
 
-      <div className={styles.content}>
+      <div className={styles.section}>
         <Input
           value={property.name ?? ''}
           onChange={setName}
           text={'translation'}
           size={'large'}
           placeholder={t('properties.name')}
+          maxLength={30}
+          dataTestId="property-name"
         />
         <div className={classNames(styles.button, { hidden: !selected })}>
           <ButtonIcon
             icon={FaFire}
-            onClick={() => setDeleteConfirmOpen(true)}
-            color="negative"
+            onClick={handleDeleteProperty}
+            color={isLoadingDeleteConfirm ? undefined : 'negative'}
             disabled={!canDeleteProperty}
+            loading={isLoadingDeleteConfirm}
+            dataTestId="properties-list-item-delete-btn"
           />
         </div>
       </div>
+
+      {property.type === PropertyType.Option && (
+        <OptionPropertyDetails
+          property={property}
+          addOption={addOption}
+          editOption={editOption}
+          removeOption={removeOption}
+          restoreOption={restoreOption}
+        />
+      )}
+
+      {isOptionDeleteConfirmOpen && (
+        <PropertyOptionDeleteConfirmModal
+          property={property}
+          deletedOptions={deletedOptions}
+          propertyOptionsUsage={propertyOptionsUsage}
+          propertyUpdating={propertyUpdating}
+          onUpdate={updateAndCloseModal}
+          onClose={() => setOptionDeleteConfirmOpen(false)}
+        />
+      )}
+
       {isDeleteConfirmOpen && (
-        <Modal onClose={() => setDeleteConfirmOpen(false)}>
-          <div className={styles.deleteConfirm}>
-            <div className={styles.deleteConfirmText}>
-              {t('properties.delete')}
-              <div className={styles.deleteConfirmProperty}>
-                {property.name}
-              </div>
-            </div>
-
-            <div className={styles.deleteConfirmButtons}>
-              <ButtonIcon
-                icon={FaFire}
-                onClick={deleteProperty}
-                color="negative"
-                loading={propertyDeleting}
-              />
-
-              <ButtonIcon
-                icon={HiMiniXMark}
-                onClick={() => setDeleteConfirmOpen(false)}
-              />
-            </div>
-          </div>
-        </Modal>
+        <PropertyDeleteConfirmModal
+          property={property}
+          propertyUsage={propertyUsage}
+          propertyDeleting={propertyDeleting}
+          onDelete={deleteProperty}
+          onClose={() => setDeleteConfirmOpen(false)}
+        />
       )}
     </div>
   );
@@ -187,24 +263,26 @@ export const PropertyListItemOverlay = () => {
       className={classNames(styles.overlay, { selected: true })}
       style={{ width: position.width, left: position.x, top: position.y }}
     >
-      <div className={styles.header}>
-        <div className={styles.typeIcon}>
-          {property?.type && (
-            <>
-              <Icon icon={typeToIcon[property.type]} size="medium" />
-              <span className={styles.typeLabel}>{property?.type}</span>
-            </>
-          )}
-        </div>
-        <ButtonIcon icon={FaFeatherPointed} disabled={true} />
-        <ButtonIcon icon={IoReorderThree} />
+      <div className={styles.section}>
+        <PropertyTypeSelect
+          propertyType={property?.type ?? PropertyType.Text}
+          onPropertyTypeSelect={() => {}}
+          disabled={true}
+        />
+        <ButtonIcon
+          icon={FaFeatherPointed}
+          onClick={() => {}}
+          disabled={true}
+        />
+        <ButtonIcon icon={IoReorderThree} onClick={() => {}} />
       </div>
 
-      <div className={styles.content}>
+      <div className={styles.section}>
         <Input
           value={property?.name ?? ''}
           text={'translation'}
           size={'large'}
+          disabled
         />
         <ButtonIcon icon={FaFire} disabled={true} />
       </div>

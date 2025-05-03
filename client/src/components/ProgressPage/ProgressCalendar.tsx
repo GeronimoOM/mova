@@ -10,7 +10,7 @@ import {
   ProgressCadence,
   ProgressType,
 } from '../../api/types/graphql';
-import { breakpoints } from '../../index.css';
+import { breakpoints, hover } from '../../index.css';
 import { sequence } from '../../utils/arrays';
 import {
   DISPLAY_DATE_FORMAT,
@@ -23,8 +23,8 @@ import { useMediaQuery } from '../../utils/useMediaQuery';
 import { useLanguageContext } from '../LanguageContext';
 import { useLocaleContext } from '../LocaleContext';
 import { ButtonIcon } from '../common/ButtonIcon';
+import { Dropdown } from '../common/Dropdown';
 import { Icon } from '../common/Icon';
-import { Tooltip } from '../common/Tooltip';
 import * as styles from './ProgressCalendar.css';
 import { progressTypeToColor } from './progress';
 import {
@@ -191,7 +191,6 @@ const ProgressCalendarBody = ({
                 cadence={ProgressCadence.Daily}
                 instance={dailyData?.[week * N_WEEKDAYS + weekday]}
                 goal={goal}
-                tooltipSide={getTooltipSide(week, weeklyData.length)}
               />
             </td>
           ))}
@@ -208,7 +207,6 @@ const ProgressCalendarBody = ({
               cadence={ProgressCadence.Weekly}
               instance={weeklyData?.[week]}
               goal={goal}
-              tooltipSide={getTooltipSide(week, weeklyData.length)}
             />
           </td>
         ))}
@@ -222,7 +220,6 @@ type ProgressCalendarCellProps = {
   cadence: ProgressCadence;
   instance?: ProgressCalendarInstance;
   goal?: GoalFieldsFragment;
-  tooltipSide: 'top' | 'left' | 'right';
 };
 
 const ProgressCalendarCell = ({
@@ -230,9 +227,9 @@ const ProgressCalendarCell = ({
   cadence,
   instance,
   goal,
-  tooltipSide,
 }: ProgressCalendarCellProps) => {
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
+  const canHover = useMediaQuery(hover.enabled);
 
   const points = instance?.points ?? 0;
   const useColor = useMemo(() => goal && points > 0, [goal, points]);
@@ -258,7 +255,9 @@ const ProgressCalendarCell = ({
 
   return (
     instance && (
-      <Tooltip
+      <Dropdown
+        isOpen={isTooltipOpen}
+        onOpen={setIsTooltipOpen}
         content={
           <ProgressCalendarCellTooltip
             type={type}
@@ -267,10 +266,13 @@ const ProgressCalendarCell = ({
             points={instance.points}
           />
         }
-        side={tooltipSide}
-        onOpen={setIsTooltipOpen}
       >
-        <div className={styles.cellWrapper({ selected: isTooltipOpen })}>
+        <div
+          className={styles.cellWrapper({ selected: isTooltipOpen })}
+          onClick={(e) => canHover && e.stopPropagation()}
+          onMouseEnter={() => setIsTooltipOpen(true)}
+          onMouseLeave={() => setIsTooltipOpen(false)}
+        >
           <div
             className={styles.cell({
               color,
@@ -278,7 +280,7 @@ const ProgressCalendarCell = ({
             })}
           />
         </div>
-      </Tooltip>
+      </Dropdown>
     )
   );
 };
@@ -331,17 +333,4 @@ const ProgressCalendarCellTooltip = ({
       </div>
     </div>
   );
-};
-
-const getTooltipSide = (
-  week: number,
-  totalWeeks: number,
-): 'top' | 'left' | 'right' => {
-  if (week <= 3) {
-    return 'right';
-  } else if (week >= totalWeeks - 4) {
-    return 'left';
-  } else {
-    return 'top';
-  }
 };

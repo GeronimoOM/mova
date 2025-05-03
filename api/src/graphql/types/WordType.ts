@@ -8,6 +8,7 @@ import {
 } from '@nestjs/graphql';
 import { TimestampScalar } from 'graphql/scalars/Timestamp';
 import { DateTime } from 'luxon';
+import { Color } from 'models/Color';
 import { LanguageId } from 'models/Language';
 import { OptionId, PropertyId } from 'models/Property';
 import { PartOfSpeech, WordId, WordOrder } from 'models/Word';
@@ -74,8 +75,8 @@ export class CreateWordInput {
   @Field(() => TimestampScalar, { nullable: true })
   addedAt?: DateTime;
 
-  @Field(() => [UpdatePropertyValueInput], { nullable: true })
-  properties?: UpdatePropertyValueInput[];
+  @Field(() => [SavePropertyValueInput], { nullable: true })
+  properties?: SavePropertyValueInput[];
 }
 
 @InputType()
@@ -89,20 +90,32 @@ export class UpdateWordInput {
   @Field({ nullable: true })
   translation?: string;
 
-  @Field(() => [UpdatePropertyValueInput], { nullable: true })
-  properties?: UpdatePropertyValueInput[];
+  @Field(() => [SavePropertyValueInput], { nullable: true })
+  properties?: SavePropertyValueInput[];
 }
 
 @InputType()
-export class UpdatePropertyValueInput {
+export class UpdatePropertyValueOptionInput {
+  @Field(() => ID, { nullable: true })
+  id?: OptionId;
+
+  @Field({ nullable: true })
+  value?: string;
+
+  @Field(() => Color, { nullable: true })
+  color?: Color;
+}
+
+@InputType()
+export class SavePropertyValueInput {
   @Field(() => ID)
   id: PropertyId;
 
   @Field({ nullable: true })
   text?: string;
 
-  @Field(() => ID, { nullable: true })
-  option?: OptionId;
+  @Field(() => UpdatePropertyValueOptionInput, { nullable: true })
+  option?: UpdatePropertyValueOptionInput;
 }
 
 @InputType()

@@ -1,7 +1,18 @@
 import { TypedDocumentNode, useMutation } from '@apollo/client';
-import { fromTimestamp, toTimestamp } from '../utils/datetime';
-import { MaxMastery } from '../utils/mastery';
 import { cache } from './cache';
+import {
+  optimisticAttemptWordMastery,
+  optimisticCreateLanguage,
+  optimisticCreateProperty,
+  optimisticCreateWord,
+  optimisticDeleteLanguage,
+  optimisticDeleteProperty,
+  optimisticDeleteWord,
+  optimisticReorderProperties,
+  optimisticUpdateLanguage,
+  optimisticUpdateProperty,
+  optimisticUpdateWord,
+} from './optimistic';
 import {
   AttemptWordMasteryDocument,
   CreateLanguageDocument,
@@ -38,13 +49,7 @@ export function useCreateLanguage(): UseMutationResult<
   typeof CreateLanguageDocument
 > {
   return useMutation(CreateLanguageDocument, {
-    optimisticResponse: ({ input }) => ({
-      createLanguage: {
-        ...input,
-        id: input.id!,
-        addedAt: input.addedAt!,
-      },
-    }),
+    optimisticResponse: optimisticCreateLanguage,
     update: (cache, { data }) => {
       cache.updateQuery(
         {
@@ -63,9 +68,7 @@ export function useUpdateLanguage(): UseMutationResult<
   typeof UpdateLanguageDocument
 > {
   return useMutation(UpdateLanguageDocument, {
-    optimisticResponse: ({ input }) => ({
-      updateLanguage: input,
-    }),
+    optimisticResponse: optimisticUpdateLanguage,
   });
 }
 
@@ -73,11 +76,7 @@ export function useDeleteLanguage(): UseMutationResult<
   typeof DeleteLanguageDocument
 > {
   return useMutation(DeleteLanguageDocument, {
-    optimisticResponse: ({ input: { id } }) => ({
-      deleteLanguage: {
-        id,
-      },
-    }),
+    optimisticResponse: optimisticDeleteLanguage,
     update: (cache, { data }) => {
       cache.updateQuery(
         {
@@ -98,26 +97,13 @@ export function useCreateProperty(): UseMutationResult<
   typeof CreatePropertyDocument
 > {
   return useMutation(CreatePropertyDocument, {
-    optimisticResponse: ({ input }) => {
+    optimisticResponse: (variables) => {
       const properties = readPartOfSpeechProperties(
-        input.languageId,
-        input.partOfSpeech,
+        variables.input.languageId,
+        variables.input.partOfSpeech,
       );
-      const order =
-        properties.reduce(
-          (maxOrder, { order }) => (order > maxOrder ? order : maxOrder),
-          0,
-        ) + 1;
 
-      return {
-        createProperty: {
-          ...input,
-          id: input.id!,
-          addedAt: input.addedAt!,
-          order,
-          __typename: 'TextProperty',
-        },
-      };
+      return optimisticCreateProperty(variables, properties);
     },
     update: (cache, { data }, { variables }) => {
       cache.updateFragment(
@@ -140,12 +126,11 @@ export function useUpdateProperty(): UseMutationResult<
   typeof UpdatePropertyDocument
 > {
   return useMutation(UpdatePropertyDocument, {
-    optimisticResponse: ({ input }) => ({
-      updateProperty: {
-        ...readProperty(input.id)!,
-        ...(input.name && { name: input.name }),
-      },
-    }),
+    optimisticResponse: (variables) => {
+      const currentProperty = readProperty(variables.input.id)!;
+
+      return optimisticUpdateProperty(variables, currentProperty);
+    },
   });
 }
 
@@ -153,11 +138,14 @@ export function useReorderProperties(): UseMutationResult<
   typeof ReorderPropertiesDocument
 > {
   return useMutation(ReorderPropertiesDocument, {
-    optimisticResponse: ({ input }) => ({
-      reorderProperties: input.propertyIds.map(
-        (propertyId) => readProperty(propertyId)!,
-      ),
-    }),
+    optimisticResponse: (variables) => {
+      const properties = readPartOfSpeechProperties(
+        variables.input.languageId,
+        variables.input.partOfSpeech,
+      );
+
+      return optimisticReorderProperties(variables, properties);
+    },
     update: (cache, { data }, { variables }) => {
       cache.updateFragment(
         {
@@ -181,9 +169,8 @@ export function useDeleteProperty(): UseMutationResult<
   typeof DeletePropertyDocument
 > {
   return useMutation(DeletePropertyDocument, {
-    optimisticResponse: ({ input: { id } }) => ({
-      deleteProperty: readProperty(id)!,
-    }),
+    optimisticResponse: ({ input: { id } }) =>
+      optimisticDeleteProperty(readProperty(id)!),
     update: (cache, { data }) => {
       cache.updateFragment(
         {
@@ -205,27 +192,7 @@ export function useDeleteProperty(): UseMutationResult<
 
 export function useCreateWord(): UseMutationResult<typeof CreateWordDocument> {
   return useMutation(CreateWordDocument, {
-    optimisticResponse: ({ input }) => ({
-      createWord: {
-        ...input,
-        id: input.id!,
-        addedAt: input.addedAt!,
-        mastery: 0,
-        nextExerciseAt: toTimestamp(
-          fromTimestamp(input.addedAt!)!.plus({ days: 1 }),
-        )!,
-        properties:
-          input.properties?.map(({ id, text }) => ({
-            property: {
-              id,
-              __typename: 'TextProperty',
-            },
-            text: text!,
-            __typename: 'TextPropertyValue',
-          })) ?? [],
-        __typename: 'Word',
-      },
-    }),
+    optimisticResponse: optimisticCreateWord,
     update: (cache, { data }, { variables }) => {
       cache.updateFragment(
         {
@@ -247,44 +214,18 @@ export function useCreateWord(): UseMutationResult<typeof CreateWordDocument> {
 
 export function useUpdateWord(): UseMutationResult<typeof UpdateWordDocument> {
   return useMutation(UpdateWordDocument, {
-    optimisticResponse: ({ input }) => {
-      const word = readWordFull(input.id)!;
+    optimisticResponse: (variables) => {
+      const currentWord = readWordFull(variables.input.id)!;
 
-      return {
-        updateWord: {
-          ...word,
-          ...(input.original && { name: input.original }),
-          ...(input.translation && { name: input.translation }),
-          ...(input.properties && {
-            properties: input.properties.reduce((props, { id, text }) => {
-              props = props.filter((prop) => prop.property.id !== id);
-              if (text) {
-                props.push({
-                  property: {
-                    id,
-                    __typename: 'TextProperty',
-                  },
-                  text: text!,
-                  __typename: 'TextPropertyValue',
-                });
-              }
-              return props;
-            }, word.properties),
-          }),
-        },
-      };
+      return optimisticUpdateWord(variables, currentWord);
     },
   });
 }
 
 export function useDeleteWord(): UseMutationResult<typeof DeleteWordDocument> {
   return useMutation(DeleteWordDocument, {
-    optimisticResponse: ({ input: { id } }) => ({
-      deleteWord: {
-        id,
-        languageId: readWordFull(id)!.languageId,
-      },
-    }),
+    optimisticResponse: ({ input: { id } }) =>
+      optimisticDeleteWord(readWordFull(id)!),
     update: (cache, { data }) => {
       cache.updateFragment(
         {
@@ -310,17 +251,10 @@ export function useAttemptWordMastery(): UseMutationResult<
   typeof AttemptWordMasteryDocument
 > {
   return useMutation(AttemptWordMasteryDocument, {
-    optimisticResponse: ({ wordId, success }) => {
-      const word = readWordFull(wordId)!;
+    optimisticResponse: (variables) => {
+      const word = readWordFull(variables.wordId)!;
 
-      return {
-        attemptMastery: success
-          ? {
-              ...word,
-              mastery: Math.min(word.mastery + 1, MaxMastery),
-            }
-          : word,
-      };
+      return optimisticAttemptWordMastery(variables, word);
     },
     update: (_, { data }, { variables }) => {
       updateWord(data!.attemptMastery);

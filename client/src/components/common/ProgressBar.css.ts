@@ -1,6 +1,7 @@
 import { style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
-import { colors, themeVars } from '../../index.css';
+import { themeVars } from '../../index.css';
+import { accentColorStyle } from '../../utils/colors';
 
 export const container = style({
   width: '100%',
@@ -13,14 +14,9 @@ export const bar = recipe({
   },
 
   variants: {
-    color: Object.fromEntries(
-      colors.map((color) => [
-        color,
-        {
-          backgroundColor: themeVars.color[color],
-        },
-      ]),
-    ),
+    color: accentColorStyle((colorVar) => ({
+      backgroundColor: colorVar,
+    })),
   },
 
   defaultVariants: {

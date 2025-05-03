@@ -37,6 +37,15 @@ export class LanguageRepository {
     return languages.map((language) => this.mapToLanguage(language));
   }
 
+  async getByName(name: string): Promise<Language | null> {
+    const language = await this.connectionManager
+      .getConnection()(TABLE_LANGUAGES)
+      .where({ name })
+      .first();
+
+    return language ? this.mapToLanguage(language) : null;
+  }
+
   async create(language: Language): Promise<void> {
     const languageRow: LanguageTable = {
       id: language.id,

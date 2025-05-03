@@ -1,6 +1,6 @@
 import { style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
-import { colors, themeVars } from '../../index.css';
+import { accentColorStyle } from '../../utils/colors';
 
 export const wrapper = style({
   display: 'flex',
@@ -21,9 +21,9 @@ export const icon = recipe({
   },
 
   variants: {
-    color: Object.fromEntries(
-      colors.map((color) => [color, { color: themeVars.color[color] }]),
-    ),
+    color: accentColorStyle((colorVar) => ({
+      color: colorVar,
+    })),
   },
 });
 

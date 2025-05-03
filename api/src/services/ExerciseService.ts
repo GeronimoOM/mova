@@ -174,11 +174,11 @@ export class ExerciseService {
       word,
       currentWord,
     );
-    change.changedAt = now;
 
     await this.connectionManager.transactionally(async () => {
       await this.wordRepository.update(word);
       if (change) {
+        change.changedAt = now;
         await this.changeService.create(change);
       }
 
@@ -186,7 +186,7 @@ export class ExerciseService {
         await this.progressService.saveProgress(word.languageId, {
           id: uuid(),
           type: ProgressType.Mastery,
-          date: change.changedAt,
+          date: now,
         });
       }
     });
@@ -231,8 +231,7 @@ export class ExerciseService {
   }
 
   private async getIncludeMastered(ctx: Context): Promise<boolean> {
-    return ctx.user
-      ? (await this.userService.getSettings(ctx.user.id)).includeMastered
-      : true;
+    const settings = await this.userService.getSettings(ctx.user.id);
+    return settings.includeMastered ?? true;
   }
 }

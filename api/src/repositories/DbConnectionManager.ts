@@ -56,7 +56,7 @@ export class DbConnectionManager implements OnApplicationBootstrap {
 
   private initConnection(): Knex {
     const { host, port, user, password, database } =
-      this.configService.get<DbServiceConfig>('env.database');
+      this.configService.getOrThrow<DbServiceConfig>('env.database');
 
     return knex({
       client: 'mysql',

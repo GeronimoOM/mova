@@ -1,9 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { WordCreateType, WordUpdateType } from 'graphql/types/ChangeType';
-import { PropertyId } from 'models/Property';
+import {
+  PropertyValueSaveUnionType,
+  WordCreateType,
+  WordUpdateType,
+} from 'graphql/types/ChangeType';
+import {
+  OptionPropertyType,
+  TextPropertyType,
+} from 'graphql/types/PropertyType';
+import { PropertyId, PropertyType } from 'models/Property';
 import {
   PropertyValue,
-  isOptionPropertyValue,
+  PropertyValueSave,
+  isIdOptionValue,
   isTextPropertyValue,
 } from 'models/PropertyValue';
 import { Word, WordCreate, WordUpdate } from 'models/Word';
@@ -14,13 +23,12 @@ import {
   UpdateWordParams,
 } from 'services/WordService';
 import {
-  OptionPropertyValueType,
+  OptionValueType,
   PropertyValueUnionType,
-  TextPropertyValueType,
 } from '../types/PropertyValueType';
 import {
   CreateWordInput,
-  UpdatePropertyValueInput,
+  SavePropertyValueInput,
   UpdateWordInput,
   WordType,
 } from '../types/WordType';
@@ -59,7 +67,9 @@ export class WordTypeMapper {
       mastery: wordCreate.mastery,
       nextExerciseAt: this.exerciseService.getNextExerciseAt(wordCreate),
       languageId: wordCreate.languageId,
-      properties: Object.values(wordCreate.properties ?? {}),
+      properties: Object.values(wordCreate.properties ?? {}).map(
+        (propertyValue) => this.mapPropertyValueSave(propertyValue),
+      ),
     };
   }
 
@@ -95,24 +105,36 @@ export class WordTypeMapper {
   ): typeof PropertyValueUnionType {
     const property = this.propertyTypeMapper.map(propertyValue.property);
     if (isTextPropertyValue(propertyValue)) {
+      const textProperty = property as TextPropertyType;
+
       return {
-        property,
+        property: textProperty,
         text: propertyValue.text,
-      } as TextPropertyValueType;
-    } else if (isOptionPropertyValue(propertyValue)) {
-      const optionValue = propertyValue.property.options[propertyValue.option];
+      };
+    } else {
+      const optionProperty = property as OptionPropertyType;
+
+      let option: OptionValueType;
+      if (isIdOptionValue(propertyValue.option)) {
+        const propertyOption =
+          propertyValue.property.options[propertyValue.option.id];
+        option = {
+          id: propertyValue.option.id,
+          ...propertyOption,
+        };
+      } else {
+        option = propertyValue.option;
+      }
+
       return {
-        property,
-        option: {
-          id: propertyValue.option,
-          value: optionValue,
-        },
-      } as OptionPropertyValueType;
+        property: optionProperty,
+        option,
+      };
     }
   }
 
   private mapFromUpdateValuesInput(
-    input?: UpdatePropertyValueInput[],
+    input?: SavePropertyValueInput[],
   ): Record<PropertyId, UpdatePropertyValueParams> | undefined {
     if (!input) {
       return;
@@ -126,11 +148,37 @@ export class WordTypeMapper {
   }
 
   private mapFromUpdateValueInput(
-    input: UpdatePropertyValueInput,
+    input: SavePropertyValueInput,
   ): UpdatePropertyValueParams {
     return {
       ...(input.text && { text: input.text }),
       ...(input.option && { option: input.option }),
     };
+  }
+
+  private mapPropertyValueSave(
+    propertyValueSave: PropertyValueSave,
+  ): typeof PropertyValueSaveUnionType {
+    if (propertyValueSave.type === PropertyType.Text) {
+      return {
+        propertyId: propertyValueSave.propertyId,
+        type: propertyValueSave.type,
+        text: propertyValueSave.text ?? undefined,
+      };
+    } else {
+      return {
+        propertyId: propertyValueSave.propertyId,
+        type: propertyValueSave.type,
+        ...(propertyValueSave.option &&
+          (isIdOptionValue(propertyValueSave.option)
+            ? {
+                optionId: propertyValueSave.option.id,
+              }
+            : {
+                value: propertyValueSave.option.value,
+                color: propertyValueSave.option.color,
+              })),
+      };
+    }
   }
 }

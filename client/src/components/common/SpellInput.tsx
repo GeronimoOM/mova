@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import { useCallback, useRef } from 'react';
-import { Color } from '../../index.css';
+import { AccentColor } from '../../index.css';
 import * as styles from './SpellInput.css';
 
 const OBSCURED_LENGTH = 100;
@@ -11,7 +11,7 @@ type SpellInputProps = {
   length: number;
   obscureLength?: boolean;
   disabled?: boolean;
-  highlights?: Array<Color | null>;
+  highlights?: Array<AccentColor | null>;
 };
 
 export const SpellInput = ({

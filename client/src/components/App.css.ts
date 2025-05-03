@@ -4,7 +4,7 @@ import { breakpoints, fontThemeVars, theme, themeVars } from '../index.css';
 export const app = style([
   theme,
   {
-    maxWidth: 900,
+    maxWidth: 1000,
     height: '100%',
     margin: '0 auto',
     display: 'grid',

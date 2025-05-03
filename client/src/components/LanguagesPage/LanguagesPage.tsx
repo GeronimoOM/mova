@@ -30,9 +30,13 @@ export const LanguagesPage = () => {
     [setSelectedLanguageId],
   );
 
-  const handleLanguageCreated = useCallback(() => {
-    setIsNewLanguageOpen(false);
-  }, []);
+  const handleLanguageCreated = useCallback(
+    (languageId: string) => {
+      setIsNewLanguageOpen(false);
+      setSelectedLanguageId(languageId);
+    },
+    [setSelectedLanguageId],
+  );
 
   useEffect(() => {
     if (!languages) {
@@ -41,10 +45,10 @@ export const LanguagesPage = () => {
 
     if (!languages.length) {
       setIsNewLanguageOpen(true);
-    } else if (languages.length === 1) {
+    } else if (!selectedLanguageId) {
       setSelectedLanguageId(languages[0].id);
     }
-  }, [languages, setSelectedLanguageId]);
+  }, [languages, selectedLanguageId, setSelectedLanguageId]);
 
   return (
     <div className={styles.wrapper}>
@@ -81,6 +85,7 @@ export const LanguagesPage = () => {
             highlighted={true}
             onClick={handleCreateNew}
             wrapped
+            dataTestId="languages-create-btn"
           />
         </div>
       )}

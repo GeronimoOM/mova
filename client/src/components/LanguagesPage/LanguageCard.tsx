@@ -17,7 +17,7 @@ export type LanguageCardProps = {
   language: LanguageFieldsFragment | null;
   selected: boolean;
   onSelect: (languageId: string) => void;
-  onLanguageCreated: () => void;
+  onLanguageCreated: (languageId: string) => void;
 };
 
 export const LanguageCard = ({
@@ -48,18 +48,23 @@ export const LanguageCard = ({
 
   useEffect(() => {
     if (createdLanguage) {
-      onLanguageCreated?.();
+      onLanguageCreated?.(createdLanguage.id);
     }
   }, [createdLanguage, onLanguageCreated]);
 
   return (
-    <div className={classNames(styles.card, { selected })}>
+    <div
+      className={classNames(styles.card, { selected })}
+      data-testid="languages-list-item"
+      data-selected={selected ? true : undefined}
+    >
       <div className={styles.main}>
         <Input
           value={language.name ?? ''}
           onChange={setName}
           size="large"
           placeholder={t('languages.name')}
+          maxLength={20}
         />
       </div>
       <div className={styles.buttons}>
@@ -68,6 +73,7 @@ export const LanguageCard = ({
           empty={!selected}
           disabled={isNewLanguage}
           onClick={() => onSelect(language.id!)}
+          dataTestId="languages-list-item-select-btn"
         />
 
         <ButtonIcon
@@ -77,12 +83,14 @@ export const LanguageCard = ({
           highlighted={true}
           disabled={!canCreateLanguage && !canUpdateLanguage}
           loading={isNewLanguage ? languageCreating : languageUpdating}
+          dataTestId="languages-list-item-save-btn"
         />
         <ButtonIcon
           icon={FaFire}
           onClick={() => setDeleteConfirmOpen(true)}
           color="negative"
           disabled={!canDeleteLanguage}
+          dataTestId="languages-list-item-delete-btn"
         />
       </div>
 
@@ -102,11 +110,13 @@ export const LanguageCard = ({
                 onClick={deleteLanguage}
                 color="negative"
                 loading={languageDeleting}
+                dataTestId="languages-list-item-delete-confirm-btn"
               />
 
               <ButtonIcon
                 icon={HiMiniXMark}
                 onClick={() => setDeleteConfirmOpen(false)}
+                dataTestId="languages-list-item-delete-cancel-btn"
               />
             </div>
           </div>

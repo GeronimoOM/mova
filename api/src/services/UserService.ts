@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { User, UserId, UserSettings } from 'models/User';
 import { UserRepository } from 'repositories/UserRepository';
+import { v1 as uuid } from 'uuid';
+import { EncryptionService } from './EncryptionService';
 
 const DEFAULT_SETTINGS: UserSettings = {
   selectedLocale: 'en',
@@ -9,23 +11,77 @@ const DEFAULT_SETTINGS: UserSettings = {
   includeMastered: true,
 };
 
+const ADMIN_ID = 'admin-id';
+
+export interface CreateUserParams {
+  id?: UserId;
+  name: string;
+  password: string;
+}
+
 @Injectable()
 export class UserService {
-  private users: User[];
+  private adminUserName: string;
+  private adminUser: User;
 
   constructor(
     private userRepository: UserRepository,
     private configService: ConfigService,
+    private cryptService: EncryptionService,
   ) {
-    this.users = this.configService.get<User[]>('users');
+    this.adminUserName = this.configService.getOrThrow<string>('admin.name');
   }
 
-  async getUser(userId: UserId): Promise<User | null> {
-    return this.users.find((user) => user.id === userId) ?? null;
+  async getById(userId: UserId): Promise<User | null> {
+    if (userId === ADMIN_ID) {
+      return await this.getAdminUser();
+    }
+
+    return await this.userRepository.getById(userId);
   }
 
-  async getUserByUsername(username: string): Promise<User | null> {
-    return this.users.find((user) => user.username === username) ?? null;
+  async getByName(name: string): Promise<User | null> {
+    if (name === this.adminUserName) {
+      return await this.getAdminUser();
+    }
+
+    return await this.userRepository.getByName(name);
+  }
+
+  async create(params: CreateUserParams): Promise<User> {
+    if (params.id) {
+      const sameIdUser = await this.getById(params.id);
+      if (sameIdUser) {
+        throw new Error(`User with id already exists`);
+      }
+    }
+
+    const name = params.name.trim();
+    const sameNameUser = await this.getByName(name);
+    if (sameNameUser) {
+      throw new Error(`User with name already exists (name:${name})`);
+    }
+
+    const user: User = {
+      id: params.id ?? uuid(),
+      name: name,
+      password: await this.cryptService.hash(params.password),
+    };
+
+    await this.userRepository.create(user);
+
+    return user;
+  }
+
+  async delete(id: UserId): Promise<User> {
+    const user = await this.userRepository.getById(id);
+    if (!user) {
+      throw new Error(`User does not exist (id:${id})`);
+    }
+
+    await this.userRepository.delete(id);
+
+    return user;
   }
 
   async getSettings(userId: UserId) {
@@ -38,10 +94,26 @@ export class UserService {
     return this.mergeSettings(await this.getSettings(userId));
   }
 
-  mergeSettings(settings: Partial<UserSettings>) {
+  private mergeSettings(settings: Partial<UserSettings>) {
     return {
       ...DEFAULT_SETTINGS,
       ...settings,
     };
+  }
+
+  private async getAdminUser(): Promise<User> {
+    if (!this.adminUser) {
+      const adminPassword =
+        this.configService.getOrThrow<string>('admin.password');
+
+      this.adminUser = {
+        id: ADMIN_ID,
+        name: this.adminUserName,
+        password: await this.cryptService.hash(adminPassword),
+        isAdmin: true,
+      };
+    }
+
+    return this.adminUser;
   }
 }

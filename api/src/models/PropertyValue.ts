@@ -1,3 +1,4 @@
+import { Color } from 'models/Color';
 import {
   isOptionProperty,
   isTextProperty,
@@ -20,8 +21,17 @@ export interface TextPropertyValue extends BasePropertyValue {
 
 export interface OptionPropertyValue extends BasePropertyValue {
   property: OptionProperty;
-  option: OptionId;
+  option: OptionValue;
 }
+
+export type OptionValue =
+  | {
+      id: OptionId;
+    }
+  | {
+      value: string;
+      color?: Color;
+    };
 
 export type PropertyValue = TextPropertyValue | OptionPropertyValue;
 
@@ -49,7 +59,24 @@ export interface TextPropertyValueSave extends BasePropertyValueSave {
 
 export interface OptionPropertyValueSave extends BasePropertyValueSave {
   type: PropertyType.Option;
-  option: OptionId | null;
+  option: OptionValue | null;
 }
 
 export type PropertyValueSave = TextPropertyValueSave | OptionPropertyValueSave;
+
+export function isIdOptionValue(
+  propertyValueOption: OptionPropertyValue['option'],
+): propertyValueOption is { id: OptionId } {
+  return 'id' in propertyValueOption;
+}
+
+export function arePropertyValuesOptionsEqual(
+  value1: OptionPropertyValue['option'],
+  value2: OptionPropertyValue['option'],
+): boolean {
+  return isIdOptionValue(value1)
+    ? isIdOptionValue(value2) && value1.id === value2.id
+    : !isIdOptionValue(value2) &&
+        value1.value === value2.value &&
+        value1.color === value2.color;
+}

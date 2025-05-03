@@ -10,6 +10,7 @@ import {
 } from '@nestjs/graphql';
 import { TimestampScalar } from 'graphql/scalars/Timestamp';
 import { DateTime } from 'luxon';
+import { Color } from 'models/Color';
 import { LanguageId } from 'models/Language';
 import {
   OptionId,
@@ -22,6 +23,10 @@ import { PartOfSpeech } from 'models/Word';
 
 registerEnumType(PropertyTypeEnum, {
   name: 'PropertyType',
+});
+
+registerEnumType(Color, {
+  name: 'Color',
 });
 
 @InterfaceType('IProperty')
@@ -64,10 +69,13 @@ export class OptionPropertyType extends PropertyInterface {
 @ObjectType('Option')
 export class OptionType {
   @Field(() => ID)
-  id: string;
+  id: OptionId;
 
   @Field()
   value: string;
+
+  @Field(() => Color, { nullable: true })
+  color?: Color;
 }
 
 export const PropertyUnionType = createUnionType({
@@ -103,8 +111,20 @@ export class CreatePropertyInput {
   @Field(() => TimestampScalar, { nullable: true })
   addedAt?: DateTime;
 
-  @Field(() => [String], { nullable: true })
-  options: string[];
+  @Field(() => [CreateOptionInput], { nullable: true })
+  options?: CreateOptionInput[];
+}
+
+@InputType()
+export class CreateOptionInput {
+  @Field(() => ID, { nullable: true })
+  id?: OptionId;
+
+  @Field()
+  value: string;
+
+  @Field(() => Color, { nullable: true })
+  color?: Color;
 }
 
 @InputType()
@@ -113,10 +133,22 @@ export class UpdatePropertyInput {
   id: PropertyId;
 
   @Field({ nullable: true })
-  name: string;
+  name?: string;
 
   @Field(() => [UpdateOptionInput], { nullable: true })
-  options: UpdateOptionInput[];
+  options?: UpdateOptionInput[];
+}
+
+@InputType()
+export class UpdateOptionInput {
+  @Field(() => ID, { nullable: true })
+  id?: OptionId;
+
+  @Field({ nullable: true })
+  value?: string;
+
+  @Field(() => Color, { nullable: true })
+  color?: Color;
 }
 
 @InputType()
@@ -132,16 +164,16 @@ export class ReorderPropertiesInput {
 }
 
 @InputType()
-export class UpdateOptionInput {
-  @Field(() => ID)
-  id: OptionId;
-
-  @Field()
-  value: string;
-}
-
-@InputType()
 export class DeletePropertyInput {
   @Field(() => ID)
   id: PropertyId;
+}
+
+@ObjectType('OptionUsage')
+export class OptionUsageType {
+  @Field(() => ID)
+  id: OptionId;
+
+  @Field(() => Int)
+  count: number;
 }

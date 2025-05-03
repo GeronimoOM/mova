@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { TbHexagonPlusFilled } from 'react-icons/tb';
+import { v1 as uuid } from 'uuid';
 import { PartOfSpeech } from '../../api/types/graphql';
 import { useLanguageContext } from '../LanguageContext';
 import { ButtonIcon } from '../common/ButtonIcon';
@@ -21,29 +22,39 @@ export const PropertiesList = ({
   const { orderedProperties, swapPropertiesPreview, reorderProperties } =
     useOrderedProperties(selectedLanguageId, selectedPartOfSpeech);
 
-  const [isNewPropertyOpen, setIsNewPropertyOpen] = useState(false);
+  const [newPropertyId, setNewPropertyId] = useState<string | null>(null);
   const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(
     null,
   );
 
-  const handleCreateNewRef = useCallback((node: HTMLDivElement | null) => {
-    node?.scrollIntoView({ behavior: 'smooth' });
-  }, []);
+  const isNewPropertyOpen = useMemo(
+    () =>
+      !!newPropertyId &&
+      !orderedProperties?.find((prop) => prop.id === newPropertyId),
+    [newPropertyId, orderedProperties],
+  );
 
-  const handleCreateNew = useCallback(() => {
-    setIsNewPropertyOpen(true);
+  useEffect(() => {
+    setNewPropertyId(null);
     setSelectedPropertyId(null);
+  }, [selectedLanguageId, selectedPartOfSpeech]);
+
+  const handleOpenNew = useCallback(() => {
+    const newPropertyId = uuid();
+    setNewPropertyId(newPropertyId);
+    setSelectedPropertyId(newPropertyId);
   }, []);
 
   const handlePropertyCreated = useCallback(() => {
-    setIsNewPropertyOpen(false);
-    setSelectedPropertyId(null);
+    setNewPropertyId(null);
   }, []);
 
-  useEffect(() => {
-    setIsNewPropertyOpen(false);
-    setSelectedPropertyId(null);
-  }, [selectedLanguageId, selectedPartOfSpeech]);
+  const handleScrollRef = useCallback(
+    (ref: React.RefObject<HTMLDivElement | null>) => {
+      ref.current?.scrollIntoView({ behavior: 'smooth' });
+    },
+    [],
+  );
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -61,21 +72,26 @@ export const PropertiesList = ({
             />
           ))}
 
-          {isNewPropertyOpen ? (
-            <div key="new" ref={handleCreateNewRef}>
-              <PropertyListItem
-                partOfSpeech={selectedPartOfSpeech}
-                property={null}
-                selected={!selectedPropertyId}
-                onSelect={() => setSelectedPropertyId(null)}
-                onPropertyCreated={handlePropertyCreated}
-                onSwapPreview={swapPropertiesPreview}
-                onReorder={reorderProperties}
-              />
-            </div>
-          ) : (
-            <div key="end" className={styles.listEnd} />
+          {isNewPropertyOpen && (
+            <PropertyListItem
+              key={newPropertyId}
+              partOfSpeech={selectedPartOfSpeech}
+              property={null}
+              newPropertyId={newPropertyId!}
+              selected={
+                !!selectedPropertyId && newPropertyId === selectedPropertyId
+              }
+              onSelect={() => setSelectedPropertyId(newPropertyId)}
+              onSwapPreview={swapPropertiesPreview}
+              onReorder={reorderProperties}
+              onPropertyCreated={handlePropertyCreated}
+              onRef={handleScrollRef}
+            />
           )}
+
+          {/* {isNewPropertyOpen && <div className={styles.scrollRef} ref={handleScrollRef} /> } */}
+
+          <div key="end" className={styles.listEnd} />
         </div>
 
         <PropertyListItemOverlay />
@@ -86,8 +102,9 @@ export const PropertiesList = ({
               icon={TbHexagonPlusFilled}
               color="primary"
               highlighted={true}
-              onClick={handleCreateNew}
+              onClick={handleOpenNew}
               wrapped
+              dataTestId="properties-create-btn"
             />
           </div>
         )}
