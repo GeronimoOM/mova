@@ -18,4 +18,4 @@ TypeScript, NestJS, GraphQL, MySQL, ElasticSearch, NGINX.
 
 ## Front End
 
-TypeScript, React, Apollo GraphQL, Vanilla Extract CSS, Workbox.
+TypeScript, React, Apollo GraphQL, Vanilla Extract CSS, Workbox, Cypress.
