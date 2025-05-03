@@ -104,6 +104,7 @@ export const PropertiesList = ({
               highlighted={true}
               onClick={handleOpenNew}
               wrapped
+              dataTestId="properties-create-btn"
             />
           </div>
         )}

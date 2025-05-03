@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PiGraphBold } from 'react-icons/pi';
 import { PartOfSpeech } from '../../../api/types/graphql';
@@ -6,7 +6,7 @@ import {
   partOfSpeechToShortLabel,
   partsOfSpeech,
 } from '../../../utils/partsOfSpeech';
-import { useClickOutsideHandler } from '../../../utils/useClickOutsideHandler';
+import { Dropdown } from '../../common/Dropdown';
 import { Icon } from '../../common/Icon';
 import * as styles from './PartOfSpeechSelect.css';
 
@@ -22,56 +22,63 @@ export const PartOfSpeechSelect = ({
   disabled,
 }: PartOfSpeechSelectProps) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const selectRef = useRef<HTMLDivElement>(null);
+
+  const handleDropdownOpen = (isOpen: boolean) => {
+    if (!disabled) {
+      setIsDropdownOpen(isOpen);
+    }
+  };
 
   const handlePartOfSpeechSelect = (partOfSpeech: PartOfSpeech) => {
     onPartOfSpeechSelect(partOfSpeech);
     setIsDropdownOpen(false);
   };
 
-  useClickOutsideHandler({
-    ref: selectRef,
-    onClick: () => setIsDropdownOpen(false),
-  });
-
   return (
-    <div className={styles.wrapper} ref={selectRef}>
-      <PartOfSpeechSelectButton
-        partOfSpeech={partOfSpeech}
-        onOpenDropdown={() => setIsDropdownOpen(!isDropdownOpen)}
-        disabled={disabled}
-      />
-
-      {isDropdownOpen && (
+    <Dropdown
+      isOpen={isDropdownOpen}
+      onOpen={handleDropdownOpen}
+      content={
         <PartOfSpeechSelectDropdown
           onPartOfSpeechSelect={handlePartOfSpeechSelect}
         />
-      )}
-    </div>
+      }
+      position="bottom"
+      alignment="stretch"
+      outline="bold"
+    >
+      <PartOfSpeechSelectButton
+        partOfSpeech={partOfSpeech}
+        disabled={disabled}
+      />
+    </Dropdown>
   );
 };
 
 type PartOfSpeechSelectButtonProps = {
   partOfSpeech: PartOfSpeech | null;
-  onOpenDropdown: () => void;
   disabled?: boolean;
 };
 
 const PartOfSpeechSelectButton = ({
   partOfSpeech,
-  onOpenDropdown,
   disabled,
 }: PartOfSpeechSelectButtonProps) => {
   const { t } = useTranslation();
 
   return (
-    <div className={styles.button({ disabled })} onClick={onOpenDropdown}>
+    <div
+      className={styles.button({ disabled })}
+      data-testid="part-of-speech-select"
+    >
       <Icon icon={PiGraphBold} size="small" />
-      {partOfSpeech ? (
-        <div>{t(partOfSpeechToShortLabel[partOfSpeech])}</div>
-      ) : (
-        <div className={styles.placeholder}>{t('pos.select')}</div>
-      )}
+      <div className={styles.buttonText}>
+        {partOfSpeech ? (
+          <div>{t(partOfSpeechToShortLabel[partOfSpeech])}</div>
+        ) : (
+          <div className={styles.placeholder}>{t('pos.select')}</div>
+        )}
+      </div>
     </div>
   );
 };
@@ -92,6 +99,7 @@ const PartOfSpeechSelectDropdown = ({
           key={partOfSpeech}
           className={styles.dropdownItem}
           onClick={() => onPartOfSpeechSelect(partOfSpeech)}
+          data-testid={`part-of-speech-option-${partOfSpeech.toLowerCase()}`}
         >
           {t(partOfSpeechToShortLabel[partOfSpeech])}
         </div>

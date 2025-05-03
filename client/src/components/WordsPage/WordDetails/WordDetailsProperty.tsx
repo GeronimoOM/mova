@@ -34,7 +34,7 @@ export const WordDetailsProperty = ({
   simplified,
 }: WordDetailsPropertyProps) => {
   return (
-    <div className={styles.row}>
+    <div className={styles.row} data-testid="word-details-property">
       <div className={styles.label}>{property.name}</div>
 
       {isTextPropertyFragment(property) && (
@@ -82,6 +82,7 @@ const WordDetailsTextProperty = ({
       }
       disabled={simplified}
       maxLength={100}
+      dataTestId="word-details-property-text"
     />
   );
 };
@@ -145,7 +146,11 @@ const WordDetailsOptionProperty = ({
         }
         alignment="start"
       >
-        <OptionPill option={option} disabled={simplified} />
+        <OptionPill
+          option={option}
+          disabled={simplified}
+          dataTestId="word-details-property-option"
+        />
       </Dropdown>
     </div>
   );

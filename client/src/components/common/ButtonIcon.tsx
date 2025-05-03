@@ -19,6 +19,7 @@ export type ButtonIconProps = IconProps & {
   empty?: boolean;
   wrapped?: boolean;
   borderless?: boolean;
+  dataTestId?: string;
 };
 
 export const ButtonIcon = ({
@@ -34,6 +35,7 @@ export const ButtonIcon = ({
   wrapped,
   size,
   borderless,
+  dataTestId,
 }: ButtonIconProps) => {
   const button = (
     <div
@@ -45,6 +47,7 @@ export const ButtonIcon = ({
         borderless,
       })}
       onClick={onClick}
+      data-testid={dataTestId}
     >
       <Icon icon={!loading ? icon : FaSyncAlt} size={size} />
     </div>

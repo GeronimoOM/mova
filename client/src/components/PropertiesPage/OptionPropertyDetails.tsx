@@ -37,6 +37,7 @@ export const OptionPropertyDetails = ({
           onColorChange={(color) => editOption(option.id, { ...option, color })}
           onDelete={() => removeOption(option.id)}
           onRestore={() => restoreOption(option.id)}
+          dataTestId="properties-list-item-option"
         />
       ))}
 
@@ -45,6 +46,7 @@ export const OptionPropertyDetails = ({
         onClick={() => addOption({ value: '', color: null })}
         size={'small'}
         disabled={Object.keys(property.options).length >= MAX_OPTIONS_LENGTH}
+        dataTestId="properties-list-item-option-add-btn"
       />
     </div>
   );

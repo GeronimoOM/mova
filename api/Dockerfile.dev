@@ -4,4 +4,4 @@ EXPOSE 3000 3001
 
 WORKDIR /app
 
-CMD ["npm", "run", "start:debug"]
+CMD ["yarn", "run", "start:dev"]

@@ -2,6 +2,7 @@ import { ApolloProvider } from '@apollo/client';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
+import { cacheEvict } from './api/cache';
 import { client, setClientId } from './api/client';
 import { App } from './components/App';
 import { AuthProvider } from './components/AuthContext';
@@ -17,7 +18,7 @@ registerServiceWorker((message) => {
     setClientId(message.clientId);
   } else if (message.type === SwWorkerMessageType.SyncOver) {
     if (message.isSuccess && message.hasChanges) {
-      // cacheEvict();
+      cacheEvict();
     }
   }
 });

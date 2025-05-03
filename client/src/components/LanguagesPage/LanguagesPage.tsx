@@ -30,9 +30,13 @@ export const LanguagesPage = () => {
     [setSelectedLanguageId],
   );
 
-  const handleLanguageCreated = useCallback(() => {
-    setIsNewLanguageOpen(false);
-  }, []);
+  const handleLanguageCreated = useCallback(
+    (languageId: string) => {
+      setIsNewLanguageOpen(false);
+      setSelectedLanguageId(languageId);
+    },
+    [setSelectedLanguageId],
+  );
 
   useEffect(() => {
     if (!languages) {
@@ -81,6 +85,7 @@ export const LanguagesPage = () => {
             highlighted={true}
             onClick={handleCreateNew}
             wrapped
+            dataTestId="languages-create-btn"
           />
         </div>
       )}

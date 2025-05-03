@@ -243,7 +243,9 @@ function getExerciseProperties(
   word: WordFieldsFullFragment,
   allProperties: PropertyFieldsFragment[],
 ): PropertyFieldsFragment[] {
-  const wordPropertyIds = word.properties.map((prop) => prop.property.id);
+  const wordPropertyIds = word.properties
+    .filter((prop) => prop.__typename === 'TextPropertyValue')
+    .map((prop) => prop.property.id);
   const selectedPropertyIds: string[] = [];
   while (
     wordPropertyIds.length &&

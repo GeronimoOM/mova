@@ -16,6 +16,7 @@ export type DropdownProps = {
   onOpen: (isOpen: boolean) => void;
   position?: DropdownPosition;
   alignment?: DropdownAlignment;
+  outline?: 'normal' | 'bold';
 };
 
 export const Dropdown = ({
@@ -25,6 +26,7 @@ export const Dropdown = ({
   onOpen,
   position,
   alignment,
+  outline,
 }: DropdownProps) => {
   const anchorRef = useRef<HTMLDivElement>(null);
 
@@ -40,6 +42,7 @@ export const Dropdown = ({
           anchorRef={anchorRef as React.RefObject<HTMLElement>}
           position={position}
           alignment={alignment}
+          outline={outline}
         />
       )}
     </div>
@@ -51,6 +54,7 @@ type DropdownContentProps = {
   anchorRef: React.RefObject<HTMLElement>;
   position?: DropdownPosition;
   alignment?: DropdownAlignment;
+  outline?: 'normal' | 'bold';
 };
 
 const DropdownContent = ({
@@ -58,6 +62,7 @@ const DropdownContent = ({
   anchorRef,
   position,
   alignment,
+  outline,
 }: DropdownContentProps) => {
   const { containerRef } = useLayoutContext();
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -75,6 +80,7 @@ const DropdownContent = ({
       className={styles.dropdown({
         position: position ?? computedPosition,
         alignment: alignment ?? computedAlignment,
+        outline,
       })}
     >
       {content}

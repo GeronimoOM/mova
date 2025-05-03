@@ -19,6 +19,7 @@ export const PropertiesPartsOfSpeech = ({
           key={partOfSpeech}
           className={styles.item}
           onClick={() => onSelectPartOfSpeech(partOfSpeech)}
+          data-testid={`properties-pos-tab-${partOfSpeech.toLowerCase()}`}
         >
           <PartOfSpeechPill
             partOfSpeech={partOfSpeech}

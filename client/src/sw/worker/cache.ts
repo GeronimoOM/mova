@@ -25,6 +25,8 @@ import {
 } from '../../utils/properties';
 import { SyncState } from './sync';
 
+const IDB_NAME = 'mova';
+
 export class MovaDb extends Dexie {
   state!: Dexie.Table<SyncState>;
   languages!: Dexie.Table<LanguageFieldsFragment & Partial<Language>>;
@@ -34,7 +36,7 @@ export class MovaDb extends Dexie {
   auth!: Dexie.Table<{ id: number; token: string }>;
 }
 
-const db = new Dexie('mova') as MovaDb;
+const db = new Dexie(IDB_NAME) as MovaDb;
 
 const indices = {
   state: 'id',

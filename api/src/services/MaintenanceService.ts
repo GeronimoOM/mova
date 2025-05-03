@@ -22,10 +22,10 @@ import { PropertyRepository } from 'repositories/PropertyRepository';
 import { UserRepository } from 'repositories/UserRepository';
 import { WordRepository } from 'repositories/WordRepository';
 import { Readable } from 'stream';
-import * as etPreset from '../utils/presets/et';
+import { Preset, presets } from 'utils/presets';
 import { LanguageService } from './LanguageService';
 import { ProgressService } from './ProgressService';
-import { PropertyService } from './PropertyService';
+import { CreatePropertyParams, PropertyService } from './PropertyService';
 import { UserService } from './UserService';
 import { WordService } from './WordService';
 
@@ -97,27 +97,41 @@ export class MaintenanceService {
     await this.progressService.syncAllWordsProgress(languageId);
   }
 
-  async initEstonian(ctx: Context, userId: UserId): Promise<void> {
+  async initPreset(
+    ctx: Context,
+    userId: UserId,
+    preset: Preset,
+  ): Promise<void> {
     const user = await this.userService.getById(userId);
     if (!user) {
       throw new Error('User does not exist');
     }
 
+    const presetConfig = presets[preset];
+
     ctx.user = user;
     await this.dbConnectionManager.transactionally(async () => {
       const language = await this.languageService.create(ctx, {
-        name: etPreset.name,
+        name: presetConfig.name,
       });
       for (const [partOfSpeech, properties] of Object.entries(
-        etPreset.properties,
+        presetConfig.properties,
       )) {
-        for (const propertyName of properties) {
+        for (const propertyConfig of properties) {
           await this.propertyService.create(ctx, {
             languageId: language.id,
-            name: propertyName,
             partOfSpeech: partOfSpeech as PartOfSpeech,
-            type: PropertyType.Text,
-          });
+            ...(typeof propertyConfig === 'string'
+              ? {
+                  name: propertyConfig,
+                  type: PropertyType.Text,
+                }
+              : {
+                  name: propertyConfig.name,
+                  type: propertyConfig.type,
+                  options: propertyConfig.options,
+                }),
+          } as CreatePropertyParams);
         }
       }
     });

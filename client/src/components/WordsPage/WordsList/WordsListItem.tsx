@@ -14,9 +14,20 @@ export const WordsListItem = ({
   setSelectedWord,
 }: WordsListItemProps) => {
   return (
-    <div className={styles.item} onClick={() => setSelectedWord(word.id)}>
-      <div className={styles.original}>{word.original}</div>
-      <div className={styles.translation}>{word.translation}</div>
+    <div
+      className={styles.item}
+      onClick={() => setSelectedWord(word.id)}
+      data-testid="words-list-item"
+    >
+      <div className={styles.original} data-testid="words-list-item-original">
+        {word.original}
+      </div>
+      <div
+        className={styles.translation}
+        data-testid="words-list-item-translation"
+      >
+        {word.translation}
+      </div>
     </div>
   );
 };

@@ -19,7 +19,10 @@ export const NavBarItem = ({ href, icon, text }: NavBarItemProps) => {
 
   return (
     <NavLink to={href} className={classNames(styles.link, { disabled })}>
-      <div className={styles.item}>
+      <div
+        className={styles.item}
+        data-testid={`navbar-link-${text.toLowerCase()}`}
+      >
         <div className={styles.icon}>
           <Icon icon={icon} />
         </div>

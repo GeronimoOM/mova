@@ -42,7 +42,7 @@ export const WordsList = ({
       ) : isEmpty ? (
         <NoWords isSearch={isSearch} />
       ) : (
-        <div className={styles.list}>
+        <div className={styles.list} data-testid="words-list">
           {words?.map((word) =>
             isDivider(word) ? (
               !isSearch && (
@@ -72,6 +72,7 @@ export const WordsList = ({
           highlighted={true}
           onClick={onCreateNew}
           wrapped
+          dataTestId="words-create-btn"
         />
       </div>
     </div>

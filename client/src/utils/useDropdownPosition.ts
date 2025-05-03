@@ -1,7 +1,7 @@
 import { useCallback, useLayoutEffect, useMemo, useState } from 'react';
 
 export type DropdownPosition = 'top' | 'bottom';
-export type DropdownAlignment = 'start' | 'center' | 'end';
+export type DropdownAlignment = 'start' | 'center' | 'end' | 'stretch';
 
 export type UseDropdownPositionProps = {
   dropdownRef?: React.RefObject<HTMLElement | null>;

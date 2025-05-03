@@ -13,7 +13,6 @@ export const dropdown = recipe({
     zIndex: 100,
     boxSizing: 'border-box',
     backgroundColor: `${themeVars.color.background}`,
-    outline: `1px solid ${themeVars.color.text}`,
     borderRadius: 4,
   },
 
@@ -37,11 +36,26 @@ export const dropdown = recipe({
       end: {
         right: 0,
       },
+      stretch: {
+        left: 0,
+        right: 0,
+      },
+    },
+
+    outline: {
+      normal: {
+        outline: `1px solid ${themeVars.color.text}`,
+      },
+
+      bold: {
+        outline: `2px solid ${themeVars.color.text}`,
+      },
     },
   },
 
   defaultVariants: {
     position: 'bottom',
     alignment: 'center',
+    outline: 'normal',
   },
 });

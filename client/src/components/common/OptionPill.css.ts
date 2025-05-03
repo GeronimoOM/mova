@@ -59,7 +59,7 @@ export const option = recipe({
         pointerEvents: 'none',
         borderStyle: 'dashed',
         backgroundColor: `${themeVars.color.backgroundDarker} !important`,
-        opacity: 0.5,
+        opacity: 0.8,
         cursor: 'default',
       },
     },

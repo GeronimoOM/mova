@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   Post,
   Put,
   Query,
@@ -21,6 +22,7 @@ import { chain } from 'stream-chain';
 import { parser as jsonParser } from 'stream-json/jsonl/Parser';
 import { stringer as jsonStringer } from 'stream-json/jsonl/Stringer';
 import { DATE_FORMAT } from 'utils/constants';
+import { Preset } from 'utils/presets';
 
 @Admin()
 @Controller('/api/data')
@@ -69,11 +71,16 @@ export class MaintenanceController {
     return language;
   }
 
-  @Post('/init/et')
-  async initEstonian(
+  @Post('/init/:preset')
+  async initPreset(
     @ContextDec() ctx: Context,
     @Body('userId') userId: UserId,
+    @Param('preset') preset: string,
   ) {
-    await this.maintenanceService.initEstonian(ctx, userId);
+    if (!Object.values(Preset).includes(preset as Preset)) {
+      throw new Error('Preset does not exist');
+    }
+
+    await this.maintenanceService.initPreset(ctx, userId, preset as Preset);
   }
 }

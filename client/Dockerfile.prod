@@ -1,6 +1,4 @@
-FROM node:22-alpine
-
-RUN ["npm", "install", "-g", "pnpm"]
+FROM node:23-alpine
 
 EXPOSE 4000
 
@@ -8,7 +6,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN ["pnpm", "install"]
-RUN ["pnpm", "run", "build"]
+RUN ["yarn", "install"]
+RUN ["yarn", "run", "build"]
 
-CMD ["pnpm", "run", "serve"]
+CMD ["yarn", "run", "start:prod"]

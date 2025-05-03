@@ -162,6 +162,7 @@ export const PropertyListItem = ({
         ref.current = elem;
         onRef?.(ref);
       }}
+      data-testid="properties-list-item"
     >
       <div className={styles.section}>
         <PropertyTypeSelect
@@ -177,6 +178,7 @@ export const PropertyListItem = ({
             highlighted={true}
             disabled={!canCreateProperty && !canUpdateProperty}
             loading={isNewProperty ? propertyCreating : isUpdateLoading}
+            dataTestId="properties-list-item-save-btn"
           />
         </div>
         <div
@@ -185,7 +187,11 @@ export const PropertyListItem = ({
           }}
           className={classNames(styles.button, { hidden: !selected })}
         >
-          <ButtonIcon icon={IoReorderThree} disabled={!canDragProperty} />
+          <ButtonIcon
+            icon={IoReorderThree}
+            disabled={!canDragProperty}
+            dataTestId="properties-list-item-reorder-btn"
+          />
         </div>
       </div>
 
@@ -197,6 +203,7 @@ export const PropertyListItem = ({
           size={'large'}
           placeholder={t('properties.name')}
           maxLength={30}
+          dataTestId="property-name"
         />
         <div className={classNames(styles.button, { hidden: !selected })}>
           <ButtonIcon
@@ -205,6 +212,7 @@ export const PropertyListItem = ({
             color={isLoadingDeleteConfirm ? undefined : 'negative'}
             disabled={!canDeleteProperty}
             loading={isLoadingDeleteConfirm}
+            dataTestId="properties-list-item-delete-btn"
           />
         </div>
       </div>

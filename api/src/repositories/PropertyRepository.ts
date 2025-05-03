@@ -4,6 +4,8 @@ import { LanguageId } from 'models/Language';
 import {
   BaseProperty,
   isOptionProperty,
+  Option,
+  OptionId,
   OptionProperty,
   Property,
   PropertyId,
@@ -16,6 +18,10 @@ import { DbConnectionManager } from './DbConnectionManager';
 import { Serializer } from './Serializer';
 
 const TABLE_PROPERTIES = 'properties';
+
+type DbOption = Option & {
+  id: OptionId;
+};
 
 @Injectable()
 export class PropertyRepository {
@@ -89,8 +95,15 @@ export class PropertyRepository {
     };
 
     if (isOptionProperty(property)) {
-      propertyRow.data = this.serializer.serialize({
-        options: property.options,
+      propertyRow.data = this.serializer.serialize<{
+        options: DbOption[];
+      }>({
+        options: Object.entries(property.options).map(
+          ([optionId, optionValue]) => ({
+            id: optionId,
+            ...optionValue,
+          }),
+        ),
       });
     }
 
@@ -107,8 +120,15 @@ export class PropertyRepository {
     };
 
     if (isOptionProperty(property)) {
-      propertyRow.data = this.serializer.serialize({
-        options: property.options,
+      propertyRow.data = this.serializer.serialize<{
+        options: DbOption[];
+      }>({
+        options: Object.entries(property.options).map(
+          ([optionId, optionValue]) => ({
+            id: optionId,
+            ...optionValue,
+          }),
+        ),
       });
     }
 
@@ -176,9 +196,13 @@ export class PropertyRepository {
         return baseProperty as TextProperty;
       case PropertyType.Option: {
         const options = row.data
-          ? this.serializer.deserialize<Pick<OptionProperty, 'options'>>(
-              row.data,
-            ).options
+          ? Object.fromEntries(
+              this.serializer
+                .deserialize<{
+                  options: DbOption[];
+                }>(row.data)
+                .options.map(({ id, ...rest }) => [id, rest]),
+            )
           : {};
 
         return {

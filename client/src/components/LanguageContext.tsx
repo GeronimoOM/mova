@@ -80,10 +80,10 @@ export const LanguageProvider = ({ children }: LanguageProviderProps) => {
   }, [authToken, language, fetchUserSettings, setLanguageAndSave]);
 
   useEffect(() => {
-    if (!language && languages?.length) {
+    if (authToken && !language && languages?.length) {
       setLanguageAndSave(languages[0].id);
     }
-  }, [language, languages, setLanguageAndSave]);
+  }, [authToken, language, languages, setLanguageAndSave]);
 
   return (
     <LanguageContext.Provider value={contextValue}>

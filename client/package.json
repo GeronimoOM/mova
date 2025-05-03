@@ -5,12 +5,15 @@
   "author": "GeronimoOM",
   "license": "UNLICENSED",
   "scripts": {
-    "start": "vite",
     "build": "vite build",
-    "serve": "vite preview",
+    "build:dev": "vite build --watch",
+    "start": "vite",
+    "start:prod": "vite preview",
     "format": "prettier --write .",
     "lint": "eslint --fix .",
     "type-check": "tsc --noEmit",
+    "test": "cypress run --e2e",
+    "test:dev": "cypress open --e2e",
     "lint-staged": "lint-staged",
     "graphql:codegen": "graphql-codegen -c ./src/api/codegen.ts",
     "pwa:assets-gen": "pwa-assets-generator --preset minimal-2023 public/images/logo.svg"
@@ -41,12 +44,15 @@
     "@graphql-codegen/client-preset": "4.6.3",
     "@graphql-typed-document-node/core": "3.2.0",
     "@types/luxon": "3.4.2",
+    "@types/node": "22.14.1",
     "@types/react": "19.0.10",
     "@types/react-dom": "19.0.4",
     "@types/uuid": "10.0.0",
+    "@types/yamljs": "0.2.34",
     "@vanilla-extract/vite-plugin": "5.0.1",
     "@vite-pwa/assets-generator": "0.2.6",
     "@vitejs/plugin-react": "4.3.4",
+    "cypress": "14.3.1",
     "eslint": "9.20.1",
     "eslint-plugin-react": "7.37.4",
     "eslint-plugin-react-hooks": "5.1.0",
@@ -62,7 +68,8 @@
     "vite-plugin-pwa": "0.21.1",
     "workbox-core": "7.3.0",
     "workbox-precaching": "7.3.0",
-    "workbox-routing": "7.3.0"
+    "workbox-routing": "7.3.0",
+    "yamljs": "0.3.0"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

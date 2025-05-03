@@ -43,6 +43,7 @@ export const WordDetailsOptionDropdown = ({
           icon={HiMiniXMark}
           onClick={() => handleSelect(null)}
           size={'small'}
+          dataTestId="word-details-options-clear-btn"
         />
 
         {property.options.map((option) => (
@@ -56,7 +57,10 @@ export const WordDetailsOptionDropdown = ({
               })
             }
           >
-            <OptionPill option={option} />
+            <OptionPill
+              option={option}
+              dataTestId="word-details-options-option"
+            />
           </div>
         ))}
       </div>
@@ -67,6 +71,7 @@ export const WordDetailsOptionDropdown = ({
           placeholder={t('words.options.custom')}
           onValueChange={(value) => setRawOption({ ...rawOption, value })}
           onColorChange={(color) => setRawOption({ ...rawOption, color })}
+          dataTestId="word-details-options-custom"
         />
         <ButtonIcon
           icon={ImCheckmark}
@@ -79,6 +84,7 @@ export const WordDetailsOptionDropdown = ({
           }
           size={'small'}
           disabled={!rawOption.value}
+          dataTestId="word-details-options-custom-save-btn"
         />
       </div>
     </div>

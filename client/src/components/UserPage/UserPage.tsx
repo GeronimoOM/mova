@@ -56,7 +56,12 @@ export const UserPage = () => {
         </div>
 
         <div className={styles.card}>
-          <ButtonIcon icon={MdLogout} onClick={logout} color="negative" />
+          <ButtonIcon
+            icon={MdLogout}
+            onClick={logout}
+            color="negative"
+            dataTestId="user-logout-btn"
+          />
           {t('users.logout')}
         </div>
       </div>

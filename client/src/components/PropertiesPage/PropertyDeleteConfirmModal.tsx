@@ -45,9 +45,14 @@ export const PropertyDeleteConfirmModal = ({
             onClick={onDelete}
             color="negative"
             loading={propertyDeleting}
+            dataTestId="properties-list-item-delete-confirm-btn"
           />
 
-          <ButtonIcon icon={HiMiniXMark} onClick={onClose} />
+          <ButtonIcon
+            icon={HiMiniXMark}
+            onClick={onClose}
+            dataTestId="properties-list-item-delete-cancel-btn"
+          />
         </div>
       </div>
     </Modal>

@@ -84,6 +84,7 @@ export const PropertyTypePill = ({
         disabled,
       })}
       onClick={() => !disabled && onSelect(propertyType)}
+      data-testid={`property-type-pill-${propertyType.toLowerCase()}`}
     >
       <Icon icon={propertyTypeToIcon[propertyType]} size="medium" />
       <span className={styles.typeLabel}>

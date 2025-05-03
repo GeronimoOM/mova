@@ -18,6 +18,7 @@ export type OptionPillProps = {
   onColorChange?: (color: OptionColor | null) => void;
   onDelete?: () => void;
   onRestore?: () => void;
+  dataTestId?: string;
 };
 
 export const OptionPill = ({
@@ -29,13 +30,18 @@ export const OptionPill = ({
   onColorChange,
   onDelete,
   onRestore,
+  dataTestId,
 }: OptionPillProps) => {
   const color = option?.color ?? undefined;
   const empty = !option;
   const isEditable = !deleted && !!onValueChange;
 
   return (
-    <div className={styles.option({ color, empty, disabled, deleted })}>
+    <div
+      className={styles.option({ color, empty, disabled, deleted })}
+      data-testid={dataTestId}
+      data-option-color={color?.toLowerCase() ?? 'empty'}
+    >
       <Input
         value={option ? option.value : '   '}
         placeholder={placeholder}
@@ -62,6 +68,7 @@ export const OptionPill = ({
               onClick={onDelete}
               size={'tiny'}
               borderless
+              dataTestId="option-delete-btn"
             />
           )}
 
@@ -72,6 +79,7 @@ export const OptionPill = ({
                 onClick={onRestore}
                 size={'tiny'}
                 borderless
+                dataTestId="option-restore-btn"
               />
             </div>
           )}
@@ -110,6 +118,7 @@ const OptionColorPicker = ({ color, onPick }: OptionColorPickerProps) => {
               color={optionColor ?? undefined}
               highlightedAlt
               toggled={optionColor === color}
+              dataTestId={`option-color-picker-option-${optionColor?.toLowerCase() ?? 'empty'}`}
             />
           ))}
         </div>
@@ -122,6 +131,7 @@ const OptionColorPicker = ({ color, onPick }: OptionColorPickerProps) => {
         borderless
         color={color ?? undefined}
         highlightedAlt
+        dataTestId="option-color-picker"
       />
     </Dropdown>
   );

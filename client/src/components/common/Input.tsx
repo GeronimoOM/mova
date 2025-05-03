@@ -19,6 +19,7 @@ export type InputProps = {
   maxLength?: number;
   left?: React.ReactNode;
   right?: React.ReactNode;
+  dataTestId?: string;
 };
 
 export const Input = ({
@@ -37,6 +38,7 @@ export const Input = ({
   maxLength,
   left,
   right,
+  dataTestId,
 }: InputProps) => {
   const [localValue, setLocalValue] = useState(value);
 
@@ -83,6 +85,7 @@ export const Input = ({
         autoCapitalize="off"
         autoCorrect="off"
         size={inputSize}
+        data-testid={dataTestId}
       />
       {right && <div className={styles.right}>{right}</div>}
     </div>

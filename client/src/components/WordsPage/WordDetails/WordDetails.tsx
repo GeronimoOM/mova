@@ -129,7 +129,12 @@ export const WordDetails = ({
       <div className={styles.innerWrapper}>
         {!simplified && (
           <div className={styles.buttons}>
-            <ButtonIcon icon={HiMiniXMark} onClick={onClose} wrapped={true} />
+            <ButtonIcon
+              icon={HiMiniXMark}
+              onClick={onClose}
+              wrapped={true}
+              dataTestId="word-details-close-btn"
+            />
 
             <ButtonIcon
               icon={FaFeatherPointed}
@@ -139,6 +144,7 @@ export const WordDetails = ({
               disabled={!canCreateWord && !canUpdateWord}
               loading={isNewWord ? wordCreating : wordUpdating}
               wrapped={true}
+              dataTestId="word-details-save-btn"
             />
 
             <div className={styles.bottomButton}>
@@ -148,6 +154,7 @@ export const WordDetails = ({
                   onClick={onSelectPrev}
                   disabled={!hasPrev}
                   wrapped={true}
+                  dataTestId="word-details-up-btn"
                 />
               )}
 
@@ -157,6 +164,7 @@ export const WordDetails = ({
                   onClick={onSelectNext}
                   disabled={!hasNext}
                   wrapped={true}
+                  dataTestId="word-details-down-btn"
                 />
               )}
 
@@ -166,6 +174,7 @@ export const WordDetails = ({
                 color="negative"
                 disabled={!canDeleteWord}
                 wrapped={true}
+                dataTestId="word-details-delete-btn"
               />
             </div>
           </div>
@@ -200,6 +209,7 @@ export const WordDetails = ({
                   />
                 )
               }
+              dataTestId="word-details-original"
             />
           </div>
 
@@ -220,6 +230,7 @@ export const WordDetails = ({
                 loading={wordLoading}
                 disabled={simplified}
                 maxLength={100}
+                dataTestId="word-details-translation"
               />
             </div>
           </div>
@@ -256,11 +267,13 @@ export const WordDetails = ({
                 onClick={deleteWord}
                 color="negative"
                 loading={wordDeleting}
+                dataTestId="word-details-delete-confirm-btn"
               />
 
               <ButtonIcon
                 icon={HiMiniXMark}
                 onClick={() => setDeleteConfirmOpen(false)}
+                dataTestId="word-details-delete-cancel-btn"
               />
             </div>
           </div>
