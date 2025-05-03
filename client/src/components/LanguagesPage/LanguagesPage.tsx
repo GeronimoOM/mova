@@ -45,10 +45,10 @@ export const LanguagesPage = () => {
 
     if (!languages.length) {
       setIsNewLanguageOpen(true);
-    } else if (languages.length === 1) {
+    } else if (!selectedLanguageId) {
       setSelectedLanguageId(languages[0].id);
     }
-  }, [languages, setSelectedLanguageId]);
+  }, [languages, selectedLanguageId, setSelectedLanguageId]);
 
   return (
     <div className={styles.wrapper}>

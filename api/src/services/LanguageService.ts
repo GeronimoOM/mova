@@ -69,6 +69,12 @@ export class LanguageService {
     return languages;
   }
 
+  async getByName(ctx: Context, id: LanguageId): Promise<Language | null> {
+    const language = await this.languageRepository.getByName(id);
+
+    return language && language.userId === ctx.user.id ? language : null;
+  }
+
   async exists(ctx: Context, id: LanguageId): Promise<boolean> {
     const language = await this.languageRepository.getById(id);
     return !!language && language.userId === ctx.user.id;

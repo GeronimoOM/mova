@@ -111,27 +111,53 @@ export class MaintenanceService {
 
     ctx.user = user;
     await this.dbConnectionManager.transactionally(async () => {
-      const language = await this.languageService.create(ctx, {
-        name: presetConfig.name,
-      });
+      let language = await this.languageService.getByName(
+        ctx,
+        presetConfig.name,
+      );
+      if (!language) {
+        language = await this.languageService.create(ctx, {
+          name: presetConfig.name,
+        });
+      }
       for (const [partOfSpeech, properties] of Object.entries(
         presetConfig.properties,
       )) {
+        const existingProperties = await this.propertyService.getByLanguageId(
+          ctx,
+          language.id,
+          partOfSpeech as PartOfSpeech,
+        );
+
         for (const propertyConfig of properties) {
-          await this.propertyService.create(ctx, {
-            languageId: language.id,
-            partOfSpeech: partOfSpeech as PartOfSpeech,
-            ...(typeof propertyConfig === 'string'
-              ? {
-                  name: propertyConfig,
-                  type: PropertyType.Text,
-                }
-              : {
-                  name: propertyConfig.name,
-                  type: propertyConfig.type,
-                  options: propertyConfig.options,
-                }),
-          } as CreatePropertyParams);
+          let propertyParams: Omit<
+            CreatePropertyParams,
+            'languageId' | 'partOfSpeech'
+          >;
+          if (typeof propertyConfig === 'string') {
+            propertyParams = {
+              name: propertyConfig,
+              type: PropertyType.Text,
+            };
+          } else {
+            propertyParams = {
+              name: propertyConfig.name,
+              type: propertyConfig.type,
+              options: propertyConfig.options,
+            } as CreatePropertyParams;
+          }
+
+          if (
+            !existingProperties.find(
+              (prop) => prop.name === propertyParams.name,
+            )
+          ) {
+            await this.propertyService.create(ctx, {
+              languageId: language.id,
+              partOfSpeech: partOfSpeech as PartOfSpeech,
+              ...propertyParams,
+            } as CreatePropertyParams);
+          }
         }
       }
     });
