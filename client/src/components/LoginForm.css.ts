@@ -1,19 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import { fontThemeVars, theme, themeVars } from '../index.css';
-
-export const wrapper = style([
-  theme,
-  {
-    fontFamily: fontThemeVars.baseFont,
-    boxSizing: 'border-box',
-    width: '100%',
-    maxWidth: 900,
-    margin: '0 auto',
-    height: '100%',
-    color: themeVars.color.text,
-    backgroundColor: themeVars.color.background,
-  },
-]);
+import { themeVars } from '../index.css';
 
 export const form = style({
   boxSizing: 'border-box',

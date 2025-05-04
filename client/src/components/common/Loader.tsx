@@ -11,6 +11,7 @@ export const Loader = () => {
         color="primary"
         highlighted={true}
         loading={true}
+        size="large"
       />
     </div>
   );

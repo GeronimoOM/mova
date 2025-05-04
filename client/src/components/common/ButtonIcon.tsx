@@ -10,7 +10,7 @@ export type ButtonIconProps = IconProps & {
   icon?: IconType;
   onClick?: () => void;
   color?: AccentColor | OptionColor;
-  size?: 'tiny' | 'small' | 'medium';
+  size?: 'tiny' | 'small' | 'medium' | 'large';
   highlighted?: boolean;
   highlightedAlt?: boolean;
   disabled?: boolean;

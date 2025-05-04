@@ -1,7 +1,8 @@
 import { DateTime } from 'luxon';
 import { WordFieldsFragment } from '../../../api/types/graphql';
 import { DISPLAY_DATE_FORMAT } from '../../../utils/constants';
-import { useLocaleContext } from '../../LocaleContext';
+import { Locale } from '../../../utils/translator';
+import { useUserContext } from '../../UserContext';
 import * as styles from './WordsListItem.css';
 
 export type WordsListItemProps = {
@@ -45,7 +46,8 @@ export const WordsListItemDivider = ({
   total,
   isTotalComplete,
 }: WordsListItemDividerProps) => {
-  const [locale] = useLocaleContext();
+  const { settings } = useUserContext();
+  const locale = settings.selectedLocale as Locale;
 
   return (
     <div className={styles.divider}>

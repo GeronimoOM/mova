@@ -1,22 +1,17 @@
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import React, {
   createContext,
   useCallback,
   useContext,
   useEffect,
   useMemo,
-  useState,
 } from 'react';
-import {
-  GetLanguagesDocument,
-  GetUserSettingsDocument,
-  UpdateSettingsDocument,
-} from '../api/types/graphql';
-import { useAuthContext } from './AuthContext';
+import { GetLanguagesDocument } from '../api/types/graphql';
+import { useUserContext } from './UserContext';
 
 export type LanguageContextType = [
   language: string | null,
-  setLanguage: (language: string | null) => void,
+  setLanguage: (language: string) => void,
 ];
 
 export const LanguageContext = createContext<LanguageContextType>([
@@ -24,66 +19,36 @@ export const LanguageContext = createContext<LanguageContextType>([
   () => {},
 ]);
 
-const LOCAL_STORAGE_LANGUAGE_KEY = 'selectedLanguage';
-
 type LanguageProviderProps = {
   children?: React.ReactNode;
 };
 
 export const LanguageProvider = ({ children }: LanguageProviderProps) => {
-  const { authToken } = useAuthContext();
+  const { authToken, settings, setSettings } = useUserContext();
+  const language = settings.selectedLanguageId ?? null;
 
-  const [language, setLanguage] = useState<string | null>(() =>
-    localStorage.getItem(LOCAL_STORAGE_LANGUAGE_KEY),
+  const setLanguage = useCallback(
+    (languageId: string) => {
+      setSettings({
+        selectedLanguageId: languageId,
+      });
+    },
+    [setSettings],
   );
 
   const { data: languagesQuery } = useQuery(GetLanguagesDocument);
   const languages = languagesQuery?.languages;
 
-  const [fetchUserSettings] = useLazyQuery(GetUserSettingsDocument, {
-    fetchPolicy: 'no-cache',
-  });
-  const [updateUserSettings] = useMutation(UpdateSettingsDocument);
-
-  const setLanguageAndSave = useCallback(
-    (language: string | null, saveInApi = true) => {
-      if (language) {
-        localStorage.setItem(LOCAL_STORAGE_LANGUAGE_KEY, language);
-
-        if (saveInApi) {
-          updateUserSettings({
-            variables: { input: { selectedLanguageId: language } },
-          });
-        }
-      } else {
-        localStorage.removeItem(LOCAL_STORAGE_LANGUAGE_KEY);
-      }
-
-      setLanguage(language);
-    },
-    [updateUserSettings],
-  );
-
   const contextValue = useMemo<LanguageContextType>(
-    () => [language, setLanguageAndSave],
-    [language, setLanguageAndSave],
+    () => [language, setLanguage],
+    [language, setLanguage],
   );
-
-  useEffect(() => {
-    if (authToken && !language) {
-      fetchUserSettings().then(({ data: userSettings }) => {
-        if (userSettings?.settings.selectedLanguageId) {
-          setLanguageAndSave(userSettings.settings.selectedLanguageId, false);
-        }
-      });
-    }
-  }, [authToken, language, fetchUserSettings, setLanguageAndSave]);
 
   useEffect(() => {
     if (authToken && !language && languages?.length) {
-      setLanguageAndSave(languages[0].id);
+      setLanguage(languages[0].id);
     }
-  }, [authToken, language, languages, setLanguageAndSave]);
+  }, [authToken, language, languages, setLanguage]);
 
   return (
     <LanguageContext.Provider value={contextValue}>

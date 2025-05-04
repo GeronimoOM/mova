@@ -35,7 +35,7 @@ export async function sendMessageToClient(
 ): Promise<void> {
   for (const client of await (
     self as unknown as ServiceWorkerGlobalScope
-  ).clients.matchAll()) {
+  ).clients.matchAll({ includeUncontrolled: true, type: 'window' })) {
     client.postMessage(message);
   }
 }

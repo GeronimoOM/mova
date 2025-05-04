@@ -75,10 +75,6 @@ export const cache = new InMemoryCache({
   },
 });
 
-export const cacheEvict = () => {
-  cache.reset();
-};
-
 export const cacheClearWordsSearch = (languageId: string) => {
   cache.evict({
     id: `Language:${languageId}`,

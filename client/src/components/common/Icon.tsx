@@ -3,7 +3,7 @@ import * as styles from './Icon.css';
 
 export type IconProps = {
   icon: IconType;
-  size?: 'tiny' | 'small' | 'medium';
+  size?: 'tiny' | 'small' | 'medium' | 'large';
 };
 
 export const Icon = ({ icon: IconComponent, size }: IconProps) => {

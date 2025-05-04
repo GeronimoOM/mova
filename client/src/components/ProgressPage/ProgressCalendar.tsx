@@ -19,9 +19,10 @@ import {
   DISPLAY_WEEKDAY_FORMAT,
   N_WEEKDAYS,
 } from '../../utils/constants';
+import { Locale } from '../../utils/translator';
 import { useMediaQuery } from '../../utils/useMediaQuery';
 import { useLanguageContext } from '../LanguageContext';
-import { useLocaleContext } from '../LocaleContext';
+import { useUserContext } from '../UserContext';
 import { ButtonIcon } from '../common/ButtonIcon';
 import { Dropdown } from '../common/Dropdown';
 import { Icon } from '../common/Icon';
@@ -136,7 +137,8 @@ const ProgressCalendarHeader = ({
     return getGroupedMonths(weeklyData);
   }, [weeklyData]);
 
-  const [locale] = useLocaleContext();
+  const { settings } = useUserContext();
+  const locale = settings.selectedLocale as Locale;
 
   return (
     <thead>
@@ -170,7 +172,8 @@ const ProgressCalendarBody = ({
   goal,
 }: ProgressCalendarBodyProps) => {
   const { t } = useTranslation();
-  const [locale] = useLocaleContext();
+  const { settings } = useUserContext();
+  const locale = settings.selectedLocale as Locale;
 
   return (
     <tbody>
@@ -298,7 +301,8 @@ const ProgressCalendarCellTooltip = ({
   date,
   points,
 }: ProgressCalendarCellTooltipProps) => {
-  const [locale] = useLocaleContext();
+  const { settings } = useUserContext();
+  const locale = settings.selectedLocale as Locale;
   const { t } = useTranslation();
 
   let dateString;

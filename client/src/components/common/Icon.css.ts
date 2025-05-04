@@ -17,6 +17,11 @@ export const icon = recipe({
         width: '1.5rem',
         height: '1.5rem',
       },
+
+      large: {
+        width: '2.5rem',
+        height: '2.5rem',
+      },
     },
   },
 

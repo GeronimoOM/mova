@@ -3,13 +3,12 @@ import { FaRepeat } from 'react-icons/fa6';
 import { MdLogout } from 'react-icons/md';
 
 import classNames from 'classnames';
+import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { AppRoute } from '../../routes';
-import { useAuthContext } from '../AuthContext';
-import { Locale, useLocaleContext } from '../LocaleContext';
-import { Font, useSettingsContext } from '../SettingsContext';
+import { Font } from '../../utils/fonts';
+import { Locale } from '../../utils/translator';
 import { ButtonIcon } from '../common/ButtonIcon';
+import { useUserContext } from '../UserContext';
 import * as styles from './UserPage.css';
 
 const translationLanguageToFlag: Record<Locale, FlagComponent> = {
@@ -20,16 +19,24 @@ const translationLanguageToFlag: Record<Locale, FlagComponent> = {
 
 export const UserPage = () => {
   const { t } = useTranslation();
-  const [locale, setLocale] = useLocaleContext();
-  const { font, setFont, includeMastered, setIncludeMastered } =
-    useSettingsContext();
-  const navigate = useNavigate();
-  const { clearAuthToken } = useAuthContext();
+  const { settings, setSettings, logout } = useUserContext();
 
-  const logout = () => {
-    clearAuthToken();
-    navigate(AppRoute.Words);
-  };
+  const locale = settings.selectedLocale as Locale;
+  const font = settings.selectedFont as Font;
+  const includeMastered = settings.includeMastered as boolean;
+
+  const setLocale = useCallback(
+    (locale: Locale) => setSettings({ selectedLocale: locale }),
+    [setSettings],
+  );
+  const setFont = useCallback(
+    (font: Font) => setSettings({ selectedFont: font }),
+    [setSettings],
+  );
+  const setIncludeMastered = useCallback(
+    (includeMastered: boolean) => setSettings({ includeMastered }),
+    [setSettings],
+  );
 
   return (
     <div className={styles.wrapper}>

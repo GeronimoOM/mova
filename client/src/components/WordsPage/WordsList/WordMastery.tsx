@@ -6,10 +6,11 @@ import { useTranslation } from 'react-i18next';
 import { hover } from '../../../index.css';
 import { DISPLAY_DATE_TIME_FORMAT } from '../../../utils/constants';
 import { fromTimestamp } from '../../../utils/datetime';
+import { Locale } from '../../../utils/translator';
 import { useMediaQuery } from '../../../utils/useMediaQuery';
-import { useLocaleContext } from '../../LocaleContext';
 import { Dropdown } from '../../common/Dropdown';
 import { Icon } from '../../common/Icon';
+import { useUserContext } from '../../UserContext';
 import * as styles from './WordMastery.css';
 
 const MAX_PROGRESS = 3;
@@ -53,7 +54,8 @@ export const WordMastery = ({ mastery, nextExerciseAt }: WordMasteryProps) => {
 const WordMasteryTooltip = ({
   nextExerciseAt,
 }: Pick<WordMasteryProps, 'nextExerciseAt'>) => {
-  const [locale] = useLocaleContext();
+  const { settings } = useUserContext();
+  const locale = settings.selectedLocale as Locale;
   const { t } = useTranslation();
 
   let tooltip: string;
