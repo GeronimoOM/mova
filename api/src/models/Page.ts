@@ -25,7 +25,7 @@ export function emptyPage<T, C>(): Page<T, C> {
 export function toPage<T, C>(
   items: T[],
   limit: number,
-  toCursor: (item: T) => C,
+  toCursor: (item: T) => C | null,
 ): Page<T, C> {
   let hasMore = false;
   if (items.length > limit) {
@@ -36,7 +36,7 @@ export function toPage<T, C>(
   return {
     items,
     ...(hasMore && {
-      nextCursor: toCursor(items[items.length - 1]),
+      nextCursor: toCursor(items[items.length - 1]) ?? undefined,
     }),
   };
 }

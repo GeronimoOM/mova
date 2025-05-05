@@ -159,7 +159,7 @@ export class WordRepository {
 
     const wordRows = await query;
 
-    const toNextCursor = (word: WordTable): WordSortedCursor => {
+    const toNextCursor = (word: WordTable): WordSortedCursor | null => {
       switch (order) {
         case WordOrder.Chronological:
           return {
@@ -172,9 +172,7 @@ export class WordRepository {
             id: word.id,
           };
         default:
-          throw new Error(
-            'Current ordering does not support cursor pagination',
-          );
+          return null;
       }
     };
 
