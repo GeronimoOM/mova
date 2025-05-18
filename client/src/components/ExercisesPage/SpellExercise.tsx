@@ -179,7 +179,10 @@ const SpellTextExerciseProperty = ({
     return wordProperty.text;
   }, [word, property]);
 
-  const [input, setInput] = useState(propertyValue.slice(0, revealPrefix));
+  const [input, setInput] = useState(() =>
+    propertyValue.slice(0, revealPrefix),
+  );
+  const [isVerified, setIsVerified] = useState(false);
   const [highlights, setHighlights] = useState<Array<AccentColor | null>>(
     Array(revealPrefix).fill('primary'),
   );
@@ -201,7 +204,7 @@ const SpellTextExerciseProperty = ({
   };
 
   useEffect(() => {
-    if (isSubmitted) {
+    if (isSubmitted && !isVerified) {
       onResult(input === propertyValue);
 
       let verifiedInput = propertyValue;
@@ -218,8 +221,11 @@ const SpellTextExerciseProperty = ({
 
       setInput(verifiedInput);
       setHighlights(verifiedHighlights);
+
+      setIsVerified(true);
     }
-  }, [input, isSubmitted, propertyValue, onResult]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [input, isSubmitted, propertyValue]);
 
   return (
     <div className={styles.property}>
