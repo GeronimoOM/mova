@@ -79,6 +79,7 @@ export const Input = ({
         })}
         type={type ?? 'text'}
         value={obscured ? '' : localValue}
+        disabled={disabled}
         onChange={(e) => handleChange(e.target.value)}
         placeholder={placeholder}
         spellCheck={false}

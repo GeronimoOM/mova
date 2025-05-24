@@ -17,6 +17,7 @@ export type WordDetailsOptionDropdownProps = {
   selected: OptionValue | null;
   onSelect: (option: UpdatePropertyValueOptionInput | null) => void;
   onClose: () => void;
+  exercise?: boolean;
 };
 
 export const WordDetailsOptionDropdown = ({
@@ -24,6 +25,7 @@ export const WordDetailsOptionDropdown = ({
   selected,
   onSelect,
   onClose,
+  exercise,
 }: WordDetailsOptionDropdownProps) => {
   const { t } = useTranslation();
 
@@ -70,7 +72,11 @@ export const WordDetailsOptionDropdown = ({
           option={rawOption}
           placeholder={t('words.options.custom')}
           onValueChange={(value) => setRawOption({ ...rawOption, value })}
-          onColorChange={(color) => setRawOption({ ...rawOption, color })}
+          onColorChange={
+            exercise
+              ? undefined
+              : (color) => setRawOption({ ...rawOption, color })
+          }
           dataTestId="word-details-options-custom"
         />
         <ButtonIcon

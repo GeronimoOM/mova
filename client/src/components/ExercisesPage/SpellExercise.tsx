@@ -6,7 +6,11 @@ import { FaCheck, FaMinus } from 'react-icons/fa';
 import { FaBookOpen } from 'react-icons/fa6';
 
 import {
+  OptionPropertyFieldsFragment,
+  OptionPropertyValueFieldsFragment,
+  OptionValue,
   PropertyFieldsFragment,
+  PropertyType,
   TextPropertyFieldsFragment,
   TextPropertyValueFieldsFragment,
   WordFieldsFullFragment,
@@ -16,14 +20,17 @@ import { SpellInput } from '../common/SpellInput';
 
 import { useTranslation } from 'react-i18next';
 import { AccentColor } from '../../index.css';
+import * as arrays from '../../utils/arrays';
 import { ButtonIcon } from '../common/ButtonIcon';
 import { Icon } from '../common/Icon';
+import { WordDetailsOptionProperty } from '../WordsPage/WordDetails/WordDetailsProperty';
 import * as styles from './SpellExercise.css';
 
 const NORMAL_REVEAL_PREFIX = 1;
 const ADVANCED_REVEAL_PREFIX = 0;
 const EXTRA_CHARACTERS_CHAR = '_';
-const ADVANCED_MAX_PROPERTIES = 2;
+const ADVANCED_MAX_TEXT_PROPERTIES = 2;
+const ADVANCED_MAX_OPTION_PROPERTIES = 1;
 
 export type SpellExerciseProps = {
   word: WordFieldsFullFragment;
@@ -112,17 +119,27 @@ export const SpellExercise = ({
         onResult={(result) => handlePartialResult('original', result)}
       />
 
-      {wordProperties.map((property) => (
-        <SpellTextExerciseProperty
-          key={property.id}
-          word={word}
-          property={property as TextPropertyFieldsFragment}
-          isSubmitted={isSubmitted}
-          revealPrefix={revealPrefix}
-          advanced={advanced}
-          onResult={(result) => handlePartialResult(property.id, result)}
-        />
-      ))}
+      {wordProperties.map((property) =>
+        property.type === PropertyType.Text ? (
+          <SpellTextExerciseProperty
+            key={property.id}
+            word={word}
+            property={property as TextPropertyFieldsFragment}
+            isSubmitted={isSubmitted}
+            revealPrefix={revealPrefix}
+            advanced={advanced}
+            onResult={(result) => handlePartialResult(property.id, result)}
+          />
+        ) : (
+          <SpellOptionExerciseProperty
+            key={property.id}
+            word={word}
+            property={property as OptionPropertyFieldsFragment}
+            isSubmitted={isSubmitted}
+            onResult={(result) => handlePartialResult(property.id, result)}
+          />
+        ),
+      )}
 
       <div className={styles.result}>
         {advanced && (
@@ -179,9 +196,12 @@ const SpellTextExerciseProperty = ({
     return wordProperty.text;
   }, [word, property]);
 
-  const [input, setInput] = useState(() =>
-    propertyValue.slice(0, revealPrefix),
+  const revealPrefixInput = useMemo(
+    () => propertyValue.slice(0, revealPrefix),
+    [propertyValue, revealPrefix],
   );
+
+  const [input, setInput] = useState(revealPrefixInput);
   const [isVerified, setIsVerified] = useState(false);
   const [highlights, setHighlights] = useState<Array<AccentColor | null>>(
     Array(revealPrefix).fill('primary'),
@@ -190,29 +210,20 @@ const SpellTextExerciseProperty = ({
   const { t } = useTranslation();
 
   useEffect(() => {
-    setInput(
-      (input) =>
-        propertyValue.slice(0, revealPrefix) + input.slice(revealPrefix),
-    );
+    setInput((input) => revealPrefixInput + input.slice(revealPrefix));
     setHighlights(Array(revealPrefix).fill('primary'));
-  }, [propertyValue, revealPrefix]);
-
-  const handleInput = (value: string) => {
-    if (value.length >= revealPrefix) {
-      setInput(value);
-    }
-  };
+  }, [revealPrefixInput, revealPrefix]);
 
   useEffect(() => {
     if (isSubmitted && !isVerified) {
-      onResult(input === propertyValue);
+      onResult(input.trim() === propertyValue);
 
       let verifiedInput = propertyValue;
       const verifiedHighlights = propertyValue
         .split('')
         .map((char, i) => (char === input[i] ? 'primary' : 'negative'));
       if (
-        input.length > propertyValue.length &&
+        input.trim().length > propertyValue.length &&
         input.slice(0, propertyValue.length) === propertyValue
       ) {
         verifiedInput += EXTRA_CHARACTERS_CHAR;
@@ -226,6 +237,12 @@ const SpellTextExerciseProperty = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [input, isSubmitted, propertyValue]);
+
+  const handleInput = (value: string) => {
+    if (value.startsWith(revealPrefixInput)) {
+      setInput(value);
+    }
+  };
 
   return (
     <div className={styles.property}>
@@ -245,29 +262,117 @@ const SpellTextExerciseProperty = ({
   );
 };
 
+type SpellOptionExercisePropertyProps = {
+  word: WordFieldsFullFragment;
+  property: OptionPropertyFieldsFragment;
+  isSubmitted: boolean;
+  onResult: (result: boolean) => void;
+};
+
+const SpellOptionExerciseProperty = ({
+  word,
+  property,
+  isSubmitted,
+  onResult,
+}: SpellOptionExercisePropertyProps) => {
+  const propertyValue = useMemo(() => {
+    const wordProperty = word.properties.find(
+      (prop) => prop.property.id === property.id,
+    ) as OptionPropertyValueFieldsFragment;
+    return wordProperty.option!;
+  }, [word, property]);
+
+  const [inputOption, setInputOption] = useState<OptionValue | null>(null);
+
+  const inputPropertyValue = useMemo<OptionPropertyValueFieldsFragment>(
+    () => ({
+      property,
+      option: inputOption as OptionValue,
+    }),
+    [inputOption, property],
+  );
+
+  const [isVerified, setIsVerified] = useState(false);
+  const [result, setResult] = useState(false);
+
+  useEffect(() => {
+    if (isSubmitted && !isVerified) {
+      const result = inputOption?.value === propertyValue?.value;
+      onResult(result);
+      setResult(result);
+      setInputOption(propertyValue);
+      setIsVerified(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [result, isSubmitted, propertyValue]);
+
+  return (
+    <div className={styles.property}>
+      <div className={styles.propertyLabel}>{property.name}</div>
+
+      <div className={styles.optionPropertyRow}>
+        <WordDetailsOptionProperty
+          property={property}
+          propertyValue={inputPropertyValue}
+          onChange={({ option }) =>
+            setInputOption(
+              option?.value ? { id: option.id, value: option.value } : null,
+            )
+          }
+          disabled={isSubmitted}
+          exercise
+        />
+
+        {isVerified && (
+          <div className={styles.optionPropertyResult}>
+            <Icon
+              icon={result ? FaCheck : FaMinus}
+              color={result ? 'primary' : 'negative'}
+            />{' '}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 function getExerciseProperties(
   word: WordFieldsFullFragment,
   allProperties: PropertyFieldsFragment[],
 ): PropertyFieldsFragment[] {
-  const wordPropertyIds = word.properties
-    .filter((prop) => prop.__typename === 'TextPropertyValue')
-    .map((prop) => prop.property.id);
-  const selectedPropertyIds: string[] = [];
-  while (
-    wordPropertyIds.length &&
-    selectedPropertyIds.length < ADVANCED_MAX_PROPERTIES
-  ) {
-    const randomIndex = Math.floor(Math.random() * wordPropertyIds.length);
-    selectedPropertyIds.push(wordPropertyIds[randomIndex]);
-    wordPropertyIds.splice(randomIndex, 1);
-  }
+  const [wordTextProperties, wordOptionProperties] = arrays.splitByPredicate(
+    word.properties,
+    (prop) => prop.__typename === 'TextPropertyValue',
+  );
+  const selectedPropertyIds = [
+    ...pickRandomPropertyIds(
+      wordTextProperties.map((prop) => prop.property.id),
+      ADVANCED_MAX_TEXT_PROPERTIES,
+    ),
+
+    ...pickRandomPropertyIds(
+      wordOptionProperties.map((prop) => prop.property.id),
+      ADVANCED_MAX_OPTION_PROPERTIES,
+    ),
+  ];
 
   const selectedProperties = selectedPropertyIds.map(
-    (propId) =>
-      allProperties.find(
-        (prop) => prop.id === propId,
-      ) as PropertyFieldsFragment,
+    (propId) => allProperties.find((prop) => prop.id === propId)!,
   );
 
   return selectedProperties.sort((p1, p2) => p1.order - p2.order);
+}
+
+function pickRandomPropertyIds(
+  wordPropertyIds: string[],
+  total: number,
+): string[] {
+  const selectedPropertyIds: string[] = [];
+  while (wordPropertyIds.length && selectedPropertyIds.length < total) {
+    const randomIndex = Math.floor(Math.random() * wordPropertyIds.length);
+    selectedPropertyIds.push(wordPropertyIds[randomIndex]);
+    wordPropertyIds = wordPropertyIds.toSpliced(randomIndex, 1);
+  }
+
+  return selectedPropertyIds;
 }

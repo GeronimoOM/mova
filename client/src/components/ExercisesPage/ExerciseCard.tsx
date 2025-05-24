@@ -284,7 +284,7 @@ const WordDetailsOverlay = ({ wordId, onClose }: WordDetailsOverlayProps) => {
         wordId={wordId}
         onSelectWord={() => {}}
         onClose={onClose}
-        simplified={true}
+        disabled
       />
     </div>
   );

@@ -1,4 +1,5 @@
 import { recipe } from '@vanilla-extract/recipes';
+import { accentAndOptionColorStyle } from '../../utils/colors';
 
 export const icon = recipe({
   variants: {
@@ -23,6 +24,10 @@ export const icon = recipe({
         height: '2.5rem',
       },
     },
+
+    color: accentAndOptionColorStyle((colorVar) => ({
+      color: colorVar,
+    })),
   },
 
   defaultVariants: {

@@ -5,7 +5,7 @@ import { accentAndOptionColorStyle } from '../../utils/colors';
 
 export const option = recipe({
   base: {
-    width: 'fit-content',
+    width: 'max-content',
     height: 'calc(0.75rem + 12px)', // TODO fix
     fontFamily: fontThemeVars.monoFont,
     fontWeight: 600,

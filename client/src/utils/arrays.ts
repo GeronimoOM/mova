@@ -46,3 +46,20 @@ export function areEqual<T>(arr1: T[], arr2: T[]): boolean {
 export function sequence(n: number) {
   return Array.from({ length: n }, (_, i) => i);
 }
+
+export function splitByPredicate<T>(
+  arr: T[],
+  predicate: (item: T) => boolean,
+): [trueArr: T[], falseArr: T[]] {
+  const trueArr: T[] = [];
+  const falseArr: T[] = [];
+  for (const item of arr) {
+    if (predicate(item)) {
+      trueArr.push(item);
+    } else {
+      falseArr.push(item);
+    }
+  }
+
+  return [trueArr, falseArr];
+}

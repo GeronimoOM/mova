@@ -24,14 +24,14 @@ export type WordDetailsPropertyProps = {
   property: PropertyFieldsFragment;
   propertyValue: PropertyValueFieldsFragment | null;
   onChange: (value: SavePropertyValueInput) => void;
-  simplified?: boolean;
+  disabled?: boolean;
 };
 
 export const WordDetailsProperty = ({
   property,
   propertyValue,
   onChange,
-  simplified,
+  disabled,
 }: WordDetailsPropertyProps) => {
   return (
     <div className={styles.row} data-testid="word-details-property">
@@ -42,7 +42,7 @@ export const WordDetailsProperty = ({
           property={property}
           propertyValue={propertyValue as TextPropertyValueFieldsFragment}
           onChange={onChange}
-          simplified={simplified}
+          disabled={disabled}
         />
       )}
 
@@ -51,7 +51,7 @@ export const WordDetailsProperty = ({
           property={property}
           propertyValue={propertyValue as OptionPropertyValueFieldsFragment}
           onChange={onChange}
-          simplified={simplified}
+          disabled={disabled}
         />
       )}
     </div>
@@ -62,14 +62,14 @@ export type WordDetailsTextPropertyProps = {
   property: TextPropertyFieldsFragment;
   propertyValue: TextPropertyValueFieldsFragment | null;
   onChange: (value: SavePropertyValueInput) => void;
-  simplified?: boolean;
+  disabled?: boolean;
 };
 
 const WordDetailsTextProperty = ({
   property,
   propertyValue,
   onChange,
-  simplified,
+  disabled,
 }: WordDetailsTextPropertyProps) => {
   return (
     <Input
@@ -80,7 +80,7 @@ const WordDetailsTextProperty = ({
           text,
         })
       }
-      disabled={simplified}
+      disabled={disabled}
       maxLength={100}
       dataTestId="word-details-property-text"
     />
@@ -91,14 +91,16 @@ export type WordDetailsOptionPropertyProps = {
   property: OptionPropertyFieldsFragment;
   propertyValue: OptionPropertyValueFieldsFragment | null;
   onChange: (value: SavePropertyValueInput) => void;
-  simplified?: boolean;
+  disabled?: boolean;
+  exercise?: boolean;
 };
 
-const WordDetailsOptionProperty = ({
+export const WordDetailsOptionProperty = ({
   property,
   propertyValue,
   onChange,
-  simplified,
+  disabled,
+  exercise,
 }: WordDetailsOptionPropertyProps) => {
   const [isOpen, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -128,7 +130,7 @@ const WordDetailsOptionProperty = ({
     <div ref={wrapperRef} className={styles.optionWrapper}>
       <Dropdown
         isOpen={isOpen}
-        onOpen={(isOpen) => !simplified && setOpen(isOpen)}
+        onOpen={(isOpen) => !disabled && setOpen(isOpen)}
         content={
           <div style={{ width: wrapperWidth, boxSizing: 'border-box' }}>
             <WordDetailsOptionDropdown
@@ -141,6 +143,7 @@ const WordDetailsOptionProperty = ({
                 })
               }
               onClose={() => setOpen(false)}
+              exercise={exercise}
             />
           </div>
         }
@@ -148,7 +151,7 @@ const WordDetailsOptionProperty = ({
       >
         <OptionPill
           option={option}
-          disabled={simplified}
+          disabled={disabled}
           dataTestId="word-details-property-option"
         />
       </Dropdown>

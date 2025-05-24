@@ -33,7 +33,7 @@ export const detailsHeader = style({
   justifyContent: 'space-between',
   paddingRight: 0,
   selectors: {
-    '&:not(.simplified)': {
+    '&:not(.disabled)': {
       marginRight: 65,
     },
   },
@@ -47,7 +47,7 @@ export const detailsRow = style({
 
 export const originalRow = style({
   selectors: {
-    '&:not(.simplified)': {
+    '&:not(.disabled)': {
       marginRight: 65,
     },
   },

@@ -38,7 +38,7 @@ export type WordDetailsProps = {
   onSelectPrev?: () => void;
   hasNext?: boolean;
   onSelectNext?: () => void;
-  simplified?: boolean;
+  disabled?: boolean;
 };
 
 const EXISTS_DELAY_MS = 300;
@@ -51,7 +51,7 @@ export const WordDetails = ({
   onSelectPrev,
   hasNext,
   onSelectNext,
-  simplified,
+  disabled,
 }: WordDetailsProps) => {
   const [selectedLanguageId] = useLanguageContext();
 
@@ -127,7 +127,7 @@ export const WordDetails = ({
   return (
     <div className={styles.wrapper}>
       <div className={styles.innerWrapper}>
-        {!simplified && (
+        {!disabled && (
           <div className={styles.buttons}>
             <ButtonIcon
               icon={HiMiniXMark}
@@ -148,7 +148,7 @@ export const WordDetails = ({
             />
 
             <div className={styles.bottomButton}>
-              {!simplified && (
+              {!disabled && (
                 <ButtonIcon
                   icon={FaArrowUp}
                   onClick={onSelectPrev}
@@ -158,7 +158,7 @@ export const WordDetails = ({
                 />
               )}
 
-              {!simplified && (
+              {!disabled && (
                 <ButtonIcon
                   icon={FaArrowDown}
                   onClick={onSelectNext}
@@ -181,7 +181,7 @@ export const WordDetails = ({
         )}
 
         <div className={styles.details}>
-          <div className={classNames(styles.detailsHeader, { simplified })}>
+          <div className={classNames(styles.detailsHeader, { disabled })}>
             <PartOfSpeechSelect
               partOfSpeech={word.partOfSpeech ?? null}
               onPartOfSpeechSelect={setPartOfSpeech}
@@ -193,13 +193,13 @@ export const WordDetails = ({
             />
           </div>
 
-          <div className={classNames(styles.originalRow, { simplified })}>
+          <div className={classNames(styles.originalRow, { disabled })}>
             <Input
               text="original"
               value={word.original ?? ''}
               onChange={setOriginal}
               loading={wordLoading}
-              disabled={simplified}
+              disabled={disabled}
               maxLength={100}
               right={
                 existingWord && (
@@ -228,7 +228,7 @@ export const WordDetails = ({
                 value={word.translation ?? ''}
                 onChange={setTranslation}
                 loading={wordLoading}
-                disabled={simplified}
+                disabled={disabled}
                 maxLength={100}
                 dataTestId="word-details-translation"
               />
@@ -242,14 +242,14 @@ export const WordDetails = ({
                 property={property}
                 propertyValue={word.properties?.[property.id] ?? null}
                 onChange={setPropertyValue}
-                simplified={simplified}
+                disabled={disabled}
               />
             ))
           ) : (
             <WordDetailsPropertiesSkeleton />
           )}
 
-          {!simplified && <div className={styles.detailsEnd} />}
+          {!disabled && <div className={styles.detailsEnd} />}
         </div>
       </div>
 

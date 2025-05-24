@@ -38,3 +38,17 @@ export const result = style({
   gap: 20,
   padding: 10,
 });
+
+export const optionPropertyRow = style({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyItems: 'stretch',
+  gap: 20,
+});
+
+export const optionPropertyResult = style({
+  display: 'flex',
+  width: '100%',
+  flexShrink: 0,
+});
