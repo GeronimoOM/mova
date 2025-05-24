@@ -14,6 +14,7 @@ import {
 import { DbConnectionManager } from 'repositories/DbConnectionManager';
 import { WordRepository } from 'repositories/WordRepository';
 import { shuffle } from 'utils/arrays';
+import * as records from 'utils/records';
 import { v1 as uuid } from 'uuid';
 import { ChangeBuilder } from './ChangeBuilder';
 import { ChangeService } from './ChangeService';
@@ -22,18 +23,13 @@ import { UserService } from './UserService';
 
 const DEFAULT_EXERCISE_WORDS_TOTAL = 20;
 
-const MASTERY_DISTRIBUTION: Record<WordMastery, number> = {
-  0: 0.5,
-  1: 0.3,
-  2: 0.15,
-  3: 0.05,
-};
+const MASTERY_BASE_DISTRIBUTION_COEF = 0.4;
 
 const MASTERY_INC_DELAY: Record<WordMastery, Duration> = {
   0: Duration.fromObject({ hours: 1 }),
   1: Duration.fromObject({ hours: 12 }),
   2: Duration.fromObject({ hours: 24 * 3 }),
-  3: Duration.fromObject({ hours: 24 * 21 }),
+  3: Duration.fromObject({ hours: 24 * 28 }),
 };
 
 const MASTERY_ATTEMPT_DELAY = Duration.fromObject({ hours: 1 });
@@ -69,49 +65,33 @@ export class ExerciseService {
     }: GetExerciseWordsParams,
   ): Promise<Word[]> {
     const includeMastered = await this.getIncludeMastered(ctx);
-
-    const wordsByMastery = Object.fromEntries(
-      await Promise.all(
-        WordMasteries.filter(
-          (mastery) => includeMastered || mastery < MaxWordMastery,
-        ).map(async (mastery) => [
-          mastery,
-          await this.getWordsByMastery(languageId, mastery, total),
-        ]),
+    const wordsByMasteryTuples = await Promise.all(
+      WordMasteries.filter(
+        (mastery) => includeMastered || mastery < MaxWordMastery,
+      ).map(
+        async (mastery) =>
+          [
+            mastery,
+            await this.getWordsByMastery(languageId, mastery, total),
+          ] as [WordMastery, Word[]],
       ),
+    );
+    const wordsByMastery = Object.fromEntries(
+      wordsByMasteryTuples.filter(([, words]) => words.length),
     ) as Record<WordMastery, Word[]>;
 
-    const totalByMastery = Object.fromEntries(
-      Object.entries(MASTERY_DISTRIBUTION).map(([mastery, distribution]) => [
-        mastery,
-        Math.min(
-          Math.floor(distribution * total),
-          wordsByMastery[mastery]?.length ?? 0,
-        ),
-      ]),
-    ) as Record<WordMastery, number>;
-
-    let sum = Object.values(totalByMastery).reduce(
-      (acc, value) => acc + value,
-      0,
-    );
-    for (
-      let mastery = 0;
-      sum < total && mastery < WordMasteries.length;
-      mastery++
-    ) {
-      const masteryDistributionExtra = Math.min(
-        wordsByMastery[mastery].length - totalByMastery[mastery],
-        total - sum,
-      );
-
-      totalByMastery[mastery] += masteryDistributionExtra;
-      sum += masteryDistributionExtra;
+    if (!Object.keys(wordsByMastery).length) {
+      return [];
     }
 
+    const totalByMastery = await this.getTotalByMastery(
+      languageId,
+      total,
+      wordsByMastery,
+    );
+
     const words: Word[] = Object.entries(totalByMastery).flatMap(
-      ([mastery, count]) =>
-        wordsByMastery[Number(mastery)]?.slice(0, count) ?? [],
+      ([mastery, count]) => wordsByMastery[mastery]?.slice(0, count) ?? [],
     );
 
     return shuffle(words);
@@ -233,5 +213,66 @@ export class ExerciseService {
   private async getIncludeMastered(ctx: Context): Promise<boolean> {
     const settings = await this.userService.getSettings(ctx.user.id);
     return settings.includeMastered ?? true;
+  }
+
+  private async getTotalByMastery(
+    languageId: LanguageId,
+    total: number,
+    wordsByMastery: Record<WordMastery, Word[]>,
+  ): Promise<Record<WordMastery, number>> {
+    const basePercentageByMastery =
+      (1 / Object.keys(wordsByMastery).length) * MASTERY_BASE_DISTRIBUTION_COEF;
+
+    const countByMastery =
+      await this.wordRepository.getCountByMastery(languageId);
+    delete countByMastery[MaxWordMastery];
+    const totalCount = Object.values(countByMastery).reduce(
+      (count, sum) => count + sum,
+      0,
+    );
+    const percentageByMasteryFromTotal = records.mapValues(
+      countByMastery,
+      (count) =>
+        (totalCount ? count / totalCount : 0) *
+        (1 - MASTERY_BASE_DISTRIBUTION_COEF),
+    );
+
+    const totalByMastery = Object.fromEntries(
+      Object.entries(wordsByMastery).map(([mastery, masteryWords]) => [
+        mastery,
+        Math.min(
+          Math.floor(
+            total *
+              (basePercentageByMastery +
+                (percentageByMasteryFromTotal[mastery] ?? 0)),
+          ),
+          masteryWords.length,
+        ),
+      ]),
+    ) as Record<WordMastery, number>;
+
+    let currentTotal = Object.values(totalByMastery).reduce(
+      (value, sum) => sum + value,
+      0,
+    );
+    for (const [mastery, masteryWords] of Object.entries(wordsByMastery)) {
+      if (currentTotal >= total) {
+        break;
+      }
+
+      if (Number(mastery) === MaxWordMastery) {
+        continue;
+      }
+
+      const extraMasteryTotal = Math.min(
+        masteryWords.length - totalByMastery[mastery],
+        total - currentTotal,
+      );
+
+      totalByMastery[mastery] += extraMasteryTotal;
+      currentTotal += extraMasteryTotal;
+    }
+
+    return totalByMastery;
   }
 }
