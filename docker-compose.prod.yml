@@ -1,7 +1,6 @@
-version: '3.8'
 services:
   mova-api:
-    image: mova-api:prod
+    image: olehmatsuk/mova-api:prod
     build:
       context: ./api
       dockerfile: Dockerfile.prod
@@ -60,7 +59,7 @@ services:
           memory: 512M
 
   mova-client:
-    image: mova-client:prod
+    image: olehmatsuk/mova-client:prod
     build:
       context: ./client
       dockerfile: Dockerfile.prod

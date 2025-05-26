@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   mova-api:
     image: mova-api:dev
