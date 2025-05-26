@@ -1,12 +1,29 @@
-FROM node:23-alpine
-
-EXPOSE 9000
+FROM node:23-alpine AS builder
 
 WORKDIR /app
 
+COPY package.json yarn.lock ./
+
+RUN --mount=type=cache,target=/root/.yarn YARN_CACHE_FOLDER=/root/.yarn \
+    yarn install
+
 COPY . .
 
-RUN ["yarn", "install"]
-RUN ["yarn", "run", "build"]
+RUN yarn run build
+
+
+
+FROM node:23-alpine AS production
+
+COPY --from=builder /app/package.json /app/yarn.lock ./
+
+RUN --mount=type=cache,target=/root/.yarn YARN_CACHE_FOLDER=/root/.yarn \
+    yarn install --only-production
+
+RUN yarn global add serve
+
+COPY --from=builder /app/dist ./dist
+
+EXPOSE 4000
 
 CMD ["yarn", "run", "start:prod"]
