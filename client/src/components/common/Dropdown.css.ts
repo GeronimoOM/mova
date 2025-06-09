@@ -14,6 +14,7 @@ export const dropdown = recipe({
     boxSizing: 'border-box',
     backgroundColor: `${themeVars.color.background}`,
     borderRadius: 4,
+    overflowY: 'auto',
   },
 
   variants: {

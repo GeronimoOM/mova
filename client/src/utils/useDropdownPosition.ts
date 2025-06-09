@@ -7,20 +7,32 @@ export type UseDropdownPositionProps = {
   dropdownRef?: React.RefObject<HTMLElement | null>;
   anchorRef?: React.RefObject<HTMLElement | null>;
   containerRef?: React.RefObject<HTMLElement | null>;
+  position?: DropdownPosition;
+  alignment?: DropdownAlignment;
   minOffset?: number;
+  verticalGap?: number;
 };
 
 export function useDropdownPosition({
   dropdownRef,
   anchorRef,
   containerRef,
-  minOffset = 50,
+  position: fixedPosition,
+  alignment: fixedAlignment,
+  minOffset = 30,
+  verticalGap = 5,
 }: UseDropdownPositionProps): {
   position: DropdownPosition;
   alignment: DropdownAlignment;
+  maxHeight: number;
 } {
-  const [position, setPosition] = useState<DropdownPosition>('bottom');
-  const [alignment, setAlignment] = useState<DropdownAlignment>('center');
+  const [position, setPosition] = useState<DropdownPosition>(
+    fixedPosition ?? 'bottom',
+  );
+  const [alignment, setAlignment] = useState<DropdownAlignment>(
+    fixedAlignment ?? 'center',
+  );
+  const [maxHeight, setMaxHeight] = useState<number>(0);
 
   const onResize = useCallback(() => {
     if (
@@ -35,29 +47,37 @@ export function useDropdownPosition({
     const anchorBoundRect = anchorRef.current.getBoundingClientRect();
     const containerBoundRect = containerRef.current.getBoundingClientRect();
 
-    const anchorCenterX = anchorBoundRect.left + anchorBoundRect.width / 2;
-    const dropdownHalfWidth = dropdownBoundRect.width / 2;
-    const leftOffset =
-      anchorCenterX - dropdownHalfWidth - containerBoundRect.left;
-    const rightOffset =
-      containerBoundRect.right - anchorCenterX - dropdownHalfWidth;
+    const position =
+      fixedPosition ?? computePosition({ anchorBoundRect, containerBoundRect });
+    const maxHeight = computeMaxHeight({
+      anchorBoundRect,
+      containerBoundRect,
+      position,
+      minOffset,
+      verticalGap,
+    });
 
-    const bottomOffset =
-      containerBoundRect.bottom -
-      anchorBoundRect.bottom -
-      dropdownBoundRect.height;
-    const position = bottomOffset < minOffset ? 'top' : 'bottom';
-
-    let alignment: DropdownAlignment = 'center';
-    if (leftOffset < minOffset) {
-      alignment = 'start';
-    } else if (rightOffset < minOffset) {
-      alignment = 'end';
-    }
+    const alignment =
+      fixedAlignment ??
+      computeAlignment({
+        dropdownBoundRect,
+        anchorBoundRect,
+        containerBoundRect,
+        minOffset,
+      });
 
     setPosition(position);
     setAlignment(alignment);
-  }, [anchorRef, containerRef, dropdownRef, minOffset]);
+    setMaxHeight(maxHeight);
+  }, [
+    anchorRef,
+    containerRef,
+    dropdownRef,
+    fixedPosition,
+    fixedAlignment,
+    minOffset,
+    verticalGap,
+  ]);
 
   useLayoutEffect(() => {
     window.addEventListener('resize', onResize);
@@ -67,5 +87,76 @@ export function useDropdownPosition({
     return () => window.removeEventListener('resize', onResize);
   }, [onResize, anchorRef]);
 
-  return useMemo(() => ({ position, alignment }), [position, alignment]);
+  return useMemo(
+    () => ({ position, alignment, maxHeight }),
+    [position, alignment, maxHeight],
+  );
+}
+
+function computePosition({
+  anchorBoundRect,
+  containerBoundRect,
+}: {
+  anchorBoundRect: DOMRect;
+  containerBoundRect: DOMRect;
+}): DropdownPosition {
+  const bottomOffset = containerBoundRect.bottom - anchorBoundRect.bottom;
+  const topOffset = anchorBoundRect.top - containerBoundRect.top;
+
+  return bottomOffset < topOffset ? 'top' : 'bottom';
+}
+
+function computeMaxHeight({
+  anchorBoundRect,
+  containerBoundRect,
+  position,
+  minOffset,
+  verticalGap,
+}: {
+  anchorBoundRect: DOMRect;
+  containerBoundRect: DOMRect;
+  position: DropdownPosition;
+  minOffset: number;
+  verticalGap: number;
+}): number {
+  if (position === 'top') {
+    return (
+      anchorBoundRect.top - containerBoundRect.top - minOffset - verticalGap
+    );
+  } else {
+    return (
+      containerBoundRect.bottom -
+      anchorBoundRect.bottom -
+      minOffset -
+      verticalGap
+    );
+  }
+}
+
+function computeAlignment({
+  dropdownBoundRect,
+  anchorBoundRect,
+  containerBoundRect,
+  minOffset,
+}: {
+  dropdownBoundRect: DOMRect;
+  anchorBoundRect: DOMRect;
+  containerBoundRect: DOMRect;
+  minOffset: number;
+}): DropdownAlignment {
+  const anchorCenterX = anchorBoundRect.left + anchorBoundRect.width / 2;
+  const dropdownHalfWidth = dropdownBoundRect.width / 2;
+  const centeredLeftOffset =
+    anchorCenterX - dropdownHalfWidth - containerBoundRect.left;
+  const centeredRightOffset =
+    containerBoundRect.right - anchorCenterX - dropdownHalfWidth;
+
+  let alignment: DropdownAlignment = 'center';
+  if (centeredLeftOffset < minOffset) {
+    alignment = 'start';
+  } else if (centeredRightOffset < minOffset) {
+    alignment = 'end';
+  }
+
+  return alignment;
 }

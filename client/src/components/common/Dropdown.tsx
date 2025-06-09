@@ -67,21 +67,29 @@ const DropdownContent = ({
   const { containerRef } = useLayoutContext();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const { position: computedPosition, alignment: computedAlignment } =
-    useDropdownPosition({
-      dropdownRef,
-      anchorRef,
-      containerRef: containerRef ?? undefined,
-    });
+  const {
+    position: computedPosition,
+    alignment: computedAlignment,
+    maxHeight,
+  } = useDropdownPosition({
+    dropdownRef,
+    anchorRef,
+    containerRef: containerRef ?? undefined,
+    position,
+    alignment,
+  });
 
   return (
     <div
       ref={dropdownRef}
       className={styles.dropdown({
-        position: position ?? computedPosition,
-        alignment: alignment ?? computedAlignment,
+        position: computedPosition,
+        alignment: computedAlignment,
         outline,
       })}
+      style={{
+        ...(maxHeight && { maxHeight }),
+      }}
     >
       {content}
     </div>
