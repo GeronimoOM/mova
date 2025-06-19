@@ -60,9 +60,15 @@ export class MaintenanceController {
   }
 
   @Put('/reindex')
-  async reindexLanguage(@Query('id') languageId: LanguageId) {
-    const language = await this.maintenanceService.reindexLanguage(languageId);
-    return language;
+  async reindexLanguage(@Query('id') languageId?: LanguageId) {
+    if (languageId) {
+      const language =
+        await this.maintenanceService.reindexLanguage(languageId);
+      return language;
+    } else {
+      const languagesCount = await this.maintenanceService.reindexLanguages();
+      return languagesCount;
+    }
   }
 
   @Put('/resync/progress')

@@ -1,6 +1,6 @@
 import * as elastic from '@elastic/elasticsearch/lib/api/types';
 
-export const INDEX_WORDS = 'words';
+export const INDEX_WORDS = 'words_v2';
 
 export const INDICES = [INDEX_WORDS];
 
@@ -13,9 +13,6 @@ export const INDEX_TO_MAPPING: Record<IndexType, elastic.MappingTypeMapping> = {
         type: 'text',
       },
       translation: {
-        type: 'text',
-      },
-      properties: {
         type: 'text',
       },
       languageId: {
@@ -40,7 +37,6 @@ export const INDEX_SETTINGS: elastic.IndicesIndexSettings = {
     filter: {
       custom_asciifolding: {
         type: 'asciifolding',
-        preserve_original: true,
       },
     },
   },

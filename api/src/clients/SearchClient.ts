@@ -16,9 +16,10 @@ import {
   IndexType,
 } from './elasticConfig';
 
-export type WordDocument = Omit<Word, 'addedAt' | 'properties' | 'mastery'> & {
-  properties?: string[];
-};
+export type WordDocument = Pick<
+  Word,
+  'id' | 'original' | 'translation' | 'languageId' | 'partOfSpeech'
+>;
 
 export interface SearchWordsParams {
   languageId: LanguageId;
@@ -60,12 +61,21 @@ export class SearchClient implements OnApplicationBootstrap {
     query = query.toLowerCase();
 
     const queryShould: QueryDslQueryContainer[] = [
-      { fuzzy: { original: { value: query, boost: 1 } } },
-      { prefix: { original: { value: query, boost: 4 } } },
-      { fuzzy: { translation: { value: query, boost: 0.5 } } },
-      { prefix: { translation: { value: query, boost: 2 } } },
-      { fuzzy: { properties: { value: query, boost: 0.5 } } },
-      { prefix: { properties: { value: query, boost: 2 } } },
+      {
+        match: {
+          original: {
+            query,
+            fuzziness: 'AUTO',
+            prefix_length: 2,
+          },
+        },
+      },
+      { prefix: { original: query } },
+      {
+        match: {
+          translation: { query },
+        },
+      },
     ];
 
     const searchResponse = await this.getClient().search<WordDocument>({
@@ -176,17 +186,17 @@ export class SearchClient implements OnApplicationBootstrap {
   private wordToDocument(word: Word): WordDocument {
     return {
       id: word.id,
-      original: word.original.toLowerCase(),
+      original: [
+        word.original.toLowerCase(),
+        ...Object.values(word.properties ?? {})
+          .filter((value): value is TextPropertyValue =>
+            isTextPropertyValue(value),
+          )
+          .map((value) => value.text.toLowerCase()),
+      ].join(' '),
       translation: word.translation.toLowerCase(),
       languageId: word.languageId,
       partOfSpeech: word.partOfSpeech,
-      properties: word.properties
-        ? Object.values(word.properties)
-            .filter((value): value is TextPropertyValue =>
-              isTextPropertyValue(value),
-            )
-            .map((value) => value.text.toLowerCase())
-        : undefined,
     };
   }
 

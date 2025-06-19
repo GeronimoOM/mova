@@ -93,6 +93,16 @@ export class MaintenanceService {
     return language;
   }
 
+  async reindexLanguages(): Promise<number> {
+    let count = 0;
+    for await (const language of this.languageRepository.streamRecords()) {
+      await this.wordService.indexLanguage(language.id);
+      count++;
+    }
+
+    return count;
+  }
+
   async resyncProgress(languageId: LanguageId): Promise<void> {
     await this.progressService.syncAllWordsProgress(languageId);
   }
