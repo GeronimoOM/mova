@@ -15,11 +15,11 @@
     "search": "otsing",
     "translation": "tõlge",
     "similar": {
-      "label": "sarnane",
+      "label": "sarnased",
       "search": "otsing sõnu sarnase tähendusega"
     },
     "distinct": {
-      "label": "erinev",
+      "label": "erinevad",
       "search": "otsing sõnu eristamiseks"
     },
    "suggestions": "soovitatud",
