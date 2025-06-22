@@ -1,5 +1,5 @@
 import { NetworkStatus, useLazyQuery, useQuery } from '@apollo/client';
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { FaInfo } from 'react-icons/fa';
 import { HiMiniXMark } from 'react-icons/hi2';
 
@@ -11,7 +11,6 @@ import {
   GetExerciseWordsDocument,
   GetPropertiesDocument,
   PropertyFieldsFragment,
-  WordFieldsFullFragment,
 } from '../../api/types/graphql';
 import { toGroupedRecord } from '../../utils/arrays';
 import { useLanguageContext } from '../LanguageContext';
@@ -19,9 +18,10 @@ import { WordDetails } from '../WordsPage/WordDetails/WordDetails';
 import { ButtonIcon } from '../common/ButtonIcon';
 import { Loader } from '../common/Loader';
 import * as styles from './ExerciseCard.css';
+import { PickExercise } from './PickExercise';
 import { RecallExercise } from './RecallExercise';
 import { SpellExercise } from './SpellExercise';
-import { ExerciseType, masteryToExerciseType } from './exercises';
+import { ExerciseWord } from './exercises';
 
 export const ExerciseCard = () => {
   const [selectedLanguageId] = useLanguageContext();
@@ -229,7 +229,7 @@ const ExercisesNotReady = () => {
 };
 
 type ExerciseProps = {
-  word: WordFieldsFullFragment;
+  word: ExerciseWord;
   properties: PropertyFieldsFragment[];
   onSuccess: () => void;
   onFailure: () => void;
@@ -244,9 +244,17 @@ const Exercise = ({
   onNext,
 }: ExerciseProps) => {
   const [mastery] = useState(word.mastery);
-  const exerciseType = masteryToExerciseType[mastery];
-  switch (exerciseType) {
-    case ExerciseType.Recall:
+  if (mastery === 0) {
+    if (word.distinctLinks.length) {
+      return (
+        <PickExercise
+          word={word}
+          onSuccess={onSuccess}
+          onFailure={onFailure}
+          onNext={onNext}
+        />
+      );
+    } else {
       return (
         <RecallExercise
           word={word}
@@ -255,18 +263,18 @@ const Exercise = ({
           onNext={onNext}
         />
       );
-    case ExerciseType.Spell:
-    case ExerciseType.SpellAdv:
-      return (
-        <SpellExercise
-          word={word}
-          properties={properties}
-          onSuccess={onSuccess}
-          onFailure={onFailure}
-          onNext={onNext}
-          advanced={exerciseType === ExerciseType.SpellAdv}
-        />
-      );
+    }
+  } else {
+    return (
+      <SpellExercise
+        word={word}
+        properties={properties}
+        onSuccess={onSuccess}
+        onFailure={onFailure}
+        onNext={onNext}
+        advanced={mastery > 1}
+      />
+    );
   }
 };
 
@@ -276,10 +284,8 @@ type WordDetailsOverlayProps = {
 };
 
 const WordDetailsOverlay = ({ wordId, onClose }: WordDetailsOverlayProps) => {
-  const ref = useRef<HTMLDivElement>(null);
-
   return (
-    <div className={styles.details} ref={ref}>
+    <div className={styles.details}>
       <WordDetails
         wordId={wordId}
         onSelectWord={() => {}}

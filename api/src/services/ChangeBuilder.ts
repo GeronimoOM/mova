@@ -6,9 +6,11 @@ import {
   CreateLanguageChange,
   CreatePropertyChange,
   CreateWordChange,
+  CreateWordLinkChange,
   DeleteLanguageChange,
   DeletePropertyChange,
   DeleteWordChange,
+  DeleteWordLinkChange,
   ReorderPropertiesChange,
   UpdateLanguageChange,
   UpdatePropertyChange,
@@ -34,7 +36,7 @@ import {
   isOptionPropertyValue,
   isTextPropertyValue,
 } from 'models/PropertyValue';
-import { PartOfSpeech, Word } from 'models/Word';
+import { PartOfSpeech, Word, WordLink } from 'models/Word';
 import * as records from 'utils/records';
 import { ExerciseService } from './ExerciseService';
 
@@ -278,6 +280,30 @@ export class ChangeBuilder {
       id: word.id,
       type: ChangeType.DeleteWord,
       deleted: word.id,
+    };
+  }
+
+  buildCreateWordLinkChange(
+    ctx: Context,
+    wordLink: WordLink,
+  ): CreateWordLinkChange {
+    return {
+      ...this.buildBaseChange(ctx),
+      id: wordLink.word1Id,
+      type: ChangeType.CreateWordLink,
+      created: wordLink,
+    };
+  }
+
+  buildDeleteWordLinkChange(
+    ctx: Context,
+    wordLink: WordLink,
+  ): DeleteWordLinkChange {
+    return {
+      ...this.buildBaseChange(ctx),
+      id: wordLink.word1Id,
+      type: ChangeType.DeleteWordLink,
+      deleted: wordLink,
     };
   }
 

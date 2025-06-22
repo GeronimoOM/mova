@@ -1,7 +1,7 @@
 const byTestId = (dataTestId: string) => `[data-testid="${dataTestId}"]`;
 
 export const words = {
-  searchInput: () => cy.get(byTestId('words-search-bar')),
+  searchInput: () => cy.get(byTestId('words-search')),
   searchClearBtn: () => cy.get(byTestId('words-search-clear-btn')),
 
   list: () => cy.get(byTestId('words-list')),
@@ -20,6 +20,7 @@ export const word = {
   deleteBtn: () => cy.get(byTestId('word-details-delete-btn')),
   deleteConfirmBtn: () => cy.get(byTestId('word-details-delete-confirm-btn')),
   deleteCancelBtn: () => cy.get(byTestId('word-details-delete-cancel-btn')),
+  moreBtn: () => cy.get(byTestId('word-details-more-btn')),
   upBtn: () => cy.get(byTestId('word-details-up-btn')),
   downBtn: () => cy.get(byTestId('word-details-down-btn')),
 
@@ -47,6 +48,19 @@ export const word = {
   propertyOptionsCustom: () => cy.get(byTestId('word-details-options-custom')),
   propertyOptionsCustomSaveBtn: () =>
     cy.get(byTestId('word-details-options-custom-save-btn')),
+
+  links: (type: string) =>
+    cy.get(byTestId(`word-details-link-${type.toLowerCase()}`)),
+  linksAddBtn: (type: string) =>
+    word.links(type).find(byTestId('word-links-btn')),
+  linkSearchInput: () => cy.get(byTestId('word-links-search')),
+  link: (original: string) =>
+    cy
+      .get(byTestId('word-link'))
+      .contains(original)
+      .closest(byTestId('word-link')),
+  linkBtn: (original: string) =>
+    word.link(original).find(byTestId('word-link-btn')),
 };
 
 export const properties = {

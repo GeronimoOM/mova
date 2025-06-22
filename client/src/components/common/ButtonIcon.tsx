@@ -46,7 +46,10 @@ export const ButtonIcon = ({
         empty,
         borderless,
       })}
-      onClick={onClick}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick?.();
+      }}
       data-testid={dataTestId}
     >
       <Icon icon={!loading ? icon : FaSyncAlt} size={size} />

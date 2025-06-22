@@ -10,7 +10,7 @@ import {
   PropertyUpdate,
 } from './Property';
 import { UserId } from './User';
-import { WordCreate, WordId, WordUpdate } from './Word';
+import { WordCreate, WordId, WordLink, WordUpdate } from './Word';
 
 export type ChangeId = LanguageId | PropertyId | WordId;
 
@@ -33,6 +33,8 @@ export enum ChangeType {
   CreateWord = 'word:create',
   UpdateWord = 'word:update',
   DeleteWord = 'word:delete',
+  CreateWordLink = 'wordlink:create',
+  DeleteWordLink = 'wordlink:delete',
 }
 
 export interface CreateLanguageChange extends BaseChange {
@@ -85,6 +87,16 @@ export interface DeleteWordChange extends BaseChange {
   deleted: WordId;
 }
 
+export interface CreateWordLinkChange extends BaseChange {
+  type: ChangeType.CreateWordLink;
+  created: WordLink;
+}
+
+export interface DeleteWordLinkChange extends BaseChange {
+  type: ChangeType.DeleteWordLink;
+  deleted: WordLink;
+}
+
 export type Change =
   | CreateLanguageChange
   | UpdateLanguageChange
@@ -95,7 +107,9 @@ export type Change =
   | DeletePropertyChange
   | CreateWordChange
   | UpdateWordChange
-  | DeleteWordChange;
+  | DeleteWordChange
+  | CreateWordLinkChange
+  | DeleteWordLinkChange;
 
 export interface ChangePage extends Page<Change, ChangeCursor> {
   syncType: SyncType;

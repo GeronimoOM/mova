@@ -1,15 +1,27 @@
 import { NetworkStatus, useLazyQuery } from '@apollo/client';
 import { DateTime } from 'luxon';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { v1 as uuid } from 'uuid';
 import {
+  buildCreateLinkRefetchQueries,
+  buildDeleteLinkRefetchQueries,
+  useCreateLink,
   useCreateWord,
+  useDeleteLink,
   useDeleteWord,
   useUpdateWord,
 } from '../../../api/mutations';
 import {
   GetPropertiesDocument,
   GetWordDocument,
+  LinkedWordFieldsFragment,
   OptionPropertyValueFieldsFragment,
   PartOfSpeech,
   PropertyFieldsFragment,
@@ -17,6 +29,7 @@ import {
   SavePropertyValueInput,
   TextPropertyValueFieldsFragment,
   WordFieldsFullFragment,
+  WordLinkType,
 } from '../../../api/types/graphql';
 import { toRecord } from '../../../utils/arrays';
 import { toTimestamp } from '../../../utils/datetime';
@@ -28,6 +41,8 @@ export type Word = Omit<
 > & {
   partOfSpeech: PartOfSpeech | null;
   properties: Record<string, PropertyValueFieldsFragment>;
+  similarLinks: LinkedWordChange[];
+  distinctLinks: LinkedWordChange[];
 };
 
 type WordDetailsReturn = {
@@ -38,6 +53,10 @@ type WordDetailsReturn = {
   setTranslation: (translation: string) => void;
   setPartOfSpeech: (partOfSpeech: PartOfSpeech) => void;
   setPropertyValue: (propertyValue: SavePropertyValueInput) => void;
+  addSimilar: (link: LinkedWordFieldsFragment) => void;
+  deleteSimilar: (link: LinkedWordFieldsFragment) => void;
+  addDistinct: (link: LinkedWordFieldsFragment) => void;
+  deleteDistinct: (link: LinkedWordFieldsFragment) => void;
 
   properties?: Array<PropertyFieldsFragment>;
   propertiesLoading: boolean;
@@ -58,6 +77,10 @@ type WordDetailsReturn = {
   deletedWord: { id: string } | undefined;
 };
 
+export type LinkedWordChange = LinkedWordFieldsFragment & {
+  isDeleted?: boolean;
+};
+
 export function useWordDetails(wordId: string | null): WordDetailsReturn {
   const [selectedLanguageId] = useLanguageContext();
   const [original, setOriginal] = useState('');
@@ -65,6 +88,12 @@ export function useWordDetails(wordId: string | null): WordDetailsReturn {
   const [partOfSpeech, setPartOfSpeech] = useState<PartOfSpeech | null>(null);
   const [propertyValueChanges, setPropertyValueChanges] = useState<
     Record<string, SavePropertyValueInput>
+  >({});
+  const [similarLinkChanges, setSimilarLinkChanges] = useState<
+    Record<string, LinkedWordChange>
+  >({});
+  const [distinctLinkChanges, setDistinctLinkChanges] = useState<
+    Record<string, LinkedWordChange>
   >({});
 
   const [fetchWord, { data: wordQuery, networkStatus: fetchWordStatus }] =
@@ -81,6 +110,8 @@ export function useWordDetails(wordId: string | null): WordDetailsReturn {
     useUpdateWord();
   const [deleteWordMutate, { data: deleteWordResult, loading: wordDeleting }] =
     useDeleteWord();
+  const [createLinkMutate, { loading: linkCreating }] = useCreateLink();
+  const [deleteLinkMutate, { loading: linkDeleting }] = useDeleteLink();
 
   const isNewWord = !wordId;
   const wordLoading = [
@@ -111,7 +142,9 @@ export function useWordDetails(wordId: string | null): WordDetailsReturn {
       isWordValid &&
       (original !== currentWord?.original ||
         translation !== currentWord?.translation ||
-        Object.keys(propertyValueChanges).length),
+        Object.keys(propertyValueChanges).length ||
+        Object.keys(similarLinkChanges).length ||
+        Object.keys(distinctLinkChanges).length),
   );
   const canDeleteWord = Boolean(selectedLanguageId && !isNewWord);
 
@@ -133,6 +166,37 @@ export function useWordDetails(wordId: string | null): WordDetailsReturn {
 
     return propertyValues;
   }, [currentPropertyValues, propertyValueChanges]);
+
+  const combineLinkChanges = useCallback(
+    (
+      currentLinks: LinkedWordFieldsFragment[] | undefined,
+      linkChanges: Record<string, LinkedWordChange>,
+    ): LinkedWordChange[] => {
+      return Object.values(linkChanges).reduce((current, linkChange) => {
+        if (linkChange.isDeleted) {
+          return current.map((link) =>
+            link.id === linkChange.id ? linkChange : link,
+          );
+        } else {
+          return [
+            ...current.filter((link) => link.id !== linkChange.id),
+            linkChange,
+          ];
+        }
+      }, currentLinks ?? []);
+    },
+    [],
+  );
+
+  const similarLinks = useMemo<LinkedWordChange[]>(
+    () => combineLinkChanges(currentWord?.similarLinks, similarLinkChanges),
+    [combineLinkChanges, currentWord?.similarLinks, similarLinkChanges],
+  );
+
+  const distinctLinks = useMemo<LinkedWordChange[]>(
+    () => combineLinkChanges(currentWord?.distinctLinks, distinctLinkChanges),
+    [combineLinkChanges, currentWord?.distinctLinks, distinctLinkChanges],
+  );
 
   useEffect(() => {
     if (wordId) {
@@ -158,6 +222,8 @@ export function useWordDetails(wordId: string | null): WordDetailsReturn {
     setTranslation(currentWord?.translation ?? '');
     setPartOfSpeech(currentWord?.partOfSpeech ?? null);
     setPropertyValueChanges({});
+    setSimilarLinkChanges({});
+    setDistinctLinkChanges({});
   }, [currentWord]);
 
   const setPropertyValue = useCallback(
@@ -196,10 +262,130 @@ export function useWordDetails(wordId: string | null): WordDetailsReturn {
     [currentPropertyValues, propertyValueChanges],
   );
 
+  const addLink = useCallback(
+    (
+      changes: Record<string, LinkedWordChange>,
+      current: LinkedWordFieldsFragment[] | undefined,
+      setter: Dispatch<SetStateAction<Record<string, LinkedWordChange>>>,
+      link: LinkedWordChange,
+    ) => {
+      const updatedChanges = { ...changes };
+      const currentLink = current?.find((l) => l.id === link.id);
+      if (currentLink) {
+        delete updatedChanges[link.id];
+      } else {
+        delete link.isDeleted;
+
+        updatedChanges[link.id] = link;
+      }
+
+      setter(updatedChanges);
+    },
+    [],
+  );
+  const addSimilar = useCallback(
+    (link: LinkedWordFieldsFragment) =>
+      addLink(
+        similarLinkChanges,
+        currentWord?.similarLinks,
+        setSimilarLinkChanges,
+        link,
+      ),
+    [addLink, similarLinkChanges, currentWord?.similarLinks],
+  );
+  const addDistinct = useCallback(
+    (link: LinkedWordFieldsFragment) =>
+      addLink(
+        distinctLinkChanges,
+        currentWord?.distinctLinks,
+        setDistinctLinkChanges,
+        link,
+      ),
+    [addLink, distinctLinkChanges, currentWord?.distinctLinks],
+  );
+
+  const deleteLink = useCallback(
+    (
+      changes: Record<string, LinkedWordChange>,
+      current: LinkedWordFieldsFragment[] | undefined,
+      setter: Dispatch<SetStateAction<Record<string, LinkedWordChange>>>,
+      link: LinkedWordFieldsFragment,
+    ) => {
+      const updatedChanges = { ...changes };
+      const currentLink = current?.find((l) => l.id === link.id);
+      if (currentLink) {
+        updatedChanges[link.id] = {
+          ...currentLink,
+          isDeleted: true,
+        };
+      } else {
+        delete updatedChanges[link.id];
+      }
+
+      setter(updatedChanges);
+    },
+    [],
+  );
+  const deleteSimilar = useCallback(
+    (link: LinkedWordFieldsFragment) =>
+      deleteLink(
+        similarLinkChanges,
+        currentWord?.similarLinks,
+        setSimilarLinkChanges,
+        link,
+      ),
+    [deleteLink, similarLinkChanges, currentWord?.similarLinks],
+  );
+  const deleteDistinct = useCallback(
+    (link: LinkedWordFieldsFragment) =>
+      deleteLink(
+        distinctLinkChanges,
+        currentWord?.distinctLinks,
+        setDistinctLinkChanges,
+        link,
+      ),
+    [deleteLink, distinctLinkChanges, currentWord?.distinctLinks],
+  );
+
+  const saveLinks = useCallback(
+    async (wordId: string) => {
+      const saveLinkRequests = [
+        WordLinkType.Similar,
+        WordLinkType.Distinct,
+      ].flatMap((type) =>
+        Object.values(
+          type === WordLinkType.Similar
+            ? similarLinkChanges
+            : distinctLinkChanges,
+        ).map((linkChange) =>
+          (linkChange.isDeleted ? deleteLinkMutate : createLinkMutate)({
+            ...(linkChange.isDeleted
+              ? buildDeleteLinkRefetchQueries
+              : buildCreateLinkRefetchQueries)(wordId, type, linkChange),
+            variables: {
+              input: {
+                type,
+                word1Id: wordId,
+                word2Id: linkChange.id,
+              },
+            },
+          }),
+        ),
+      );
+
+      await Promise.all(saveLinkRequests);
+    },
+    [
+      createLinkMutate,
+      deleteLinkMutate,
+      distinctLinkChanges,
+      similarLinkChanges,
+    ],
+  );
+
   const createWord = useCallback(async () => {
     if (canCreateWord) {
-      setPropertyValueChanges({});
-      await createWordMutate({
+      const createdWord = await createWordMutate({
         variables: {
           input: {
             id: uuid(),
@@ -212,10 +398,12 @@ export function useWordDetails(wordId: string | null): WordDetailsReturn {
           },
         },
       });
+      await saveLinks(createdWord.data!.createWord.id!);
     }
   }, [
     canCreateWord,
     createWordMutate,
+    saveLinks,
     original,
     translation,
     selectedLanguageId,
@@ -225,7 +413,6 @@ export function useWordDetails(wordId: string | null): WordDetailsReturn {
 
   const updateWord = useCallback(async () => {
     if (canUpdateWord) {
-      setPropertyValueChanges({});
       await updateWordMutate({
         variables: {
           input: {
@@ -236,10 +423,12 @@ export function useWordDetails(wordId: string | null): WordDetailsReturn {
           },
         },
       });
+      await saveLinks(wordId!);
     }
   }, [
     canUpdateWord,
     updateWordMutate,
+    saveLinks,
     wordId,
     original,
     currentWord,
@@ -264,24 +453,30 @@ export function useWordDetails(wordId: string | null): WordDetailsReturn {
         translation,
         partOfSpeech,
         properties: propertyValues,
+        similarLinks,
+        distinctLinks,
       },
       wordLoading,
       setOriginal,
       setTranslation,
       setPartOfSpeech,
       setPropertyValue,
+      addSimilar,
+      deleteSimilar,
+      addDistinct,
+      deleteDistinct,
 
       properties,
       propertiesLoading,
 
       canCreateWord,
       createWord,
-      wordCreating,
+      wordCreating: wordCreating || linkCreating || linkDeleting,
       createdWord,
 
       canUpdateWord,
       updateWord,
-      wordUpdating,
+      wordUpdating: wordUpdating || linkCreating || linkDeleting,
       updatedWord,
 
       wordDeleting,
@@ -306,6 +501,14 @@ export function useWordDetails(wordId: string | null): WordDetailsReturn {
       propertyValues,
       setPropertyValue,
       translation,
+      similarLinks,
+      distinctLinks,
+      addSimilar,
+      deleteSimilar,
+      addDistinct,
+      deleteDistinct,
+      linkCreating,
+      linkDeleting,
       updateWord,
       updatedWord,
       wordCreating,

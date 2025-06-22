@@ -14,7 +14,15 @@ import {
   Property,
   PropertyId,
 } from 'models/Property';
-import { PartOfSpeech, Word, WordCursor, WordId, WordOrder } from 'models/Word';
+import {
+  PartOfSpeech,
+  Word,
+  WordCursor,
+  WordId,
+  WordLink,
+  WordLinkType,
+  WordOrder,
+} from 'models/Word';
 import { DbConnectionManager } from 'repositories/DbConnectionManager';
 import { Serializer } from 'repositories/Serializer';
 import {
@@ -70,6 +78,18 @@ export interface UpdatePropertyValueParams {
 
 export interface DeleteWordParams {
   id: WordId;
+}
+
+export interface CreateLinkParams {
+  word1Id: WordId;
+  word2Id: WordId;
+  type: WordLinkType;
+}
+
+export interface DeleteLinkParams {
+  word1Id: WordId;
+  word2Id: WordId;
+  type: WordLinkType;
 }
 
 @Injectable()
@@ -133,6 +153,25 @@ export class WordService {
     return await this.wordRepository.getByOriginal(languageId, original);
   }
 
+  async getLinked(
+    ctx: Context,
+    wordId: WordId,
+    type: WordLinkType,
+  ): Promise<Word[]> {
+    await this.getById(ctx, wordId);
+    const linkWordIds = await this.wordRepository.getLinks(wordId, type);
+
+    return await this.wordRepository.getByIds(linkWordIds);
+  }
+
+  async getAllLinks(
+    languageIds: LanguageId | LanguageId[],
+  ): Promise<WordLink[]> {
+    return await this.wordRepository.getAllLinks(
+      Array.isArray(languageIds) ? languageIds : [languageIds],
+    );
+  }
+
   async create(ctx: Context, params: CreateWordParams): Promise<Word> {
     await this.languageService.getById(ctx, params.languageId);
 
@@ -171,6 +210,43 @@ export class WordService {
     await this.searchClient.indexWord(word);
 
     return word;
+  }
+
+  async createLink(ctx: Context, params: CreateLinkParams): Promise<WordLink> {
+    if (params.word1Id === params.word2Id) {
+      throw new Error(`Cannot link word to itself (id:${params.word1Id})`);
+    }
+
+    const [word1, word2] = await Promise.all([
+      this.getById(ctx, params.word1Id),
+      this.getById(ctx, params.word2Id),
+    ]);
+
+    if (word1.languageId !== word2.languageId) {
+      throw new Error(
+        `Cannot link words of different languages (${word1.languageId},${word2.languageId})`,
+      );
+    }
+
+    if (word1.partOfSpeech !== word2.partOfSpeech) {
+      throw new Error(
+        `Cannot link words of different parts of speech (${word1.partOfSpeech},${word2.partOfSpeech})`,
+      );
+    }
+
+    const link = {
+      ...params,
+      languageId: word1.languageId,
+    };
+
+    await this.connectionManager.transactionally(async () => {
+      await this.wordRepository.createLink(link);
+      await this.changeService.create(
+        this.changeBuilder.buildCreateWordLinkChange(ctx, link),
+      );
+    });
+
+    return link;
   }
 
   async update(ctx: Context, params: UpdateWordParams): Promise<Word> {
@@ -227,6 +303,24 @@ export class WordService {
     await this.searchClient.deleteWord(id);
 
     return word;
+  }
+
+  async deleteLink(ctx: Context, params: DeleteLinkParams): Promise<WordLink> {
+    const [word1] = await Promise.all([
+      this.getById(ctx, params.word1Id),
+      this.getById(ctx, params.word2Id),
+    ]);
+
+    const link = { ...params, languageId: word1.languageId };
+
+    await this.connectionManager.transactionally(async () => {
+      await this.wordRepository.deleteLink(link);
+      await this.changeService.create(
+        this.changeBuilder.buildDeleteWordLinkChange(ctx, link),
+      );
+    });
+
+    return link;
   }
 
   async indexLanguage(languageId: LanguageId): Promise<void> {

@@ -32,7 +32,7 @@ export const WordsSearchBar = ({
         text="original"
         placeholder={t('words.search')}
         left={<Icon icon={PiMagnifyingGlassBold} />}
-        dataTestId="words-search-bar"
+        dataTestId="words-search"
       />
       <ButtonIcon
         icon={BsEraserFill}

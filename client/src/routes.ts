@@ -1,5 +1,8 @@
 export enum AppRoute {
-  Words = '/',
+  Default = '/',
+  Words = '/words',
+  Word = '/words/:id',
+  WordNew = '/words/new',
   Properties = '/properties',
   Exercises = '/exercises',
   Progress = '/progress',
@@ -8,3 +11,5 @@ export enum AppRoute {
 }
 
 export const allowedNoLanguageRoutes = [AppRoute.Languages, AppRoute.User];
+
+export const wordRoute = (wordId: string) => `/words/${wordId}`;

@@ -24,7 +24,7 @@ export const property = style({
   fontSize: '1.25rem',
   textTransform: 'lowercase',
   padding: '5px 10px',
-  borderRadius: 5,
+  borderRadius: 3,
   backgroundColor: themeVars.color.backgroundLighter,
 });
 

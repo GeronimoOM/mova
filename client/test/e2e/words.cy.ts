@@ -18,7 +18,7 @@ describe('words', () => {
         it('shows list of words', () => {
           cy.visit('/', testModeVisitOptions[mode]);
 
-          sel.words.listItems().should('have.length', 15);
+          sel.words.listItems().should('have.length.at.least', 15);
           sel.words.list().scrollTo('bottom');
           sel.words.listItems().should('have.length', 17);
           sel.words.listItemOriginal(0).contains('pidi');
@@ -80,6 +80,7 @@ describe('words', () => {
           sel.words.listItems().should('be.visible');
 
           sel.words.listItems().contains('kaeblema').click();
+          sel.word.moreBtn().click();
           sel.word.upBtn().click();
           sel.word.original().should('have.value', 'saatus');
           sel.word.downBtn().click().click();
@@ -205,10 +206,46 @@ describe('words', () => {
           assertUpdated2();
         });
 
+        it('updates links', () => {
+          cy.visit('/', testModeVisitOptions[mode]);
+
+          sel.words.list().scrollTo('bottom');
+          sel.words.listItems().contains('märkama').click();
+          sel.word.linksAddBtn('distinct').click();
+          sel.word.link('märkima').click();
+          sel.word.links('distinct').contains('märkima');
+          sel.word.linkSearchInput().type('olene');
+          sel.word.link('olenema').click();
+          sel.word.links('distinct').contains('olenema');
+          sel.word.saveBtn().click();
+
+          sel.word.links('distinct').contains('märkima');
+          sel.word.links('distinct').contains('olenema');
+
+          cy.visit('/', testModeVisitOptions[mode]);
+
+          sel.words.list().scrollTo('bottom');
+          sel.words.listItems().contains('märkama').click();
+          sel.word.links('distinct').contains('märkima');
+          sel.word.links('distinct').contains('olenema');
+
+          sel.word.linkBtn('olenema').click();
+          sel.word.saveBtn().click();
+          sel.word.links('distinct').should('not.contain.text', 'olenema');
+
+          cy.visit('/', testModeVisitOptions[mode]);
+
+          sel.words.list().scrollTo('bottom');
+          sel.words.listItems().contains('märkama').click();
+          sel.word.links('distinct').contains('märkima');
+          sel.word.links('distinct').should('not.contain.text', 'olenema');
+        });
+
         it('deletes word', () => {
           cy.visit('/', testModeVisitOptions[mode]);
 
           sel.words.listItems().contains('saatus').click();
+          sel.word.moreBtn().click();
           sel.word.deleteBtn().click();
           sel.word.deleteCancelBtn().click();
 

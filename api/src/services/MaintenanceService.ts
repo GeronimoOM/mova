@@ -6,6 +6,7 @@ import {
   ProgressTable,
   PropertyTable,
   UserTable,
+  WordLinkTable,
   WordTable,
 } from 'knex/types/tables';
 import { Context } from 'models/Context';
@@ -190,6 +191,10 @@ export class MaintenanceService {
       yield { type: MigrationRecordType.Word, record: word };
     }
 
+    for await (const wordLink of this.wordRepository.streamLinkRecords()) {
+      yield { type: MigrationRecordType.WordLink, record: wordLink };
+    }
+
     for await (const goal of this.progressRepository.streamGoals()) {
       yield { type: MigrationRecordType.Goal, record: goal };
     }
@@ -224,6 +229,12 @@ export class MaintenanceService {
         case MigrationRecordType.Word:
           await this.wordRepository.insertBatch(
             records.map(({ record }) => record) as WordTable[],
+          );
+          break;
+
+        case MigrationRecordType.WordLink:
+          await this.wordRepository.insertLinksBatch(
+            records.map(({ record }) => record) as WordLinkTable[],
           );
           break;
 

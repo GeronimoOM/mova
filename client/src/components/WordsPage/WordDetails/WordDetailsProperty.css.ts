@@ -47,8 +47,7 @@ export const labelSkeleton = recipe({
 
 export const optionWrapper = style({
   height: 40,
-  boxSizing: 'border-box',
-  width: '100%',
   display: 'flex',
   alignItems: 'center',
+  width: 'min-content',
 });

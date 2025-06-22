@@ -1,11 +1,17 @@
-import { TypedDocumentNode, useMutation } from '@apollo/client';
+import {
+  MutationHookOptions,
+  TypedDocumentNode,
+  useMutation,
+} from '@apollo/client';
 import { cache } from './cache';
 import {
   optimisticAttemptWordMastery,
   optimisticCreateLanguage,
+  optimisticCreateLink,
   optimisticCreateProperty,
   optimisticCreateWord,
   optimisticDeleteLanguage,
+  optimisticDeleteLink,
   optimisticDeleteProperty,
   optimisticDeleteWord,
   optimisticReorderProperties,
@@ -16,15 +22,18 @@ import {
 import {
   AttemptWordMasteryDocument,
   CreateLanguageDocument,
+  CreateLinkDocument,
   CreatePropertyDocument,
   CreateWordDocument,
   DeleteLanguageDocument,
+  DeleteLinkDocument,
   DeletePropertyDocument,
   DeleteWordDocument,
   GetLanguagesDocument,
   GetProgressDocument,
   LanguagePropertiesFragmentDoc,
   LanguageWordsFragmentDoc,
+  LinkedWordFieldsFragment,
   PartOfSpeech,
   ProgressType,
   PropertyFieldsFragment,
@@ -38,6 +47,8 @@ import {
   WordFieldsFragmentDoc,
   WordFieldsFullFragment,
   WordFieldsFullFragmentDoc,
+  WordFieldsLinksFragmentDoc,
+  WordLinkType,
 } from './types/graphql';
 
 type UseMutationResult<MDocument> =
@@ -246,6 +257,70 @@ export function useDeleteWord(): UseMutationResult<typeof DeleteWordDocument> {
     },
   });
 }
+
+export function useCreateLink(): UseMutationResult<typeof CreateLinkDocument> {
+  return useMutation(CreateLinkDocument, {
+    optimisticResponse: optimisticCreateLink,
+  });
+}
+
+export const buildCreateLinkRefetchQueries = (
+  wordId: string,
+  type: WordLinkType,
+  link: LinkedWordFieldsFragment,
+): Partial<MutationHookOptions> => ({
+  update: (cache) => {
+    cache.updateFragment(
+      {
+        id: `Word:${wordId}`,
+        fragment: WordFieldsLinksFragmentDoc,
+        fragmentName: 'WordFieldsLinks',
+        overwrite: true,
+      },
+      (word) => ({
+        ...word!,
+        ...(type === WordLinkType.Similar && {
+          similarLinks: [...word!.similarLinks, link],
+        }),
+        ...(type === WordLinkType.Distinct && {
+          distinctLinks: [...word!.distinctLinks, link],
+        }),
+      }),
+    );
+  },
+});
+
+export function useDeleteLink(): UseMutationResult<typeof DeleteLinkDocument> {
+  return useMutation(DeleteLinkDocument, {
+    optimisticResponse: optimisticDeleteLink,
+  });
+}
+
+export const buildDeleteLinkRefetchQueries = (
+  wordId: string,
+  type: WordLinkType,
+  link: LinkedWordFieldsFragment,
+): Partial<MutationHookOptions> => ({
+  update: (cache) => {
+    cache.updateFragment(
+      {
+        id: `Word:${wordId}`,
+        fragment: WordFieldsLinksFragmentDoc,
+        fragmentName: 'WordFieldsLinks',
+        overwrite: true,
+      },
+      (word) => ({
+        ...word!,
+        ...(type === WordLinkType.Similar && {
+          similarLinks: word!.similarLinks?.filter((l) => l.id !== link.id),
+        }),
+        ...(type === WordLinkType.Distinct && {
+          distinctLinks: word!.distinctLinks?.filter((l) => l.id !== link.id),
+        }),
+      }),
+    );
+  },
+});
 
 export function useAttemptWordMastery(): UseMutationResult<
   typeof AttemptWordMasteryDocument

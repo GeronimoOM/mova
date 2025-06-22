@@ -1,11 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import { FaAngleDoubleRight } from 'react-icons/fa';
 
-import { BsFillLightbulbFill } from 'react-icons/bs';
+import {
+  BsFillExclamationDiamondFill,
+  BsFillLightbulbFill,
+} from 'react-icons/bs';
 import { FaCheck, FaMinus } from 'react-icons/fa';
 import { FaBookOpen } from 'react-icons/fa6';
 
 import {
+  LinkedWordFieldsFragment,
   OptionPropertyFieldsFragment,
   OptionPropertyValueFieldsFragment,
   OptionValue,
@@ -13,7 +17,6 @@ import {
   PropertyType,
   TextPropertyFieldsFragment,
   TextPropertyValueFieldsFragment,
-  WordFieldsFullFragment,
 } from '../../api/types/graphql';
 import { Input } from '../common/Input';
 import { SpellInput } from '../common/SpellInput';
@@ -21,9 +24,11 @@ import { SpellInput } from '../common/SpellInput';
 import { useTranslation } from 'react-i18next';
 import { AccentColor } from '../../index.css';
 import * as arrays from '../../utils/arrays';
+import { pickN } from '../../utils/random';
 import { ButtonIcon } from '../common/ButtonIcon';
 import { Icon } from '../common/Icon';
 import { WordDetailsOptionProperty } from '../WordsPage/WordDetails/WordDetailsProperty';
+import { ExerciseWord } from './exercises';
 import * as styles from './SpellExercise.css';
 
 const NORMAL_REVEAL_PREFIX = 1;
@@ -33,7 +38,7 @@ const ADVANCED_MAX_TEXT_PROPERTIES = 2;
 const ADVANCED_MAX_OPTION_PROPERTIES = 1;
 
 export type SpellExerciseProps = {
-  word: WordFieldsFullFragment;
+  word: ExerciseWord;
   properties: PropertyFieldsFragment[];
   onSuccess: () => void;
   onFailure: () => void;
@@ -53,6 +58,8 @@ export const SpellExercise = ({
     advanced ? ADVANCED_REVEAL_PREFIX : NORMAL_REVEAL_PREFIX,
   );
   const [isSubmitted, setSubmitted] = useState<boolean>(false);
+  const [similar, setSimilar] = useState<LinkedWordFieldsFragment | null>(null);
+  const [attempt, setAttempt] = useState(1);
   const [wordProperties] = useState(() =>
     advanced ? getExerciseProperties(word, properties) : [],
   );
@@ -85,6 +92,13 @@ export const SpellExercise = ({
 
   const handleSubmit = () => {
     setSubmitted(true);
+    setSimilar(null);
+  };
+
+  const handleSimilar = (similar: LinkedWordFieldsFragment) => {
+    setSubmitted(false);
+    setAttempt((attempt) => attempt + 1);
+    setSimilar(similar);
   };
 
   const handleNext = () => {
@@ -110,19 +124,23 @@ export const SpellExercise = ({
         disabled
       />
 
+      {similar && <SpellExerciseSimilarMessage similar={similar} />}
+
       <SpellTextExerciseProperty
+        key={attempt}
         word={word}
         property={null}
         isSubmitted={isSubmitted}
         revealPrefix={revealPrefix}
         advanced={advanced}
         onResult={(result) => handlePartialResult('original', result)}
+        onSimilar={handleSimilar}
       />
 
       {wordProperties.map((property) =>
         property.type === PropertyType.Text ? (
           <SpellTextExerciseProperty
-            key={property.id}
+            key={`${attempt}:${property.id}`}
             word={word}
             property={property as TextPropertyFieldsFragment}
             isSubmitted={isSubmitted}
@@ -132,7 +150,7 @@ export const SpellExercise = ({
           />
         ) : (
           <SpellOptionExerciseProperty
-            key={property.id}
+            key={`${attempt}:${property.id}`}
             word={word}
             property={property as OptionPropertyFieldsFragment}
             isSubmitted={isSubmitted}
@@ -169,12 +187,13 @@ export const SpellExercise = ({
 };
 
 type SpellTextExercisePropertyProps = {
-  word: WordFieldsFullFragment;
+  word: ExerciseWord;
   property: TextPropertyFieldsFragment | null;
   isSubmitted: boolean;
   revealPrefix: number;
   advanced?: boolean;
   onResult: (result: boolean) => void;
+  onSimilar?: (link: LinkedWordFieldsFragment) => void;
 };
 
 const SpellTextExerciseProperty = ({
@@ -184,6 +203,7 @@ const SpellTextExerciseProperty = ({
   revealPrefix,
   advanced,
   onResult,
+  onSimilar,
 }: SpellTextExercisePropertyProps) => {
   const propertyValue = useMemo(() => {
     if (!property) {
@@ -216,6 +236,15 @@ const SpellTextExerciseProperty = ({
 
   useEffect(() => {
     if (isSubmitted && !isVerified) {
+      if (onSimilar && !property) {
+        const similarLink = word.similarLinks.find(
+          (link) => link.original === input.trim(),
+        );
+        if (similarLink) {
+          return onSimilar(similarLink);
+        }
+      }
+
       onResult(input.trim() === propertyValue);
 
       let verifiedInput = propertyValue;
@@ -263,7 +292,7 @@ const SpellTextExerciseProperty = ({
 };
 
 type SpellOptionExercisePropertyProps = {
-  word: WordFieldsFullFragment;
+  word: ExerciseWord;
   property: OptionPropertyFieldsFragment;
   isSubmitted: boolean;
   onResult: (result: boolean) => void;
@@ -328,7 +357,7 @@ const SpellOptionExerciseProperty = ({
             <Icon
               icon={result ? FaCheck : FaMinus}
               color={result ? 'primary' : 'negative'}
-            />{' '}
+            />
           </div>
         )}
       </div>
@@ -336,8 +365,28 @@ const SpellOptionExerciseProperty = ({
   );
 };
 
+type SpellExerciseSimilarMessageProps = {
+  similar: LinkedWordFieldsFragment;
+};
+
+const SpellExerciseSimilarMessage = ({
+  similar,
+}: SpellExerciseSimilarMessageProps) => {
+  const { t } = useTranslation();
+
+  return (
+    <div className={styles.similarMessage}>
+      <Icon icon={BsFillExclamationDiamondFill} size="medium" color="primary" />
+      <div className={styles.similarMessageWord}>{similar.original}</div>
+      <div className={styles.similarMessageText}>
+        {t('exercise.spellSimilar')}
+      </div>
+    </div>
+  );
+};
+
 function getExerciseProperties(
-  word: WordFieldsFullFragment,
+  word: ExerciseWord,
   allProperties: PropertyFieldsFragment[],
 ): PropertyFieldsFragment[] {
   const [wordTextProperties, wordOptionProperties] = arrays.splitByPredicate(
@@ -345,12 +394,12 @@ function getExerciseProperties(
     (prop) => prop.__typename === 'TextPropertyValue',
   );
   const selectedPropertyIds = [
-    ...pickRandomPropertyIds(
+    ...pickN(
       wordTextProperties.map((prop) => prop.property.id),
       ADVANCED_MAX_TEXT_PROPERTIES,
     ),
 
-    ...pickRandomPropertyIds(
+    ...pickN(
       wordOptionProperties.map((prop) => prop.property.id),
       ADVANCED_MAX_OPTION_PROPERTIES,
     ),
@@ -361,18 +410,4 @@ function getExerciseProperties(
   );
 
   return selectedProperties.sort((p1, p2) => p1.order - p2.order);
-}
-
-function pickRandomPropertyIds(
-  wordPropertyIds: string[],
-  total: number,
-): string[] {
-  const selectedPropertyIds: string[] = [];
-  while (wordPropertyIds.length && selectedPropertyIds.length < total) {
-    const randomIndex = Math.floor(Math.random() * wordPropertyIds.length);
-    selectedPropertyIds.push(wordPropertyIds[randomIndex]);
-    wordPropertyIds = wordPropertyIds.toSpliced(randomIndex, 1);
-  }
-
-  return selectedPropertyIds;
 }

@@ -40,6 +40,11 @@ import {
   ReorderPropertiesInput,
   UpdatePropertyInput,
 } from './PropertyType';
+import {
+  CreateWordLinkInput,
+  DeleteWordLinkInput,
+  WordLinkObjectType,
+} from './WordLinkType';
 import { CreateWordInput, DeleteWordInput, UpdateWordInput } from './WordType';
 
 registerEnumType(ChangeTypeEnum, {
@@ -309,6 +314,22 @@ export class DeleteWordChangeType extends ChangeInterface {
   deleted: WordId;
 }
 
+@ObjectType('CreateWordLinkChange', {
+  implements: () => ChangeInterface,
+})
+export class CreateWordLinkChangeType extends ChangeInterface {
+  @Field()
+  created: WordLinkObjectType;
+}
+
+@ObjectType('DeleteWordLinkChange', {
+  implements: () => ChangeInterface,
+})
+export class DeleteWordLinkChangeType extends ChangeInterface {
+  @Field()
+  deleted: WordLinkObjectType;
+}
+
 export const ChangeUnionType = createUnionType({
   name: 'Change',
   types: () =>
@@ -323,6 +344,8 @@ export const ChangeUnionType = createUnionType({
       CreateWordChangeType,
       UpdateWordChangeType,
       DeleteWordChangeType,
+      CreateWordLinkChangeType,
+      DeleteWordLinkChangeType,
     ] as const,
   resolveType: (value: Change) => {
     switch (value.type) {
@@ -346,6 +369,10 @@ export const ChangeUnionType = createUnionType({
         return UpdateWordChangeType;
       case ChangeType.DeleteWord:
         return DeleteWordChangeType;
+      case ChangeType.CreateWordLink:
+        return CreateWordLinkChangeType;
+      case ChangeType.DeleteWordLink:
+        return DeleteWordLinkChangeType;
     }
   },
 });
@@ -393,4 +420,10 @@ export class ApplyChangeInput {
 
   @Field(() => DeleteWordInput, { nullable: true })
   deleteWord: DeleteWordInput;
+
+  @Field(() => CreateWordLinkInput, { nullable: true })
+  createWordLink: CreateWordLinkInput;
+
+  @Field(() => DeleteWordLinkInput, { nullable: true })
+  deleteWordLink: DeleteWordLinkInput;
 }

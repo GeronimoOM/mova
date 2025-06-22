@@ -16,7 +16,7 @@ export const NavBar = () => {
       <div className={styles.title}>
         <p>Mova</p>
       </div>
-      <NavBarItem href={AppRoute.Words} icon={FaBook} text={t('nav.words')} />
+      <NavBarItem href={AppRoute.Default} icon={FaBook} text={t('nav.words')} />
       <NavBarItem
         href={AppRoute.Exercises}
         icon={FaBrain}

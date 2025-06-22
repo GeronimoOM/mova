@@ -1,9 +1,11 @@
 import {
   optimisticAttemptWordMastery,
   optimisticCreateLanguage,
+  optimisticCreateLink,
   optimisticCreateProperty,
   optimisticCreateWord,
   optimisticDeleteLanguage,
+  optimisticDeleteLink,
   optimisticDeleteProperty,
   optimisticDeleteWord,
   optimisticReorderProperties,
@@ -17,12 +19,16 @@ import {
   AttemptWordMasteryMutationVariables,
   CreateLanguageMutation,
   CreateLanguageMutationVariables,
+  CreateLinkMutation,
+  CreateLinkMutationVariables,
   CreatePropertyMutation,
   CreatePropertyMutationVariables,
   CreateWordMutation,
   CreateWordMutationVariables,
   DeleteLanguageMutation,
   DeleteLanguageMutationVariables,
+  DeleteLinkMutation,
+  DeleteLinkMutationVariables,
   DeletePropertyMutation,
   DeletePropertyMutationVariables,
   DeleteWordMutation,
@@ -50,6 +56,8 @@ enum GraphQlMutation {
   CreateWord = 'CreateWord',
   UpdateWord = 'UpdateWord',
   DeleteWord = 'DeleteWord',
+  CreateLink = 'CreateLink',
+  DeleteLink = 'DeleteLink',
   AttemptMastery = 'AttemptMastery',
 }
 
@@ -129,6 +137,16 @@ function buildChange(request: GraphQlRequest): ApplyChangeInput {
       return {
         deleteWord: (request.variables as DeleteWordMutationVariables).input,
       };
+    case GraphQlMutation.CreateLink:
+      return {
+        createWordLink: (request.variables as CreateLinkMutationVariables)
+          .input,
+      };
+    case GraphQlMutation.DeleteLink:
+      return {
+        createWordLink: (request.variables as DeleteLinkMutationVariables)
+          .input,
+      };
     default:
       throw new Error(`Unsupported operation name ${request.operationName}`);
   }
@@ -191,6 +209,16 @@ async function cacheGraphQlMutationResponse(
       case GraphQlMutation.DeleteWord: {
         const { deleteWord } = responseData as DeleteWordMutation;
         await cache.deleteWord(deleteWord.id);
+        break;
+      }
+      case GraphQlMutation.CreateLink: {
+        const { createLink } = responseData as CreateLinkMutation;
+        await cache.saveLink(createLink);
+        break;
+      }
+      case GraphQlMutation.DeleteLink: {
+        const { deleteLink } = responseData as DeleteLinkMutation;
+        await cache.deleteLink(deleteLink);
         break;
       }
       case GraphQlMutation.AttemptMastery: {
@@ -272,7 +300,14 @@ async function handleGraphQlMutationOptimistically(
 
       return response(optimisticDeleteWord(currentWord));
     }
-
+    case GraphQlMutation.CreateLink:
+      return response(
+        optimisticCreateLink(request.variables as CreateLinkMutationVariables),
+      );
+    case GraphQlMutation.DeleteLink:
+      return response(
+        optimisticDeleteLink(request.variables as DeleteLinkMutationVariables),
+      );
     case GraphQlMutation.AttemptMastery: {
       const variables =
         request.variables as AttemptWordMasteryMutationVariables;

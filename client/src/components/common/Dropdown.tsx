@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { RefObject, useRef } from 'react';
 
 import { useClickOutsideHandler } from '../../utils/useClickOutsideHandler';
 import {
@@ -13,7 +13,9 @@ export type DropdownProps = {
   children: React.ReactNode;
   content: React.ReactNode;
   isOpen: boolean;
-  onOpen: (isOpen: boolean) => void;
+  onOpen?: (isOpen: boolean) => void;
+  onCloseOutside?: () => void;
+  closeOutsideRef?: RefObject<HTMLDivElement | null>;
   position?: DropdownPosition;
   alignment?: DropdownAlignment;
   outline?: 'normal' | 'bold';
@@ -24,26 +26,38 @@ export const Dropdown = ({
   content,
   isOpen,
   onOpen,
+  onCloseOutside,
+  closeOutsideRef,
   position,
   alignment,
   outline,
 }: DropdownProps) => {
   const anchorRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
-  useClickOutsideHandler({ ref: anchorRef, onClick: () => onOpen(false) });
+  useClickOutsideHandler({
+    ref: contentRef,
+    excludeRef: closeOutsideRef ?? anchorRef,
+    onClick: () => {
+      onOpen?.(false);
+      onCloseOutside?.();
+    },
+  });
 
   return (
     <div ref={anchorRef} className={styles.wrapper}>
-      <div onClick={() => onOpen(!isOpen)}>{children}</div>
+      <div onClick={() => onOpen?.(!isOpen)}>{children}</div>
 
       {isOpen && (
-        <DropdownContent
-          content={content}
-          anchorRef={anchorRef as React.RefObject<HTMLElement>}
-          position={position}
-          alignment={alignment}
-          outline={outline}
-        />
+        <div ref={contentRef}>
+          <DropdownContent
+            content={content}
+            anchorRef={anchorRef as React.RefObject<HTMLElement>}
+            position={position}
+            alignment={alignment}
+            outline={outline}
+          />
+        </div>
       )}
     </div>
   );

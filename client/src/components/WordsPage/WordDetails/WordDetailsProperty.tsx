@@ -14,7 +14,6 @@ import {
   isOptionPropertyFragment,
   isTextPropertyFragment,
 } from '../../../utils/properties';
-import { useWidthListener } from '../../../utils/useWidthListener';
 import { Dropdown } from '../../common/Dropdown';
 import { Input } from '../../common/Input';
 import { OptionPill } from '../../common/OptionPill';
@@ -103,8 +102,7 @@ export const WordDetailsOptionProperty = ({
   exercise,
 }: WordDetailsOptionPropertyProps) => {
   const [isOpen, setOpen] = useState(false);
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const wrapperWidth = useWidthListener(wrapperRef);
+  const pillRef = useRef<HTMLDivElement>(null);
 
   const option = useMemo(() => {
     const option = propertyValue?.option ?? null;
@@ -127,35 +125,38 @@ export const WordDetailsOptionProperty = ({
   }, [property, propertyValue]);
 
   return (
-    <div ref={wrapperRef} className={styles.optionWrapper}>
-      <Dropdown
-        isOpen={isOpen}
-        onOpen={(isOpen) => !disabled && setOpen(isOpen)}
-        content={
-          <div style={{ width: wrapperWidth, boxSizing: 'border-box' }}>
-            <WordDetailsOptionDropdown
-              property={property}
-              selected={option}
-              onSelect={(option) =>
-                onChange({
-                  id: property.id,
-                  option,
-                })
-              }
-              onClose={() => setOpen(false)}
-              exercise={exercise}
-            />
-          </div>
-        }
-        alignment="start"
+    <Dropdown
+      isOpen={isOpen}
+      onCloseOutside={() => setOpen(false)}
+      closeOutsideRef={pillRef}
+      content={
+        <WordDetailsOptionDropdown
+          property={property}
+          selected={option}
+          onSelect={(option) =>
+            onChange({
+              id: property.id,
+              option,
+            })
+          }
+          onClose={() => setOpen(false)}
+          exercise={exercise}
+        />
+      }
+      alignment="stretch"
+    >
+      <div
+        className={styles.optionWrapper}
+        ref={pillRef}
+        onClick={() => !disabled && setOpen(!isOpen)}
       >
         <OptionPill
           option={option}
           disabled={disabled}
           dataTestId="word-details-property-option"
         />
-      </Dropdown>
-    </div>
+      </div>
+    </Dropdown>
   );
 };
 

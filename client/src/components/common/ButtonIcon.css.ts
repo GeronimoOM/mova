@@ -77,8 +77,7 @@ export const button = recipe({
 });
 
 export const wrapper = style({
-  outline: `1px solid ${themeVars.color.background}`,
-  backgroundColor: themeVars.color.backgroundLight,
+  backgroundColor: themeVars.color.background,
   padding: 8,
   borderRadius: 30,
 });

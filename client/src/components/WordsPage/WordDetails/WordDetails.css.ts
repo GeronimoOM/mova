@@ -45,6 +45,11 @@ export const detailsRow = style({
   gap: 5,
 });
 
+export const detailsRowGap = style({
+  margin: `0 5px`,
+  borderTop: `2px solid ${themeVars.color.backgroundLight}`,
+});
+
 export const originalRow = style({
   selectors: {
     '&:not(.disabled)': {
@@ -70,8 +75,10 @@ export const existingWarningTooltip = style({
 
 export const existingWarningWord = style({
   fontFamily: fontThemeVars.monoFont,
+  fontWeight: 500,
+  letterSpacing: '0.025em',
   padding: 5,
-  borderRadius: 5,
+  borderRadius: 3,
   backgroundColor: themeVars.color.backgroundLighter,
   cursor: 'pointer',
   transition: 'background-color 0.2s ease',
@@ -91,7 +98,7 @@ export const translationLabel = style({
   fontWeight: 'bold',
 });
 
-export const translationIcon = style({
+export const icon = style({
   display: 'flex',
   alignItems: 'center',
   padding: 5,
@@ -105,28 +112,32 @@ export const translationRow = style({
   gap: 5,
 });
 
-export const buttons = style({
+export const buttonsTop = style({
   position: 'absolute',
-  top: 10,
-  bottom: 10,
-  right: 18,
+  top: 20,
+  right: 28,
 
-  padding: 10,
   display: 'flex',
   flexDirection: 'column',
   gap: 10,
   zIndex: 10,
 });
 
-export const bottomButton = style({
+export const buttonsBottom = style({
+  position: 'absolute',
+  bottom: 20,
+  right: 28,
+
+  backgroundColor: themeVars.color.background,
+  borderRadius: 30,
   display: 'flex',
   flexDirection: 'column',
   gap: 10,
-  marginTop: 'auto',
+  zIndex: 10,
 });
 
 export const detailsEnd = style({
-  minHeight: 50,
+  minHeight: 66,
 });
 
 export const deleteConfirm = style({
@@ -148,7 +159,7 @@ export const deleteConfirmText = style({
 export const deleteConfirmWord = style({
   fontFamily: fontThemeVars.monoFont,
   padding: 5,
-  borderRadius: 5,
+  borderRadius: 3,
   backgroundColor: themeVars.color.backgroundLighter,
 });
 

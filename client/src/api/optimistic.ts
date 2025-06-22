@@ -10,12 +10,16 @@ import {
   AttemptWordMasteryMutationVariables,
   CreateLanguageMutation,
   CreateLanguageMutationVariables,
+  CreateLinkMutation,
+  CreateLinkMutationVariables,
   CreatePropertyMutation,
   CreatePropertyMutationVariables,
   CreateWordMutation,
   CreateWordMutationVariables,
   DeleteLanguageMutation,
   DeleteLanguageMutationVariables,
+  DeleteLinkMutation,
+  DeleteLinkMutationVariables,
   DeletePropertyMutation,
   DeleteWordMutation,
   OptionFieldsFragment,
@@ -193,6 +197,28 @@ export function optimisticDeleteWord(
 ): DeleteWordMutation {
   return {
     deleteWord: currentWord,
+  };
+}
+
+export function optimisticCreateLink({
+  input,
+}: CreateLinkMutationVariables): CreateLinkMutation {
+  return {
+    createLink: {
+      ...input,
+      __typename: 'WordLink',
+    },
+  };
+}
+
+export function optimisticDeleteLink({
+  input,
+}: DeleteLinkMutationVariables): DeleteLinkMutation {
+  return {
+    deleteLink: {
+      ...input,
+      __typename: 'WordLink',
+    },
   };
 }
 

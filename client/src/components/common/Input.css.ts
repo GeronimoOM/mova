@@ -79,8 +79,18 @@ export const input = recipe({
       medium: {
         fontSize: '1rem',
         height: '1.5rem',
+
+        '::placeholder': {
+          fontSize: '0.9rem',
+        },
       },
-      large: { fontSize: '1.25rem', height: '2rem' },
+      large: {
+        fontSize: '1.25rem',
+        height: '2rem',
+        '::placeholder': {
+          fontSize: '1rem',
+        },
+      },
     },
 
     disabled: {

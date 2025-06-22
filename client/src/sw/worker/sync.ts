@@ -8,9 +8,11 @@ import {
   CreateLanguageChangeFieldsFragment,
   CreatePropertyChangeFieldsFragment,
   CreateWordChangeFieldsFragment,
+  CreateWordLinkChangeFieldsFragment,
   DeleteLanguageChangeFieldsFragment,
   DeletePropertyChangeFieldsFragment,
   DeleteWordChangeFieldsFragment,
+  DeleteWordLinkChangeFieldsFragment,
   GetChangesDocument,
   GetChangesQuery,
   ReorderPropertiesChangeFieldsFragment,
@@ -246,6 +248,17 @@ async function applyChanges(
         case ChangeType.DeleteWord:
           await cache.deleteWord(
             (change as DeleteWordChangeFieldsFragment).deletedWord,
+          );
+          break;
+        case ChangeType.CreateWordLink: {
+          await cache.saveLink(
+            (change as CreateWordLinkChangeFieldsFragment).createdLink,
+          );
+          break;
+        }
+        case ChangeType.DeleteWordLink:
+          await cache.deleteLink(
+            (change as DeleteWordLinkChangeFieldsFragment).deletedLink,
           );
           break;
       }

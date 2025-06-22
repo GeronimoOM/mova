@@ -52,7 +52,7 @@ export const deleteConfirmText = style({
 export const deleteConfirmLanguage = style({
   fontSize: '1.25rem',
   padding: '5px 10px',
-  borderRadius: 5,
+  borderRadius: 3,
   backgroundColor: themeVars.color.backgroundLighter,
 });
 

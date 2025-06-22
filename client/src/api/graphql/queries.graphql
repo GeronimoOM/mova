@@ -32,6 +32,7 @@ query GetWords(
 query GetWord($id: ID!) {
   word(id: $id) {
     ...WordFieldsFull
+    ...WordFieldsLinks
   }
 }
 
@@ -78,6 +79,7 @@ query GetExerciseWords($languageId: ID!) {
     id
     exerciseWords {
       ...WordFieldsFull
+      ...WordFieldsLinks
     }
   }
 }

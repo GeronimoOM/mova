@@ -14,6 +14,15 @@
   "words": {
     "search": "otsing",
     "translation": "tõlge",
+    "similar": {
+      "label": "sarnane",
+      "search": "otsing sõnu sarnase tähendusega"
+    },
+    "distinct": {
+      "label": "erinev",
+      "search": "otsing sõnu eristamiseks"
+    },
+   "suggestions": "soovitatud",
     "empty": {
       "list": "sõnu pole veel lisatud",
       "search": "sõnu pole leitud"
@@ -34,7 +43,9 @@
     "word": "sõna",
     "translation": "tõlge",
     "recall": "tuleta meelde tõlget",
+    "pick": "vali õige sõna",
     "spell": "kirjuta sõna",
+    "spellSimilar": "on sarnane aga pole õige sõna",
     "empty": {
       "title": "harjutused pole veel valmis",
       "description": "lisa rohkem sõnu oma sõnastikku või proovi lihtsalt hiljem uuesti"

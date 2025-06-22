@@ -17,7 +17,10 @@ export const Main = () => {
     <main ref={ref} className={styles.main}>
       <LayoutProvider containerRef={ref}>
         <Routes>
+          <Route path={AppRoute.Default} Component={WordsPage} />
           <Route path={AppRoute.Words} Component={WordsPage} />
+          <Route path={AppRoute.WordNew} Component={WordsPage} />
+          <Route path={AppRoute.Word} Component={WordsPage} />
           <Route path={AppRoute.Properties} Component={PropertiesPage} />
           <Route path={AppRoute.Exercises} Component={ExercisesPage} />
           <Route path={AppRoute.Progress} Component={ProgressPage} />

@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
+import { BsFillExclamationDiamondFill, BsTranslate } from 'react-icons/bs';
 import { FaArrowDown, FaArrowUp } from 'react-icons/fa';
 import { FaFeatherPointed, FaFire } from 'react-icons/fa6';
-
-import { BsFillExclamationDiamondFill, BsTranslate } from 'react-icons/bs';
 import { HiMiniXMark } from 'react-icons/hi2';
+import { MdMoreVert } from 'react-icons/md';
 
 import { NetworkStatus, useLazyQuery } from '@apollo/client';
 import classNames from 'classnames';
@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import {
   GetWordByOriginalDocument,
   WordFieldsFragment,
+  WordLinkType,
 } from '../../../api/types/graphql';
 import { hover } from '../../../index.css';
 import { useDebouncedValue } from '../../../utils/useDebouncedValue';
@@ -28,6 +29,7 @@ import {
   WordDetailsPropertiesSkeleton,
   WordDetailsProperty,
 } from './WordDetailsProperty';
+import { WordLinks } from './WordLinks';
 import { useWordDetails } from './useWordDetails';
 
 export type WordDetailsProps = {
@@ -63,6 +65,10 @@ export const WordDetails = ({
     setTranslation,
     setPartOfSpeech,
     setPropertyValue,
+    addSimilar,
+    deleteSimilar,
+    addDistinct,
+    deleteDistinct,
     properties,
     propertiesLoading,
     canCreateWord,
@@ -97,6 +103,7 @@ export const WordDetails = ({
       ? existingWordQuery?.language?.word
       : undefined;
 
+  const [areMoreButtonsVisible, setMoreButtonsVisible] = useState(false);
   const [isDeleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
   useEffect(() => {
@@ -128,27 +135,29 @@ export const WordDetails = ({
     <div className={styles.wrapper}>
       <div className={styles.innerWrapper}>
         {!disabled && (
-          <div className={styles.buttons}>
-            <ButtonIcon
-              icon={HiMiniXMark}
-              onClick={onClose}
-              wrapped={true}
-              dataTestId="word-details-close-btn"
-            />
+          <>
+            <div className={styles.buttonsTop}>
+              <ButtonIcon
+                icon={HiMiniXMark}
+                onClick={onClose}
+                wrapped={true}
+                dataTestId="word-details-close-btn"
+              />
 
-            <ButtonIcon
-              icon={FaFeatherPointed}
-              onClick={isNewWord ? createWord : updateWord}
-              color="primary"
-              highlighted={true}
-              disabled={!canCreateWord && !canUpdateWord}
-              loading={isNewWord ? wordCreating : wordUpdating}
-              wrapped={true}
-              dataTestId="word-details-save-btn"
-            />
+              <ButtonIcon
+                icon={FaFeatherPointed}
+                onClick={isNewWord ? createWord : updateWord}
+                color="primary"
+                highlighted={true}
+                disabled={!canCreateWord && !canUpdateWord}
+                loading={isNewWord ? wordCreating : wordUpdating}
+                wrapped={true}
+                dataTestId="word-details-save-btn"
+              />
+            </div>
 
-            <div className={styles.bottomButton}>
-              {!disabled && (
+            <div className={styles.buttonsBottom}>
+              {!disabled && areMoreButtonsVisible && (
                 <ButtonIcon
                   icon={FaArrowUp}
                   onClick={onSelectPrev}
@@ -158,7 +167,7 @@ export const WordDetails = ({
                 />
               )}
 
-              {!disabled && (
+              {!disabled && areMoreButtonsVisible && (
                 <ButtonIcon
                   icon={FaArrowDown}
                   onClick={onSelectNext}
@@ -168,16 +177,26 @@ export const WordDetails = ({
                 />
               )}
 
+              {areMoreButtonsVisible && (
+                <ButtonIcon
+                  icon={FaFire}
+                  onClick={() => setDeleteConfirmOpen(true)}
+                  color="negative"
+                  disabled={!canDeleteWord}
+                  wrapped={true}
+                  dataTestId="word-details-delete-btn"
+                />
+              )}
+
               <ButtonIcon
-                icon={FaFire}
-                onClick={() => setDeleteConfirmOpen(true)}
-                color="negative"
-                disabled={!canDeleteWord}
+                onClick={() => setMoreButtonsVisible(!areMoreButtonsVisible)}
+                icon={MdMoreVert}
+                toggled={areMoreButtonsVisible}
                 wrapped={true}
-                dataTestId="word-details-delete-btn"
+                dataTestId="word-details-more-btn"
               />
             </div>
-          </div>
+          </>
         )}
 
         <div className={styles.details}>
@@ -218,7 +237,7 @@ export const WordDetails = ({
               {t('words.translation')}
             </div>
             <div className={styles.translationRow}>
-              <div className={styles.translationIcon}>
+              <div className={styles.icon}>
                 <Icon icon={BsTranslate} />
               </div>
 
@@ -248,6 +267,30 @@ export const WordDetails = ({
           ) : (
             <WordDetailsPropertiesSkeleton />
           )}
+
+          <div className={styles.detailsRowGap} />
+
+          <div className={styles.detailsRow}>
+            <WordLinks
+              word={word}
+              type={WordLinkType.Similar}
+              links={word.similarLinks}
+              onOpenLink={onSelectWord}
+              onAddLink={addSimilar}
+              onDeleteLink={deleteSimilar}
+            />
+          </div>
+
+          <div className={styles.detailsRow}>
+            <WordLinks
+              word={word}
+              type={WordLinkType.Distinct}
+              links={word.distinctLinks}
+              onOpenLink={onSelectWord}
+              onAddLink={addDistinct}
+              onDeleteLink={deleteDistinct}
+            />
+          </div>
 
           {!disabled && <div className={styles.detailsEnd} />}
         </div>

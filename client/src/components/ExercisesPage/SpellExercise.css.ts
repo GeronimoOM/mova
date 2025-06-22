@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import { themeVars } from '../../index.css';
+import { fontThemeVars, themeVars } from '../../index.css';
 
 export const wrapper = style({
   display: 'flex',
@@ -51,4 +51,27 @@ export const optionPropertyResult = style({
   display: 'flex',
   width: '100%',
   flexShrink: 0,
+});
+
+export const similarMessage = style({
+  display: 'flex',
+  flexWrap: 'wrap',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: 10,
+});
+
+export const similarMessageWord = style({
+  fontFamily: fontThemeVars.monoFont,
+  fontWeight: 500,
+  letterSpacing: '0.025em',
+  height: '1.5rem',
+  padding: '5px 10px',
+  borderRadius: 3,
+  backgroundColor: themeVars.color.backgroundLighter,
+});
+
+export const similarMessageText = style({
+  color: themeVars.color.muted,
+  fontStyle: 'italic',
 });

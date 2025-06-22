@@ -210,7 +210,7 @@ async function handleGraphQlQueryWordFromCache(
   request: GraphQlRequest,
 ): Promise<Response> {
   const { id } = request.variables as GetWordQueryVariables;
-  const word = await cache.getWord(id);
+  const word = await cache.getWord(id, true);
   return response<GetWordQuery>({ word });
 }
 

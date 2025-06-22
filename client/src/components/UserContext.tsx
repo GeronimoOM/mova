@@ -124,7 +124,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
 
       if (authToken) {
         setAuthToken(authToken);
-        navigate(AppRoute.Words);
+        navigate(AppRoute.Default);
       }
 
       return authToken;
@@ -142,7 +142,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     setAuthToken(null);
     client.clearStore();
     resetServiceWorker();
-    navigate(AppRoute.Words);
+    navigate(AppRoute.Default);
   }, [navigate]);
 
   useEffect(() => {

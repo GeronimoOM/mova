@@ -22,7 +22,9 @@ import {
   UpdatePropertyParams,
 } from './PropertyService';
 import {
+  CreateLinkParams,
   CreateWordParams,
+  DeleteLinkParams,
   DeleteWordParams,
   UpdateWordParams,
   WordService,
@@ -49,6 +51,8 @@ export type ApplyChangesParams = Array<{
   createWord?: CreateWordParams;
   updateWord?: UpdateWordParams;
   deleteWord?: DeleteWordParams;
+  createWordLink?: CreateLinkParams;
+  deleteWordLink?: DeleteLinkParams;
 }>;
 
 @Injectable()
@@ -106,6 +110,10 @@ export class ChangeService {
           await this.wordService.update(ctx, change.updateWord);
         } else if (change.deleteWord) {
           await this.wordService.delete(ctx, change.deleteWord);
+        } else if (change.createWordLink) {
+          await this.wordService.createLink(ctx, change.createWordLink);
+        } else if (change.deleteWordLink) {
+          await this.wordService.deleteLink(ctx, change.deleteWordLink);
         }
       }
     });
@@ -151,8 +159,9 @@ export class ChangeService {
     params: GetChangePageParams,
   ): Promise<ChangePage> {
     const languages = await this.languageService.getAll(ctx);
+    const languageIds = languages.map((language) => language.id);
     const wordsPage = await this.wordService.getPage(ctx, {
-      languageId: languages.map((language) => language.id),
+      languageId: languageIds,
       order: WordOrder.Chronological,
       direction: Direction.Asc,
       ...(params.cursor && {
@@ -178,10 +187,7 @@ export class ChangeService {
     };
 
     if (!params.cursor) {
-      const [languages, properties] = await Promise.all([
-        this.languageService.getAll(ctx),
-        this.propertyService.getAll(ctx),
-      ]);
+      const properties = await this.propertyService.getAll(ctx);
 
       changes.items = [
         ...languages.map((language) =>
@@ -191,6 +197,17 @@ export class ChangeService {
           this.changeBuilder.buildCreatePropertyChange(ctx, property),
         ),
         ...changes.items,
+      ];
+    }
+
+    if (!changes.nextCursor) {
+      const links = await this.wordService.getAllLinks(languageIds);
+
+      changes.items = [
+        ...changes.items,
+        ...links.map((link) =>
+          this.changeBuilder.buildCreateWordLinkChange(ctx, link),
+        ),
       ];
     }
 

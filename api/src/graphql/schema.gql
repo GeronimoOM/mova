@@ -111,6 +111,17 @@ type OptionUsage {
   count: Int!
 }
 
+type WordLink {
+  word1Id: ID!
+  word2Id: ID!
+  type: WordLinkType!
+}
+
+enum WordLinkType {
+  Similar
+  Distinct
+}
+
 type OptionValue {
   id: ID
   value: String!
@@ -127,6 +138,7 @@ type Word {
   nextExerciseAt: Timestamp!
   languageId: ID!
   properties: [PropertyValue!]!
+  links(type: WordLinkType!): [Word!]!
 }
 
 union PropertyValue = TextPropertyValue | OptionPropertyValue
@@ -211,7 +223,7 @@ type ChangePage {
   syncType: SyncType!
 }
 
-union Change = CreateLanguageChange | UpdateLanguageChange | DeleteLanguageChange | CreatePropertyChange | UpdatePropertyChange | ReorderPropertiesChange | DeletePropertyChange | CreateWordChange | UpdateWordChange | DeleteWordChange
+union Change = CreateLanguageChange | UpdateLanguageChange | DeleteLanguageChange | CreatePropertyChange | UpdatePropertyChange | ReorderPropertiesChange | DeletePropertyChange | CreateWordChange | UpdateWordChange | DeleteWordChange | CreateWordLinkChange | DeleteWordLinkChange
 
 type CreateLanguageChange implements IChange {
   id: ID!
@@ -237,6 +249,8 @@ enum ChangeType {
   CreateWord
   UpdateWord
   DeleteWord
+  CreateWordLink
+  DeleteWordLink
 }
 
 type UpdateLanguageChange implements IChange {
@@ -323,6 +337,20 @@ type DeleteWordChange implements IChange {
   deleted: ID!
 }
 
+type CreateWordLinkChange implements IChange {
+  id: ID!
+  changedAt: Timestamp!
+  type: ChangeType!
+  created: WordLink!
+}
+
+type DeleteWordLinkChange implements IChange {
+  id: ID!
+  changedAt: Timestamp!
+  type: ChangeType!
+  deleted: WordLink!
+}
+
 enum SyncType {
   Full
   Delta
@@ -405,6 +433,8 @@ type Mutation {
   createWord(input: CreateWordInput!): Word!
   updateWord(input: UpdateWordInput!): Word!
   deleteWord(input: DeleteWordInput!): Word!
+  createLink(input: CreateWordLinkInput!): WordLink!
+  deleteLink(input: DeleteWordLinkInput!): WordLink!
   attemptMastery(wordId: ID!, success: Boolean!): Word!
   setGoals(input: SetGoalsInput!): [Goal!]!
   updateSettings(input: UpdateUserSettingsInput!): UserSettings!
@@ -479,6 +509,8 @@ input ApplyChangeInput {
   createWord: CreateWordInput
   updateWord: UpdateWordInput
   deleteWord: DeleteWordInput
+  createWordLink: CreateWordLinkInput
+  deleteWordLink: DeleteWordLinkInput
 }
 
 input CreateWordInput {
@@ -512,6 +544,18 @@ input UpdateWordInput {
 
 input DeleteWordInput {
   id: ID!
+}
+
+input CreateWordLinkInput {
+  word1Id: ID!
+  word2Id: ID!
+  type: WordLinkType!
+}
+
+input DeleteWordLinkInput {
+  word1Id: ID!
+  word2Id: ID!
+  type: WordLinkType!
 }
 
 input SetGoalsInput {

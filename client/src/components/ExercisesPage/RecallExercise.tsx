@@ -1,5 +1,4 @@
 import { BsTranslate } from 'react-icons/bs';
-import { WordFieldsFullFragment } from '../../api/types/graphql';
 
 import classNames from 'classnames';
 import { useCallback, useState } from 'react';
@@ -11,9 +10,10 @@ import { ButtonIcon } from '../common/ButtonIcon';
 import { Icon } from '../common/Icon';
 import { Input } from '../common/Input';
 import * as styles from './RecallExercise.css';
+import { ExerciseWord } from './exercises';
 
 export type RecallExerciseProps = {
-  word: WordFieldsFullFragment;
+  word: ExerciseWord;
   onSuccess: () => void;
   onFailure: () => void;
   onNext: () => void;

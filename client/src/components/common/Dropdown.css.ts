@@ -4,7 +4,6 @@ import { themeVars } from '../../index.css';
 
 export const wrapper = style({
   position: 'relative',
-  width: 'fit-content',
 });
 
 export const dropdown = recipe({

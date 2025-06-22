@@ -14,6 +14,15 @@
   "words": {
     "search": "search",
     "translation": "translation",
+    "similar": {
+      "label": "similar",
+      "search": "search for words with similar meaning"
+    },
+    "distinct": {
+      "label": "distinct",
+      "search": "search for words to distinguish"
+    },
+    "suggestions": "suggestions", 
     "empty": {
       "list": "no words added yet",
       "search": "no words found"
@@ -34,7 +43,9 @@
     "word": "word",
     "translation": "translation",
     "recall": "recall the translation",
+    "pick": "pick correct word",
     "spell": "spell the word",
+    "spellSimilar": "is similar but not the correct word",
     "empty": {
       "title": "no exercises yet",
       "description": "add more words to your vocabulary or simply try again later"

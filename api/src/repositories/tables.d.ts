@@ -3,7 +3,7 @@ import { LanguageId } from 'models/Language';
 import { ProgressId } from 'models/Progress';
 import { PropertyId, PropertyType } from 'models/Property';
 import { UserId } from 'models/User';
-import { PartOfSpeech, WordId } from 'models/Word';
+import { PartOfSpeech, WordId, WordLinkType } from 'models/Word';
 
 declare module 'knex/types/tables' {
   interface LanguageTable {
@@ -51,6 +51,13 @@ declare module 'knex/types/tables' {
     language_id: LanguageId;
   }
 
+  interface WordLinkTable {
+    word1_id: WordId;
+    word2_id: WordId;
+    type: WordLinkType;
+    language_id: LanguageId;
+  }
+
   interface ChangeTable {
     id: ChangeId;
     changed_at: string;
@@ -77,6 +84,7 @@ declare module 'knex/types/tables' {
     words: WordTable;
     progress: ProgressTable;
     goals: GoalTable;
+    word_links: WordLinkTable;
     changes: ChangeTable;
     users: UserTable;
     user_settings: UserSettingsTable;

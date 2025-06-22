@@ -67,6 +67,18 @@ mutation DeleteWord($input: DeleteWordInput!) {
   }
 }
 
+mutation CreateLink($input: CreateWordLinkInput!) {
+  createLink(input: $input) {
+    ...WordLinkFields
+  }
+}
+
+mutation DeleteLink($input: DeleteWordLinkInput!) {
+  deleteLink(input: $input) {
+    ...WordLinkFields
+  }
+}
+
 mutation AttemptWordMastery($wordId: ID!, $success: Boolean!) {
   attemptMastery(wordId: $wordId, success: $success) {
     ...WordFields

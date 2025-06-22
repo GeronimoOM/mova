@@ -79,3 +79,15 @@ export const WordCursor = Type.Union([
   AlphabeticalCursor,
   StartCursor,
 ]);
+
+export interface WordLink {
+  word1Id: WordId;
+  word2Id: WordId;
+  type: WordLinkType;
+  languageId: LanguageId;
+}
+
+export enum WordLinkType {
+  Similar = 'similar',
+  Distinct = 'distinct',
+}

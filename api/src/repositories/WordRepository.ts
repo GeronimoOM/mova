@@ -1,5 +1,5 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { WordTable } from 'knex/types/tables';
+import { WordLinkTable, WordTable } from 'knex/types/tables';
 import { DateTime, Duration } from 'luxon';
 import { LanguageId } from 'models/Language';
 import { Direction, Page, toPage } from 'models/Page';
@@ -11,6 +11,8 @@ import {
   PartOfSpeech,
   Word,
   WordId,
+  WordLink,
+  WordLinkType,
   WordMastery,
   WordOrder,
   WordSortedCursor,
@@ -23,6 +25,7 @@ import { DbConnectionManager } from './DbConnectionManager';
 import { Serializer } from './Serializer';
 
 const TABLE_WORDS = 'words';
+const TABLE_WORD_LINKS = 'word_links';
 
 const BATCH_SIZE = 100;
 
@@ -235,6 +238,30 @@ export class WordRepository {
     } while (true);
   }
 
+  async getLinks(id: WordId, type: WordLinkType): Promise<WordId[]> {
+    const links = await this.connectionManager
+      .getConnection()(TABLE_WORD_LINKS)
+      .where({ word1_id: id, type })
+      .orWhere({ word2_id: id, type });
+
+    return links.map((link) =>
+      link.word1_id === id ? link.word2_id : link.word1_id,
+    );
+  }
+
+  async getAllLinks(languageIds: LanguageId[]): Promise<WordLink[]> {
+    const links = await this.connectionManager
+      .getConnection()(TABLE_WORD_LINKS)
+      .whereIn('language_id', languageIds);
+
+    return links.map((link) => ({
+      word1Id: link.word1_id,
+      word2Id: link.word2_id,
+      type: link.type,
+      languageId: link.language_id,
+    }));
+  }
+
   async create(word: Word): Promise<void> {
     await this.connectionManager
       .getConnection()(TABLE_WORDS)
@@ -246,6 +273,19 @@ export class WordRepository {
         part_of_speech: word.partOfSpeech,
         added_at: toTimestamp(word.addedAt),
         properties: this.mapFromWordProperties(word.properties) ?? undefined,
+      })
+      .onConflict()
+      .ignore();
+  }
+
+  async createLink(wordLink: WordLink): Promise<void> {
+    await this.connectionManager
+      .getConnection()(TABLE_WORD_LINKS)
+      .insert({
+        word1_id: wordLink.word1Id,
+        word2_id: wordLink.word2Id,
+        type: wordLink.type,
+        language_id: wordLink.languageId,
       })
       .onConflict()
       .ignore();
@@ -282,6 +322,14 @@ export class WordRepository {
     await this.connectionManager
       .getConnection()(TABLE_WORDS)
       .where({ language_id: languageId })
+      .delete();
+  }
+
+  async deleteLink({ word1Id, word2Id, type }: WordLink): Promise<void> {
+    await this.connectionManager
+      .getConnection()(TABLE_WORD_LINKS)
+      .where({ word1_id: word1Id, word2_id: word2Id, type })
+      .orWhere({ word1_id: word2Id, word2_id: word1Id, type })
       .delete();
   }
 
@@ -389,9 +437,21 @@ export class WordRepository {
     return this.connectionManager.getConnection()(TABLE_WORDS).stream();
   }
 
+  streamLinkRecords(): AsyncIterable<WordLinkTable> {
+    return this.connectionManager.getConnection()(TABLE_WORD_LINKS).stream();
+  }
+
   async insertBatch(batch: WordTable[]): Promise<void> {
     await this.connectionManager
       .getConnection()(TABLE_WORDS)
+      .insert(batch)
+      .onConflict()
+      .merge();
+  }
+
+  async insertLinksBatch(batch: WordLinkTable[]): Promise<void> {
+    await this.connectionManager
+      .getConnection()(TABLE_WORD_LINKS)
       .insert(batch)
       .onConflict()
       .merge();

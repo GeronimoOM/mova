@@ -37,6 +37,27 @@ fragment WordFieldsFull on Word {
   }
 }
 
+fragment WordFieldsLinks on Word {
+  similarLinks: links(type: Similar) {
+    ...LinkedWordFields
+  }
+  distinctLinks: links(type: Distinct) {
+    ...LinkedWordFields
+  }
+}
+
+fragment LinkedWordFields on Word {
+  id
+  original
+  translation
+}
+
+fragment WordLinkFields on WordLink {
+  word1Id
+  word2Id
+  type
+}
+
 fragment PropertyValueFields on PropertyValue {
   ... on TextPropertyValue {
     ...TextPropertyValueFields
@@ -118,6 +139,9 @@ fragment ChangeFields on Change {
   ...CreateWordChangeFields
   ...UpdateWordChangeFields
   ...DeleteWordChangeFields
+
+  ...CreateWordLinkChangeFields
+  ...DeleteWordLinkChangeFields
 }
 
 fragment CreateLanguageChangeFields on CreateLanguageChange {
@@ -215,6 +239,18 @@ fragment PropertyValueSaveFields on PropertyValueSave {
     optionId
     value
     color
+  }
+}
+
+fragment CreateWordLinkChangeFields on CreateWordLinkChange {
+  createdLink: created {
+    ...WordLinkFields
+  }
+}
+
+fragment DeleteWordLinkChangeFields on DeleteWordLinkChange {
+  deletedLink: deleted {
+    ...WordLinkFields
   }
 }
 

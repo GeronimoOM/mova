@@ -16,7 +16,11 @@ import {
   type WordCreate,
   type WordFieldsFragment,
   type WordFieldsFullFragment,
+  type WordLinkFieldsFragment,
   type WordUpdate,
+  LinkedWordFieldsFragment,
+  WordFieldsLinksFragment,
+  WordLinkType,
 } from '../../api/types/graphql';
 import { updatedOptions } from '../../utils/options';
 import {
@@ -32,8 +36,8 @@ export class MovaDb extends Dexie {
   languages!: Dexie.Table<LanguageFieldsFragment & Partial<Language>>;
   properties!: Dexie.Table<PropertyFieldsFragment>;
   words!: Dexie.Table<WordFieldsFragment | WordFieldsFullFragment>;
+  links!: Dexie.Table<WordLinkFieldsFragment>;
   changes!: Dexie.Table<ApplyChangeInput & { id: number }>;
-  auth!: Dexie.Table<{ id: number; token: string }>;
 }
 
 const db = new Dexie(IDB_NAME) as MovaDb;
@@ -43,8 +47,11 @@ const indices = {
   languages: 'id,addedAt',
   properties: 'id,[languageId+partOfSpeech]',
   words: 'id,[languageId+addedAt+id],[languageId+original+id]',
+  links: '[word1Id+type+word2Id],&[word2Id+type+word1Id]',
   changes: 'id',
 };
+
+const trxTables = ['languages', 'properties', 'words', 'links'];
 
 db.version(1).stores(indices);
 
@@ -55,6 +62,12 @@ db.version(2)
   });
 
 db.version(3)
+  .stores(indices)
+  .upgrade(async () => {
+    await destroy();
+  });
+
+db.version(4)
   .stores(indices)
   .upgrade(async () => {
     await destroy();
@@ -247,8 +260,25 @@ export async function searchWords(
 
 export async function getWord(
   id: string,
-): Promise<WordFieldsFullFragment | undefined> {
-  return (await db.words.get(id)) as WordFieldsFullFragment;
+  full = false,
+): Promise<(WordFieldsFullFragment & WordFieldsLinksFragment) | undefined> {
+  const word = (await db.words.get(id)) as WordFieldsFullFragment &
+    WordFieldsLinksFragment;
+
+  if (full) {
+    const [similarLinks, distinctLinks] = await Promise.all([
+      getLinkedWords(id, WordLinkType.Similar),
+      getLinkedWords(id, WordLinkType.Distinct),
+    ]);
+
+    return {
+      ...word,
+      similarLinks,
+      distinctLinks,
+    };
+  }
+
+  return word;
 }
 
 export async function getWordByOriginal(
@@ -328,6 +358,41 @@ export async function deleteWord(wordId: string): Promise<void> {
   await db.words.delete(wordId);
 }
 
+export async function getLinkedWords(
+  id: string,
+  type: WordLinkType,
+): Promise<LinkedWordFieldsFragment[]> {
+  const links = (
+    await Promise.all([
+      db.links.where({ word1Id: id, type }).toArray(),
+      db.links.where({ word2Id: id, type }).toArray(),
+    ])
+  ).flat();
+  const linkIds = links.map((link) =>
+    link.word1Id === id ? link.word2Id : link.word1Id,
+  );
+
+  return await db.words.where('id').anyOf(linkIds).toArray();
+}
+
+export async function saveLink(
+  wordLink: WordLinkFieldsFragment,
+): Promise<void> {
+  await db.links.put({
+    ...wordLink,
+    __typename: 'WordLink',
+  });
+}
+
+export async function deleteLink(
+  wordLink: WordLinkFieldsFragment,
+): Promise<void> {
+  await Promise.all([
+    db.links.delete([wordLink.word1Id, wordLink.type, wordLink.word2Id]),
+    db.links.delete([wordLink.word2Id, wordLink.type, wordLink.word1Id]),
+  ]);
+}
+
 export async function getChanges(
   limit: number,
 ): Promise<Array<ApplyChangeInput & { id: number }>> {
@@ -354,11 +419,12 @@ export async function destroy(): Promise<void> {
     db.languages.clear(),
     db.properties.clear(),
     db.words.clear(),
+    db.links.clear(),
     db.changes.clear(),
     db.state.clear(),
   ]);
 }
 
 export async function transactionally<T>(fn: () => Promise<T>): Promise<T> {
-  return await db.transaction('rw', ['languages', 'properties', 'words'], fn);
+  return await db.transaction('rw', trxTables, fn);
 }
