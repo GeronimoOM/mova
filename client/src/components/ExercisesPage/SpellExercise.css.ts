@@ -5,6 +5,8 @@ export const wrapper = style({
   display: 'flex',
   flexDirection: 'column',
   gap: 15,
+  padding: '0 1px',
+  overflowY: 'auto',
 });
 
 export const title = style({
@@ -43,8 +45,11 @@ export const optionPropertyRow = style({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  justifyItems: 'stretch',
   gap: 20,
+});
+
+export const optionPropertyPill = style({
+  flex: 1,
 });
 
 export const optionPropertyResult = style({

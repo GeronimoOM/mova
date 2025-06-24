@@ -9,6 +9,7 @@ export const card = style({
   flexDirection: 'column',
   alignItems: 'center',
   position: 'relative',
+  overflowY: 'auto',
 });
 
 export const exercise = style({

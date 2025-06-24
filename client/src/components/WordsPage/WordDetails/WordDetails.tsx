@@ -278,6 +278,7 @@ export const WordDetails = ({
               onOpenLink={onSelectWord}
               onAddLink={addSimilar}
               onDeleteLink={deleteSimilar}
+              disabled={disabled}
             />
           </div>
 
@@ -289,6 +290,7 @@ export const WordDetails = ({
               onOpenLink={onSelectWord}
               onAddLink={addDistinct}
               onDeleteLink={deleteDistinct}
+              disabled={disabled}
             />
           </div>
 

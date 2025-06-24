@@ -17,7 +17,7 @@ export const labelRow = style({
   gap: 8,
 });
 
-globalStyle(`${labelRow} > *:last-child`, {
+export const addButton = style({
   marginLeft: 'auto',
 });
 
@@ -42,6 +42,10 @@ export const listItem = style({
     '&.deleted': {
       textDecoration: 'line-through',
       color: themeVars.color.muted,
+    },
+
+    '&.disabled': {
+      pointerEvents: 'none',
     },
   },
 });

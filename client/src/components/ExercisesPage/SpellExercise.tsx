@@ -340,17 +340,19 @@ const SpellOptionExerciseProperty = ({
       <div className={styles.propertyLabel}>{property.name}</div>
 
       <div className={styles.optionPropertyRow}>
-        <WordDetailsOptionProperty
-          property={property}
-          propertyValue={inputPropertyValue}
-          onChange={({ option }) =>
-            setInputOption(
-              option?.value ? { id: option.id, value: option.value } : null,
-            )
-          }
-          disabled={isSubmitted}
-          exercise
-        />
+        <div className={styles.optionPropertyPill}>
+          <WordDetailsOptionProperty
+            property={property}
+            propertyValue={inputPropertyValue}
+            onChange={({ option }) =>
+              setInputOption(
+                option?.value ? { id: option.id, value: option.value } : null,
+              )
+            }
+            disabled={isSubmitted}
+            exercise
+          />
+        </div>
 
         {isVerified && (
           <div className={styles.optionPropertyResult}>

@@ -59,6 +59,7 @@ export type WordLinksProps = {
   onOpenLink: (wordId: string) => void;
   onAddLink: (link: LinkedWordFieldsFragment) => void;
   onDeleteLink: (link: LinkedWordFieldsFragment) => void;
+  disabled?: boolean;
 };
 
 export const WordLinks = ({
@@ -68,6 +69,7 @@ export const WordLinks = ({
   onAddLink,
   onDeleteLink,
   onOpenLink,
+  disabled,
 }: WordLinksProps) => {
   const { t } = useTranslation();
   const [isDropdownOpen, setDropdownOpen] = useState(false);
@@ -103,14 +105,16 @@ export const WordLinks = ({
           <Icon icon={linkTypeToIcon[type]} />
           <div>{t(linkTypeToLabel[type])}</div>
 
-          <div ref={addBtnRef}>
-            <ButtonIcon
-              icon={TbLinkPlus}
-              onClick={() => setDropdownOpen(!isDropdownOpen)}
-              size={'small'}
-              dataTestId="word-links-btn"
-            />
-          </div>
+          {!disabled && (
+            <div className={styles.addButton} ref={addBtnRef}>
+              <ButtonIcon
+                icon={TbLinkPlus}
+                onClick={() => setDropdownOpen(!isDropdownOpen)}
+                size={'small'}
+                dataTestId="word-links-btn"
+              />
+            </div>
+          )}
         </div>
       </Dropdown>
 
@@ -124,6 +128,7 @@ export const WordLinks = ({
             onAction={() =>
               link.isDeleted ? onAddLink(link) : onDeleteLink(link)
             }
+            disabled={disabled}
           />
         ))}
       </div>
@@ -136,25 +141,37 @@ type WordLinkProps = {
   onLinkClick: () => void;
   action: LinkAction;
   onAction: () => void;
+  disabled?: boolean;
 };
 
-const WordLink = ({ link, action, onLinkClick, onAction }: WordLinkProps) => {
+const WordLink = ({
+  link,
+  action,
+  onLinkClick,
+  onAction,
+  disabled,
+}: WordLinkProps) => {
   return (
     <div
-      className={classNames(styles.listItem, { deleted: link.isDeleted })}
+      className={classNames(styles.listItem, {
+        deleted: link.isDeleted,
+        disabled,
+      })}
       onClick={() => onLinkClick()}
       data-testid="word-link"
     >
       <div className={styles.listItemOriginal}>{link.original}</div>
       <div className={styles.listItemTranslation}>{link.translation}</div>
-      <div className={styles.listItemUnlinkBtn}>
-        <ButtonIcon
-          icon={linkActionToIcon[action]}
-          onClick={onAction}
-          size={'small'}
-          dataTestId={'word-link-btn'}
-        />
-      </div>
+      {!disabled && (
+        <div className={styles.listItemUnlinkBtn}>
+          <ButtonIcon
+            icon={linkActionToIcon[action]}
+            onClick={onAction}
+            size={'small'}
+            dataTestId={'word-link-btn'}
+          />
+        </div>
+      )}
     </div>
   );
 };

@@ -8,7 +8,7 @@ import {
 import { OptionPill } from '../../common/OptionPill';
 
 import { useTranslation } from 'react-i18next';
-import { HiMiniXMark } from 'react-icons/hi2';
+import { BsEraserFill } from 'react-icons/bs';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import * as styles from './WordDetailsOptionsDropdown.css';
 
@@ -42,7 +42,7 @@ export const WordDetailsOptionDropdown = ({
     <div className={styles.wrapper}>
       <div className={styles.options}>
         <ButtonIcon
-          icon={HiMiniXMark}
+          icon={BsEraserFill}
           onClick={() => handleSelect(null)}
           size={'small'}
           dataTestId="word-details-options-clear-btn"

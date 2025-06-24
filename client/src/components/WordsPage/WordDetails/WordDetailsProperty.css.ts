@@ -49,5 +49,4 @@ export const optionWrapper = style({
   height: 40,
   display: 'flex',
   alignItems: 'center',
-  width: 'min-content',
 });
