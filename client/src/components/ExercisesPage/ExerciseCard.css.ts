@@ -9,6 +9,7 @@ export const card = style({
   flexDirection: 'column',
   alignItems: 'center',
   position: 'relative',
+  height: '100%',
   overflowY: 'auto',
 });
 

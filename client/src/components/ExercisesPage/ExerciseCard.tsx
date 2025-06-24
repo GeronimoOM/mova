@@ -1,5 +1,5 @@
 import { NetworkStatus, useLazyQuery, useQuery } from '@apollo/client';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { FaInfo } from 'react-icons/fa';
 import { HiMiniXMark } from 'react-icons/hi2';
 
@@ -14,6 +14,7 @@ import {
 } from '../../api/types/graphql';
 import { toGroupedRecord } from '../../utils/arrays';
 import { useLanguageContext } from '../LanguageContext';
+import { LayoutProvider } from '../LayoutContext';
 import { WordDetails } from '../WordsPage/WordDetails/WordDetails';
 import { ButtonIcon } from '../common/ButtonIcon';
 import { Loader } from '../common/Loader';
@@ -30,6 +31,8 @@ export const ExerciseCard = () => {
   const [wordIndex, setWordIndex] = useState(-1);
   const [isInfoAvailable, setInfoAvailable] = useState(false);
   const [isInfoOpen, setInfoOpen] = useState(false);
+
+  const cardRef = useRef<HTMLDivElement>(null);
 
   const { data: propertiesQuery, loading: propertiesLoading } = useQuery(
     GetPropertiesDocument,
@@ -122,12 +125,12 @@ export const ExerciseCard = () => {
   };
 
   return (
-    <div className={styles.card}>
+    <div className={styles.card} ref={cardRef}>
       {isStarted ? (
         loading ? (
           <Loader />
         ) : currentWord ? (
-          <>
+          <LayoutProvider containerRef={cardRef}>
             <div className={styles.exercise}>
               <Exercise
                 key={currentWord!.id}
@@ -162,7 +165,7 @@ export const ExerciseCard = () => {
                 onClick={handleClose}
               />
             </div>
-          </>
+          </LayoutProvider>
         ) : (
           <ExercisesNotReady />
         )

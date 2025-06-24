@@ -6,7 +6,6 @@ export const wrapper = style({
   flexDirection: 'column',
   gap: 15,
   padding: '0 1px',
-  overflowY: 'auto',
 });
 
 export const title = style({
@@ -54,8 +53,7 @@ export const optionPropertyPill = style({
 
 export const optionPropertyResult = style({
   display: 'flex',
-  width: '100%',
-  flexShrink: 0,
+  flex: 0,
 });
 
 export const similarMessage = style({
