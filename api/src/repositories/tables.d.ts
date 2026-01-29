@@ -32,7 +32,7 @@ declare module 'knex/types/tables' {
     part_of_speech: PartOfSpeech;
     added_at: string;
     mastery: number;
-    mastery_inc_at?: string;
+    confidence: number;
     mastery_attempt_at?: string;
     properties?: string;
   }

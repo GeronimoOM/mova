@@ -85,6 +85,12 @@ mutation AttemptWordMastery($wordId: ID!, $success: Boolean!) {
   }
 }
 
+mutation ResetConfidence($wordId: ID!) {
+  resetConfidence(wordId: $wordId) {
+    ...WordFields
+  }
+}
+
 mutation SetGoals($input: SetGoalsInput!) {
   setGoals(input: $input) {
     ...GoalFields
@@ -104,6 +110,5 @@ mutation UpdateSettings($input: UpdateUserSettingsInput!) {
     selectedLanguageId
     selectedLocale
     selectedFont
-    includeMastered
   }
 }

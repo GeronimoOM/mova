@@ -159,7 +159,6 @@ query GetUserSettings {
     selectedLanguageId
     selectedLocale
     selectedFont
-    includeMastered
   }
 }
 

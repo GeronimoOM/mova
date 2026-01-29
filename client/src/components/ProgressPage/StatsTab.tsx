@@ -2,9 +2,15 @@ import { useQuery } from '@apollo/client';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaBook, FaBrain } from 'react-icons/fa6';
+import { GiMuscleUp } from 'react-icons/gi';
 import { PiGraphBold } from 'react-icons/pi';
 import { PieChart } from 'react-minimal-pie-chart';
 import { GetStatsDocument } from '../../api/types/graphql';
+import {
+  confidences,
+  confidenceToColor,
+  confidenceToLabel,
+} from '../../utils/confidence';
 import { masteries, masteryToColor, masteryToLabel } from '../../utils/mastery';
 import {
   partOfSpeechToColor,
@@ -25,6 +31,7 @@ export const StatsTab = () => {
   const stats = statsQuery?.language?.stats;
   const total = stats?.total;
   const byMastery = stats?.mastery;
+  const byConfidence = stats?.confidence;
   const byPartOfSpeech = stats?.partsOfSpeech;
 
   const { t } = useTranslation();
@@ -41,6 +48,22 @@ export const StatsTab = () => {
         };
       }),
     [byMastery],
+  );
+
+  const confidenceData = useMemo(
+    () =>
+      confidences.map((confidence) => {
+        const data = byConfidence?.find(
+          (item) => item.confidence === confidence,
+        );
+
+        return {
+          color: confidenceToColor[confidence],
+          title: confidenceToLabel[confidence],
+          value: data?.total ?? 0,
+        };
+      }),
+    [byConfidence],
   );
 
   const partOfSpeechData = useMemo(
@@ -90,6 +113,18 @@ export const StatsTab = () => {
         <div className={styles.cardRow}>
           <Chart data={masteryData} />
           <ChartLegend data={masteryData} />
+        </div>
+      </div>
+
+      <div className={styles.card}>
+        <div className={styles.cardRow}>
+          <Icon icon={GiMuscleUp} size="small" />
+          {t('stats.byConfidence')}
+        </div>
+
+        <div className={styles.cardRow}>
+          <Chart data={confidenceData} />
+          <ChartLegend data={confidenceData} />
         </div>
       </div>
     </div>

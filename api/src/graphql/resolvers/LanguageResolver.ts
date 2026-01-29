@@ -134,7 +134,6 @@ export class LanguageResolver {
 
   @ResolveField(() => WordType, { nullable: true })
   async word(
-    @ContextDec() ctx: Context,
     @Parent() language: LanguageType,
     @Args('original') original: string,
   ): Promise<WordType | null> {
@@ -152,6 +151,12 @@ export class LanguageResolver {
         mastery: Number(mastery),
         total,
       })),
+      confidence: Object.entries(wordsStats.confidence).map(
+        ([confidence, total]) => ({
+          confidence: Number(confidence),
+          total,
+        }),
+      ),
       partsOfSpeech: Object.entries(wordsStats.partsOfSpeech).map(
         ([partOfSpeech, total]) => ({
           partOfSpeech: partOfSpeech as PartOfSpeech,

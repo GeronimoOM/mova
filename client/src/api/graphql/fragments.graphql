@@ -27,6 +27,7 @@ fragment WordFields on Word {
   addedAt
   languageId
   mastery
+  confidence
   nextExerciseAt
 }
 
@@ -202,6 +203,7 @@ fragment CreateWordChangeFields on CreateWordChange {
     partOfSpeech
     addedAt
     mastery
+    confidence
     nextExerciseAt
     languageId
     properties {
@@ -216,6 +218,7 @@ fragment UpdateWordChangeFields on UpdateWordChange {
     original
     translation
     mastery
+    confidence
     nextExerciseAt
     properties {
       ...PropertyValueSaveFields
@@ -290,6 +293,10 @@ fragment WordsStatsFields on WordsStats {
   mastery {
     total
     mastery
+  }
+  confidence {
+    total
+    confidence
   }
   partsOfSpeech {
     total

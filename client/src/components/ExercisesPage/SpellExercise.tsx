@@ -115,13 +115,16 @@ export const SpellExercise = ({
 
   return (
     <div className={styles.wrapper}>
-      <div className={styles.title}>{t('exercise.spell')}</div>
+      <div className={styles.title} data-testid="exercise-title">
+        {t('exercise.spell')}
+      </div>
 
       <Input
         value={word.translation}
         text="translation"
         size="large"
         disabled
+        dataTestId="exercise-word"
       />
 
       {similar && <SpellExerciseSimilarMessage similar={similar} />}
@@ -174,12 +177,14 @@ export const SpellExercise = ({
           onClick={handleSubmit}
           disabled={isSubmitted}
           toggled={hasResult}
+          dataTestId="exercise-submit-btn"
         />
 
         <ButtonIcon
           icon={!hasResult ? FaMinus : FaAngleDoubleRight}
           {...(!hasResult && { color: 'negative' })}
           onClick={handleNext}
+          dataTestId="exercise-skip-btn"
         />
       </div>
     </div>
@@ -286,6 +291,7 @@ const SpellTextExerciseProperty = ({
         length={isSubmitted ? input.length : propertyValue.length}
         obscureLength={advanced && !isSubmitted}
         highlights={highlights}
+        dataTestId="spell-exercise-input"
       />
     </div>
   );

@@ -10,6 +10,7 @@ import { BaseContext } from 'models/Context';
 import { AuthService } from 'services/AuthService';
 import {
   HEADER_AUTHORIZATION,
+  HEADER_SORT_EXERCISES,
   HEADER_SYNC_CLIENT_ID,
   HEADER_TIMEZONE,
 } from 'utils/constants';
@@ -49,6 +50,7 @@ export class ContextMiddleware implements NestMiddleware {
       user,
       clientId: request.headers[HEADER_SYNC_CLIENT_ID] as string,
       timezone: request.headers[HEADER_TIMEZONE] as string,
+      sortExercises: request.headers[HEADER_SORT_EXERCISES] === 'true',
     };
 
     next();

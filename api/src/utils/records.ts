@@ -37,6 +37,17 @@ export function mapValues<K extends string | number, V1, V2>(
   ) as Record<K, V2>;
 }
 
+export function map<
+  K1 extends string | number,
+  K2 extends string | number,
+  V1,
+  V2,
+>(record: Record<K1, V1>, mapFn: (kv: [K1, V1]) => [K2, V2]): Record<K2, V2> {
+  return Object.fromEntries(
+    Object.entries<V1>(record).map((kv) => mapFn(kv as [K1, V1])),
+  ) as Record<K2, V2>;
+}
+
 export type RecordDiff<K extends string | number, V> = {
   added: Record<K, V>;
   updated: Record<K, V>;

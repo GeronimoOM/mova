@@ -18,5 +18,4 @@ export interface UserSettings {
   selectedLanguageId?: LanguageId;
   selectedLocale?: string;
   selectedFont?: string;
-  includeMastered?: boolean;
 }

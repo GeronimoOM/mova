@@ -259,6 +259,9 @@ export class WordCreateType {
   @Field(() => Int)
   mastery: number;
 
+  @Field(() => Int)
+  confidence: number;
+
   @Field(() => TimestampScalar)
   nextExerciseAt: DateTime;
 
@@ -293,6 +296,9 @@ export class WordUpdateType {
 
   @Field(() => Int, { nullable: true })
   mastery?: number;
+
+  @Field(() => Int, { nullable: true })
+  confidence?: number;
 
   @Field(() => TimestampScalar, { nullable: true })
   nextExerciseAt?: DateTime;

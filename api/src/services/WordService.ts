@@ -17,10 +17,12 @@ import {
 import {
   PartOfSpeech,
   Word,
+  WordConfidence,
   WordCursor,
   WordId,
   WordLink,
   WordLinkType,
+  WordMastery,
   WordOrder,
 } from 'models/Word';
 import { DbConnectionManager } from 'repositories/DbConnectionManager';
@@ -181,7 +183,8 @@ export class WordService {
       translation: params.translation,
       languageId: params.languageId,
       partOfSpeech: params.partOfSpeech,
-      mastery: 0,
+      mastery: WordMastery.None,
+      confidence: WordConfidence.Normal,
       addedAt: params.addedAt ?? DateTime.utc(),
     };
 

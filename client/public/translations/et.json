@@ -28,8 +28,9 @@
       "search": "sõnu pole leitud"
     },
     "mastery": {
+      "label": "oskus",
       "nextExerciseAt": "järgmine harjutus",
-      "exerciseReady": "harjutus on valmis"
+      "exerciseReady": "valmis"
     },
     "existing": "on juba lisatud",
     "options": {
@@ -89,7 +90,8 @@
   "stats": {
     "total": "sõnu kokku",
     "byPartOfSpeech": "sõnad sõnaliigi järgi",
-    "byMastery": "sõnad oskuse järgi"
+    "byMastery": "sõnad oskuse järgi",
+    "byConfidence": "sõnad kindluse järgi"
   },
   "pos": {
     "noun": {
@@ -119,13 +121,22 @@
     "select": "vali"
   },
   "mastery": {
+    "label": "oskus",
     "none": "puudub",
-    "basic": "algne",
-    "advanced": "keskmine",
-    "mastered": "õpitud"
+    "basic": "algtaseme",
+    "intermediate": "kesktaseme",
+    "advanced": "kõrgtaseme"
+  },
+  "confidence": {
+    "label": "kindlus",
+    "lowest": "väga madal",
+    "low": "madal",
+    "normal": "normaalne",
+    "high": "kõrge",
+    "higher": "väga kõrge",
+    "highest": "maksimaalne"
   },
   "users": {
-    "includeMastered": "Küsida õpitud sõnu",
     "logout": "Logi välja"
   }
 }

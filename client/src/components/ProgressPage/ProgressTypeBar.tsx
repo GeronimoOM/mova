@@ -45,7 +45,12 @@ export const ProgressTypeBar = ({ type, progress }: ProgressBarProps) => {
           color={progressTypeToColor[type]}
         />
       </div>
-      <div className={styles.label({ color: progressTypeToColor[type] })}>
+      <div
+        className={styles.label({ color: progressTypeToColor[type] })}
+        data-testid={`progress-type-bar-${type.toLowerCase()}`}
+        data-progress-current={currentPoints}
+        data-progress-goal={goalPoints}
+      >
         <span className={styles.labelNumber}>{currentPoints}</span>
         {'/'}
         <span className={styles.labelNumber}>{goalPoints}</span>

@@ -8,7 +8,6 @@ import { EncryptionService } from './EncryptionService';
 const DEFAULT_SETTINGS: UserSettings = {
   selectedLocale: 'en',
   selectedFont: 'default',
-  includeMastered: true,
 };
 
 const ADMIN_ID = 'admin-id';

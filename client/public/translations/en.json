@@ -22,14 +22,14 @@
       "label": "distinct",
       "search": "search for words to distinguish"
     },
-    "suggestions": "suggestions", 
+    "suggestions": "suggestions",
     "empty": {
       "list": "no words added yet",
       "search": "no words found"
     },
     "mastery": {
       "nextExerciseAt": "next exercise on",
-      "exerciseReady": "exercise is ready"
+      "exerciseReady": "ready"
     },
     "existing": "already added",
     "options": {
@@ -43,7 +43,7 @@
     "word": "word",
     "translation": "translation",
     "recall": "recall the translation",
-    "pick": "pick correct word",
+    "pick": "pick the correct word",
     "spell": "spell the word",
     "spellSimilar": "is similar but not the correct word",
     "empty": {
@@ -89,7 +89,8 @@
   "stats": {
     "total": "words in total",
     "byPartOfSpeech": "words by part of speech",
-    "byMastery": "words by mastery"
+    "byMastery": "words by mastery",
+    "byConfidence": "words by confidence"
   },
   "pos": {
     "noun": {
@@ -119,13 +120,22 @@
     "select": "select"
   },
   "mastery": {
+    "label": "mastery",
     "none": "none",
     "basic": "basic",
-    "advanced": "intermediary",
-    "mastered": "mastered"
+    "intermediate": "intermediate",
+    "advanced": "advanced"
+  },
+  "confidence": {
+    "label": "confidence",
+    "lowest": "very low",
+    "low": "low",
+    "normal": "normal",
+    "high": "high",
+    "higher": "very high",
+    "highest": "maximum"
   },
   "users": {
-    "includeMastered": "Quiz mastered words",
     "logout": "Log out"
   }
 }

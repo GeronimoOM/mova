@@ -73,6 +73,12 @@ db.version(4)
     await destroy();
   });
 
+db.version(5)
+  .stores(indices)
+  .upgrade(async () => {
+    await destroy();
+  });
+
 export async function getState(): Promise<SyncState> {
   return (await db.state.get(1))!;
 }

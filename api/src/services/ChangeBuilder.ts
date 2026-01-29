@@ -234,6 +234,7 @@ export class ChangeBuilder {
       word.translation === currentWord.translation &&
       !propertiesDiff &&
       word.mastery === currentWord.mastery &&
+      word.confidence === currentWord.confidence &&
       nextExerciseAt === currentNextExerciseAt
     ) {
       return null;
@@ -266,6 +267,9 @@ export class ChangeBuilder {
         }),
         ...(word.mastery !== currentWord.mastery && {
           mastery: word.mastery,
+        }),
+        ...(word.confidence !== currentWord.confidence && {
+          confidence: word.confidence,
         }),
         ...(nextExerciseAt !== currentNextExerciseAt && {
           nextExerciseAt,

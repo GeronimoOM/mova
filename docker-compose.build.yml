@@ -1,0 +1,34 @@
+services:
+  mova-api:
+    extends:
+      file: docker-compose.prod.yml
+      service: mova-api
+
+  mova-db:
+    extends:
+      file: docker-compose.prod.yml
+      service: mova-db
+
+  mova-index:
+    extends:
+      file: docker-compose.prod.yml
+      service: mova-index
+
+  mova-client:
+    extends:
+      file: docker-compose.prod.yml
+      service: mova-client
+
+  mova-nginx:
+    image: nginx:latest
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx/nginx.dev.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - mova-api
+      - mova-client
+
+volumes:
+  mova-db:
+  mova-index:

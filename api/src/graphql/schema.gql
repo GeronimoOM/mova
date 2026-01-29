@@ -35,7 +35,7 @@ enum PartOfSpeech {
 enum WordOrder {
   Alphabetical
   Chronological
-  Random
+  Confidence
 }
 
 enum Direction {
@@ -135,6 +135,7 @@ type Word {
   partOfSpeech: PartOfSpeech!
   addedAt: Timestamp!
   mastery: Int!
+  confidence: Int!
   nextExerciseAt: Timestamp!
   languageId: ID!
   properties: [PropertyValue!]!
@@ -182,6 +183,7 @@ type WordCreate {
   partOfSpeech: PartOfSpeech!
   addedAt: Timestamp!
   mastery: Int!
+  confidence: Int!
   nextExerciseAt: Timestamp!
   languageId: ID!
   properties: [PropertyValueSave!]!
@@ -214,6 +216,7 @@ type WordUpdate {
   translation: String
   properties: [PropertyValueSave!]
   mastery: Int
+  confidence: Int
   nextExerciseAt: Timestamp
 }
 
@@ -392,12 +395,16 @@ type UserSettings {
   selectedLanguageId: ID
   selectedLocale: String
   selectedFont: String
-  includeMastered: Boolean
 }
 
 type WordsStatsMastery {
   total: Int!
   mastery: Int!
+}
+
+type WordsStatsConfidence {
+  total: Int!
+  confidence: Int!
 }
 
 type WordsStatsPartOfSpeech {
@@ -408,6 +415,7 @@ type WordsStatsPartOfSpeech {
 type WordsStats {
   total: Int!
   mastery: [WordsStatsMastery!]!
+  confidence: [WordsStatsConfidence!]!
   partsOfSpeech: [WordsStatsPartOfSpeech!]!
 }
 
@@ -436,6 +444,7 @@ type Mutation {
   createLink(input: CreateWordLinkInput!): WordLink!
   deleteLink(input: DeleteWordLinkInput!): WordLink!
   attemptMastery(wordId: ID!, success: Boolean!): Word!
+  resetConfidence(wordId: ID!): Word!
   setGoals(input: SetGoalsInput!): [Goal!]!
   updateSettings(input: UpdateUserSettingsInput!): UserSettings!
 }
@@ -573,5 +582,4 @@ input UpdateUserSettingsInput {
   selectedLanguageId: ID
   selectedLocale: String
   selectedFont: String
-  includeMastered: Boolean
 }

@@ -1,13 +1,10 @@
 import { fromTimestamp, toTimestamp } from '../utils/datetime';
-import { MaxMastery } from '../utils/mastery';
 import { updatedOptions } from '../utils/options';
 import {
   isOptionPropertyFragment,
   updatedWordProperties,
 } from '../utils/properties';
 import {
-  AttemptWordMasteryMutation,
-  AttemptWordMasteryMutationVariables,
   CreateLanguageMutation,
   CreateLanguageMutationVariables,
   CreateLinkMutation,
@@ -161,6 +158,7 @@ export function optimisticCreateWord({
       id: input.id!,
       addedAt: input.addedAt!,
       mastery: 0,
+      confidence: 0,
       nextExerciseAt: toTimestamp(
         fromTimestamp(input.addedAt!)!.plus({ days: 1 }),
       )!,
@@ -219,19 +217,5 @@ export function optimisticDeleteLink({
       ...input,
       __typename: 'WordLink',
     },
-  };
-}
-
-export function optimisticAttemptWordMastery(
-  { success }: AttemptWordMasteryMutationVariables,
-  currentWord: WordFieldsFragment,
-): AttemptWordMasteryMutation {
-  return {
-    attemptMastery: success
-      ? {
-          ...currentWord,
-          mastery: Math.min(currentWord.mastery + 1, MaxMastery),
-        }
-      : currentWord,
   };
 }

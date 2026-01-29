@@ -1,5 +1,4 @@
 import {
-  optimisticAttemptWordMastery,
   optimisticCreateLanguage,
   optimisticCreateLink,
   optimisticCreateProperty,
@@ -16,7 +15,6 @@ import {
 import {
   ApplyChangeInput,
   AttemptWordMasteryMutation,
-  AttemptWordMasteryMutationVariables,
   CreateLanguageMutation,
   CreateLanguageMutationVariables,
   CreateLinkMutation,
@@ -35,6 +33,7 @@ import {
   DeleteWordMutationVariables,
   ReorderPropertiesMutation,
   ReorderPropertiesMutationVariables,
+  ResetConfidenceMutation,
   UpdateLanguageMutation,
   UpdateLanguageMutationVariables,
   UpdatePropertyMutation,
@@ -59,6 +58,7 @@ enum GraphQlMutation {
   CreateLink = 'CreateLink',
   DeleteLink = 'DeleteLink',
   AttemptMastery = 'AttemptMastery',
+  ResetConfidence = 'ResetConfidence',
 }
 
 export function isGraphQlMutation(request: GraphQlRequest): boolean {
@@ -226,6 +226,11 @@ async function cacheGraphQlMutationResponse(
         await cache.updateWord(attemptMastery);
         break;
       }
+      case GraphQlMutation.ResetConfidence: {
+        const { resetConfidence } = responseData as ResetConfidenceMutation;
+        await cache.updateWord(resetConfidence);
+        break;
+      }
     }
   } catch (err) {
     console.error('Failed to cache response', err);
@@ -308,13 +313,6 @@ async function handleGraphQlMutationOptimistically(
       return response(
         optimisticDeleteLink(request.variables as DeleteLinkMutationVariables),
       );
-    case GraphQlMutation.AttemptMastery: {
-      const variables =
-        request.variables as AttemptWordMasteryMutationVariables;
-      const currentWord = (await cache.getWord(variables.wordId))!;
-
-      return response(optimisticAttemptWordMastery(variables, currentWord));
-    }
     default:
       throw new Error(`Unsupported operation name ${request.operationName}`);
   }

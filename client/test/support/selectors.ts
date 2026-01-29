@@ -118,6 +118,38 @@ export const language = {
     cy.get(byTestId('languages-list-item-delete-cancel-btn')),
 };
 
+export const exercises = {
+  startBtn: () => cy.get(byTestId('exercises-start-btn')),
+  readyNumber: () => cy.get(byTestId('exercises-ready-number')),
+};
+
+export const exercise = {
+  submitBtn: () => cy.get(byTestId('exercise-submit-btn')),
+  skipBtn: () => cy.get(byTestId('exercise-skip-btn')),
+  title: () => cy.get(byTestId('exercise-title')),
+  word: () => cy.get(byTestId('exercise-word')),
+
+  recall: {
+    translation: () => cy.get(byTestId('recall-exercise-translation')),
+    revealBtn: () => cy.get(byTestId('recall-exercise-reveal-btn')),
+  },
+
+  pick: {
+    options: () => cy.get(byTestId('pick-exercise-option')),
+    option: (optionValue: string) =>
+      exercise.pick
+        .options()
+        .contains(optionValue)
+        .closest(byTestId('pick-exercise-option')),
+  },
+
+  spell: {
+    input: () => cy.get(byTestId('spell-exercise-input')),
+    inputChar: (index: number) =>
+      exercise.spell.input().find('input').eq(index),
+  },
+};
+
 export const login = {
   user: () => cy.get(byTestId('login-user')),
   password: () => cy.get(byTestId('login-password')),
@@ -140,4 +172,7 @@ export const common = {
     cy.get(byTestId(`option-color-picker-option-${color ?? 'empty'}`)),
   optionDeleteBtn: () => cy.get(byTestId('option-delete-btn')),
   optionRestoreBtn: () => cy.get(byTestId('option-restore-btn')),
+
+  progressTypeBar: (type: string) =>
+    cy.get(byTestId(`progress-type-bar-${type}`)),
 };

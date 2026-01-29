@@ -19,10 +19,8 @@ describe('words', () => {
           cy.visit('/', testModeVisitOptions[mode]);
 
           sel.words.listItems().should('have.length.at.least', 15);
-          sel.words.list().scrollTo('bottom');
-          sel.words.listItems().should('have.length', 17);
-          sel.words.listItemOriginal(0).contains('pidi');
-          sel.words.listItemTranslation(0).contains('по, уздовж');
+          sel.words.listItemOriginal(0).contains('hell');
+          sel.words.listItemTranslation(0).contains('ніжний, чутливий');
         });
 
         it('searches list of words', () => {

@@ -10,6 +10,15 @@ export class WordsStatsMasteryType {
   mastery: number;
 }
 
+@ObjectType('WordsStatsConfidence')
+export class WordsStatsConfidenceType {
+  @Field(() => Int)
+  total: number;
+
+  @Field(() => Int)
+  confidence: number;
+}
+
 @ObjectType('WordsStatsPartOfSpeech')
 export class WordsStatsPartOfSpeechType {
   @Field(() => Int)
@@ -26,6 +35,9 @@ export class WordsStatsType {
 
   @Field(() => [WordsStatsMasteryType])
   mastery: WordsStatsMasteryType[];
+
+  @Field(() => [WordsStatsConfidenceType])
+  confidence: WordsStatsConfidenceType[];
 
   @Field(() => [WordsStatsPartOfSpeechType])
   partsOfSpeech: WordsStatsPartOfSpeechType[];

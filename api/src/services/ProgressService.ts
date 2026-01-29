@@ -43,15 +43,17 @@ export class ProgressService {
   ) {}
 
   async getStats(languageId: LanguageId): Promise<WordsStats> {
-    const [total, mastery, partsOfSpeech] = await Promise.all([
+    const [total, mastery, confidence, partsOfSpeech] = await Promise.all([
       this.wordRepository.getCount(languageId),
       this.wordRepository.getCountByMastery(languageId),
+      this.wordRepository.getCountByConfidence(languageId),
       this.wordRepository.getCountByPartOfSpeech(languageId),
     ]);
 
     return {
       total,
       mastery,
+      confidence,
       partsOfSpeech,
     };
   }

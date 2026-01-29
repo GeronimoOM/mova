@@ -17,7 +17,7 @@ export interface Word {
   partOfSpeech: PartOfSpeech;
   addedAt: DateTime;
   mastery: number;
-  masteryIncAt?: DateTime;
+  confidence: number;
   masteryAttemptAt?: DateTime;
   properties?: Record<PropertyId, PropertyValue>;
 }
@@ -34,13 +34,30 @@ export enum PartOfSpeech {
 export enum WordOrder {
   Alphabetical = 'alphabetical',
   Chronological = 'chronological',
-  Random = 'random',
+  Confidence = 'confidence',
 }
 
-export const WordMasteries = [0, 1, 2, 3] as const;
-export type WordMastery = (typeof WordMasteries)[number];
+export enum WordMastery {
+  None = 0,
+  Basic = 1,
+  Intermediate = 2,
+  Advanced = 3,
+}
+export const WordMasteries = [
+  WordMastery.None,
+  WordMastery.Basic,
+  WordMastery.Intermediate,
+  WordMastery.Advanced,
+];
 
-export const MaxWordMastery = Math.max(...WordMasteries);
+export enum WordConfidence {
+  Lowest = -2,
+  Low = -1,
+  Normal = 0,
+  High = 1,
+  Higher = 2,
+  Highest = 3,
+}
 
 export interface WordCreate extends Omit<Word, 'properties'> {
   properties?: Record<PropertyId, PropertyValueSave>;
@@ -51,7 +68,8 @@ export interface WordUpdate {
   original?: string;
   translation?: string;
   properties?: Record<PropertyId, PropertyValueSave>;
-  mastery?: number;
+  mastery?: WordMastery;
+  confidence?: WordConfidence;
   nextExerciseAt?: DateTime;
 }
 

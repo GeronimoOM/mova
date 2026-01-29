@@ -23,6 +23,7 @@ import { parser as jsonParser } from 'stream-json/jsonl/Parser';
 import { stringer as jsonStringer } from 'stream-json/jsonl/Stringer';
 import { DATE_FORMAT } from 'utils/constants';
 import { Preset } from 'utils/presets';
+import { compileTemplate } from 'utils/templates';
 
 @Admin()
 @Controller('/api/data')
@@ -49,7 +50,11 @@ export class MaintenanceController {
     if (!multipartFile) {
       throw new Error('No file to import');
     }
-    const recordStream = chain([multipartFile.file, jsonParser()]);
+    const recordStream = chain([
+      multipartFile.file,
+      (line: Buffer) => compileTemplate(line.toString()),
+      jsonParser(),
+    ]);
 
     await this.maintenanceService.import(recordStream);
   }

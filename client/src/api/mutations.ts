@@ -5,7 +5,6 @@ import {
 } from '@apollo/client';
 import { cache } from './cache';
 import {
-  optimisticAttemptWordMastery,
   optimisticCreateLanguage,
   optimisticCreateLink,
   optimisticCreateProperty,
@@ -39,6 +38,7 @@ import {
   PropertyFieldsFragment,
   PropertyFieldsFragmentDoc,
   ReorderPropertiesDocument,
+  ResetConfidenceDocument,
   SetGoalsDocument,
   UpdateLanguageDocument,
   UpdatePropertyDocument,
@@ -326,17 +326,22 @@ export function useAttemptWordMastery(): UseMutationResult<
   typeof AttemptWordMasteryDocument
 > {
   return useMutation(AttemptWordMasteryDocument, {
-    optimisticResponse: (variables) => {
-      const word = readWordFull(variables.wordId)!;
-
-      return optimisticAttemptWordMastery(variables, word);
-    },
     update: (_, { data }, { variables }) => {
       updateWord(data!.attemptMastery);
       if (variables?.success) {
         const word = readWordFull(data!.attemptMastery.id)!;
         increaseCurrentProgress(word.languageId, ProgressType.Mastery);
       }
+    },
+  });
+}
+
+export function useResetConfidence(): UseMutationResult<
+  typeof ResetConfidenceDocument
+> {
+  return useMutation(ResetConfidenceDocument, {
+    update: (_, { data }) => {
+      updateWord(data!.resetConfidence);
     },
   });
 }

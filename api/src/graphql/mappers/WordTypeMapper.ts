@@ -49,6 +49,7 @@ export class WordTypeMapper {
       partOfSpeech: word.partOfSpeech,
       addedAt: word.addedAt,
       mastery: word.mastery,
+      confidence: word.confidence,
       nextExerciseAt: this.exerciseService.getNextExerciseAt(word),
       languageId: word.languageId,
       properties: Object.values(word.properties ?? {}).map((value) =>
@@ -65,6 +66,7 @@ export class WordTypeMapper {
       partOfSpeech: wordCreate.partOfSpeech,
       addedAt: wordCreate.addedAt,
       mastery: wordCreate.mastery,
+      confidence: wordCreate.confidence,
       nextExerciseAt: this.exerciseService.getNextExerciseAt(wordCreate),
       languageId: wordCreate.languageId,
       properties: Object.values(wordCreate.properties ?? {}).map(
@@ -79,6 +81,7 @@ export class WordTypeMapper {
       original: wordUpdate.original,
       translation: wordUpdate.translation,
       mastery: wordUpdate.mastery,
+      confidence: wordUpdate.confidence,
       nextExerciseAt: wordUpdate.nextExerciseAt,
       ...(wordUpdate.properties && {
         properties: Object.values(wordUpdate.properties),

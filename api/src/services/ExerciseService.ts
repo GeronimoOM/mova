@@ -4,8 +4,8 @@ import { Context } from 'models/Context';
 import { LanguageId } from 'models/Language';
 import { ProgressType } from 'models/Progress';
 import {
-  MaxWordMastery,
   Word,
+  WordConfidence,
   WordId,
   WordMasteries,
   WordMastery,
@@ -18,21 +18,29 @@ import * as records from 'utils/records';
 import { v1 as uuid } from 'uuid';
 import { ChangeBuilder } from './ChangeBuilder';
 import { ChangeService } from './ChangeService';
+import { LanguageService } from './LanguageService';
 import { ProgressService } from './ProgressService';
-import { UserService } from './UserService';
 
 const DEFAULT_EXERCISE_WORDS_TOTAL = 20;
 
+// percentage of exercise words
 const MASTERY_BASE_DISTRIBUTION_COEF = 0.4;
 
-const MASTERY_INC_DELAY: Record<WordMastery, Duration> = {
-  0: Duration.fromObject({ hours: 1 }),
-  1: Duration.fromObject({ hours: 12 }),
-  2: Duration.fromObject({ hours: 24 * 3 }),
-  3: Duration.fromObject({ hours: 24 * 28 }),
+const MASTERY_DELAY_BASE: Record<WordMastery, Duration> = {
+  [WordMastery.None]: Duration.fromObject({ hours: 1 }),
+  [WordMastery.Basic]: Duration.fromObject({ hours: 12 }),
+  [WordMastery.Intermediate]: Duration.fromObject({ hours: 24 * 3 }),
+  [WordMastery.Advanced]: Duration.fromObject({ hours: 24 * 7 }),
 };
 
-const MASTERY_ATTEMPT_DELAY = Duration.fromObject({ hours: 1 });
+export const CONFIDENCE_DELAY_MULTIPLIER: Record<WordConfidence, number> = {
+  [WordConfidence.Lowest]: 0.2,
+  [WordConfidence.Low]: 0.6,
+  [WordConfidence.Normal]: 1,
+  [WordConfidence.High]: 1.5,
+  [WordConfidence.Higher]: 2,
+  [WordConfidence.Highest]: 3,
+};
 
 export type GetExerciseWordsParams = {
   languageId: LanguageId;
@@ -47,11 +55,11 @@ export type AttemptMasteryParams = {
 @Injectable()
 export class ExerciseService {
   constructor(
+    private languageService: LanguageService,
     private wordRepository: WordRepository,
     @Inject(forwardRef(() => ChangeService))
     private changeService: ChangeService,
     private progressService: ProgressService,
-    private userService: UserService,
     @Inject(forwardRef(() => ChangeBuilder))
     private changeBuilder: ChangeBuilder,
     private connectionManager: DbConnectionManager,
@@ -64,11 +72,12 @@ export class ExerciseService {
       total = DEFAULT_EXERCISE_WORDS_TOTAL,
     }: GetExerciseWordsParams,
   ): Promise<Word[]> {
-    const includeMastered = await this.getIncludeMastered(ctx);
+    if (!(await this.languageService.exists(ctx, languageId))) {
+      throw new Error(`Language does not exist (id:${languageId})`);
+    }
+
     const wordsByMasteryTuples = await Promise.all(
-      WordMasteries.filter(
-        (mastery) => includeMastered || mastery < MaxWordMastery,
-      ).map(
+      WordMasteries.map(
         async (mastery) =>
           [
             mastery,
@@ -94,27 +103,23 @@ export class ExerciseService {
       ([mastery, count]) => wordsByMastery[mastery]?.slice(0, count) ?? [],
     );
 
-    return shuffle(words);
+    return ctx.sortExercises
+      ? words.toSorted((w1, w2) => (w1.id < w2.id ? -1 : 1))
+      : shuffle(words);
   }
 
   async getCount(ctx: Context, languageId: LanguageId): Promise<number> {
-    const includeMastered = await this.getIncludeMastered(ctx);
+    if (!(await this.languageService.exists(ctx, languageId))) {
+      throw new Error(`Language does not exist (id:${languageId})`);
+    }
 
-    const counts = await Promise.all(
-      WordMasteries.filter(
-        (mastery) => includeMastered || mastery < MaxWordMastery,
-      ).map(
-        async (mastery) =>
-          await this.wordRepository.getExerciseCount({
-            languageId,
-            mastery,
-            masteryIncOlderThan: MASTERY_INC_DELAY[mastery],
-            masteryAttemptOlderThan: MASTERY_ATTEMPT_DELAY,
-          }),
-      ),
-    );
-
-    return counts.reduce((sum, count) => sum + count, 0);
+    return await this.wordRepository.getCount(languageId, {
+      masteryAttemptOlderThan: {
+        masteryDelayBase: MASTERY_DELAY_BASE,
+        confidenceDelayMultiplier: CONFIDENCE_DELAY_MULTIPLIER,
+      },
+      excludeMaxMasteryConfidence: true,
+    });
   }
 
   async attemptMastery(
@@ -126,17 +131,9 @@ export class ExerciseService {
       throw new Error(`Word does not exist (wordId:${params.wordId})`);
     }
 
-    if (
-      (params.success &&
-        (currentWord.masteryIncAt ?? currentWord.addedAt).plus(
-          MASTERY_INC_DELAY[currentWord.mastery],
-        ) >= DateTime.utc()) ||
-      (currentWord.masteryAttemptAt &&
-        currentWord.masteryAttemptAt.plus(MASTERY_ATTEMPT_DELAY) >=
-          DateTime.utc())
-    ) {
+    if (this.getNextExerciseAt(currentWord) > DateTime.utc()) {
       throw new Error(
-        `Word mastery cannot be increased yet (wordId:${params.wordId})`,
+        `Word exercise cannot be attempted yet (wordId:${params.wordId})`,
       );
     }
 
@@ -144,11 +141,24 @@ export class ExerciseService {
     const word = {
       ...currentWord,
       masteryAttemptAt: now,
-      ...(params.success && {
-        masteryIncAt: now,
-        mastery: Math.min(currentWord.mastery + 1, MaxWordMastery),
-      }),
     };
+
+    if (params.success) {
+      if (word.confidence < WordConfidence.Normal) {
+        word.confidence += 1;
+      } else if (word.mastery === WordMastery.Advanced) {
+        word.confidence = Math.min(word.confidence + 1, WordConfidence.Highest);
+      } else {
+        word.mastery += 1;
+      }
+    } else {
+      if (word.confidence === WordConfidence.Lowest) {
+        word.mastery = Math.max(word.mastery - 1, WordMastery.None);
+      } else {
+        word.confidence = word.confidence - 1;
+      }
+    }
+
     const change = this.changeBuilder.buildUpdateWordChange(
       ctx,
       word,
@@ -174,45 +184,71 @@ export class ExerciseService {
     return word;
   }
 
-  getNextExerciseAt(
-    word: Pick<
-      Word,
-      'mastery' | 'addedAt' | 'masteryIncAt' | 'masteryAttemptAt'
-    >,
-  ): DateTime {
-    const masteryDelayUntil = (word.masteryIncAt ?? word.addedAt).plus(
-      MASTERY_INC_DELAY[word.mastery],
-    );
-    const attemptDelayUntil = word.masteryAttemptAt?.plus(
-      MASTERY_ATTEMPT_DELAY,
-    );
-    const maxDelayUntil = attemptDelayUntil
-      ? DateTime.max(masteryDelayUntil, attemptDelayUntil)
-      : masteryDelayUntil;
+  async resetConfidence(ctx: Context, wordId: WordId): Promise<Word> {
+    const currentWord = await this.wordRepository.getById(wordId);
+    if (!currentWord) {
+      throw new Error(`Word does not exist (wordId:${wordId})`);
+    }
 
-    return maxDelayUntil;
+    if (
+      currentWord.mastery !== WordMastery.Advanced ||
+      currentWord.confidence !== WordConfidence.Highest
+    ) {
+      throw new Error(
+        `Word exercise cannot be attempted yet (wordId:${wordId})`,
+      );
+    }
+
+    const now = DateTime.utc();
+    const word = {
+      ...currentWord,
+      confidence: WordConfidence.Normal,
+    };
+
+    const change = this.changeBuilder.buildUpdateWordChange(
+      ctx,
+      word,
+      currentWord,
+    );
+
+    await this.connectionManager.transactionally(async () => {
+      await this.wordRepository.update(word);
+      if (change) {
+        change.changedAt = now;
+        await this.changeService.create(change);
+      }
+    });
+
+    return word;
+  }
+
+  getNextExerciseAt(
+    word: Pick<Word, 'mastery' | 'confidence' | 'addedAt' | 'masteryAttemptAt'>,
+  ): DateTime {
+    return (word.masteryAttemptAt ?? word.addedAt).plus(
+      MASTERY_DELAY_BASE[word.mastery] *
+        CONFIDENCE_DELAY_MULTIPLIER[word.confidence],
+    );
   }
 
   private async getWordsByMastery(
     languageId: LanguageId,
-    mastery: number,
+    mastery: WordMastery,
     total: number,
   ): Promise<Word[]> {
     return (
       await this.wordRepository.getPage({
         languageId,
         limit: total,
-        order: WordOrder.Random,
+        order: WordOrder.Confidence,
         mastery,
-        masteryIncOlderThan: MASTERY_INC_DELAY[mastery],
-        masteryAttemptOlderThan: MASTERY_ATTEMPT_DELAY,
+        masteryAttemptOlderThan: {
+          masteryDelayBase: MASTERY_DELAY_BASE,
+          confidenceDelayMultiplier: CONFIDENCE_DELAY_MULTIPLIER,
+        },
+        excludeMaxMasteryConfidence: true,
       })
     ).items;
-  }
-
-  private async getIncludeMastered(ctx: Context): Promise<boolean> {
-    const settings = await this.userService.getSettings(ctx.user.id);
-    return settings.includeMastered ?? true;
   }
 
   private async getTotalByMastery(
@@ -220,25 +256,32 @@ export class ExerciseService {
     total: number,
     wordsByMastery: Record<WordMastery, Word[]>,
   ): Promise<Record<WordMastery, number>> {
-    const basePercentageByMastery =
-      (1 / Object.keys(wordsByMastery).length) * MASTERY_BASE_DISTRIBUTION_COEF;
-
-    const countByMastery =
-      await this.wordRepository.getCountByMastery(languageId);
-    delete countByMastery[MaxWordMastery];
-    const totalCount = Object.values(countByMastery).reduce(
+    const countByMastery = await this.wordRepository.getCountByMastery(
+      languageId,
+      {
+        masteryAttemptOlderThan: {
+          masteryDelayBase: MASTERY_DELAY_BASE,
+          confidenceDelayMultiplier: CONFIDENCE_DELAY_MULTIPLIER,
+        },
+        excludeMaxMasteryConfidence: true,
+      },
+    );
+    const countsSum = Object.values(countByMastery).reduce(
       (count, sum) => count + sum,
       0,
     );
     const percentageByMasteryFromTotal = records.mapValues(
       countByMastery,
       (count) =>
-        (totalCount ? count / totalCount : 0) *
+        (countsSum ? count / countsSum : 0) *
         (1 - MASTERY_BASE_DISTRIBUTION_COEF),
     );
 
-    const totalByMastery = Object.fromEntries(
-      Object.entries(wordsByMastery).map(([mastery, masteryWords]) => [
+    const basePercentageByMastery =
+      (1 / Object.keys(wordsByMastery).length) * MASTERY_BASE_DISTRIBUTION_COEF;
+    const totalByMastery = records.map(
+      wordsByMastery,
+      ([mastery, masteryWords]) => [
         mastery,
         Math.min(
           Math.floor(
@@ -248,24 +291,20 @@ export class ExerciseService {
           ),
           masteryWords.length,
         ),
-      ]),
+      ],
     ) as Record<WordMastery, number>;
 
     let currentTotal = Object.values(totalByMastery).reduce(
-      (value, sum) => sum + value,
+      (sum, value) => sum + value,
       0,
     );
-    for (const [mastery, masteryWords] of Object.entries(wordsByMastery)) {
+    for (const mastery of WordMasteries) {
       if (currentTotal >= total) {
         break;
       }
 
-      if (Number(mastery) === MaxWordMastery) {
-        continue;
-      }
-
       const extraMasteryTotal = Math.min(
-        masteryWords.length - totalByMastery[mastery],
+        (wordsByMastery[mastery]?.length ?? 0) - totalByMastery[mastery],
         total - currentTotal,
       );
 

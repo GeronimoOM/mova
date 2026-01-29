@@ -33,19 +33,28 @@ export const RecallExercise = ({
 
   const handleSuccess = useCallback(() => {
     setResult(true);
+    setIsRevealed(true);
     onSuccess();
   }, [onSuccess]);
 
   const handleFailure = useCallback(() => {
     setResult(false);
+    setIsRevealed(true);
     onFailure();
   }, [onFailure]);
 
   return (
     <div className={styles.wrapper}>
-      <div className={styles.title}>{t('exercise.recall')}</div>
+      <div className={styles.title} data-testid="exercise-title">
+        {t('exercise.recall')}
+      </div>
 
-      <Input value={word.original} size="large" disabled />
+      <Input
+        value={word.original}
+        size="large"
+        disabled
+        dataTestId="exercise-word"
+      />
 
       <div className={styles.translation}>
         <div className={styles.translationLabel}>
@@ -65,12 +74,14 @@ export const RecallExercise = ({
             size="large"
             disabled
             obscured={!isRevealed}
+            dataTestId="recall-exercise-translation"
           />
 
           <ButtonIcon
             icon={FaEye}
             onClick={() => setIsRevealed(true)}
             disabled={isRevealed}
+            dataTestId="recall-exercise-reveal-btn"
           />
         </div>
       </div>
@@ -82,12 +93,14 @@ export const RecallExercise = ({
           onClick={handleSuccess}
           disabled={isSubmitted}
           toggled={isSubmitted}
+          dataTestId="exercise-submit-btn"
         />
 
         <ButtonIcon
           icon={!isSubmitted ? FaMinus : FaAngleDoubleRight}
           onClick={isSubmitted ? onNext : handleFailure}
           {...(!isSubmitted && { color: 'negative' })}
+          dataTestId="exercise-skip-btn"
         />
       </div>
     </div>

@@ -1,85 +1,185 @@
-import { TbRectangle, TbRectangleFilled } from 'react-icons/tb';
-
-import { DateTime } from 'luxon';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { hover } from '../../../index.css';
 import { DISPLAY_DATE_TIME_FORMAT } from '../../../utils/constants';
 import { fromTimestamp } from '../../../utils/datetime';
 import { Locale } from '../../../utils/translator';
-import { useMediaQuery } from '../../../utils/useMediaQuery';
 import { Dropdown } from '../../common/Dropdown';
-import { Icon } from '../../common/Icon';
 import { useUserContext } from '../../UserContext';
 import * as styles from './WordMastery.css';
 
-const MAX_PROGRESS = 3;
+import { DateTime } from 'luxon';
+import { IconType } from 'react-icons';
+import { FaUndoAlt } from 'react-icons/fa';
+import { PiStar, PiStarFill, PiStarHalfFill } from 'react-icons/pi';
+import { useResetConfidence } from '../../../api/mutations';
+import { AccentColor, ThemeColor } from '../../../index.css';
+import {
+  Confidence,
+  confidenceToColor,
+  confidenceToLabel,
+  MaxConfidence,
+} from '../../../utils/confidence';
+import {
+  Mastery,
+  masteryToColor,
+  masteryToLabel,
+  MaxMastery,
+} from '../../../utils/mastery';
+import { ButtonIcon } from '../../common/ButtonIcon';
+import { Icon } from '../../common/Icon';
 
 type WordMasteryProps = {
-  mastery: number;
+  wordId: string | null;
+  mastery: Mastery;
+  confidence: Confidence;
   nextExerciseAt: string | null;
 };
 
-export const WordMastery = ({ mastery, nextExerciseAt }: WordMasteryProps) => {
+const positiveConfidenceToBorderType: Partial<
+  Record<Confidence, 'dotted' | 'dashed' | 'solid'>
+> = {
+  1: 'dotted',
+  2: 'dashed',
+  3: 'solid',
+} as const;
+
+const getLevelIcon = (
+  mastery: Mastery,
+  confidence: Confidence,
+  level: number,
+): IconType => {
+  if (level !== mastery) {
+    return PiStarFill;
+  } else if (confidence === -2) {
+    return PiStar;
+  } else if (confidence === -1) {
+    return PiStarHalfFill;
+  } else {
+    return PiStarFill;
+  }
+};
+
+const getLevelColor = (
+  mastery: Mastery,
+  level: number,
+): ThemeColor | AccentColor =>
+  level > mastery ? 'backgroundLighter' : 'secondary1';
+
+export const WordMastery = ({
+  wordId,
+  mastery,
+  confidence,
+  nextExerciseAt,
+}: WordMasteryProps) => {
   const [isOpen, setOpen] = useState(false);
-  const canHover = useMediaQuery(hover.enabled);
+  const handleOpen = (isOpen: boolean) => {
+    if (!wordId) {
+      return;
+    }
+
+    setOpen(isOpen);
+  };
 
   return (
     <Dropdown
       isOpen={isOpen}
-      onOpen={setOpen}
-      content={<WordMasteryTooltip nextExerciseAt={nextExerciseAt} />}
+      onOpen={handleOpen}
+      content={
+        <WordMasteryTooltip
+          wordId={wordId}
+          mastery={mastery}
+          confidence={confidence}
+          nextExerciseAt={nextExerciseAt}
+        />
+      }
       alignment={'end'}
     >
       <div
-        className={styles.mastery}
-        onClick={(e) => canHover && e.stopPropagation()}
-        onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
+        className={styles.mastery({
+          disabled: !wordId,
+          ...(mastery === MaxMastery && {
+            border: positiveConfidenceToBorderType[confidence],
+          }),
+        })}
       >
-        {Array(MAX_PROGRESS)
-          .fill(null)
-          .map((_, index) =>
-            mastery > index ? (
-              <Icon key={index} icon={TbRectangleFilled} />
-            ) : (
-              <Icon key={index} icon={TbRectangle} />
-            ),
-          )}
+        {[1, 2, 3].map((level) => (
+          <Icon
+            key={level}
+            icon={getLevelIcon(mastery, confidence, level)}
+            color={getLevelColor(mastery, level)}
+          />
+        ))}
       </div>
     </Dropdown>
   );
 };
 
 const WordMasteryTooltip = ({
+  wordId,
+  mastery,
+  confidence,
   nextExerciseAt,
-}: Pick<WordMasteryProps, 'nextExerciseAt'>) => {
+}: WordMasteryProps) => {
   const { settings } = useUserContext();
   const locale = settings.selectedLocale as Locale;
   const { t } = useTranslation();
+  const [resetConfidence] = useResetConfidence();
 
-  let tooltip: string;
-  let formattedNextExerciseAt: string | null = null;
-  if (nextExerciseAt) {
-    const nextExerciseAtDate = fromTimestamp(nextExerciseAt)!;
-    if (nextExerciseAtDate >= DateTime.utc()) {
-      tooltip = t('words.mastery.nextExerciseAt');
-      formattedNextExerciseAt = nextExerciseAtDate
-        .setZone('local')
-        .setLocale(locale)
-        .toFormat(DISPLAY_DATE_TIME_FORMAT);
-    } else {
-      tooltip = t('words.mastery.exerciseReady');
-    }
-  } else {
-    tooltip = t('words.mastery.exerciseReady');
-  }
+  const nextExerciseAtDate = fromTimestamp(nextExerciseAt)!;
+  const nextExerciseAtValue = nextExerciseAtDate
+    .setZone('local')
+    .setLocale(locale)
+    .toFormat(DISPLAY_DATE_TIME_FORMAT);
+  const isNextExerciseReady = nextExerciseAtDate < DateTime.utc();
+  const isMastered = mastery === MaxMastery && confidence === MaxConfidence;
+
+  const handleResetConfidenceClick = () => {
+    resetConfidence({
+      variables: {
+        wordId: wordId!,
+      },
+    });
+  };
 
   return (
     <div className={styles.tooltip}>
-      <div>{tooltip}</div>
-      {formattedNextExerciseAt && (
-        <div className={styles.tooltipDate}>{formattedNextExerciseAt}</div>
+      <div>{t('mastery.label')}</div>
+      <div
+        className={styles.tooltipValue}
+        style={{
+          color: masteryToColor[mastery],
+        }}
+      >
+        {t(masteryToLabel[mastery])}
+      </div>
+
+      <div>{t('confidence.label')}</div>
+      <div
+        className={styles.tooltipValue}
+        style={{
+          color: confidenceToColor[confidence],
+        }}
+      >
+        {t(confidenceToLabel[confidence])}
+      </div>
+
+      <div>{t('words.mastery.nextExerciseAt')}</div>
+      <div
+        className={styles.tooltipValue}
+        style={{
+          ...(isNextExerciseReady && { color: masteryToColor[MaxMastery] }),
+        }}
+      >
+        {isMastered
+          ? '—'
+          : isNextExerciseReady
+            ? t('words.mastery.exerciseReady')
+            : nextExerciseAtValue}
+      </div>
+      {isMastered && (
+        <div className={styles.resetButton}>
+          <ButtonIcon icon={FaUndoAlt} onClick={handleResetConfidenceClick} />
+        </div>
       )}
     </div>
   );

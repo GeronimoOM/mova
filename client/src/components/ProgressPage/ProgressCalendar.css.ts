@@ -70,21 +70,6 @@ export const cell = recipe({
     color: accentColorStyle((colorVar) => ({
       backgroundColor: colorVar,
     })),
-
-    intensity: {
-      30: {
-        opacity: 0.3,
-      },
-      60: {
-        opacity: 0.6,
-      },
-      80: {
-        opacity: 0.85,
-      },
-      100: {
-        opacity: 1,
-      },
-    },
   },
 });
 

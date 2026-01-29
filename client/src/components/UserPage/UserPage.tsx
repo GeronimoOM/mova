@@ -1,5 +1,4 @@
 import { EE, FlagComponent, GB, UA } from 'country-flag-icons/react/1x1';
-import { FaRepeat } from 'react-icons/fa6';
 import { MdLogout } from 'react-icons/md';
 
 import classNames from 'classnames';
@@ -23,7 +22,6 @@ export const UserPage = () => {
 
   const locale = settings.selectedLocale as Locale;
   const font = settings.selectedFont as Font;
-  const includeMastered = settings.includeMastered as boolean;
 
   const setLocale = useCallback(
     (locale: Locale) => setSettings({ selectedLocale: locale }),
@@ -31,10 +29,6 @@ export const UserPage = () => {
   );
   const setFont = useCallback(
     (font: Font) => setSettings({ selectedFont: font }),
-    [setSettings],
-  );
-  const setIncludeMastered = useCallback(
-    (includeMastered: boolean) => setSettings({ includeMastered }),
     [setSettings],
   );
 
@@ -53,13 +47,6 @@ export const UserPage = () => {
           <FontButton font="default" selected={font} onSelect={setFont} />
 
           <FontButton font="classic" selected={font} onSelect={setFont} />
-        </div>
-
-        <div className={styles.card}>
-          <IncludeMasteredButton
-            includeMastered={includeMastered}
-            onSetIncludeMastered={setIncludeMastered}
-          />
         </div>
 
         <div className={styles.card}>
@@ -112,28 +99,5 @@ const FontButton = ({ font, selected, onSelect }: FontButtonProps) => {
       <div className={styles.fontBase({ font })}>AaБб</div>
       <div className={styles.fontMono({ font })}>AaBb</div>
     </div>
-  );
-};
-
-type IncludeMasteredButtonProps = {
-  includeMastered: boolean;
-  onSetIncludeMastered: (includeMastered: boolean) => void;
-};
-
-const IncludeMasteredButton = ({
-  includeMastered,
-  onSetIncludeMastered,
-}: IncludeMasteredButtonProps) => {
-  const { t } = useTranslation();
-
-  return (
-    <>
-      <ButtonIcon
-        icon={FaRepeat}
-        toggled={includeMastered}
-        onClick={() => onSetIncludeMastered(!includeMastered)}
-      />
-      {t('users.includeMastered')}
-    </>
   );
 };

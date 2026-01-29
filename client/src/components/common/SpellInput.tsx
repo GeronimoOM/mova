@@ -12,6 +12,7 @@ type SpellInputProps = {
   obscureLength?: boolean;
   disabled?: boolean;
   highlights?: Array<AccentColor | null>;
+  dataTestId?: string;
 };
 
 export const SpellInput = ({
@@ -21,6 +22,7 @@ export const SpellInput = ({
   obscureLength,
   disabled,
   highlights,
+  dataTestId,
 }: SpellInputProps) => {
   length = obscureLength ? OBSCURED_LENGTH : length;
 
@@ -77,7 +79,7 @@ export const SpellInput = ({
   );
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} data-testid={dataTestId}>
       {Array(length)
         .fill(null)
         .map((_, i) => (

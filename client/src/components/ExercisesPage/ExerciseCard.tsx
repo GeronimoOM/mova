@@ -208,10 +208,16 @@ const ExerciseStart = ({
         color="primary"
         highlighted={true}
         onClick={onStart}
+        dataTestId="exercises-start-btn"
       />
 
       <div className={styles.exercisesReady}>
-        <div className={styles.exercisesReadyNumber}>{exerciseCount}</div>
+        <div
+          className={styles.exercisesReadyNumber}
+          data-testid={'exercises-ready-number'}
+        >
+          {exerciseCount}
+        </div>
         {t('exercise.ready', { count: exerciseCount })}
       </div>
     </div>

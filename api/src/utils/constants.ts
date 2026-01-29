@@ -9,3 +9,4 @@ export const DATETIME_FORMAT_REGEX = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
 export const HEADER_SYNC_CLIENT_ID = 'sync-client-id';
 export const HEADER_AUTHORIZATION = 'authorization';
 export const HEADER_TIMEZONE = 'client-timezone';
+export const HEADER_SORT_EXERCISES = 'x-sort-exercises';

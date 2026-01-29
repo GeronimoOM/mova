@@ -10,6 +10,7 @@ import {
   ChronologicalCursor,
   PartOfSpeech,
   Word,
+  WordConfidence,
   WordId,
   WordLink,
   WordLinkType,
@@ -34,19 +35,22 @@ export interface GetWordPageParams {
   order?: WordOrder;
   direction?: Direction;
   partsOfSpeech?: PartOfSpeech[];
-  mastery?: number;
+  mastery?: WordMastery;
   addedAtDate?: DateTime;
-  masteryIncOlderThan?: Duration;
-  masteryAttemptOlderThan?: Duration;
+  masteryAttemptOlderThan?: MasteryAttemptDelay;
+  excludeMaxMasteryConfidence?: boolean;
   cursor?: WordSortedCursor;
   limit?: number;
 }
 
-export type GetExerciseCountParams = { languageId: LanguageId } & Required<
-  Pick<
-    GetWordPageParams,
-    'mastery' | 'masteryIncOlderThan' | 'masteryAttemptOlderThan'
-  >
+type MasteryAttemptDelay = {
+  masteryDelayBase: Record<WordMastery, Duration>;
+  confidenceDelayMultiplier: Record<WordConfidence, number>;
+};
+
+export type GetCountParams = Pick<
+  GetWordPageParams,
+  'masteryAttemptOlderThan' | 'excludeMaxMasteryConfidence'
 >;
 
 type WordLite = Omit<Word, 'properties'> & {
@@ -83,9 +87,9 @@ export class WordRepository {
     cursor,
     limit = DEFAULT_LIMIT,
     mastery,
-    addedAtDate,
-    masteryIncOlderThan,
     masteryAttemptOlderThan,
+    excludeMaxMasteryConfidence,
+    addedAtDate,
   }: GetWordPageParams): Promise<Page<Word, WordSortedCursor>> {
     const connection = this.connectionManager.getConnection();
 
@@ -98,8 +102,8 @@ export class WordRepository {
     let cursorKey: string;
     let cursorValue: string | null;
 
-    if (order === WordOrder.Random) {
-      query.limit(limit + 1).orderByRaw('RAND()');
+    if (order === WordOrder.Confidence) {
+      query.limit(limit + 1).orderByRaw('confidence ASC, RAND()');
     } else {
       if (order === WordOrder.Chronological) {
         cursorKey = 'added_at';
@@ -146,17 +150,23 @@ export class WordRepository {
       query.whereRaw(`date(added_at) = ?`, [addedAtDate.toFormat(DATE_FORMAT)]);
     }
 
-    if (masteryIncOlderThan) {
+    if (masteryAttemptOlderThan) {
+      const delay = this.masteryAttemptDelaySecondsSql(
+        masteryAttemptOlderThan,
+        mastery,
+      );
+
       query.whereRaw(
-        `date_add(ifnull(mastery_inc_at, added_at), interval ? hour) < now()`,
-        [masteryIncOlderThan.hours],
+        `timestampadd(second, ${delay}, ifnull(mastery_attempt_at, added_at)) < now()`,
       );
     }
 
-    if (masteryAttemptOlderThan) {
-      query.whereRaw(
-        `(mastery_attempt_at is null or date_add(mastery_attempt_at, interval ? hour) < now())`,
-        [masteryAttemptOlderThan.hours],
+    if (excludeMaxMasteryConfidence) {
+      query.whereNot((query) =>
+        query.where({
+          mastery: WordMastery.Advanced,
+          confidence: WordConfidence.Highest,
+        }),
       );
     }
 
@@ -300,9 +310,7 @@ export class WordRepository {
         original: word.original,
         translation: word.translation,
         mastery: word.mastery,
-        ...(word.masteryIncAt && {
-          mastery_inc_at: toTimestamp(word.masteryIncAt),
-        }),
+        confidence: word.confidence,
         ...(word.masteryAttemptAt && {
           mastery_attempt_at: toTimestamp(word.masteryAttemptAt),
         }),
@@ -333,51 +341,89 @@ export class WordRepository {
       .delete();
   }
 
-  async getCount(languageId: LanguageId): Promise<number> {
-    const [{ count }] = await this.connectionManager
+  async getCount(
+    languageId: LanguageId,
+    {
+      masteryAttemptOlderThan,
+      excludeMaxMasteryConfidence,
+    }: GetCountParams = {},
+  ): Promise<number> {
+    const query = this.connectionManager
       .getConnection()(TABLE_WORDS)
       .where({ language_id: languageId })
       .count('id', { as: 'count' });
 
-    return Number(count);
-  }
+    if (masteryAttemptOlderThan) {
+      const delay = this.masteryAttemptDelaySecondsSql(masteryAttemptOlderThan);
+      query.whereRaw(
+        `timestampadd(second, ${delay}, ifnull(mastery_attempt_at, added_at)) < now()`,
+      );
+    }
 
-  async getExerciseCount({
-    languageId,
-    mastery,
-    masteryIncOlderThan,
-    masteryAttemptOlderThan,
-  }: GetExerciseCountParams): Promise<number> {
-    const [{ count }] = await this.connectionManager
-      .getConnection()(TABLE_WORDS)
-      .where({ language_id: languageId, mastery })
-      .whereRaw(
-        `date_add(ifnull(mastery_inc_at, added_at), interval ? hour) < now()`,
-        [masteryIncOlderThan.hours],
-      )
-      .whereRaw(
-        `(mastery_attempt_at is null or date_add(mastery_attempt_at, interval ? hour) < now())`,
-        [masteryAttemptOlderThan.hours],
-      )
-      .count('id', { as: 'count' });
+    if (excludeMaxMasteryConfidence) {
+      query.whereNot((query) =>
+        query.where({
+          mastery: WordMastery.Advanced,
+          confidence: WordConfidence.Highest,
+        }),
+      );
+    }
 
+    const [{ count }] = await query;
     return Number(count);
   }
 
   async getCountByMastery(
     languageId: LanguageId,
+    {
+      masteryAttemptOlderThan,
+      excludeMaxMasteryConfidence,
+    }: GetCountParams = {},
   ): Promise<Record<WordMastery, number>> {
     const connection = this.connectionManager.getConnection();
 
+    const query = connection(TABLE_WORDS)
+      .where({ language_id: languageId })
+      .select(connection.raw('count(id) as count'), 'mastery');
+
+    if (masteryAttemptOlderThan) {
+      const delay = this.masteryAttemptDelaySecondsSql(masteryAttemptOlderThan);
+      query.whereRaw(
+        `timestampadd(second, ${delay}, ifnull(mastery_attempt_at, added_at)) < now()`,
+      );
+    }
+
+    if (excludeMaxMasteryConfidence) {
+      query.whereNot((query) =>
+        query.where({
+          mastery: WordMastery.Advanced,
+          confidence: WordConfidence.Highest,
+        }),
+      );
+    }
+
     const counts: Array<{ count: number; mastery: WordMastery }> =
-      await connection(TABLE_WORDS)
-        .where({ language_id: languageId })
-        .select(connection.raw('count(id) as count'), 'mastery')
-        .groupBy('mastery');
+      await query.groupBy('mastery');
 
     return Object.fromEntries(
       counts.map((count) => [count.mastery, count.count]),
     ) as Record<WordMastery, number>;
+  }
+
+  async getCountByConfidence(
+    languageId: LanguageId,
+  ): Promise<Record<WordConfidence, number>> {
+    const connection = this.connectionManager.getConnection();
+
+    const counts: Array<{ count: number; confidence: WordConfidence }> =
+      await connection(TABLE_WORDS)
+        .where({ language_id: languageId })
+        .select(connection.raw('count(id) as count'), 'confidence')
+        .groupBy('confidence');
+
+    return Object.fromEntries(
+      counts.map((count) => [count.confidence, count.count]),
+    ) as Record<WordConfidence, number>;
   }
 
   async getCountByPartOfSpeech(
@@ -505,9 +551,7 @@ export class WordRepository {
       partOfSpeech: row.part_of_speech,
       addedAt: fromTimestamp(row.added_at),
       mastery: row.mastery,
-      ...(row.mastery_inc_at && {
-        masteryIncAt: fromTimestamp(row.mastery_inc_at),
-      }),
+      confidence: row.confidence,
       ...(row.mastery_attempt_at && {
         masteryAttemptAt: fromTimestamp(row.mastery_attempt_at),
       }),
@@ -569,5 +613,41 @@ export class WordRepository {
           ),
         )
       : null;
+  }
+
+  private masteryAttemptDelaySecondsSql(
+    { masteryDelayBase, confidenceDelayMultiplier }: MasteryAttemptDelay,
+    mastery?: WordMastery,
+  ): string {
+    const delayBase =
+      mastery !== undefined
+        ? masteryDelayBase[mastery].toMillis() / 1000
+        : this.caseWhenThenSql(
+            'mastery',
+            Object.entries(masteryDelayBase).map(([mastery, delay]) => [
+              Number(mastery),
+              delay.toMillis() / 1000,
+            ]),
+          );
+
+    const multiplier = this.caseWhenThenSql(
+      'confidence',
+      Object.entries(confidenceDelayMultiplier).map(
+        ([confidence, multiplier]) => [Number(confidence), multiplier],
+      ),
+    );
+
+    return `(${delayBase} * ${multiplier})`;
+  }
+
+  private caseWhenThenSql<K, V>(
+    column: string,
+    mappings: Array<[K, V]>,
+  ): string {
+    const whenThen = Array.from(
+      mappings.map(([key, value]) => `WHEN ${key} THEN ${value}`),
+    ).join(' ');
+
+    return `CASE ${column} ${whenThen} END`;
   }
 }

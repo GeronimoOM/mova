@@ -22,6 +22,7 @@ const headersLink = new ApolloLink((operation, forward) => {
       'Sync-Client-ID': clientId,
       'Client-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
       ...(token && { Authorization: `Bearer ${token}` }),
+      ...('Cypress' in window && { 'X-Sort-Exercises': 'true' }),
     },
   }));
   return forward(operation);

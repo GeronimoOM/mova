@@ -28,8 +28,9 @@
       "search": "жодного слова не знайдено"
     },
     "mastery": {
+      "label": "рівень",
       "nextExerciseAt": "наступна вправа",
-      "exerciseReady": "вправа готова"
+      "exerciseReady": "готова"
     },
     "existing": "уже додано",
     "options": {
@@ -94,7 +95,8 @@
   "stats": {
     "total": "всього слів",
     "byPartOfSpeech": "слова за частинами мови",
-    "byMastery": "слова за рівнем володіння"
+    "byMastery": "слова за рівнем володіння",
+    "byConfidence": "слова за впевненістю"
   },
   "pos": {
     "noun": {
@@ -124,13 +126,22 @@
     "select": "обери"
   },
   "mastery": {
+    "label": "рівень",
     "none": "відсутній",
     "basic": "початковий",
-    "advanced": "середній",
-    "mastered": "вивчено"
+    "intermediate": "середній",
+    "advanced": "високий"
+  },
+  "confidence": {
+    "label": "впевненість",
+    "lowest": "дуже низька",
+    "low": "низька",
+    "normal": "нормальна",
+    "high": "висока",
+    "higher": "дуже висока",
+    "highest": "максимальна"
   },
   "users": {
-    "includeMastered": "Запитувати вивчені слова",
     "logout": "Вийти"
   }
 }

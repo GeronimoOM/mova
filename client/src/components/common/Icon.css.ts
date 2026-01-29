@@ -1,5 +1,5 @@
 import { recipe } from '@vanilla-extract/recipes';
-import { accentAndOptionColorStyle } from '../../utils/colors';
+import { themeAccentAndOptionColorStyle } from '../../utils/colors';
 
 export const icon = recipe({
   variants: {
@@ -25,7 +25,7 @@ export const icon = recipe({
       },
     },
 
-    color: accentAndOptionColorStyle((colorVar) => ({
+    color: themeAccentAndOptionColorStyle((colorVar) => ({
       color: colorVar,
     })),
   },

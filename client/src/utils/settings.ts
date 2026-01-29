@@ -11,7 +11,6 @@ export function loadUserSettingsFromLocal(): UserSettings {
     selectedFont: localStorage.getItem(LOCAL_STORAGE_FONT_KEY) ?? 'default',
     selectedLanguageId:
       localStorage.getItem(LOCAL_STORAGE_LANGUAGE_KEY) ?? null,
-    includeMastered: true,
   };
 }
 

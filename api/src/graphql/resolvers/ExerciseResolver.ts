@@ -56,4 +56,14 @@ export class ExerciseResolver {
 
     return this.wordTypeMapper.map(word);
   }
+
+  @Mutation(() => WordType)
+  async resetConfidence(
+    @ContextDec() ctx: Context,
+    @Args('wordId', { type: () => ID }) wordId: WordId,
+  ): Promise<WordType> {
+    const word = await this.exerciseService.resetConfidence(ctx, wordId);
+
+    return this.wordTypeMapper.map(word);
+  }
 }

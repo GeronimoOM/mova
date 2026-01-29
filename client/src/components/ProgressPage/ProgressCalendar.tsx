@@ -238,9 +238,9 @@ const ProgressCalendarCell = ({
   const useColor = useMemo(() => goal && points > 0, [goal, points]);
   const color = useColor ? progressTypeToColor[type] : undefined;
 
-  const intensity = useMemo(() => {
+  const opacity = useMemo(() => {
     if (!goal || !color) {
-      return undefined;
+      return 100;
     }
 
     const progress = points / goal.points;
@@ -277,9 +277,9 @@ const ProgressCalendarCell = ({
           onMouseLeave={() => setIsTooltipOpen(false)}
         >
           <div
+            style={{ opacity: `${opacity / 100}` }}
             className={styles.cell({
               color,
-              intensity,
             })}
           />
         </div>

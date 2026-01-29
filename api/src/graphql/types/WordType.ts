@@ -39,6 +39,9 @@ export class WordType {
   @Field(() => Int)
   mastery: number;
 
+  @Field(() => Int)
+  confidence: number;
+
   @Field(() => TimestampScalar)
   nextExerciseAt: DateTime;
 
