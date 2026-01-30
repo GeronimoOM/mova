@@ -26,7 +26,7 @@ export const cardRow = style({
   display: 'flex',
   alignItems: 'center',
   padding: 10,
-  gap: 20,
+  gap: 10,
 });
 
 export const number = style({
@@ -36,8 +36,8 @@ export const number = style({
 
 export const legend = style({
   flex: 1,
-  maxWidth: 200,
-  marginLeft: 'auto',
+  maxWidth: 150,
+  minWidth: 0,
   display: 'flex',
   flexDirection: 'column',
   gap: 5,
@@ -50,7 +50,15 @@ export const legendRow = style({
 });
 
 export const legendIcon = style({
+  minWidth: 10,
   width: 10,
   height: 10,
   borderRadius: '50%',
+});
+
+export const legendLabel = style({
+  flexShrink: 1,
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
 });

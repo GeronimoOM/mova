@@ -4,6 +4,7 @@ import { useClickOutsideHandler } from '../../utils/useClickOutsideHandler';
 import {
   DropdownAlignment,
   DropdownPosition,
+  isCustomAlignment,
   useDropdownPosition,
 } from '../../utils/useDropdownPosition';
 import { useLayoutContext } from '../LayoutContext';
@@ -98,11 +99,16 @@ const DropdownContent = ({
       ref={dropdownRef}
       className={styles.dropdown({
         position: computedPosition,
-        alignment: computedAlignment,
+        alignment: isCustomAlignment(computedAlignment)
+          ? computedAlignment.alignment
+          : computedAlignment,
         outline,
       })}
       style={{
         ...(maxHeight && { maxHeight }),
+        ...(isCustomAlignment(computedAlignment) && {
+          transform: `translateX(${computedAlignment.translate}px)`,
+        }),
       }}
     >
       {content}

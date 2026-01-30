@@ -40,13 +40,14 @@ export const ExerciseCard = () => {
       variables: { languageId: selectedLanguageId! },
     },
   );
-  const { data: exerciseCountQuery, loading: exerciseCountLoading } = useQuery(
-    GetExerciseCountDocument,
-    {
-      variables: { languageId: selectedLanguageId! },
-      fetchPolicy: 'no-cache',
-    },
-  );
+  const {
+    data: exerciseCountQuery,
+    loading: exerciseCountLoading,
+    refetch: refetchExerciseCount,
+  } = useQuery(GetExerciseCountDocument, {
+    variables: { languageId: selectedLanguageId! },
+    fetchPolicy: 'no-cache',
+  });
   const [
     fetchExerciseWords,
     {
@@ -121,6 +122,7 @@ export const ExerciseCard = () => {
       setInfoOpen(false);
     } else {
       setIsStarted(false);
+      refetchExerciseCount();
     }
   };
 

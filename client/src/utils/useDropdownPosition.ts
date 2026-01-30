@@ -1,7 +1,18 @@
 import { useCallback, useLayoutEffect, useMemo, useState } from 'react';
 
 export type DropdownPosition = 'top' | 'bottom';
-export type DropdownAlignment = 'start' | 'center' | 'end' | 'stretch';
+export type DropdownAlignment =
+  | 'start'
+  | 'center'
+  | 'end'
+  | 'stretch'
+  | CustomDropdownAlignment;
+export type CustomDropdownAlignment = { alignment: 'start'; translate: number };
+
+export const isCustomAlignment = (
+  alignment: DropdownAlignment,
+): alignment is CustomDropdownAlignment =>
+  typeof alignment === 'object' && 'alignment' in alignment;
 
 export type UseDropdownPositionProps = {
   dropdownRef?: React.RefObject<HTMLElement | null>;
@@ -150,12 +161,24 @@ function computeAlignment({
     anchorCenterX - dropdownHalfWidth - containerBoundRect.left;
   const centeredRightOffset =
     containerBoundRect.right - anchorCenterX - dropdownHalfWidth;
+  const startRightOffset =
+    containerBoundRect.right - anchorBoundRect.left - dropdownBoundRect.width;
+  const endLeftOffset =
+    anchorBoundRect.right - containerBoundRect.left - dropdownBoundRect.width;
 
-  let alignment: DropdownAlignment = 'center';
-  if (centeredLeftOffset < minOffset) {
+  let alignment: DropdownAlignment;
+  if (centeredLeftOffset >= minOffset && centeredRightOffset >= minOffset) {
+    alignment = 'center';
+  } else if (startRightOffset >= minOffset) {
     alignment = 'start';
-  } else if (centeredRightOffset < minOffset) {
+  } else if (endLeftOffset >= minOffset) {
     alignment = 'end';
+  } else {
+    const containerCenterX =
+      containerBoundRect.left + containerBoundRect.width / 2;
+    const translateX =
+      containerCenterX - anchorBoundRect.left - dropdownHalfWidth;
+    alignment = { alignment: 'start', translate: translateX };
   }
 
   return alignment;

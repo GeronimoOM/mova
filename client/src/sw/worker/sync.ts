@@ -98,7 +98,7 @@ export async function sync(): Promise<void> {
     await pushChanges();
     hasChanges = await pullChanges();
     isSyncSuccess = true;
-    console.log('Sync success');
+    // console.log('Sync success');
   } catch (err) {
     console.error('Sync failure', err);
   } finally {
@@ -174,7 +174,7 @@ async function pullChanges(): Promise<boolean> {
     currentSyncStartedAt: null,
   });
 
-  console.log(`Pulled changes: ${nChanges} (${syncType} sync)`);
+  // console.log(`Pulled changes: ${nChanges} (${syncType} sync)`);
 
   return nChanges > 0;
 }

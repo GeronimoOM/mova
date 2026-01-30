@@ -304,7 +304,7 @@ export class ExerciseService {
       }
 
       const extraMasteryTotal = Math.min(
-        (wordsByMastery[mastery]?.length ?? 0) - totalByMastery[mastery],
+        (wordsByMastery[mastery]?.length ?? 0) - (totalByMastery[mastery] ?? 0),
         total - currentTotal,
       );
 

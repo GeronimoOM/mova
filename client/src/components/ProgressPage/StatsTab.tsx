@@ -150,6 +150,7 @@ const Chart = ({ data }: ChartProps) => {
       startAngle={-45}
       style={{
         width: '120px',
+        minWidth: '120px',
         margin: '0 auto',
       }}
     />
@@ -171,7 +172,7 @@ const ChartLegend = ({ data }: ChartLegendProps) => {
             className={styles.legendIcon}
             style={{ backgroundColor: color }}
           />
-          {t(title)}
+          <div className={styles.legendLabel}>{t(title)}</div>
           <span className={styles.number}>{value}</span>
         </div>
       ))}

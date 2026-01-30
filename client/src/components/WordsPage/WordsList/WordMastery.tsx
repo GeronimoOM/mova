@@ -92,7 +92,7 @@ export const WordMastery = ({
           nextExerciseAt={nextExerciseAt}
         />
       }
-      alignment={'end'}
+      position="bottom"
     >
       <div
         className={styles.mastery({
