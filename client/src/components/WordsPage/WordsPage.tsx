@@ -1,6 +1,8 @@
+import { useQuery } from '@apollo/client';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { cacheClearWordsSearch } from '../../api/cache';
+import { cacheClearWords } from '../../api/cache';
+import { GetStatsDocument } from '../../api/types/graphql';
 import { AppRoute, wordRoute } from '../../routes';
 import { useDebouncedValue } from '../../utils/useDebouncedValue';
 import { useLanguageContext } from '../LanguageContext';
@@ -17,6 +19,7 @@ export const WordsPage = () => {
   const [selectedWordId, setSelectedWordId] = useState<string | null>(null);
   const [isWordDetailsOpen, setIsWordDetailsOpen] = useState(false);
   const [wordsSearchQuery, setWordsSearchQuery] = useState<string>('');
+  const [isLowConfidenceWords, setLowConfidenceWords] = useState(false);
   const location = useLocation();
   const params = useParams();
   const navigate = useNavigate();
@@ -27,7 +30,20 @@ export const WordsPage = () => {
   );
 
   const { words, dividedWords, wordsLoading, fetchNextWordsPage } =
-    useWordsList(debouncedWordsSearchQuery);
+    useWordsList(debouncedWordsSearchQuery, isLowConfidenceWords);
+  const { data: statsQuery } = useQuery(GetStatsDocument, {
+    variables: { languageId: selectedLanguageId! },
+    fetchPolicy: 'cache-and-network',
+  });
+  const hasLowConfidenceWords = useMemo(() => {
+    const byConfidence = statsQuery?.language?.stats?.confidence;
+    for (const stat of byConfidence ?? []) {
+      if (stat.confidence < 0 && stat.total > 0) {
+        return true;
+      }
+    }
+    return false;
+  }, [statsQuery]);
 
   const handleWordSelect = useCallback(
     (selectedWordId: string | null) => {
@@ -46,6 +62,13 @@ export const WordsPage = () => {
     setWordsSearchQuery('');
   }, [navigate]);
 
+  const handleToggleLowConfidence = useCallback((lowConfidence: boolean) => {
+    setLowConfidenceWords(lowConfidence);
+    if (lowConfidence) {
+      setWordsSearchQuery('');
+    }
+  }, []);
+
   useEffect(() => {
     if (selectedLanguageId) {
       setSelectedWordId(null);
@@ -54,9 +77,9 @@ export const WordsPage = () => {
 
   useEffect(() => {
     if (selectedLanguageId) {
-      cacheClearWordsSearch(selectedLanguageId);
+      cacheClearWords(selectedLanguageId);
     }
-  }, [selectedLanguageId, debouncedWordsSearchQuery]);
+  }, [selectedLanguageId, debouncedWordsSearchQuery, isLowConfidenceWords]);
 
   useEffect(() => {
     if (params.id) {
@@ -118,13 +141,17 @@ export const WordsPage = () => {
         <>
           <WordsSearchBar
             query={wordsSearchQuery}
+            hasLowConfidence={hasLowConfidenceWords}
+            isLowConfidence={isLowConfidenceWords}
             onQueryChange={setWordsSearchQuery}
             onClear={() => setWordsSearchQuery('')}
+            onToggleLowConfidence={handleToggleLowConfidence}
           />
           <WordsList
             words={dividedWords}
             wordsLoading={wordsLoading}
             wordsSearchQuery={wordsSearchQuery}
+            isLowConfidence={isLowConfidenceWords}
             onFetchNextPage={fetchNextWordsPage}
             onSelectWord={handleWordSelect}
             onCreateNew={handleCreateNew}

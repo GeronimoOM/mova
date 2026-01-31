@@ -17,6 +17,7 @@ import { DbConnectionManager } from 'repositories/DbConnectionManager';
 import { ProgressRepository } from 'repositories/ProgressRepository';
 import { WordRepository } from 'repositories/WordRepository';
 import { TIMEZONE_OFFSET_FORMAT } from 'utils/constants';
+import { LanguageService } from './LanguageService';
 
 const DEFAULT_GOALS: Record<ProgressType, Omit<Goal, 'languageId'>> = {
   [ProgressType.Mastery]: {
@@ -36,6 +37,8 @@ const DEFAULT_HISTORY_SPAN = Duration.fromObject({ months: 3 });
 @Injectable()
 export class ProgressService {
   constructor(
+    @Inject(forwardRef(() => LanguageService))
+    private languageService: LanguageService,
     @Inject(forwardRef(() => WordRepository))
     private wordRepository: WordRepository,
     private progressRepository: ProgressRepository,
@@ -58,13 +61,21 @@ export class ProgressService {
     };
   }
 
-  async getGoal(languageId: LanguageId, type: ProgressType): Promise<Goal> {
-    const goals = await this.getGoals(languageId);
+  async getGoal(
+    ctx: Context,
+    languageId: LanguageId,
+    type: ProgressType,
+  ): Promise<Goal> {
+    const goals = await this.getGoals(ctx, languageId);
 
     return goals.find((goal) => goal.type === type)!;
   }
 
-  async getGoals(languageId: LanguageId): Promise<Goal[]> {
+  async getGoals(ctx: Context, languageId: LanguageId): Promise<Goal[]> {
+    if (!(await this.languageService.exists(ctx, languageId))) {
+      throw new Error(`Language does not exist (id:${languageId})`);
+    }
+
     const goals = await this.progressRepository.getGoals(languageId);
 
     return ProgressTypes.map(
@@ -89,7 +100,7 @@ export class ProgressService {
     cadence?: ProgressCadence,
   ): Promise<ProgressHistory> {
     if (!cadence) {
-      const goal = await this.getGoal(languageId, type);
+      const goal = await this.getGoal(ctx, languageId, type);
       cadence = goal.cadence;
     }
 
@@ -158,7 +169,7 @@ export class ProgressService {
     languageId: LanguageId,
     type: ProgressType,
   ): Promise<number> {
-    const goal = await this.getGoal(languageId, type);
+    const goal = await this.getGoal(ctx, languageId, type);
     const { cadence } = goal;
     const isDailyCadence = cadence === ProgressCadence.Daily;
 

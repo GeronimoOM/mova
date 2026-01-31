@@ -5,7 +5,7 @@ import { HiMiniXMark } from 'react-icons/hi2';
 
 import { useTranslation } from 'react-i18next';
 import { IoPlay } from 'react-icons/io5';
-import { useAttemptWordMastery } from '../../api/mutations';
+import { useAttemptMastery } from '../../api/mutations';
 import {
   GetExerciseCountDocument,
   GetExerciseWordsDocument,
@@ -60,7 +60,7 @@ export const ExerciseCard = () => {
     fetchPolicy: 'network-only',
     notifyOnNetworkStatusChange: true,
   });
-  const [attemptMastery] = useAttemptWordMastery();
+  const [attemptMastery] = useAttemptMastery();
 
   const exerciseCount = exerciseCountQuery?.language?.exerciseCount;
   const wordsLoading = [NetworkStatus.loading, NetworkStatus.refetch].includes(

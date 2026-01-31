@@ -13,6 +13,7 @@ export type WordsListProps = {
   words: Array<WordFieldsFragment | WordDateDivider> | undefined;
   wordsLoading: boolean;
   wordsSearchQuery: string;
+  isLowConfidence: boolean;
   onFetchNextPage: () => void;
   onSelectWord: (selectedWord: string) => void;
   onCreateNew: () => void;
@@ -22,6 +23,7 @@ export const WordsList = ({
   words,
   wordsLoading,
   wordsSearchQuery,
+  isLowConfidence,
   onFetchNextPage,
   onSelectWord,
   onCreateNew,
@@ -45,7 +47,8 @@ export const WordsList = ({
         <div className={styles.list} data-testid="words-list">
           {words?.map((word) =>
             isDivider(word) ? (
-              !isSearch && (
+              !isSearch &&
+              !isLowConfidence && (
                 <WordsListItemDivider
                   key={word.date.toString()}
                   date={word.date}

@@ -19,7 +19,7 @@ import {
   optimisticUpdateWord,
 } from './optimistic';
 import {
-  AttemptWordMasteryDocument,
+  AttemptMasteryDocument,
   CreateLanguageDocument,
   CreateLinkDocument,
   CreatePropertyDocument,
@@ -322,10 +322,10 @@ export const buildDeleteLinkRefetchQueries = (
   },
 });
 
-export function useAttemptWordMastery(): UseMutationResult<
-  typeof AttemptWordMasteryDocument
+export function useAttemptMastery(): UseMutationResult<
+  typeof AttemptMasteryDocument
 > {
-  return useMutation(AttemptWordMasteryDocument, {
+  return useMutation(AttemptMasteryDocument, {
     update: (_, { data }, { variables }) => {
       updateWord(data!.attemptMastery);
       if (variables?.success) {

@@ -96,6 +96,10 @@ export const input = recipe({
     disabled: {
       true: {
         pointerEvents: 'none',
+
+        '::placeholder': {
+          color: themeVars.color.backgroundLightest,
+        },
       },
     },
 

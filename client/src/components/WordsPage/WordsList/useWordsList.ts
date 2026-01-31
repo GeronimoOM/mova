@@ -16,7 +16,10 @@ export type WordsListReturn = {
   fetchNextWordsPage: () => void;
 };
 
-export function useWordsList(wordsSearchQuery: string): WordsListReturn {
+export function useWordsList(
+  wordsSearchQuery: string,
+  isLowConfidence: boolean,
+): WordsListReturn {
   const [selectedLanguageId] = useLanguageContext();
 
   const [
@@ -46,12 +49,21 @@ export function useWordsList(wordsSearchQuery: string): WordsListReturn {
       variables: {
         languageId: selectedLanguageId,
         limit: WORDS_PAGE_SIZE,
+        ...(isLowConfidence && {
+          lowConfidence: true,
+        }),
         ...(isSearch && {
           query: wordsSearchQuery,
         }),
       },
     });
-  }, [selectedLanguageId, isSearch, wordsSearchQuery, fetchWordsPage]);
+  }, [
+    selectedLanguageId,
+    isSearch,
+    isLowConfidence,
+    wordsSearchQuery,
+    fetchWordsPage,
+  ]);
 
   const fetchNextWordsPage = useCallback(() => {
     if (!selectedLanguageId || !nextCursor) {
@@ -63,12 +75,22 @@ export function useWordsList(wordsSearchQuery: string): WordsListReturn {
         languageId: selectedLanguageId,
         limit: WORDS_PAGE_SIZE,
         cursor: nextCursor,
+        ...(isLowConfidence && {
+          lowConfidence: true,
+        }),
         ...(isSearch && {
           query: wordsSearchQuery,
         }),
       },
     });
-  }, [selectedLanguageId, nextCursor, isSearch, wordsSearchQuery, fetchMore]);
+  }, [
+    selectedLanguageId,
+    nextCursor,
+    isSearch,
+    isLowConfidence,
+    wordsSearchQuery,
+    fetchMore,
+  ]);
 
   useEffect(() => {
     fetchFirstWordsPage();

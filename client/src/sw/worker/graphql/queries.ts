@@ -164,7 +164,7 @@ async function handleGraphQlQueryPropertiesFromCache(
 async function handleGraphQlQueryWordsFromCache(
   request: GraphQlRequest,
 ): Promise<Response> {
-  const { languageId, query, cursor, limit } =
+  const { languageId, query, lowConfidence, cursor, limit } =
     request.variables as GetWordsQueryVariables;
   const {
     addedAt,
@@ -178,7 +178,13 @@ async function handleGraphQlQueryWordsFromCache(
   if (query) {
     words = await cache.searchWords(languageId, query, limit! + 1, start);
   } else {
-    words = await cache.getWords(languageId, limit! + 1, addedAt, id);
+    words = await cache.getWords(
+      languageId,
+      limit! + 1,
+      addedAt,
+      id,
+      lowConfidence ?? undefined,
+    );
   }
 
   let nextCursor: string | null = null;

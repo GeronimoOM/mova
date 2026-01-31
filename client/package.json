@@ -14,6 +14,7 @@
     "type-check": "tsc --noEmit",
     "test": "cypress run --e2e",
     "test:open": "cypress open --e2e",
+    "test:init": "cypress run --e2e --spec test/e2e/init.cy.ts",
     "lint-staged": "lint-staged",
     "graphql:codegen": "graphql-codegen -c ./src/api/codegen.ts",
     "pwa:assets-gen": "pwa-assets-generator --preset minimal-2023 public/images/logo.svg"

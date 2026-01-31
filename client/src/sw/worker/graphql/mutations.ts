@@ -14,7 +14,7 @@ import {
 } from '../../../api/optimistic';
 import {
   ApplyChangeInput,
-  AttemptWordMasteryMutation,
+  AttemptMasteryMutation,
   CreateLanguageMutation,
   CreateLanguageMutationVariables,
   CreateLinkMutation,
@@ -222,7 +222,7 @@ async function cacheGraphQlMutationResponse(
         break;
       }
       case GraphQlMutation.AttemptMastery: {
-        const { attemptMastery } = responseData as AttemptWordMasteryMutation;
+        const { attemptMastery } = responseData as AttemptMasteryMutation;
         await cache.updateWord(attemptMastery);
         break;
       }

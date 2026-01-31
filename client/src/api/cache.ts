@@ -5,7 +5,13 @@ const languageTypePolicy: TypePolicy = {
   fields: {
     words: {
       keyArgs: (args: LanguageWordsArgs | null) => {
-        return args?.query ? 'search' : false;
+        if (args?.lowConfidence) {
+          return 'lowConfidence';
+        } else if (args?.query) {
+          return 'search';
+        } else {
+          return false;
+        }
       },
       merge(existing: WordPage | undefined, incoming: WordPage): WordPage {
         return {
@@ -75,9 +81,13 @@ export const cache = new InMemoryCache({
   },
 });
 
-export const cacheClearWordsSearch = (languageId: string) => {
+export const cacheClearWords = (languageId: string) => {
   cache.evict({
     id: `Language:${languageId}`,
     fieldName: 'words:search',
+  });
+  cache.evict({
+    id: `Language:${languageId}`,
+    fieldName: 'words:lowConfidence',
   });
 };

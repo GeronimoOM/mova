@@ -108,6 +108,8 @@ export class LanguageResolver {
     @Args('query', { nullable: true }) query?: string,
     @Args('partsOfSpeech', { type: () => [PartOfSpeech], nullable: true })
     partsOfSpeech?: PartOfSpeech[],
+    @Args('lowConfidence', { nullable: true })
+    lowConfidence?: boolean,
     @Args('order', { type: () => WordOrder, nullable: true })
     order?: WordOrder,
     @Args('direction', { type: () => Direction, nullable: true })
@@ -121,6 +123,7 @@ export class LanguageResolver {
       languageId: language.id,
       query,
       partsOfSpeech,
+      lowConfidence,
       order,
       direction,
       ...(cursor && { cursor }),
@@ -167,8 +170,11 @@ export class LanguageResolver {
   }
 
   @ResolveField(() => [GoalType])
-  async goals(@Parent() language: LanguageType): Promise<GoalType[]> {
-    return await this.progressService.getGoals(language.id);
+  async goals(
+    @ContextDec() ctx: Context,
+    @Parent() language: LanguageType,
+  ): Promise<GoalType[]> {
+    return await this.progressService.getGoals(ctx, language.id);
   }
 
   @ResolveField(() => ProgressType)
@@ -178,7 +184,7 @@ export class LanguageResolver {
     @Args('type', { type: () => ProgressTypeEnum })
     type: ProgressTypeEnum,
   ): Promise<ProgressType> {
-    const goal = await this.progressService.getGoal(language.id, type);
+    const goal = await this.progressService.getGoal(ctx, language.id, type);
     const { cadence } = goal;
 
     return {

@@ -2,7 +2,6 @@ import Dexie from 'dexie';
 import { v1 as uuid } from 'uuid';
 import {
   type ApplyChangeInput,
-  type AttemptWordMasteryMutation,
   type Language,
   type LanguageFieldsFragment,
   type LanguageUpdate,
@@ -18,6 +17,7 @@ import {
   type WordFieldsFullFragment,
   type WordLinkFieldsFragment,
   type WordUpdate,
+  AttemptMasteryMutation,
   LinkedWordFieldsFragment,
   WordFieldsLinksFragment,
   WordLinkType,
@@ -230,8 +230,9 @@ export async function getWords(
   limit: number,
   before?: number,
   beforeId?: string,
+  lowConfidence?: boolean,
 ): Promise<WordFieldsFragment[]> {
-  return await db.words
+  const query = db.words
     .where('[languageId+addedAt+id]')
     .between(
       [languageId, Dexie.minKey, Dexie.minKey],
@@ -240,8 +241,13 @@ export async function getWords(
       true,
     )
     .reverse()
-    .limit(limit)
-    .toArray();
+    .limit(limit);
+
+  if (lowConfidence) {
+    query.filter((word) => word.confidence < 0);
+  }
+
+  return await query.toArray();
 }
 
 export async function searchWords(
@@ -321,7 +327,7 @@ export async function saveWord(
 export async function updateWord(
   wordUpdate:
     | UpdateWordMutation['updateWord']
-    | AttemptWordMasteryMutation['attemptMastery']
+    | AttemptMasteryMutation['attemptMastery']
     | WordUpdate,
 ): Promise<void> {
   if (wordUpdate.__typename === 'Word') {
@@ -342,6 +348,7 @@ export async function updateWord(
         ...(wordUpdate.translation && { translation: wordUpdate.translation }),
         ...(properties && { properties }),
         ...(wordUpdate.mastery && { mastery: wordUpdate.mastery }),
+        ...(wordUpdate.confidence && { mastery: wordUpdate.confidence }),
         ...(wordUpdate.nextExerciseAt && {
           nextExerciseAt: wordUpdate.nextExerciseAt,
         }),

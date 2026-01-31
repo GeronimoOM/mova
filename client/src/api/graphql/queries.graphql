@@ -8,6 +8,7 @@ query GetWords(
   $languageId: ID!
   $query: String
   $partsOfSpeech: [PartOfSpeech!]
+  $lowConfidence: Boolean
   $cursor: String
   $limit: Int
   $order: WordOrder
@@ -18,6 +19,7 @@ query GetWords(
       cursor: $cursor
       limit: $limit
       partsOfSpeech: $partsOfSpeech
+      lowConfidence: $lowConfidence
       query: $query
       order: $order
     ) {

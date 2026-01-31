@@ -36,9 +36,10 @@ export interface GetWordPageParams {
   direction?: Direction;
   partsOfSpeech?: PartOfSpeech[];
   mastery?: WordMastery;
-  addedAtDate?: DateTime;
   masteryAttemptOlderThan?: MasteryAttemptDelay;
   excludeMaxMasteryConfidence?: boolean;
+  addedAtDate?: DateTime;
+  lowConfidence?: boolean;
   cursor?: WordSortedCursor;
   limit?: number;
 }
@@ -81,15 +82,16 @@ export class WordRepository {
 
   async getPage({
     languageId,
-    partsOfSpeech,
     order = WordOrder.Chronological,
     direction = Direction.Desc,
-    cursor,
-    limit = DEFAULT_LIMIT,
+    partsOfSpeech,
     mastery,
     masteryAttemptOlderThan,
     excludeMaxMasteryConfidence,
     addedAtDate,
+    lowConfidence,
+    cursor,
+    limit = DEFAULT_LIMIT,
   }: GetWordPageParams): Promise<Page<Word, WordSortedCursor>> {
     const connection = this.connectionManager.getConnection();
 
@@ -144,6 +146,10 @@ export class WordRepository {
 
     if (mastery !== undefined) {
       query.where({ mastery });
+    }
+
+    if (lowConfidence) {
+      query.where('confidence', '<', 0);
     }
 
     if (addedAtDate) {

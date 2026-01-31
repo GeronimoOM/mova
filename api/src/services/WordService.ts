@@ -44,6 +44,7 @@ export interface GetWordPageParams {
   languageId: LanguageId | LanguageId[];
   partsOfSpeech?: PartOfSpeech[];
   query?: string;
+  lowConfidence?: boolean;
   order?: WordOrder;
   direction?: Direction;
   cursor?: WordCursor;

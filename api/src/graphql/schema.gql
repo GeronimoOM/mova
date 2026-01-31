@@ -7,7 +7,7 @@ type Language {
   name: String!
   addedAt: Timestamp!
   properties(partOfSpeech: PartOfSpeech): [Property!]!
-  words(cursor: String, limit: Int = 20, query: String, partsOfSpeech: [PartOfSpeech!], order: WordOrder, direction: Direction): WordPage!
+  words(cursor: String, limit: Int = 20, query: String, partsOfSpeech: [PartOfSpeech!], lowConfidence: Boolean, order: WordOrder, direction: Direction): WordPage!
   word(original: String!): Word
   stats: WordsStats!
   goals: [Goal!]!
