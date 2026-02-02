@@ -243,7 +243,13 @@ const ProgressCalendarCell = ({
       return 100;
     }
 
-    const progress = points / goal.points;
+    const goalPoints =
+      cadence === goal.cadence
+        ? goal.points
+        : goal.cadence === ProgressCadence.Weekly
+          ? goal.points / 7
+          : goal.points * 7;
+    const progress = points / goalPoints;
 
     if (progress >= 1) {
       return 100;
@@ -254,7 +260,7 @@ const ProgressCalendarCell = ({
     } else {
       return 30;
     }
-  }, [points, goal, color]);
+  }, [points, color, cadence, goal]);
 
   return (
     instance && (
