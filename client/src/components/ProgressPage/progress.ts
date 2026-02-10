@@ -14,8 +14,8 @@ export const progressTypeToIcon: Record<ProgressType, IconType> = {
 };
 
 export const ProgressTypes = [
-  ProgressType.Words,
   ProgressType.Mastery,
+  ProgressType.Words,
 ] as const;
 
 export const ProgressCadences = [

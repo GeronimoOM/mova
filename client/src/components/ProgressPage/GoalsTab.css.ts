@@ -17,7 +17,7 @@ export const goal = style({
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'space-between',
-  padding: 10,
+  padding: '5px 10px',
   gap: 5,
   boxSizing: 'border-box',
   width: '100%',

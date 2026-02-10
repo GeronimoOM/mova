@@ -23,8 +23,8 @@ export const ProgressTab = () => {
     () =>
       progressQuery?.language
         ? {
-            [ProgressType.Words]: progressQuery.language.wordsProgress,
             [ProgressType.Mastery]: progressQuery.language.masteryProgress,
+            [ProgressType.Words]: progressQuery.language.wordsProgress,
           }
         : undefined,
     [progressQuery],

@@ -39,7 +39,7 @@ export const ProgressCalendar = () => {
   const [selectedLanguageId] = useLanguageContext();
 
   const [selectedType, setSelectedType] = useState<ProgressType>(
-    ProgressType.Words,
+    ProgressType.Mastery,
   );
 
   const [fetchProgressHistory, { data: progressHistory }] = useLazyQuery(
@@ -103,16 +103,16 @@ export const ProgressCalendar = () => {
 
         <div className={styles.footer}>
           <ButtonIcon
-            icon={FaBook}
-            color="secondary2"
-            toggled={selectedType === ProgressType.Words}
-            onClick={() => setSelectedType(ProgressType.Words)}
-          />
-          <ButtonIcon
             icon={FaBrain}
             color="secondary1"
             toggled={selectedType === ProgressType.Mastery}
             onClick={() => setSelectedType(ProgressType.Mastery)}
+          />
+          <ButtonIcon
+            icon={FaBook}
+            color="secondary2"
+            toggled={selectedType === ProgressType.Words}
+            onClick={() => setSelectedType(ProgressType.Words)}
           />
 
           <div className={styles.streak({ ...(hasStreak && { color }) })}>
