@@ -26,6 +26,7 @@ export const listItem = style({
   padding: '5px 10px',
   cursor: 'pointer',
   borderBottom: `1px solid ${themeVars.color.backgroundLighter}`,
+  textTransform: 'lowercase',
 
   selectors: {
     '&:hover': {
