@@ -19,6 +19,7 @@ export type DropdownProps = {
   closeOutsideRef?: RefObject<HTMLDivElement | null>;
   position?: DropdownPosition;
   alignment?: DropdownAlignment;
+  alignmentRef?: React.RefObject<HTMLElement | null>;
   outline?: 'normal' | 'bold';
 };
 
@@ -31,6 +32,7 @@ export const Dropdown = ({
   closeOutsideRef,
   position,
   alignment,
+  alignmentRef,
   outline,
 }: DropdownProps) => {
   const anchorRef = useRef<HTMLDivElement>(null);
@@ -56,6 +58,7 @@ export const Dropdown = ({
             anchorRef={anchorRef as React.RefObject<HTMLElement>}
             position={position}
             alignment={alignment}
+            alignmentRef={alignmentRef}
             outline={outline}
           />
         </div>
@@ -69,6 +72,7 @@ type DropdownContentProps = {
   anchorRef: React.RefObject<HTMLElement>;
   position?: DropdownPosition;
   alignment?: DropdownAlignment;
+  alignmentRef?: React.RefObject<HTMLElement | null>;
   outline?: 'normal' | 'bold';
 };
 
@@ -77,6 +81,7 @@ const DropdownContent = ({
   anchorRef,
   position,
   alignment,
+  alignmentRef,
   outline,
 }: DropdownContentProps) => {
   const { containerRef } = useLayoutContext();
@@ -92,6 +97,7 @@ const DropdownContent = ({
     containerRef: containerRef ?? undefined,
     position,
     alignment,
+    alignmentRef,
   });
 
   return (

@@ -1,10 +1,10 @@
 import classNames from 'classnames';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { useTranslation } from 'react-i18next';
 import { FaFeatherPointed, FaFire } from 'react-icons/fa6';
-
 import { IoReorderThree } from 'react-icons/io5';
+import { TbCopyPlusFilled } from 'react-icons/tb';
 import {
   PartOfSpeech,
   PropertyFieldsFragment,
@@ -14,10 +14,13 @@ import { ButtonIcon } from '../common/ButtonIcon';
 import { Input } from '../common/Input';
 
 import { waitAtLeast } from '../../utils/promises';
+import { isOptionPropertyFragment } from '../../utils/properties';
+import { Dropdown } from '../common/Dropdown';
 import { OptionPropertyDetails } from './OptionPropertyDetails';
 import { PropertyDeleteConfirmModal } from './PropertyDeleteConfirmModal';
 import * as styles from './PropertyListItem.css';
 import { PropertyOptionDeleteConfirmModal } from './PropertyOptionDeleteConfirmModal';
+import { PropertySelectList } from './PropertySelectList';
 import { PropertyTypeSelect } from './PropertyTypeSelect';
 import {
   usePropertyDrag,
@@ -35,7 +38,6 @@ export type PropertyListItemProps = {
   onPropertyCreated?: () => void;
   onSwapPreview: (property1Id: string, property2Id: string) => void;
   onReorder: () => void;
-  onRef?: (ref: React.RefObject<HTMLDivElement | null>) => void;
 };
 
 export const PropertyListItem = ({
@@ -47,7 +49,6 @@ export const PropertyListItem = ({
   onPropertyCreated,
   onSwapPreview,
   onReorder,
-  onRef,
 }: PropertyListItemProps) => {
   const {
     isNewProperty,
@@ -58,6 +59,7 @@ export const PropertyListItem = ({
     editOption,
     removeOption,
     restoreOption,
+    setOptions,
 
     canCreateProperty,
     createProperty,
@@ -104,6 +106,7 @@ export const PropertyListItem = ({
 
   const [isDeleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [isLoadingDeleteConfirm, setIsLoadingDeleteConfirm] = useState(false);
+  const [isCopyListOpen, setCopyListOpen] = useState(false);
 
   useEffect(() => {
     dragPreviewRef(getEmptyImage(), { captureDraggingState: true });
@@ -144,6 +147,19 @@ export const PropertyListItem = ({
     }
   }, [fetchPropertyUsage]);
 
+  const handleCopyProperty = useCallback(
+    (property: PropertyFieldsFragment) => {
+      setType(property.type);
+      setName(property.name);
+      if (isOptionPropertyFragment(property)) {
+        setOptions(property.options);
+      }
+
+      setCopyListOpen(false);
+    },
+    [setName, setType, setOptions],
+  );
+
   const updateAndCloseModal = useCallback(async () => {
     await updateProperty();
     setOptionDeleteConfirmOpen(false);
@@ -158,10 +174,7 @@ export const PropertyListItem = ({
         dragging: isDragging,
       })}
       onClick={onSelect}
-      ref={(elem) => {
-        ref.current = elem;
-        onRef?.(ref);
-      }}
+      ref={ref}
       data-testid="properties-list-item"
     >
       <div className={styles.section}>
@@ -170,6 +183,30 @@ export const PropertyListItem = ({
           onPropertyTypeSelect={setType}
           disabled={!isNewProperty}
         />
+        {isNewProperty && (
+          <div className={classNames(styles.button, { hidden: !selected })}>
+            <Dropdown
+              content={
+                <PropertySelectList
+                  listItemRef={ref}
+                  onSelect={handleCopyProperty}
+                />
+              }
+              alignmentRef={ref}
+              isOpen={isCopyListOpen}
+              onOpen={setCopyListOpen}
+              outline={'bold'}
+            >
+              <ButtonIcon
+                icon={TbCopyPlusFilled}
+                onClick={() => setCopyListOpen(!isCopyListOpen)}
+                highlighted={true}
+                toggled={isCopyListOpen}
+                dataTestId="properties-list-item-copy-btn"
+              />
+            </Dropdown>
+          </div>
+        )}
         <div className={classNames(styles.button, { hidden: !selected })}>
           <ButtonIcon
             icon={FaFeatherPointed}

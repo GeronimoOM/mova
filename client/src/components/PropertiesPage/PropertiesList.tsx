@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { TbHexagonPlusFilled } from 'react-icons/tb';
@@ -18,6 +18,7 @@ export const PropertiesList = ({
   selectedPartOfSpeech,
 }: PropertiesListProps) => {
   const [selectedLanguageId] = useLanguageContext();
+  const ref = useRef<HTMLDivElement>(null);
 
   const { orderedProperties, swapPropertiesPreview, reorderProperties } =
     useOrderedProperties(selectedLanguageId, selectedPartOfSpeech);
@@ -49,17 +50,19 @@ export const PropertiesList = ({
     setNewPropertyId(null);
   }, []);
 
-  const handleScrollRef = useCallback(
-    (ref: React.RefObject<HTMLDivElement | null>) => {
-      ref.current?.scrollIntoView({ behavior: 'smooth' });
-    },
-    [],
-  );
+  useEffect(() => {
+    if (isNewPropertyOpen) {
+      ref?.current?.scroll({
+        behavior: 'smooth',
+        top: Number.MAX_SAFE_INTEGER,
+      });
+    }
+  }, [isNewPropertyOpen]);
 
   return (
     <DndProvider backend={HTML5Backend}>
       <div className={styles.wrapper}>
-        <div className={styles.list}>
+        <div className={styles.list} ref={ref}>
           {orderedProperties?.map((property) => (
             <PropertyListItem
               key={property.id}
@@ -85,11 +88,8 @@ export const PropertiesList = ({
               onSwapPreview={swapPropertiesPreview}
               onReorder={reorderProperties}
               onPropertyCreated={handlePropertyCreated}
-              onRef={handleScrollRef}
             />
           )}
-
-          {/* {isNewPropertyOpen && <div className={styles.scrollRef} ref={handleScrollRef} /> } */}
 
           <div key="end" className={styles.listEnd} />
         </div>

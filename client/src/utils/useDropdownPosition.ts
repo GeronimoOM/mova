@@ -20,6 +20,7 @@ export type UseDropdownPositionProps = {
   containerRef?: React.RefObject<HTMLElement | null>;
   position?: DropdownPosition;
   alignment?: DropdownAlignment;
+  alignmentRef?: React.RefObject<HTMLElement | null>;
   minOffset?: number;
   verticalGap?: number;
 };
@@ -30,6 +31,7 @@ export function useDropdownPosition({
   containerRef,
   position: fixedPosition,
   alignment: fixedAlignment,
+  alignmentRef,
   minOffset = 30,
   verticalGap = 5,
 }: UseDropdownPositionProps): {
@@ -57,6 +59,7 @@ export function useDropdownPosition({
     const dropdownBoundRect = dropdownRef.current.getBoundingClientRect();
     const anchorBoundRect = anchorRef.current.getBoundingClientRect();
     const containerBoundRect = containerRef.current.getBoundingClientRect();
+    const refBoundRect = alignmentRef?.current?.getBoundingClientRect();
 
     const position =
       fixedPosition ?? computePosition({ anchorBoundRect, containerBoundRect });
@@ -74,6 +77,7 @@ export function useDropdownPosition({
         dropdownBoundRect,
         anchorBoundRect,
         containerBoundRect,
+        refBoundRect,
         minOffset,
       });
 
@@ -84,6 +88,7 @@ export function useDropdownPosition({
     anchorRef,
     containerRef,
     dropdownRef,
+    alignmentRef,
     fixedPosition,
     fixedAlignment,
     minOffset,
@@ -148,11 +153,13 @@ function computeAlignment({
   dropdownBoundRect,
   anchorBoundRect,
   containerBoundRect,
+  refBoundRect,
   minOffset,
 }: {
   dropdownBoundRect: DOMRect;
   anchorBoundRect: DOMRect;
   containerBoundRect: DOMRect;
+  refBoundRect?: DOMRect;
   minOffset: number;
 }): DropdownAlignment {
   const anchorCenterX = anchorBoundRect.left + anchorBoundRect.width / 2;
@@ -167,7 +174,13 @@ function computeAlignment({
     anchorBoundRect.right - containerBoundRect.left - dropdownBoundRect.width;
 
   let alignment: DropdownAlignment;
-  if (centeredLeftOffset >= minOffset && centeredRightOffset >= minOffset) {
+  if (refBoundRect) {
+    const translateX = refBoundRect.left - anchorBoundRect.left;
+    alignment = { alignment: 'start', translate: translateX };
+  } else if (
+    centeredLeftOffset >= minOffset &&
+    centeredRightOffset >= minOffset
+  ) {
     alignment = 'center';
   } else if (startRightOffset >= minOffset) {
     alignment = 'start';

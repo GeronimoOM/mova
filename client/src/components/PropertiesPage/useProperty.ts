@@ -45,6 +45,7 @@ export type UsePropertyReturn = {
   editOption: (id: string, option: UpdateOptionInput) => void;
   removeOption: (id: string) => void;
   restoreOption: (id: string) => void;
+  setOptions: (options: UpdateOptionInput[]) => void;
 
   canCreateProperty: boolean;
   createProperty: () => Promise<void>;
@@ -247,6 +248,26 @@ export function useProperty(
     [optionChanges],
   );
 
+  const setOptions = useCallback(
+    (options: UpdateOptionInput[]) =>
+      setOptionChanges(
+        Object.fromEntries(
+          options.map((option) => {
+            const id = uuid();
+            return [
+              id,
+              {
+                id,
+                value: option.value,
+                color: option.color,
+              },
+            ];
+          }),
+        ),
+      ),
+    [],
+  );
+
   const createProperty = useCallback(async () => {
     if (canCreateProperty) {
       setOptionChanges({});
@@ -334,6 +355,7 @@ export function useProperty(
       editOption,
       removeOption,
       restoreOption,
+      setOptions,
 
       canCreateProperty,
       createProperty,
@@ -369,6 +391,7 @@ export function useProperty(
       editOption,
       removeOption,
       restoreOption,
+      setOptions,
       canCreateProperty,
       createProperty,
       propertyCreating,
