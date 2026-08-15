@@ -1,4 +1,6 @@
-FROM node:23-alpine
+FROM node:26-alpine
+
+RUN apk add --no-cache yarn
 
 EXPOSE 3000 3001
 

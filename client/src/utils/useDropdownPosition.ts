@@ -2,11 +2,7 @@ import { useCallback, useLayoutEffect, useMemo, useState } from 'react';
 
 export type DropdownPosition = 'top' | 'bottom';
 export type DropdownAlignment =
-  | 'start'
-  | 'center'
-  | 'end'
-  | 'stretch'
-  | CustomDropdownAlignment;
+  'start' | 'center' | 'end' | 'stretch' | CustomDropdownAlignment;
 export type CustomDropdownAlignment = { alignment: 'start'; translate: number };
 
 export const isCustomAlignment = (

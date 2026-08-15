@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client/react';
 import { GetLanguagesDocument } from '../../api/types/graphql';
 import { useLanguageContext } from '../LanguageContext';
 

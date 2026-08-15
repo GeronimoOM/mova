@@ -34,7 +34,7 @@ export function updatedOptions(
     const newOption: OptionFieldsFragment = {
       id: id!,
       value,
-      color,
+      color: color ?? null,
       __typename: 'Option',
     };
     const currentOptionIdx = current.findIndex((opt) => opt.id === id);

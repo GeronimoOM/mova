@@ -1,4 +1,4 @@
-import { useLazyQuery } from '@apollo/client';
+import { useLazyQuery } from '@apollo/client/react';
 import { DateTime } from 'luxon';
 import { useCallback, useMemo, useState } from 'react';
 import { v1 as uuid } from 'uuid';
@@ -137,7 +137,8 @@ export function useProperty(
         options[optionChange.id!] = {
           id: optionChange.id!,
           value: optionChange.value,
-          color: optionChange.color,
+          color: optionChange.color ?? null,
+          __typename: 'Option',
         };
       }
     }
@@ -148,11 +149,10 @@ export function useProperty(
   const deletedOptions = useMemo(() => {
     return Object.entries(optionChanges)
       .filter(([, optionChange]) => optionChange.value === null)
-      .map(
-        ([optionId]) =>
-          (property as OptionPropertyFieldsFragment).options.find(
-            (opt) => opt.id === optionId,
-          )!,
+      .map(([optionId]) =>
+        (property as OptionPropertyFieldsFragment).options.find(
+          (opt) => opt.id === optionId,
+        )!,
       );
   }, [optionChanges, property]);
 
@@ -168,9 +168,9 @@ export function useProperty(
   );
   const canUpdateProperty = Boolean(
     selectedLanguageId &&
-      !isNewProperty &&
-      isPropertyValid &&
-      (name !== property.name || Object.keys(optionChanges).length),
+    !isNewProperty &&
+    isPropertyValid &&
+    (name !== property.name || Object.keys(optionChanges).length),
   );
   const canDeleteProperty = Boolean(selectedLanguageId && !isNewProperty);
 

@@ -1,7 +1,4 @@
-import {
-  QueryDslQueryContainer,
-  SearchResponse,
-} from '@elastic/elasticsearch/lib/api/types';
+import { estypes as elastic } from '@elastic/elasticsearch';
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { LanguageId } from 'models/Language';
 import { Page, StartCursor, emptyPage } from 'models/Page';
@@ -46,7 +43,9 @@ export class SearchClient implements OnApplicationBootstrap {
     }
 
     const start = cursor?.start ?? 0;
-    const queryFilters: QueryDslQueryContainer[] = [{ term: { languageId } }];
+    const queryFilters: elastic.QueryDslQueryContainer[] = [
+      { term: { languageId } },
+    ];
 
     if (partsOfSpeech?.length) {
       queryFilters.push({
@@ -60,7 +59,7 @@ export class SearchClient implements OnApplicationBootstrap {
 
     query = query.toLowerCase();
 
-    const queryShould: QueryDslQueryContainer[] = [
+    const queryShould: elastic.QueryDslQueryContainer[] = [
       {
         match: {
           original: {
@@ -201,7 +200,7 @@ export class SearchClient implements OnApplicationBootstrap {
   }
 
   private toPage<T>(
-    searchResponse: SearchResponse<T>,
+    searchResponse: elastic.SearchResponse<T>,
     start: number,
     limit: number,
   ): Page<string, StartCursor> {

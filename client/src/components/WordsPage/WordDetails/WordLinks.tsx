@@ -6,7 +6,7 @@ import {
   WordLinkType,
 } from '../../../api/types/graphql';
 
-import { useLazyQuery } from '@apollo/client';
+import { useLazyQuery } from '@apollo/client/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PiMagnifyingGlassBold } from 'react-icons/pi';

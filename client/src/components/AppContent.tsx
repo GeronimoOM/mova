@@ -20,7 +20,7 @@ export const AppContent = ({ authToken }: AppContentProps) => {
   const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
-    let isLoadingTimeout: NodeJS.Timeout | undefined;
+    let isLoadingTimeout: number | undefined;
     let unregisterMessageHandler: (() => void) | undefined;
 
     const initSw = async () => {

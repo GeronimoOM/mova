@@ -1,4 +1,4 @@
-import { GraphQLScalarType, Kind } from 'graphql';
+import { GraphQLScalarType } from 'graphql';
 import { DateTime } from 'luxon';
 import { fromTimestamp, toTimestamp } from 'utils/datetime';
 
@@ -6,12 +6,18 @@ export const TimestampScalar = new GraphQLScalarType<DateTime<true>, string>({
   name: 'Timestamp',
   description:
     'The `Timestamp` scalar type represents a timepoint as a string in the format `YYYY-MM-DD hh:mm:ss` .',
-  serialize: (value: DateTime) => toTimestamp(value),
-  parseValue: (value: string) => fromTimestamp(value),
-  parseLiteral: (ast) => {
-    if (ast.kind === Kind.STRING) {
-      return fromTimestamp(ast.value);
+  serialize: (value: unknown) => {
+    if (!DateTime.isDateTime(value)) {
+      throw new Error('Not a valid DateTime value for serialization');
     }
-    throw new Error('Invalid timestamp');
+
+    return toTimestamp(value);
+  },
+  parseValue: (value: unknown) => {
+    if (typeof value !== 'string') {
+      throw new Error('Not a valid DateTime value to parse');
+    }
+
+    return fromTimestamp(value);
   },
 });

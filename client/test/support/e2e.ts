@@ -6,7 +6,7 @@ import { readSecrets } from './utils';
 before(() => {
   readSecrets().then(({ name, password }) => {
     login(name, password).then((token) => {
-      Cypress.env(ENV_ADMIN_TOKEN, token);
+      Cypress.expose(ENV_ADMIN_TOKEN, token);
     });
   });
 });

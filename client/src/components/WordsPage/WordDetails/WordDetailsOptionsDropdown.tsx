@@ -3,7 +3,6 @@ import { ImCheckmark } from 'react-icons/im';
 import {
   OptionPropertyFieldsFragment,
   OptionValue,
-  UpdatePropertyValueOptionInput,
 } from '../../../api/types/graphql';
 import { OptionPill } from '../../common/OptionPill';
 
@@ -15,7 +14,7 @@ import * as styles from './WordDetailsOptionsDropdown.css';
 export type WordDetailsOptionDropdownProps = {
   property: OptionPropertyFieldsFragment;
   selected: OptionValue | null;
-  onSelect: (option: UpdatePropertyValueOptionInput | null) => void;
+  onSelect: (option: OptionValue | null) => void;
   onClose: () => void;
   exercise?: boolean;
 };
@@ -30,7 +29,9 @@ export const WordDetailsOptionDropdown = ({
   const { t } = useTranslation();
 
   const [rawOption, setRawOption] = useState<OptionValue>(
-    selected && !selected.id ? selected : { value: '', color: null },
+    selected && !selected.id
+      ? selected
+      : { value: '', color: null, __typename: 'OptionValue' },
   );
 
   const handleSelect = (option: OptionValue | null) => {
@@ -56,6 +57,7 @@ export const WordDetailsOptionDropdown = ({
                 id: option.id,
                 value: option.value,
                 color: option.color,
+                __typename: 'OptionValue',
               })
             }
           >
@@ -86,6 +88,7 @@ export const WordDetailsOptionDropdown = ({
               id: null,
               value: rawOption.value,
               color: rawOption.color,
+              __typename: 'OptionValue',
             })
           }
           size={'small'}

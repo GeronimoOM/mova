@@ -52,8 +52,7 @@ export interface CreateOptionParams {
 }
 
 export type CreatePropertyParams =
-  | CreateTextPropertyParams
-  | CreateOptionPropertyParams;
+  CreateTextPropertyParams | CreateOptionPropertyParams;
 
 export interface UpdatePropertyParams {
   id: PropertyId;

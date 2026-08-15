@@ -64,6 +64,7 @@ export function optimisticDeleteLanguage({
   return {
     deleteLanguage: {
       id: input.id,
+      __typename: 'Language',
     },
   };
 }
@@ -97,7 +98,7 @@ export function optimisticCreateProperty(
       options: (input.options ?? []).map((option) => ({
         id: option.id!,
         value: option.value,
-        color: option.color,
+        color: option.color ?? null,
         __typename: 'Option',
       })),
       __typename: 'OptionProperty',

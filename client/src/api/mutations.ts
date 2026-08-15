@@ -1,8 +1,5 @@
-import {
-  MutationHookOptions,
-  TypedDocumentNode,
-  useMutation,
-} from '@apollo/client';
+import { OperationVariables, TypedDocumentNode } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
 import { cache } from './cache';
 import {
   optimisticCreateLanguage,
@@ -52,8 +49,19 @@ import {
 } from './types/graphql';
 
 type UseMutationResult<MDocument> =
-  MDocument extends TypedDocumentNode<infer MData, infer MVariables>
+  MDocument extends TypedDocumentNode<
+    infer MData,
+    infer MVariables extends OperationVariables
+  >
     ? ReturnType<typeof useMutation<MData, MVariables>>
+    : never;
+
+type UseMutationOptions<MDocument> =
+  MDocument extends TypedDocumentNode<
+    infer MData,
+    infer MVariables extends OperationVariables
+  >
+    ? useMutation.Options<MData, MVariables>
     : never;
 
 export function useCreateLanguage(): UseMutationResult<
@@ -127,6 +135,7 @@ export function useCreateProperty(): UseMutationResult<
         },
         (properties) => ({
           properties: [...(properties?.properties ?? []), data!.createProperty],
+          __typename: 'Language' as const,
         }),
       );
     },
@@ -167,9 +176,10 @@ export function useReorderProperties(): UseMutationResult<
         },
         (fragment) => ({
           ...fragment,
-          properties: data!.reorderProperties.map(
-            ({ id }) => fragment!.properties.find((prop) => prop.id === id)!,
+          properties: data!.reorderProperties.map(({ id }) =>
+            fragment!.properties.find((prop) => prop.id === id)!,
           ),
+          __typename: 'Language' as const,
         }),
       );
     },
@@ -195,6 +205,7 @@ export function useDeleteProperty(): UseMutationResult<
           properties: (properties?.properties ?? []).filter(
             ({ id }) => id !== data!.deleteProperty.id,
           ),
+          __typename: 'Language' as const,
         }),
       );
     },
@@ -215,8 +226,10 @@ export function useCreateWord(): UseMutationResult<typeof CreateWordDocument> {
         (wordsPage) => ({
           words: {
             items: [data!.createWord, ...(wordsPage?.words.items ?? [])],
-            nextCursor: wordsPage?.words.nextCursor,
+            nextCursor: wordsPage?.words.nextCursor ?? null,
+            __typename: 'WordPage' as const,
           },
+          __typename: 'Language' as const,
         }),
       );
     },
@@ -250,8 +263,10 @@ export function useDeleteWord(): UseMutationResult<typeof DeleteWordDocument> {
             items: (wordsPage?.words.items ?? []).filter(
               ({ id }) => id !== data!.deleteWord.id,
             ),
-            nextCursor: wordsPage?.words.nextCursor,
+            nextCursor: wordsPage?.words.nextCursor ?? null,
+            __typename: 'WordPage' as const,
           },
+          __typename: 'Language' as const,
         }),
       );
     },
@@ -268,7 +283,7 @@ export const buildCreateLinkRefetchQueries = (
   wordId: string,
   type: WordLinkType,
   link: LinkedWordFieldsFragment,
-): Partial<MutationHookOptions> => ({
+): Partial<UseMutationOptions<typeof CreateLinkDocument>> => ({
   update: (cache) => {
     cache.updateFragment(
       {
@@ -300,7 +315,7 @@ export const buildDeleteLinkRefetchQueries = (
   wordId: string,
   type: WordLinkType,
   link: LinkedWordFieldsFragment,
-): Partial<MutationHookOptions> => ({
+): Partial<UseMutationOptions<typeof DeleteLinkDocument>> => ({
   update: (cache) => {
     cache.updateFragment(
       {
@@ -348,14 +363,13 @@ export function useResetConfidence(): UseMutationResult<
 
 export function useSetGoals(): UseMutationResult<typeof SetGoalsDocument> {
   return useMutation(SetGoalsDocument, {
-    optimisticResponse: ({ input }) => {
-      return {
-        setGoals: input.goals.map((goal) => ({
-          languageId: input.languageId,
-          ...goal,
-        })),
-      };
-    },
+    optimisticResponse: ({ input }) => ({
+      setGoals: input.goals.map((goal) => ({
+        languageId: input.languageId,
+        ...goal,
+        __typename: 'Goal',
+      })),
+    }),
   });
 }
 

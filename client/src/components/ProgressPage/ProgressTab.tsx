@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client/react';
 import { useMemo } from 'react';
 import {
   GetAllProgressDocument,
@@ -18,8 +18,7 @@ export const ProgressTab = () => {
     fetchPolicy: 'cache-and-network',
   });
   const progressByType:
-    | Record<ProgressType, ProgressFieldsFragment>
-    | undefined = useMemo(
+    Record<ProgressType, ProgressFieldsFragment> | undefined = useMemo(
     () =>
       progressQuery?.language
         ? {

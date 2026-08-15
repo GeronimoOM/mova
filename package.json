@@ -6,13 +6,14 @@
   "license": "UNLICENSED",
   "devDependencies": {
     "husky": "9.1.7",
-    "lerna": "8.2.0",
-    "lint-staged": "15.4.3"
+    "lerna": "10.0.0",
+    "lint-staged": "17.3.0"
   },
   "scripts": {
-    "start": "docker-compose -f docker-compose.dev.yml up",
-    "start:build": "docker-compose -f docker-compose.dev.yml up --build",
-    "start:prod": "docker-compose -f docker-compose.prod.yml up",
+    "start": "docker compose -f docker-compose.dev.yml up",
+    "start:build": "docker compose -f docker-compose.dev.yml up --build",
+    "start:prod": "docker compose -f docker-compose.prod.yml up",
+    "stop": "docker compose -f docker-compose.dev.yml down",
     "prepare": "husky",
     "postinstall": "(cd api && yarn install); (cd client && yarn install)",
     "lint-staged": "lint-staged",

@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client/react';
 import { GetProgressDocument, ProgressType } from '../../api/types/graphql';
 import { useLanguageContext } from '../LanguageContext';
 import { ProgressTypeBar } from '../ProgressPage/ProgressTypeBar';

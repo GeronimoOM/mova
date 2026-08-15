@@ -1,10 +1,10 @@
-import { Inject, Injectable, Logger, forwardRef } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { DateTime } from 'luxon';
 import { Change, ChangeCursor, ChangePage, SyncType } from 'models/Change';
 import { Context } from 'models/Context';
-import { Direction, mapCursor, mapPage } from 'models/Page';
-import { ChronologicalCursor, WordOrder } from 'models/Word';
+import { Direction, mapCursor, mapPage, Page } from 'models/Page';
+import { ChronologicalCursor, Word, WordOrder } from 'models/Word';
 import { ChangeRepository } from 'repositories/ChangeRepository';
 import { DbConnectionManager } from 'repositories/DbConnectionManager';
 import { ChangeBuilder } from './ChangeBuilder';
@@ -160,7 +160,7 @@ export class ChangeService {
   ): Promise<ChangePage> {
     const languages = await this.languageService.getAll(ctx);
     const languageIds = languages.map((language) => language.id);
-    const wordsPage = await this.wordService.getPage(ctx, {
+    const wordsPage = (await this.wordService.getPage(ctx, {
       languageId: languageIds,
       order: WordOrder.Chronological,
       direction: Direction.Asc,
@@ -171,18 +171,16 @@ export class ChangeService {
         },
       }),
       limit: params.limit,
-    });
+    })) as Page<Word, ChronologicalCursor>;
 
+    const changesPage = mapPage(wordsPage, (word) =>
+      this.changeBuilder.buildCreateWordChange(ctx, word),
+    );
     const changes: ChangePage = {
-      ...mapCursor(
-        mapPage(wordsPage, (word) =>
-          this.changeBuilder.buildCreateWordChange(ctx, word),
-        ),
-        (cursor: ChronologicalCursor) => ({
-          changedAt: cursor.addedAt,
-          id: cursor.id,
-        }),
-      ),
+      ...mapCursor(changesPage, (cursor) => ({
+        changedAt: cursor.addedAt,
+        id: cursor.id,
+      })),
       syncType: SyncType.Full,
     };
 

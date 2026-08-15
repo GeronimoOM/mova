@@ -1,7 +1,5 @@
 export type SwWorkerMessage =
-  | WorkerInitializedMessage
-  | WorkerSyncingMessage
-  | WorkerSyncOverMessage;
+  WorkerInitializedMessage | WorkerSyncingMessage | WorkerSyncOverMessage;
 
 export interface BaseSwWorkerMessage {
   type: SwWorkerMessageType;

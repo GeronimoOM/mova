@@ -1,4 +1,5 @@
-import { NetworkStatus, useLazyQuery, useQuery } from '@apollo/client';
+import { NetworkStatus } from '@apollo/client';
+import { useLazyQuery, useQuery } from '@apollo/client/react';
 import { useMemo, useRef, useState } from 'react';
 import { FaInfo } from 'react-icons/fa';
 import { HiMiniXMark } from 'react-icons/hi2';
@@ -56,7 +57,6 @@ export const ExerciseCard = () => {
       refetch: refetchExerciseWords,
     },
   ] = useLazyQuery(GetExerciseWordsDocument, {
-    variables: { languageId: selectedLanguageId! },
     fetchPolicy: 'network-only',
     notifyOnNetworkStatusChange: true,
   });
@@ -87,7 +87,9 @@ export const ExerciseCard = () => {
     if (words) {
       refetchExerciseWords();
     } else {
-      fetchExerciseWords();
+      fetchExerciseWords({
+        variables: { languageId: selectedLanguageId! },
+      });
     }
     setWordIndex(0);
     setInfoOpen(false);

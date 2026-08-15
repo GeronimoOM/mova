@@ -1,4 +1,5 @@
-import { NetworkStatus, useLazyQuery } from '@apollo/client';
+import { NetworkStatus } from '@apollo/client';
+import { useLazyQuery } from '@apollo/client/react';
 import { DateTime } from 'luxon';
 import {
   Dispatch,
@@ -138,13 +139,13 @@ export function useWordDetails(wordId: string | null): WordDetailsReturn {
   const canCreateWord = Boolean(selectedLanguageId && isNewWord && isWordValid);
   const canUpdateWord = Boolean(
     selectedLanguageId &&
-      !isNewWord &&
-      isWordValid &&
-      (original !== currentWord?.original ||
-        translation !== currentWord?.translation ||
-        Object.keys(propertyValueChanges).length ||
-        Object.keys(similarLinkChanges).length ||
-        Object.keys(distinctLinkChanges).length),
+    !isNewWord &&
+    isWordValid &&
+    (original !== currentWord?.original ||
+      translation !== currentWord?.translation ||
+      Object.keys(propertyValueChanges).length ||
+      Object.keys(similarLinkChanges).length ||
+      Object.keys(distinctLinkChanges).length),
   );
   const canDeleteWord = Boolean(selectedLanguageId && !isNewWord);
 
@@ -357,20 +358,26 @@ export function useWordDetails(wordId: string | null): WordDetailsReturn {
           type === WordLinkType.Similar
             ? similarLinkChanges
             : distinctLinkChanges,
-        ).map((linkChange) =>
-          (linkChange.isDeleted ? deleteLinkMutate : createLinkMutate)({
-            ...(linkChange.isDeleted
-              ? buildDeleteLinkRefetchQueries
-              : buildCreateLinkRefetchQueries)(wordId, type, linkChange),
-            variables: {
-              input: {
-                type,
-                word1Id: wordId,
-                word2Id: linkChange.id,
-              },
-            },
-          }),
-        ),
+        ).map((linkChange) => {
+          const input = {
+            type,
+            word1Id: wordId,
+            word2Id: linkChange.id,
+          };
+          return linkChange.isDeleted
+            ? deleteLinkMutate({
+                ...buildDeleteLinkRefetchQueries(wordId, type, linkChange),
+                variables: {
+                  input,
+                },
+              })
+            : createLinkMutate({
+                ...buildCreateLinkRefetchQueries(wordId, type, linkChange),
+                variables: {
+                  input,
+                },
+              });
+        }),
       );
 
       await Promise.all(saveLinkRequests);

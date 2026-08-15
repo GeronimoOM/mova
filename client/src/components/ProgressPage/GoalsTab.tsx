@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client/react';
 import classNames from 'classnames';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -48,14 +48,14 @@ export const GoalsTab = () => {
   );
   const canSetGoals = Boolean(
     currentGoals &&
-      goals &&
-      currentGoals.some((currentGoal, i) => {
-        const goal = goals[i];
-        return (
-          currentGoal.cadence !== goal.cadence ||
-          currentGoal.points !== goal.points
-        );
-      }),
+    goals &&
+    currentGoals.some((currentGoal, i) => {
+      const goal = goals[i];
+      return (
+        currentGoal.cadence !== goal.cadence ||
+        currentGoal.points !== goal.points
+      );
+    }),
   );
 
   useEffect(() => {

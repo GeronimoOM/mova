@@ -13,5 +13,5 @@ export function fromTimestamp(timestamp: string): DateTime<true> {
     throw new Error('Invalid timestamp');
   }
 
-  return dateTime;
+  return dateTime as DateTime<true>;
 }

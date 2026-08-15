@@ -25,10 +25,12 @@ export function compileTemplate(str: string): string {
   let index = 0;
   for (const match of str.matchAll(TEMPLATE_WRAP_REGEX)) {
     const [matchFull, matchExp] = match;
-    const [matchFrom, matchTo] = match.indices![0];
-    result.push(str.slice(index, matchFrom));
-    result.push(compileExpression(matchExp, context) ?? matchFull);
-    index = matchTo;
+    if (match.indices?.[0]) {
+      const [matchFrom, matchTo] = match.indices[0];
+      result.push(str.slice(index, matchFrom));
+      result.push(compileExpression(matchExp, context) ?? matchFull);
+      index = matchTo;
+    }
   }
   result.push(str.slice(index, str.length));
 

@@ -1,5 +1,4 @@
-import * as elastic from '@elastic/elasticsearch/lib/api/types';
-
+import { estypes as elastic } from '@elastic/elasticsearch';
 export const INDEX_WORDS = 'words_v2';
 
 export const INDICES = [INDEX_WORDS];

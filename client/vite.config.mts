@@ -67,5 +67,9 @@ export default defineConfig({
   },
   build: {
     target: 'esnext',
+    cssMinify: 'esbuild',
+  },
+  css: {
+    transformer: 'postcss',
   },
 });

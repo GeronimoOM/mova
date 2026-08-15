@@ -34,11 +34,15 @@ export class ElasticClientManager implements OnApplicationBootstrap {
   }
 
   async onApplicationBootstrap() {
-    await retry(async () => {
-      this.client = this.initClient();
+    await retry(
+      async () => {
+        this.client = this.initClient();
 
-      await this.client.ping();
-    }, CONNECT_RETRY);
+        await this.client.ping();
+      },
+      CONNECT_RETRY,
+      () => Logger.error('Failed to connect to ElasticSearch'),
+    );
 
     Logger.log('ElasticSearch client connected');
   }

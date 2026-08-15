@@ -4,6 +4,7 @@ import { useMemo, useRef, useState } from 'react';
 import {
   OptionPropertyFieldsFragment,
   OptionPropertyValueFieldsFragment,
+  OptionValue,
   PropertyFieldsFragment,
   PropertyValueFieldsFragment,
   SavePropertyValueInput,
@@ -104,7 +105,7 @@ export const WordDetailsOptionProperty = ({
   const [isOpen, setOpen] = useState(false);
   const pillRef = useRef<HTMLDivElement>(null);
 
-  const option = useMemo(() => {
+  const option = useMemo<OptionValue | null>(() => {
     const option = propertyValue?.option ?? null;
     if (option?.id) {
       const propertyOption = property.options.find(
@@ -115,9 +116,14 @@ export const WordDetailsOptionProperty = ({
           id: option.id,
           value: propertyOption.value,
           color: propertyOption.color,
+          __typename: 'OptionValue',
         };
       } else {
-        return { value: option.value, color: option.color };
+        return {
+          value: option.value,
+          color: option.color,
+          __typename: 'OptionValue',
+        };
       }
     }
 
@@ -136,7 +142,9 @@ export const WordDetailsOptionProperty = ({
           onSelect={(option) =>
             onChange({
               id: property.id,
-              option,
+              option: option
+                ? { id: option.id, value: option.value, color: option.color }
+                : null,
             })
           }
           onClose={() => setOpen(false)}

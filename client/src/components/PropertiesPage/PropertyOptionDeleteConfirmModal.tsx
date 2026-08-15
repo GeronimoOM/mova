@@ -36,7 +36,6 @@ export const PropertyOptionDeleteConfirmModal = ({
 
       return [option, usage];
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [propertyOptionsUsage]);
 
   return (

@@ -1,4 +1,4 @@
-import { useLazyQuery, useMutation } from '@apollo/client';
+import { useLazyQuery, useMutation } from '@apollo/client/react';
 import React, {
   createContext,
   useCallback,
@@ -33,7 +33,7 @@ export type UserContextType = {
   logout: () => void;
 
   settings: UserSettings;
-  setSettings: (settings: UserSettings) => void;
+  setSettings: (settings: Partial<UserSettings>) => void;
 };
 
 export const UserContext = createContext<UserContextType>({
@@ -45,7 +45,7 @@ export const UserContext = createContext<UserContextType>({
   },
   logout: () => {},
 
-  settings: {},
+  settings: { __typename: 'UserSettings' },
   setSettings: () => {},
 });
 
@@ -73,7 +73,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   const [updateUserSettings] = useMutation(UpdateSettingsDocument);
 
   const setSettings = useCallback(
-    (userSettings: UserSettings, saveInApi = true) => {
+    (userSettings: Partial<UserSettings>, saveInApi = true) => {
       saveUserSettingsToLocal(userSettings);
 
       setLocalSettings((localUserSettings) => ({
@@ -137,6 +137,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     setLocalSettings(({ selectedLocale, selectedFont }) => ({
       selectedLocale,
       selectedFont,
+      __typename: 'UserSettings',
     }));
     clearUserSettingsFromLocal();
     setAuthToken(null);

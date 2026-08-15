@@ -31,7 +31,6 @@ export const PickExercise = ({
 
   const wordOptions = useMemo<LinkedWordFieldsFragment[]>(
     () => shuffle([word, ...pickN(word.distinctLinks, MAX_OPTIONS - 1)]),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
 

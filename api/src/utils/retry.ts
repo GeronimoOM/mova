@@ -5,13 +5,14 @@ export async function sleep(ms: number): Promise<void> {
 export async function retry(
   func: () => Promise<void>,
   ms: number,
+  onError: () => void,
 ): Promise<void> {
   while (true) {
     try {
       await func();
       break;
     } catch {
-      console.log('Retrying due to error');
+      onError();
       await sleep(ms);
     }
   }

@@ -11,10 +11,11 @@ export function loadUserSettingsFromLocal(): UserSettings {
     selectedFont: localStorage.getItem(LOCAL_STORAGE_FONT_KEY) ?? 'default',
     selectedLanguageId:
       localStorage.getItem(LOCAL_STORAGE_LANGUAGE_KEY) ?? null,
+    __typename: 'UserSettings',
   };
 }
 
-export function saveUserSettingsToLocal(userSettings: UserSettings) {
+export function saveUserSettingsToLocal(userSettings: Partial<UserSettings>) {
   if (userSettings.selectedLocale) {
     localStorage.setItem(LOCAL_STORAGE_LOCALE_KEY, userSettings.selectedLocale);
   }

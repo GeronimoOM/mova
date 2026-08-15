@@ -31,5 +31,7 @@ const headersLink = new ApolloLink((operation, forward) => {
 export const client = new ApolloClient({
   link: headersLink.concat(httpLink),
   cache,
-  connectToDevTools: true,
+  devtools: {
+    enabled: true,
+  },
 });

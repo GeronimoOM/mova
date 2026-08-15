@@ -1,13 +1,14 @@
 import { InMemoryCache, TypePolicy } from '@apollo/client';
-import { LanguageWordsArgs, Progress, WordPage } from './types/graphql';
+import { GetWordsQueryVariables, Progress, WordPage } from './types/graphql';
 
 const languageTypePolicy: TypePolicy = {
   fields: {
     words: {
-      keyArgs: (args: LanguageWordsArgs | null) => {
-        if (args?.lowConfidence) {
+      keyArgs: (args) => {
+        const wordsArgs = args as GetWordsQueryVariables | null;
+        if (wordsArgs?.lowConfidence) {
           return 'lowConfidence';
-        } else if (args?.query) {
+        } else if (wordsArgs?.query) {
           return 'search';
         } else {
           return false;
@@ -19,6 +20,7 @@ const languageTypePolicy: TypePolicy = {
             new Set([...(existing?.items ?? []), ...incoming.items]),
           ),
           nextCursor: incoming.nextCursor,
+          __typename: 'WordPage',
         };
       },
     },

@@ -2,7 +2,6 @@ import Dexie from 'dexie';
 import { v1 as uuid } from 'uuid';
 import {
   type ApplyChangeInput,
-  type Language,
   type LanguageFieldsFragment,
   type LanguageUpdate,
   type OptionFieldsFragment,
@@ -33,7 +32,7 @@ const IDB_NAME = 'mova';
 
 export class MovaDb extends Dexie {
   state!: Dexie.Table<SyncState>;
-  languages!: Dexie.Table<LanguageFieldsFragment & Partial<Language>>;
+  languages!: Dexie.Table<LanguageFieldsFragment>;
   properties!: Dexie.Table<PropertyFieldsFragment>;
   words!: Dexie.Table<WordFieldsFragment | WordFieldsFullFragment>;
   links!: Dexie.Table<WordLinkFieldsFragment>;

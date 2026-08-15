@@ -1,4 +1,5 @@
-import { NetworkStatus, useLazyQuery } from '@apollo/client';
+import { NetworkStatus } from '@apollo/client';
+import { useLazyQuery } from '@apollo/client/react';
 import { DateTime } from 'luxon';
 import { useCallback, useEffect, useMemo } from 'react';
 import {

@@ -62,9 +62,9 @@ export function useLanguage(
   );
   const canUpdateLanguage = Boolean(
     selectedLanguageId &&
-      !isNewLanguage &&
-      name.length >= MIN_LANGUAGE_NAME_LENGTH &&
-      name !== language.name,
+    !isNewLanguage &&
+    name.length >= MIN_LANGUAGE_NAME_LENGTH &&
+    name !== language.name,
   );
   const canDeleteLanguage = Boolean(selectedLanguageId && !isNewLanguage);
 

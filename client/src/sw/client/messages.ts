@@ -1,7 +1,5 @@
 export type SwClientMessage =
-  | ClientInitializeMessage
-  | ClientSyncMessage
-  | ClientDestroyMessage;
+  ClientInitializeMessage | ClientSyncMessage | ClientDestroyMessage;
 
 export interface BaseSwClientMessage {
   type: SwClientMessageType;

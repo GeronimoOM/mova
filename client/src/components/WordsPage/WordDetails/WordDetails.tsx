@@ -5,7 +5,8 @@ import { FaFeatherPointed, FaFire } from 'react-icons/fa6';
 import { HiMiniXMark } from 'react-icons/hi2';
 import { MdMoreVert } from 'react-icons/md';
 
-import { NetworkStatus, useLazyQuery } from '@apollo/client';
+import { NetworkStatus } from '@apollo/client';
+import { useLazyQuery } from '@apollo/client/react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import {

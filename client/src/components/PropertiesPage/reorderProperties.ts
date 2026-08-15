@@ -1,4 +1,5 @@
-import { NetworkStatus, useLazyQuery } from '@apollo/client';
+import { NetworkStatus } from '@apollo/client';
+import { useLazyQuery } from '@apollo/client/react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDrag, useDragLayer, useDrop } from 'react-dnd';
 import { useReorderProperties } from '../../api/mutations';

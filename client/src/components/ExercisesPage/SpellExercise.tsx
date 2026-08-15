@@ -269,7 +269,6 @@ const SpellTextExerciseProperty = ({
 
       setIsVerified(true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [input, isSubmitted, propertyValue]);
 
   const handleInput = (value: string) => {
@@ -322,7 +321,14 @@ const SpellOptionExerciseProperty = ({
   const inputPropertyValue = useMemo<OptionPropertyValueFieldsFragment>(
     () => ({
       property,
-      option: inputOption as OptionValue,
+      option: inputOption
+        ? {
+            ...inputOption,
+            id: inputOption.id ?? null,
+            color: inputOption.color ?? null,
+          }
+        : null,
+      __typename: 'OptionPropertyValue',
     }),
     [inputOption, property],
   );
@@ -338,7 +344,6 @@ const SpellOptionExerciseProperty = ({
       setInputOption(propertyValue);
       setIsVerified(true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [result, isSubmitted, propertyValue]);
 
   return (
@@ -352,7 +357,13 @@ const SpellOptionExerciseProperty = ({
             propertyValue={inputPropertyValue}
             onChange={({ option }) =>
               setInputOption(
-                option?.value ? { id: option.id, value: option.value } : null,
+                option?.value
+                  ? {
+                      id: option.id,
+                      value: option.value,
+                      __typename: 'OptionValue',
+                    }
+                  : null,
               )
             }
             disabled={isSubmitted}
@@ -413,8 +424,8 @@ function getExerciseProperties(
     ),
   ];
 
-  const selectedProperties = selectedPropertyIds.map(
-    (propId) => allProperties.find((prop) => prop.id === propId)!,
+  const selectedProperties = selectedPropertyIds.map((propId) =>
+    allProperties.find((prop) => prop.id === propId)!,
   );
 
   return selectedProperties.sort((p1, p2) => p1.order - p2.order);

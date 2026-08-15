@@ -21,7 +21,7 @@ export function importData(dataFixture: string): Cypress.Chainable {
       url: '/api/data',
       body: formData,
       auth: {
-        bearer: Cypress.env(ENV_ADMIN_TOKEN),
+        bearer: Cypress.expose(ENV_ADMIN_TOKEN),
       },
     });
   });
@@ -32,7 +32,7 @@ export function clearData(): Cypress.Chainable {
     method: 'DELETE',
     url: '/api/data',
     auth: {
-      bearer: Cypress.env(ENV_ADMIN_TOKEN),
+      bearer: Cypress.expose(ENV_ADMIN_TOKEN),
     },
   });
 }

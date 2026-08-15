@@ -46,7 +46,6 @@ export const Input = ({
     if (value !== localValue.trim()) {
       setLocalValue(value);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
   const handleChange = (newValue: string) => {

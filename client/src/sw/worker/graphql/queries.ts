@@ -216,7 +216,7 @@ async function handleGraphQlQueryWordFromCache(
   request: GraphQlRequest,
 ): Promise<Response> {
   const { id } = request.variables as GetWordQueryVariables;
-  const word = await cache.getWord(id, true);
+  const word = (await cache.getWord(id, true))!;
   return response<GetWordQuery>({ word });
 }
 
@@ -225,8 +225,10 @@ async function handleGraphQlQueryWordByOriginalFromCache(
 ): Promise<Response> {
   const { languageId, original } =
     request.variables as GetWordByOriginalQueryVariables;
-  const word = await cache.getWordByOriginal(languageId, original);
-  return response<GetWordByOriginalQuery>({ language: { word } });
+  const word = (await cache.getWordByOriginal(languageId, original))!;
+  return response<GetWordByOriginalQuery>({
+    language: { word, __typename: 'Language' },
+  });
 }
 
 async function cacheGraphQlQueryResponse(

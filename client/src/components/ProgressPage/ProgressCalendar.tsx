@@ -1,4 +1,4 @@
-import { useLazyQuery } from '@apollo/client';
+import { useLazyQuery } from '@apollo/client/react';
 import { DateTime, WeekdayNumbers } from 'luxon';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
