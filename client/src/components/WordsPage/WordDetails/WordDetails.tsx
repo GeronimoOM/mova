@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { BsFillExclamationDiamondFill, BsTranslate } from 'react-icons/bs';
-import { FaArrowDown, FaArrowUp } from 'react-icons/fa';
+import { FaArrowDown, FaArrowUp, FaMagic } from 'react-icons/fa';
 import { FaFeatherPointed, FaFire } from 'react-icons/fa6';
 import { HiMiniXMark } from 'react-icons/hi2';
 import { MdMoreVert } from 'react-icons/md';
@@ -33,7 +33,8 @@ import {
   WordDetailsProperty,
 } from './WordDetailsProperty';
 import { WordLinks } from './WordLinks';
-import { useWordDetails } from './useWordDetails';
+import { WordUsageModal } from './WordUsageModal';
+import { useWordDetails, Word } from './useWordDetails';
 
 export type WordDetailsProps = {
   wordId: string | null;
@@ -108,6 +109,11 @@ export const WordDetails = ({
 
   const [areMoreButtonsVisible, setMoreButtonsVisible] = useState(false);
   const [isDeleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [isUsageModalOpen, setUsageModalOpen] = useState(false);
+
+  const onUsage = () => {
+    setUsageModalOpen(!isUsageModalOpen);
+  };
 
   useEffect(() => {
     if (selectedLanguageId && isNewWord && debouncedOriginal) {
@@ -160,6 +166,16 @@ export const WordDetails = ({
             </div>
 
             <div className={styles.buttonsBottom}>
+              {!disabled && areMoreButtonsVisible && (
+                <ButtonIcon
+                  icon={FaMagic}
+                  onClick={onUsage}
+                  disabled={!wordId}
+                  wrapped={true}
+                  dataTestId="word-details-usage-btn"
+                />
+              )}
+
               {!disabled && areMoreButtonsVisible && (
                 <ButtonIcon
                   icon={FaArrowUp}
@@ -302,34 +318,60 @@ export const WordDetails = ({
           {!disabled && <div className={styles.detailsEnd} />}
         </div>
       </div>
-
       {isDeleteConfirmOpen && (
-        <Modal onClose={() => setDeleteConfirmOpen(false)}>
-          <div className={styles.deleteConfirm}>
-            <div className={styles.deleteConfirmText}>
-              {t('words.delete')}
-              <div className={styles.deleteConfirmWord}>{word.original}</div>
-            </div>
-
-            <div className={styles.deleteConfirmButtons}>
-              <ButtonIcon
-                icon={FaFire}
-                onClick={deleteWord}
-                color="negative"
-                loading={wordDeleting}
-                dataTestId="word-details-delete-confirm-btn"
-              />
-
-              <ButtonIcon
-                icon={HiMiniXMark}
-                onClick={() => setDeleteConfirmOpen(false)}
-                dataTestId="word-details-delete-cancel-btn"
-              />
-            </div>
-          </div>
-        </Modal>
+        <DeleteConfirmModal
+          word={word}
+          wordDeleting={wordDeleting}
+          deleteWord={deleteWord}
+          onClose={() => setDeleteConfirmOpen(false)}
+        />
+      )}
+      {isUsageModalOpen && (
+        <WordUsageModal word={word} onClose={() => setUsageModalOpen(false)} />
       )}
     </div>
+  );
+};
+
+type DeleteConfirmModalProps = {
+  word: Word;
+  wordDeleting: boolean;
+  deleteWord: () => void;
+  onClose: () => void;
+};
+
+const DeleteConfirmModal = ({
+  word,
+  wordDeleting,
+  deleteWord,
+  onClose,
+}: DeleteConfirmModalProps) => {
+  const { t } = useTranslation();
+  return (
+    <Modal onClose={onClose}>
+      <div className={styles.deleteConfirm}>
+        <div className={styles.deleteConfirmText}>
+          {t('words.delete')}
+          <div className={styles.deleteConfirmWord}>{word.original}</div>
+        </div>
+
+        <div className={styles.deleteConfirmButtons}>
+          <ButtonIcon
+            icon={FaFire}
+            onClick={deleteWord}
+            color="negative"
+            loading={wordDeleting}
+            dataTestId="word-details-delete-confirm-btn"
+          />
+
+          <ButtonIcon
+            icon={HiMiniXMark}
+            onClick={onClose}
+            dataTestId="word-details-delete-cancel-btn"
+          />
+        </div>
+      </div>
+    </Modal>
   );
 };
 

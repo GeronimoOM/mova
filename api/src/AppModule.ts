@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { ScheduleModule } from '@nestjs/schedule';
+import { AiClientModule } from 'clients/AiClientModule';
 import { AuthController } from 'controllers/AuthController';
 import { ChangeTypeMapper } from 'graphql/mappers/ChangeTypeMapper';
 import { AuthResolver } from 'graphql/resolvers/AuthResolver';
@@ -14,16 +15,19 @@ import { UserResolver } from 'graphql/resolvers/UserResolver';
 import { AuthGuard } from 'guards/AuthGuard';
 import { ContextMiddleware } from 'middleware/ContextMiddleware';
 import { AsyncLocalStorage } from 'node:async_hooks';
+import { AiOutputsRepository } from 'repositories/AiOutputsRepository';
 import { ChangeRepository } from 'repositories/ChangeRepository';
 import { ProgressRepository } from 'repositories/ProgressRepository';
 import { Serializer } from 'repositories/Serializer';
 import { UserRepository } from 'repositories/UserRepository';
+import { AiWordService } from 'services/AiWordService';
 import { AuthService } from 'services/AuthService';
 import { ChangeBuilder } from 'services/ChangeBuilder';
 import { ChangeService } from 'services/ChangeService';
 import { EncryptionService } from 'services/EncryptionService';
 import { ExerciseService } from 'services/ExerciseService';
 import { ProgressService } from 'services/ProgressService';
+import { RateLimitService } from 'services/RateLimitService';
 import { UserService } from 'services/UserService';
 import { ElasticClientModule } from './clients/ElasticClientModule';
 import { SearchClient } from './clients/SearchClient';
@@ -48,6 +52,7 @@ import { WordService } from './services/WordService';
   imports: [
     GraphQlModule,
     ElasticClientModule,
+    AiClientModule,
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       load: [configLoader],
@@ -81,8 +86,10 @@ import { WordService } from './services/WordService';
     ChangeService,
     ProgressService,
     UserService,
+    AiWordService,
     MaintenanceService,
     EncryptionService,
+    RateLimitService,
     SearchClient,
     ChangeBuilder,
     LanguageRepository,
@@ -91,6 +98,7 @@ import { WordService } from './services/WordService';
     ChangeRepository,
     ProgressRepository,
     UserRepository,
+    AiOutputsRepository,
     DbConnectionManager,
     Serializer,
     {

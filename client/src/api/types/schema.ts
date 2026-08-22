@@ -709,6 +709,7 @@ export type Word = {
   partOfSpeech: PartOfSpeech;
   properties: Array<PropertyValue>;
   translation: Scalars['String']['output'];
+  usage?: Maybe<WordUsage>;
 };
 
 
@@ -763,6 +764,19 @@ export type WordUpdate = {
   original?: Maybe<Scalars['String']['output']>;
   properties?: Maybe<Array<PropertyValueSave>>;
   translation?: Maybe<Scalars['String']['output']>;
+};
+
+export type WordUsage = {
+  __typename: 'WordUsage';
+  extra?: Maybe<Scalars['String']['output']>;
+  interpretations: Array<WordUsageInterpretation>;
+};
+
+export type WordUsageInterpretation = {
+  __typename: 'WordUsageInterpretation';
+  example: Scalars['String']['output'];
+  interpretation: Scalars['String']['output'];
+  translation: Scalars['String']['output'];
 };
 
 export type WordsStats = {

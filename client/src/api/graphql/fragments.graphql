@@ -303,3 +303,12 @@ fragment WordsStatsFields on WordsStats {
     partOfSpeech
   }
 }
+
+fragment WordUsageFields on WordUsage {
+  interpretations {
+    interpretation
+    example
+    translation
+  }
+  extra
+}

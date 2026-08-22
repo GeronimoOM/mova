@@ -1,3 +1,4 @@
+import { AiOutputKey, AiOutputType } from 'models/AiOutput';
 import { ChangeId } from 'models/Change';
 import { LanguageId } from 'models/Language';
 import { ProgressId } from 'models/Progress';
@@ -78,6 +79,12 @@ declare module 'knex/types/tables' {
     settings?: string;
   }
 
+  interface AiOutputsTable {
+    key: AiOutputKey;
+    type: AiOutputType;
+    data: string;
+  }
+
   interface Tables {
     languages: LanguageTable;
     properties: PropertyTable;
@@ -88,5 +95,6 @@ declare module 'knex/types/tables' {
     changes: ChangeTable;
     users: UserTable;
     user_settings: UserSettingsTable;
+    ai_outputs: AiOutputsTable;
   }
 }

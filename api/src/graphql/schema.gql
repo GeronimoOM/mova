@@ -140,6 +140,7 @@ type Word {
   languageId: ID!
   properties: [PropertyValue!]!
   links(type: WordLinkType!): [Word!]!
+  usage: WordUsage
 }
 
 union PropertyValue = TextPropertyValue | OptionPropertyValue
@@ -417,6 +418,17 @@ type WordsStats {
   mastery: [WordsStatsMastery!]!
   confidence: [WordsStatsConfidence!]!
   partsOfSpeech: [WordsStatsPartOfSpeech!]!
+}
+
+type WordUsage {
+  interpretations: [WordUsageInterpretation!]!
+  extra: String
+}
+
+type WordUsageInterpretation {
+  interpretation: String!
+  example: String!
+  translation: String!
 }
 
 type Query {

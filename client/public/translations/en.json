@@ -137,5 +137,6 @@
   },
   "users": {
     "logout": "Log out"
-  }
+  },
+  "error": "Something went wrong. Try again later."
 }

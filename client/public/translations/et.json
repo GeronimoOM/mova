@@ -138,5 +138,6 @@
   },
   "users": {
     "logout": "Logi välja"
-  }
+  },
+  "error": "Midagi läks valesti. Proovi hiljem uuesti."
 }

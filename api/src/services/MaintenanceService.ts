@@ -15,6 +15,7 @@ import { MigrationRecord, MigrationRecordType } from 'models/Migration';
 import { PropertyType } from 'models/Property';
 import { UserId } from 'models/User';
 import { PartOfSpeech } from 'models/Word';
+import { AiOutputsRepository } from 'repositories/AiOutputsRepository';
 import { ChangeRepository } from 'repositories/ChangeRepository';
 import { DbConnectionManager } from 'repositories/DbConnectionManager';
 import { LanguageRepository } from 'repositories/LanguageRepository';
@@ -47,6 +48,7 @@ export class MaintenanceService {
     private wordRepository: WordRepository,
     private progressRepository: ProgressRepository,
     private changeRepository: ChangeRepository,
+    private aiOutputsRepository: AiOutputsRepository,
 
     private searchClient: SearchClient,
     private dbConnectionManager: DbConnectionManager,
@@ -80,6 +82,7 @@ export class MaintenanceService {
     await this.changeRepository.deleteAll();
     await this.userRepository.deleteAll();
     await this.userRepository.deleteAllSettings();
+    await this.aiOutputsRepository.deleteAll();
     await this.searchClient.deleteIndices();
   }
 
