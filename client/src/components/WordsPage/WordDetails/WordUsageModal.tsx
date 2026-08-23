@@ -20,7 +20,7 @@ export const WordUsageModal = ({ word, onClose }: WordUsageModalProps) => {
   const { t } = useTranslation();
   const { data: wordUsageQuery, loading: wordUsageLoading } = useQuery(
     GetWordUsageDocument,
-    { variables: { id: word.id! }, fetchPolicy: 'network-only' },
+    { variables: { id: word.id as string } },
   );
   const wordUsage = wordUsageQuery?.word?.usage;
 

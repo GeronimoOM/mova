@@ -326,7 +326,7 @@ export const WordDetails = ({
           onClose={() => setDeleteConfirmOpen(false)}
         />
       )}
-      {isUsageModalOpen && (
+      {isUsageModalOpen && word?.id && (
         <WordUsageModal word={word} onClose={() => setUsageModalOpen(false)} />
       )}
     </div>

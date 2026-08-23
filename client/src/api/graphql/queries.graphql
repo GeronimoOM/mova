@@ -48,6 +48,7 @@ query GetWordByOriginal($languageId: ID!, $original: String!) {
 
 query GetWordUsage($id: ID!) {
   word(id: $id) {
+    id
     usage {
       ...WordUsageFields
     }
