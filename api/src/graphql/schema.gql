@@ -140,7 +140,7 @@ type Word {
   languageId: ID!
   properties: [PropertyValue!]!
   links(type: WordLinkType!): [Word!]!
-  usage: WordUsage
+  overview: WordOverview
 }
 
 union PropertyValue = TextPropertyValue | OptionPropertyValue
@@ -420,12 +420,12 @@ type WordsStats {
   partsOfSpeech: [WordsStatsPartOfSpeech!]!
 }
 
-type WordUsage {
-  interpretations: [WordUsageInterpretation!]!
+type WordOverview {
+  interpretations: [WordOverviewInterpretation!]!
   extra: String
 }
 
-type WordUsageInterpretation {
+type WordOverviewInterpretation {
   interpretation: String!
   example: String!
   translation: String!

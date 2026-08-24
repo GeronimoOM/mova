@@ -2,35 +2,38 @@ import { useQuery } from '@apollo/client/react';
 import { useTranslation } from 'react-i18next';
 import { FaLightbulb } from 'react-icons/fa';
 import {
-  GetWordUsageDocument,
-  WordUsageFieldsFragment,
+  GetWordOverviewDocument,
+  WordOverviewFieldsFragment,
 } from '../../../api/types/operations';
 import { Icon } from '../../common/Icon';
 import { Loader } from '../../common/Loader';
 import { Modal } from '../../common/Modal';
-import * as styles from './WordUsageModal.css';
+import * as styles from './WordOverviewModal.css';
 import { Word } from './useWordDetails';
 
-export type WordUsageModalProps = {
+export type WordOverviewModalProps = {
   word: Word;
   onClose: () => void;
 };
 
-export const WordUsageModal = ({ word, onClose }: WordUsageModalProps) => {
+export const WordOverviewModal = ({
+  word,
+  onClose,
+}: WordOverviewModalProps) => {
   const { t } = useTranslation();
-  const { data: wordUsageQuery, loading: wordUsageLoading } = useQuery(
-    GetWordUsageDocument,
+  const { data: wordOverviewQuery, loading: wordOverviewLoading } = useQuery(
+    GetWordOverviewDocument,
     { variables: { id: word.id as string } },
   );
-  const wordUsage = wordUsageQuery?.word?.usage;
+  const wordOverview = wordOverviewQuery?.word?.overview;
 
   return (
     <Modal onClose={onClose}>
       <div className={styles.wrapper}>
-        {wordUsageLoading ? (
+        {wordOverviewLoading ? (
           <Loader />
-        ) : wordUsage ? (
-          <WordUsageModalContent word={word} usage={wordUsage} />
+        ) : wordOverview ? (
+          <WordOverviewModalContent word={word} overview={wordOverview} />
         ) : (
           t('error')
         )}
@@ -39,16 +42,19 @@ export const WordUsageModal = ({ word, onClose }: WordUsageModalProps) => {
   );
 };
 
-type WordUsageModalContentProps = {
+type WordOverviewModalContentProps = {
   word: Word;
-  usage: WordUsageFieldsFragment;
+  overview: WordOverviewFieldsFragment;
 };
 
-const WordUsageModalContent = ({ word, usage }: WordUsageModalContentProps) => {
+const WordOverviewModalContent = ({
+  word,
+  overview,
+}: WordOverviewModalContentProps) => {
   return (
     <div className={styles.list}>
       <div className={styles.title}>{word.original}</div>
-      {usage.interpretations.map((interpretation, idx) => (
+      {overview.interpretations.map((interpretation, idx) => (
         <div key={idx} className={styles.listItem}>
           <span>{`${idx + 1}.`}</span>
           <div className={styles.listItemContent}>
@@ -62,10 +68,10 @@ const WordUsageModalContent = ({ word, usage }: WordUsageModalContentProps) => {
           </div>
         </div>
       ))}
-      {usage.extra && (
+      {overview.extra && (
         <div className={styles.listItem}>
           <Icon icon={FaLightbulb} />
-          <span>{usage.extra}</span>
+          <span>{overview.extra}</span>
         </div>
       )}
     </div>

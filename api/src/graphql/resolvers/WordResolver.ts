@@ -12,11 +12,11 @@ import {
   DeleteWordLinkInput,
   WordLinkObjectType,
 } from 'graphql/types/WordLinkType';
-import { WordUsageType } from 'graphql/types/WordUsageType';
+import { WordOverviewType } from 'graphql/types/WordOverviewType';
 import { ContextDec } from 'middleware/ContextMiddleware';
+import { AiWordOverview } from 'models/AiWordOverview';
 import { Context } from 'models/Context';
 import { WordId, WordLinkType } from 'models/Word';
-import { WordUsage } from 'models/WordUsage';
 import { AiWordService } from 'services/AiWordService';
 import { WordService } from 'services/WordService';
 import { WordTypeMapper } from '../mappers/WordTypeMapper';
@@ -54,12 +54,12 @@ export class WordResolver {
     return words.map((word) => this.wordTypeMapper.map(word));
   }
 
-  @ResolveField(() => WordUsageType, { nullable: true })
-  async usage(
+  @ResolveField(() => WordOverviewType, { nullable: true })
+  async overview(
     @ContextDec() ctx: Context,
     @Parent() word: WordType,
-  ): Promise<WordUsage | null> {
-    return await this.aiWordService.getUsage(ctx, word.id);
+  ): Promise<AiWordOverview | null> {
+    return await this.aiWordService.getOverview(ctx, word.id);
   }
 
   @Mutation(() => WordType)

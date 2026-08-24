@@ -706,10 +706,10 @@ export type Word = {
   mastery: Scalars['Int']['output'];
   nextExerciseAt: Scalars['Timestamp']['output'];
   original: Scalars['String']['output'];
+  overview?: Maybe<WordOverview>;
   partOfSpeech: PartOfSpeech;
   properties: Array<PropertyValue>;
   translation: Scalars['String']['output'];
-  usage?: Maybe<WordUsage>;
 };
 
 
@@ -749,6 +749,19 @@ export enum WordOrder {
   Confidence = 'Confidence'
 }
 
+export type WordOverview = {
+  __typename: 'WordOverview';
+  extra?: Maybe<Scalars['String']['output']>;
+  interpretations: Array<WordOverviewInterpretation>;
+};
+
+export type WordOverviewInterpretation = {
+  __typename: 'WordOverviewInterpretation';
+  example: Scalars['String']['output'];
+  interpretation: Scalars['String']['output'];
+  translation: Scalars['String']['output'];
+};
+
 export type WordPage = {
   __typename: 'WordPage';
   items: Array<Word>;
@@ -764,19 +777,6 @@ export type WordUpdate = {
   original?: Maybe<Scalars['String']['output']>;
   properties?: Maybe<Array<PropertyValueSave>>;
   translation?: Maybe<Scalars['String']['output']>;
-};
-
-export type WordUsage = {
-  __typename: 'WordUsage';
-  extra?: Maybe<Scalars['String']['output']>;
-  interpretations: Array<WordUsageInterpretation>;
-};
-
-export type WordUsageInterpretation = {
-  __typename: 'WordUsageInterpretation';
-  example: Scalars['String']['output'];
-  interpretation: Scalars['String']['output'];
-  translation: Scalars['String']['output'];
 };
 
 export type WordsStats = {

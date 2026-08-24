@@ -1,9 +1,9 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { AiClient } from 'clients/AiClient';
 import { AiOutputType } from 'models/AiOutput';
+import { AISentences, AiWordOverview } from 'models/AiWordOverview';
 import { Context } from 'models/Context';
 import { PartOfSpeech, WordId } from 'models/Word';
-import { WordUsage } from 'models/WordUsage';
 import { AiOutputsRepository } from 'repositories/AiOutputsRepository';
 import { localeToName } from 'utils/locale';
 import { LanguageService } from './LanguageService';
@@ -11,14 +11,14 @@ import { RateLimitBucket, RateLimitService } from './RateLimitService';
 import { UserService } from './UserService';
 import { WordService } from './WordService';
 
-type InferUsageParams = {
+type InferOverviewParams = {
   userLanguage: string;
   wordLanguage: string;
   word: string;
   partOfSpeech: PartOfSpeech;
 };
 
-const INFER_USAGE_INSTRUCTION = `
+const INFER_WORD_OVERVIEW_INSTRUCTION = `
   You are assisting at language learning.
   As an input you will receive information about a word from a user's personal dictionary.
   The input is in JSON format and has the following properties:
@@ -33,6 +33,27 @@ const INFER_USAGE_INSTRUCTION = `
   - example: short sentence in the target language using the word
   - translation: translation of the whole sentence (in user language)
   Additionally, if there are some extra insights about using the word, include those in the optional 'extra' output property (in user language).
+`;
+
+type InferSentencesFixParams = {
+  language: string;
+  sentences: string[];
+  word: string;
+};
+
+const INFER_SENTENCES_FIX_INSTRUCTION = `
+  You are assisting at language learning.
+  As an input you will receieve several sentences in the target language.
+  The input is in JSON format and has the following properties:
+  - language - the target language (the one the user is learning)
+  - sentences - array of sentences in the target language
+  - word - key word that must be present in all of the sentences
+
+  Given this input, fix all the sentences to be gramatically and stylistically correct. Try to make sure that the fixed version of the sentence
+  remains similar to the original one. Additional key requirement is that each sentence has to contain the key word provided in the input
+  or some form of that word (e.g., conjugated, in specific tense, etc.) as required by the grammar rules.
+  If a sentence is already correct, simply return it without any changes.
+  Return an array of fixed sentences of the same length as the length of the input array (fixed sentence on the same position as its original sentence)
 `;
 
 export const DEFAULT_USER_LANGUAGE = 'English';
@@ -53,6 +74,63 @@ export class AiWordService implements OnApplicationBootstrap {
     private rateLimiter: RateLimitService,
   ) {}
 
+  async getOverview(
+    ctx: Context,
+    wordId: WordId,
+  ): Promise<AiWordOverview | null> {
+    const type = AiOutputType.WordOverview;
+    const key = `${type}:${wordId}`;
+
+    return await this.getAiOutput(ctx, key, type, async () => {
+      const [userSettings, word] = await Promise.all([
+        this.userService.getSettings(ctx.user.id),
+        this.wordService.getById(ctx, wordId),
+      ]);
+      const wordLanguage = await this.languageService.getById(
+        ctx,
+        word.languageId,
+      );
+      const userLanguage =
+        localeToName[userSettings.selectedLocale as string] ??
+        DEFAULT_USER_LANGUAGE;
+
+      const overview = await this.aiClient.infer({
+        instruction: INFER_WORD_OVERVIEW_INSTRUCTION,
+        input: {
+          userLanguage,
+          wordLanguage: wordLanguage.name,
+          word: word.original,
+          partOfSpeech: word.partOfSpeech,
+        } as InferOverviewParams,
+        outputSchema: AiWordOverview,
+      });
+
+      if (!overview) {
+        return null;
+      }
+
+      const fixedSentences = await this.aiClient.infer({
+        instruction: INFER_SENTENCES_FIX_INSTRUCTION,
+        input: {
+          language: wordLanguage.name,
+          sentences: overview.interpretations.map(({ example }) => example),
+          word: word.original,
+        } as InferSentencesFixParams,
+        outputSchema: AISentences,
+      });
+
+      if (fixedSentences?.length !== overview.interpretations.length) {
+        return overview;
+      }
+
+      fixedSentences.forEach((fixedSentence, idx) => {
+        overview.interpretations[idx].example = fixedSentence;
+      });
+
+      return overview;
+    });
+  }
+
   onApplicationBootstrap() {
     this.rateLimiter.register({
       key: AI_DAILY_RATE_LIMIT_KEY,
@@ -66,59 +144,30 @@ export class AiWordService implements OnApplicationBootstrap {
     });
   }
 
-  async getUsage(ctx: Context, wordId: WordId): Promise<WordUsage | null> {
-    const usageKey = `${AiOutputType.WordUsage}:${wordId}`;
-    const cachedUsage =
-      await this.aiOutputsRepository.getByKey<WordUsage>(usageKey);
-
-    if (cachedUsage) {
-      return cachedUsage;
-    }
-
-    const inferredUsage = await this.inferUsage(ctx, wordId);
-    if (inferredUsage) {
-      await this.aiOutputsRepository.create(
-        usageKey,
-        AiOutputType.WordUsage,
-        inferredUsage,
-      );
-    }
-
-    return inferredUsage;
-  }
-
-  private async inferUsage(
+  private async getAiOutput<T>(
     ctx: Context,
-    wordId: WordId,
-  ): Promise<WordUsage | null> {
+    key: string,
+    type: AiOutputType,
+    inferOutput: () => Promise<T | null>,
+  ): Promise<T | null> {
+    const cachedOutput = await this.aiOutputsRepository.getByKey<T>(key);
+
+    if (cachedOutput) {
+      return cachedOutput;
+    }
+
     if (this.isRateLimited(ctx)) {
       Logger.warn('Rate limit reached for user', ctx.user.id);
 
       return null;
     }
 
-    const [userSettings, word] = await Promise.all([
-      this.userService.getSettings(ctx.user.id),
-      this.wordService.getById(ctx, wordId),
-    ]);
-    const wordLanguage = await this.languageService.getById(
-      ctx,
-      word.languageId,
-    );
-    const userLanguage =
-      localeToName[userSettings.selectedLocale as string] ??
-      DEFAULT_USER_LANGUAGE;
+    const inferredOutput = await inferOutput();
+    if (inferredOutput) {
+      await this.aiOutputsRepository.create(key, type, inferredOutput);
+    }
 
-    return await this.aiClient.infer<InferUsageParams, typeof WordUsage>({
-      instruction: INFER_USAGE_INSTRUCTION,
-      input: {
-        userLanguage,
-        wordLanguage: wordLanguage.name,
-        word: word.original,
-        partOfSpeech: word.partOfSpeech,
-      },
-      outputSchema: WordUsage,
-    });
+    return inferredOutput;
   }
 
   private isRateLimited(ctx: Context): boolean {

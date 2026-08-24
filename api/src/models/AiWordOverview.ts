@@ -1,6 +1,6 @@
 import { Static, Type } from '@sinclair/typebox';
 
-export const WordUsage = Type.Object({
+export const AiWordOverview = Type.Object({
   interpretations: Type.Array(
     Type.Object({
       interpretation: Type.String({ maxLength: 200 }),
@@ -14,4 +14,7 @@ export const WordUsage = Type.Object({
   ),
   extra: Type.Optional(Type.String({ maxLength: 500 })),
 });
-export type WordUsage = Static<typeof WordUsage>;
+export type AiWordOverview = Static<typeof AiWordOverview>;
+
+export const AISentences = Type.Array(Type.String({ maxLength: 300 }));
+export type AISentences = Static<typeof AISentences>;

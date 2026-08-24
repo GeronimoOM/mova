@@ -304,7 +304,7 @@ fragment WordsStatsFields on WordsStats {
   }
 }
 
-fragment WordUsageFields on WordUsage {
+fragment WordOverviewFields on WordOverview {
   interpretations {
     interpretation
     example

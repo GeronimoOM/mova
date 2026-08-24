@@ -33,7 +33,7 @@ import {
   WordDetailsProperty,
 } from './WordDetailsProperty';
 import { WordLinks } from './WordLinks';
-import { WordUsageModal } from './WordUsageModal';
+import { WordOverviewModal } from './WordOverviewModal';
 import { useWordDetails, Word } from './useWordDetails';
 
 export type WordDetailsProps = {
@@ -109,10 +109,10 @@ export const WordDetails = ({
 
   const [areMoreButtonsVisible, setMoreButtonsVisible] = useState(false);
   const [isDeleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  const [isUsageModalOpen, setUsageModalOpen] = useState(false);
+  const [isOverviewModalOpen, setOverviewModalOpen] = useState(false);
 
-  const onUsage = () => {
-    setUsageModalOpen(!isUsageModalOpen);
+  const onOverview = () => {
+    setOverviewModalOpen(!isOverviewModalOpen);
   };
 
   useEffect(() => {
@@ -169,10 +169,10 @@ export const WordDetails = ({
               {!disabled && areMoreButtonsVisible && (
                 <ButtonIcon
                   icon={FaMagic}
-                  onClick={onUsage}
+                  onClick={onOverview}
                   disabled={!wordId}
                   wrapped={true}
-                  dataTestId="word-details-usage-btn"
+                  dataTestId="word-details-overview-btn"
                 />
               )}
 
@@ -326,8 +326,11 @@ export const WordDetails = ({
           onClose={() => setDeleteConfirmOpen(false)}
         />
       )}
-      {isUsageModalOpen && word?.id && (
-        <WordUsageModal word={word} onClose={() => setUsageModalOpen(false)} />
+      {isOverviewModalOpen && word?.id && (
+        <WordOverviewModal
+          word={word}
+          onClose={() => setOverviewModalOpen(false)}
+        />
       )}
     </div>
   );
