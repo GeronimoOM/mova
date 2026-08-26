@@ -1,4 +1,10 @@
-import { ApolloClient, ApolloLink, HttpLink } from '@apollo/client';
+import {
+  ApolloClient,
+  ApolloLink,
+  HttpLink,
+  ServerError,
+} from '@apollo/client';
+import { ErrorLink } from '@apollo/client/link/error';
 import { LOCAL_STORAGE_TOKEN_KEY } from '../utils/constants';
 import { cache } from './cache';
 
@@ -12,6 +18,13 @@ export function setClientId(id: string): void {
 
 const httpLink = new HttpLink({
   uri: GRAPHQL_URI,
+});
+
+const errorLink = new ErrorLink(({ error }) => {
+  if (ServerError.is(error) && error.statusCode === 401) {
+    localStorage.removeItem(LOCAL_STORAGE_TOKEN_KEY);
+    window.location.replace('/');
+  }
 });
 
 const headersLink = new ApolloLink((operation, forward) => {
@@ -29,7 +42,7 @@ const headersLink = new ApolloLink((operation, forward) => {
 });
 
 export const client = new ApolloClient({
-  link: headersLink.concat(httpLink),
+  link: errorLink.concat(headersLink).concat(httpLink),
   cache,
   devtools: {
     enabled: true,

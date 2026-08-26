@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common';
+import { HttpException, Logger } from '@nestjs/common';
 import { GraphQLModule as NestGraphQlModule } from '@nestjs/graphql';
 import { MercuriusDriver, MercuriusDriverConfig } from '@nestjs/mercurius';
 import { join } from 'path';
@@ -17,11 +17,16 @@ export const GraphQlModule =
       },
       errorFormatter(executionResult) {
         const { errors, data, extensions } = executionResult;
+        const [error] = errors;
+        const originalError = error.originalError;
 
-        Logger.error('Unexpected error', errors);
+        const isHttpError = originalError instanceof HttpException;
+        if (!isHttpError) {
+          Logger.error('Unexpected error', error);
+        }
 
         return {
-          statusCode: 500,
+          statusCode: (originalError as HttpException).getStatus() ?? 500,
           response: {
             data,
             errors,

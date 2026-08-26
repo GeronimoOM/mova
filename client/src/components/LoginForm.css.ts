@@ -17,6 +17,10 @@ export const label = style({
   fontWeight: 'bold',
 });
 
+export const error = style({
+  outline: `2px solid ${themeVars.color.negative}`,
+});
+
 export const button = style({
   display: 'flex',
   flexDirection: 'column',

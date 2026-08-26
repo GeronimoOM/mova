@@ -7,6 +7,7 @@ import {
 import { SwWorkerMessageType } from '../sw/worker/messages';
 import * as styles from './AppContent.css';
 import { Loader } from './common/Loader';
+import { LanguageProvider } from './LanguageContext';
 import { Main } from './Main';
 import { NavBar } from './NavBar/NavBar';
 
@@ -51,10 +52,12 @@ export const AppContent = ({ authToken }: AppContentProps) => {
   }, [authToken]);
 
   return (
-    <div className={styles.content}>
-      <NavBar />
-      {isLoading ? <AppLoader /> : <Main />}
-    </div>
+    <LanguageProvider>
+      <div className={styles.content}>
+        <NavBar />
+        {isLoading ? <AppLoader /> : <Main />}
+      </div>
+    </LanguageProvider>
   );
 };
 
