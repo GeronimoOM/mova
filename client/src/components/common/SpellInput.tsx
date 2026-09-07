@@ -24,7 +24,7 @@ export const SpellInput = ({
   highlights,
   dataTestId,
 }: SpellInputProps) => {
-  length = obscureLength ? OBSCURED_LENGTH : length;
+  length = Math.max(1, obscureLength ? OBSCURED_LENGTH : length);
 
   const cells = useRef<HTMLInputElement[]>(Array(length).fill(null));
 
