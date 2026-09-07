@@ -63,9 +63,11 @@ export const ExerciseCard = () => {
   const [attemptMastery] = useAttemptMastery();
 
   const exerciseCount = exerciseCountQuery?.language?.exerciseCount;
-  const wordsLoading = [NetworkStatus.loading, NetworkStatus.refetch].includes(
-    fetchingExerciseWordsStatus,
-  );
+  const wordsLoading = [
+    NetworkStatus.loading,
+    NetworkStatus.setVariables,
+    NetworkStatus.refetch,
+  ].includes(fetchingExerciseWordsStatus);
   const loading = propertiesLoading || exerciseCountLoading || wordsLoading;
   const words = exerciseWordsQuery?.language?.exerciseWords;
   const currentWord = words?.[wordIndex];
@@ -130,76 +132,96 @@ export const ExerciseCard = () => {
 
   return (
     <div className={styles.card} ref={cardRef}>
-      {isStarted ? (
-        loading ? (
-          <Loader />
-        ) : currentWord ? (
-          <LayoutProvider containerRef={cardRef}>
-            <div className={styles.exercise}>
-              <Exercise
-                key={currentWord!.id}
-                word={currentWord!}
-                properties={
-                  propertiesByPartOfSpeech![currentWord!.partOfSpeech]
-                }
-                onSuccess={handleSuccess}
-                onFailure={handleFailure}
-                onNext={handleNext}
-              />
-
-              {isInfoOpen && currentWord && (
-                <WordDetailsOverlay
-                  wordId={currentWord.id}
-                  onClose={() => setInfoOpen(false)}
-                />
-              )}
-            </div>
-
-            <div className={styles.bottom}>
-              <ButtonIcon
-                icon={FaInfo}
-                onClick={() => setInfoOpen(!isInfoOpen)}
-                disabled={!isInfoAvailable}
-                toggled={isInfoOpen}
-              />
-
-              <ButtonIcon
-                icon={HiMiniXMark}
-                color="negative"
-                onClick={handleClose}
-              />
-            </div>
-          </LayoutProvider>
-        ) : (
-          <ExercisesNotReady />
-        )
-      ) : (
-        <ExerciseStart
-          loading={loading}
-          exerciseCount={exerciseCount}
-          onStart={handleStart}
+      {loading ? (
+        <Loader />
+      ) : !isStarted ? (
+        <ExerciseStart exerciseCount={exerciseCount} onStart={handleStart} />
+      ) : currentWord ? (
+        <ExerciseContent
+          currentWord={currentWord}
+          properties={propertiesByPartOfSpeech![currentWord!.partOfSpeech]}
+          cardRef={cardRef}
+          isInfoAvailable={isInfoAvailable}
+          isInfoOpen={isInfoOpen}
+          handleNext={handleNext}
+          handleSuccess={handleSuccess}
+          handleFailure={handleFailure}
+          handleClose={handleClose}
+          handleInfoOpen={setInfoOpen}
         />
+      ) : (
+        <ExercisesNotReady />
       )}
     </div>
   );
 };
 
+type ExerciseContentProps = {
+  currentWord: ExerciseWord;
+  properties: PropertyFieldsFragment[];
+  cardRef: React.RefObject<HTMLDivElement | null>;
+  isInfoAvailable: boolean;
+  isInfoOpen: boolean;
+  handleNext: () => void;
+  handleSuccess: () => void;
+  handleFailure: () => void;
+  handleClose: () => void;
+  handleInfoOpen: (isOpen: boolean) => void;
+};
+
+const ExerciseContent = ({
+  currentWord,
+  properties,
+  cardRef,
+  isInfoAvailable,
+  isInfoOpen,
+  handleNext,
+  handleSuccess,
+  handleFailure,
+  handleClose,
+  handleInfoOpen,
+}: ExerciseContentProps) => {
+  return (
+    <LayoutProvider containerRef={cardRef}>
+      <div className={styles.exercise}>
+        <Exercise
+          key={currentWord!.id}
+          word={currentWord!}
+          properties={properties}
+          onSuccess={handleSuccess}
+          onFailure={handleFailure}
+          onNext={handleNext}
+        />
+
+        {isInfoOpen && currentWord && (
+          <WordDetailsOverlay
+            wordId={currentWord.id}
+            onClose={() => handleInfoOpen(false)}
+          />
+        )}
+      </div>
+
+      <div className={styles.bottom}>
+        <ButtonIcon
+          icon={FaInfo}
+          onClick={() => handleInfoOpen(!isInfoOpen)}
+          disabled={!isInfoAvailable}
+          toggled={isInfoOpen}
+        />
+
+        <ButtonIcon icon={HiMiniXMark} color="negative" onClick={handleClose} />
+      </div>
+    </LayoutProvider>
+  );
+};
+
 type ExerciseStartProps = {
-  loading: boolean;
   exerciseCount?: number;
   onStart: () => void;
 };
 
-const ExerciseStart = ({
-  loading,
-  exerciseCount,
-  onStart,
-}: ExerciseStartProps) => {
+const ExerciseStart = ({ exerciseCount, onStart }: ExerciseStartProps) => {
   const { t } = useTranslation();
-
-  if (loading) {
-    return <Loader />;
-  }
 
   if (!exerciseCount) {
     return <ExercisesNotReady />;
