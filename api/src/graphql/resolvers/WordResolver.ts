@@ -14,10 +14,10 @@ import {
 } from 'graphql/types/WordLinkType';
 import { WordOverviewType } from 'graphql/types/WordOverviewType';
 import { ContextDec } from 'middleware/ContextMiddleware';
-import { AiWordOverview } from 'models/AiWordOverview';
+import { AiWordOverview } from 'models/AiOutput';
 import { Context } from 'models/Context';
 import { WordId, WordLinkType } from 'models/Word';
-import { AiWordService } from 'services/AiWordService';
+import { AiService } from 'services/AiService';
 import { WordService } from 'services/WordService';
 import { WordTypeMapper } from '../mappers/WordTypeMapper';
 import {
@@ -31,7 +31,7 @@ import {
 export class WordResolver {
   constructor(
     private wordService: WordService,
-    private aiWordService: AiWordService,
+    private aiService: AiService,
     private wordTypeMapper: WordTypeMapper,
   ) {}
 
@@ -59,7 +59,7 @@ export class WordResolver {
     @ContextDec() ctx: Context,
     @Parent() word: WordType,
   ): Promise<AiWordOverview | null> {
-    return await this.aiWordService.getOverview(ctx, word.id);
+    return await this.aiService.getWordOverview(ctx, word.id);
   }
 
   @Mutation(() => WordType)

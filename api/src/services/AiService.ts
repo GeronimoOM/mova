@@ -1,7 +1,10 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { AiClient } from 'clients/AiClient';
-import { AiOutputType } from 'models/AiOutput';
-import { AISentences, AiWordOverview } from 'models/AiWordOverview';
+import {
+  AIExampleSentences,
+  AiOutputType,
+  AiWordOverview,
+} from 'models/AiOutput';
 import { Context } from 'models/Context';
 import { PartOfSpeech, WordId } from 'models/Word';
 import { AiOutputsRepository } from 'repositories/AiOutputsRepository';
@@ -45,13 +48,13 @@ const INFER_SENTENCES_FIX_INSTRUCTION = `
   You are assisting at language learning.
   As an input you will receieve several sentences in the target language.
   The input is in JSON format and has the following properties:
-  - language - the target language (the one the user is learning)
-  - sentences - array of sentences in the target language
-  - word - key word that must be present in all of the sentences
+  - language: the target language (the one the user is learning)
+  - sentences: array of sentences in the target language
+  - word: key word that must be present in all of the sentences
 
   Given this input, fix all the sentences to be gramatically and stylistically correct. Try to make sure that the fixed version of the sentence
   remains similar to the original one. Additional key requirement is that each sentence has to contain the key word provided in the input
-  or some form of that word (e.g., conjugated, in specific tense, etc.) as required by the grammar rules.
+  or some form of that word (e.g., conjugated, in specific tense, grammatical number, etc.) as required by the grammar rules.
   If a sentence is already correct, simply return it without any changes.
   Return an array of fixed sentences of the same length as the length of the input array (fixed sentence on the same position as its original sentence)
 `;
@@ -64,7 +67,7 @@ const AI_HOURLY_RATE_LIMIT_KEY = 'ai_hourly_limit';
 const AI_HOURLY_RATE_LIMIT_LIMIT = 50;
 
 @Injectable()
-export class AiWordService implements OnApplicationBootstrap {
+export class AiService implements OnApplicationBootstrap {
   constructor(
     private aiClient: AiClient,
     private languageService: LanguageService,
@@ -74,7 +77,7 @@ export class AiWordService implements OnApplicationBootstrap {
     private rateLimiter: RateLimitService,
   ) {}
 
-  async getOverview(
+  async getWordOverview(
     ctx: Context,
     wordId: WordId,
   ): Promise<AiWordOverview | null> {
@@ -116,7 +119,7 @@ export class AiWordService implements OnApplicationBootstrap {
           sentences: overview.interpretations.map(({ example }) => example),
           word: word.original,
         } as InferSentencesFixParams,
-        outputSchema: AISentences,
+        outputSchema: AIExampleSentences,
       });
 
       if (fixedSentences?.length !== overview.interpretations.length) {

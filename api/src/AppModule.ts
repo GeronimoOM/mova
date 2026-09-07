@@ -20,7 +20,7 @@ import { ChangeRepository } from 'repositories/ChangeRepository';
 import { ProgressRepository } from 'repositories/ProgressRepository';
 import { Serializer } from 'repositories/Serializer';
 import { UserRepository } from 'repositories/UserRepository';
-import { AiWordService } from 'services/AiWordService';
+import { AiService } from 'services/AiService';
 import { AuthService } from 'services/AuthService';
 import { ChangeBuilder } from 'services/ChangeBuilder';
 import { ChangeService } from 'services/ChangeService';
@@ -86,7 +86,7 @@ import { WordService } from './services/WordService';
     ChangeService,
     ProgressService,
     UserService,
-    AiWordService,
+    AiService,
     MaintenanceService,
     EncryptionService,
     RateLimitService,
