@@ -5,6 +5,7 @@ import { FaInfo } from 'react-icons/fa';
 import { HiMiniXMark } from 'react-icons/hi2';
 
 import { useTranslation } from 'react-i18next';
+import { ImArrowUpRight2 } from 'react-icons/im';
 import { IoPlay } from 'react-icons/io5';
 import { useAttemptMastery } from '../../api/mutations';
 import {
@@ -13,6 +14,7 @@ import {
   GetPropertiesDocument,
   PropertyFieldsFragment,
 } from '../../api/types/graphql';
+import { AppRoute } from '../../routes';
 import { toGroupedRecord } from '../../utils/arrays';
 import { useLanguageContext } from '../LanguageContext';
 import { LayoutProvider } from '../LayoutContext';
@@ -30,7 +32,7 @@ export const ExerciseCard = () => {
 
   const [isStarted, setIsStarted] = useState(false);
   const [wordIndex, setWordIndex] = useState(-1);
-  const [isInfoAvailable, setInfoAvailable] = useState(false);
+  const [isResolved, setResolved] = useState(false);
   const [isInfoOpen, setInfoOpen] = useState(false);
 
   const cardRef = useRef<HTMLDivElement>(null);
@@ -103,19 +105,19 @@ export const ExerciseCard = () => {
     } else {
       handleStart();
     }
-    setInfoAvailable(false);
+    setResolved(false);
     setInfoOpen(false);
   };
 
   const handleSuccess = () => {
-    setInfoAvailable(true);
+    setResolved(true);
     attemptMastery({
       variables: { wordId: currentWord!.id, success: true },
     });
   };
 
   const handleFailure = () => {
-    setInfoAvailable(true);
+    setResolved(true);
     attemptMastery({
       variables: { wordId: currentWord!.id, success: false },
     });
@@ -130,6 +132,10 @@ export const ExerciseCard = () => {
     }
   };
 
+  const handleOpenInNewTab = () => {
+    window.open(AppRoute.Word.replace(':id', currentWord!.id), '_blank');
+  };
+
   return (
     <div className={styles.card} ref={cardRef}>
       {loading ? (
@@ -141,13 +147,14 @@ export const ExerciseCard = () => {
           currentWord={currentWord}
           properties={propertiesByPartOfSpeech![currentWord!.partOfSpeech]}
           cardRef={cardRef}
-          isInfoAvailable={isInfoAvailable}
+          isResolved={isResolved}
           isInfoOpen={isInfoOpen}
           handleNext={handleNext}
           handleSuccess={handleSuccess}
           handleFailure={handleFailure}
           handleClose={handleClose}
           handleInfoOpen={setInfoOpen}
+          handleOpenInNewTab={handleOpenInNewTab}
         />
       ) : (
         <ExercisesNotReady />
@@ -160,26 +167,28 @@ type ExerciseContentProps = {
   currentWord: ExerciseWord;
   properties: PropertyFieldsFragment[];
   cardRef: React.RefObject<HTMLDivElement | null>;
-  isInfoAvailable: boolean;
+  isResolved: boolean;
   isInfoOpen: boolean;
   handleNext: () => void;
   handleSuccess: () => void;
   handleFailure: () => void;
   handleClose: () => void;
   handleInfoOpen: (isOpen: boolean) => void;
+  handleOpenInNewTab: () => void;
 };
 
 const ExerciseContent = ({
   currentWord,
   properties,
   cardRef,
-  isInfoAvailable,
+  isResolved,
   isInfoOpen,
   handleNext,
   handleSuccess,
   handleFailure,
   handleClose,
   handleInfoOpen,
+  handleOpenInNewTab,
 }: ExerciseContentProps) => {
   return (
     <LayoutProvider containerRef={cardRef}>
@@ -205,8 +214,14 @@ const ExerciseContent = ({
         <ButtonIcon
           icon={FaInfo}
           onClick={() => handleInfoOpen(!isInfoOpen)}
-          disabled={!isInfoAvailable}
+          disabled={!isResolved}
           toggled={isInfoOpen}
+        />
+
+        <ButtonIcon
+          icon={ImArrowUpRight2}
+          onClick={handleOpenInNewTab}
+          disabled={!isResolved}
         />
 
         <ButtonIcon icon={HiMiniXMark} color="negative" onClick={handleClose} />

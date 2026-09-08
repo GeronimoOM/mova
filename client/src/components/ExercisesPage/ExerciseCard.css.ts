@@ -1,4 +1,4 @@
-import { style } from '@vanilla-extract/css';
+import { globalStyle, style } from '@vanilla-extract/css';
 import { themeVars } from '../../index.css';
 
 export const card = style({
@@ -50,12 +50,20 @@ export const noWordsDescription = style({
 });
 
 export const bottom = style({
-  marginTop: 'auto',
+  position: 'absolute',
+  left: 0,
+  bottom: 0,
+  right: 0,
   display: 'flex',
   flexDirection: 'row',
-  justifyContent: 'space-between',
+  padding: 20,
+  gap: 20,
   boxSizing: 'border-box',
   width: '100%',
+});
+
+globalStyle(`${bottom} *:last-child`, {
+  marginLeft: 'auto',
 });
 
 export const exercisesReady = style({
