@@ -93,7 +93,7 @@ export class UserService {
     return this.mergeSettings(await this.getSettings(userId));
   }
 
-  private mergeSettings(settings: Partial<UserSettings>) {
+  private mergeSettings(settings: Partial<UserSettings>): UserSettings {
     return {
       ...DEFAULT_SETTINGS,
       ...settings,

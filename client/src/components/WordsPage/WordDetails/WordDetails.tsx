@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { BsFillExclamationDiamondFill, BsTranslate } from 'react-icons/bs';
-import { FaArrowDown, FaArrowUp, FaMagic } from 'react-icons/fa';
-import { FaFeatherPointed, FaFire } from 'react-icons/fa6';
+import { FaArrowDown, FaArrowUp } from 'react-icons/fa';
+import { FaFeatherPointed, FaFire, FaRobot } from 'react-icons/fa6';
 import { HiMiniXMark } from 'react-icons/hi2';
 import { MdMoreVert } from 'react-icons/md';
 
@@ -168,7 +168,7 @@ export const WordDetails = ({
             <div className={styles.buttonsBottom}>
               {!disabled && areMoreButtonsVisible && (
                 <ButtonIcon
-                  icon={FaMagic}
+                  icon={FaRobot}
                   onClick={onOverview}
                   disabled={!wordId}
                   wrapped={true}

@@ -1,21 +1,20 @@
 import { style } from '@vanilla-extract/css';
-import { breakpoints, fontThemeVars, themeVars } from '../../../index.css';
+import { fontThemeVars, themeVars } from '../../../index.css';
+
+export const modal = style({
+  height: '90%',
+  maxHeight: 600,
+  width: '90%',
+  maxWidth: 500,
+});
 
 export const wrapper = style({
-  height: 500,
-  width: 300,
+  width: '100%',
+  height: '100%',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  '@media': {
-    [breakpoints.small]: {
-      minWidth: 400,
-    },
-    [breakpoints.large]: {
-      minWidth: 500,
-    },
-  },
 });
 
 export const title = style({
@@ -53,8 +52,15 @@ export const listItemContent = style({
 });
 
 export const interpretation = style({
-  paddingBottom: 3,
-  borderBottom: `2px solid ${themeVars.color.backgroundLighter}`,
+  paddingBottom: 5,
+});
+
+export const sentences = style({
+  backgroundColor: themeVars.color.backgroundLight,
+  display: 'flex',
+  flexDirection: 'column',
+  padding: 10,
+  gap: 20,
 });
 
 export const example = style({
@@ -62,6 +68,10 @@ export const example = style({
   fontWeight: 500,
   letterSpacing: '0.025em',
   fontSize: '0.9rem',
+});
+
+export const exampleWord = style({
+  borderBottom: `2px solid ${themeVars.color.backgroundLightest}`,
 });
 
 export const translation = style({

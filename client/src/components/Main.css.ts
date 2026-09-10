@@ -2,6 +2,7 @@ import { style } from '@vanilla-extract/css';
 import { breakpoints } from '../index.css';
 
 export const main = style({
+  position: 'relative',
   gridArea: 'main',
   padding: 10,
   paddingBottom: 0,

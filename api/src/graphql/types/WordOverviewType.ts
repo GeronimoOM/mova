@@ -18,5 +18,8 @@ export class WordOverviewInterpretationType {
   example: string;
 
   @Field()
+  wordForm: string;
+
+  @Field()
   translation: string;
 }

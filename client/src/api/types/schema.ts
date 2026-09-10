@@ -760,6 +760,7 @@ export type WordOverviewInterpretation = {
   example: Scalars['String']['output'];
   interpretation: Scalars['String']['output'];
   translation: Scalars['String']['output'];
+  wordForm: Scalars['String']['output'];
 };
 
 export type WordPage = {

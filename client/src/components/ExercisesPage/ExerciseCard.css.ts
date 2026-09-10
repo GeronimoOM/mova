@@ -62,7 +62,7 @@ export const bottom = style({
   width: '100%',
 });
 
-globalStyle(`${bottom} *:last-child`, {
+globalStyle(`${bottom} > *:last-child`, {
   marginLeft: 'auto',
 });
 

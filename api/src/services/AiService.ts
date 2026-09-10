@@ -1,9 +1,10 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { AiClient } from 'clients/AiClient';
 import {
-  AIExampleSentences,
+  AIValidatedExamples,
   AiOutputType,
   AiWordOverview,
+  WordOverview,
 } from 'models/AiOutput';
 import { Context } from 'models/Context';
 import { PartOfSpeech, WordId } from 'models/Word';
@@ -25,10 +26,10 @@ const INFER_WORD_OVERVIEW_INSTRUCTION = `
   You are assisting at language learning.
   As an input you will receive information about a word from a user's personal dictionary.
   The input is in JSON format and has the following properties:
-  - userLanguage - the user language (the language in which to provide translation, extra information, etc);
-  - wordLanguage - the target language (the one the user is learning)
-  - word - word in the target language
-  - partOfSpeech - part of speech to which the word belongs (use as an extra hint to disambiguate)
+  - userLanguage: the user language (the language in which to provide translation, extra information, etc);
+  - wordLanguage: the target language (the one the user is learning)
+  - word: word in the target language
+  - partOfSpeech: part of speech to which the word belongs (use as an extra hint to disambiguate)
 
   Given this input, provide examples of using the word in the target language. If the word has multiple interpretations,
   separate the output per interpretation (using the 'interpretations' property; provide up to 3 most common and at least 1). For each interpretation, provide:
@@ -44,22 +45,23 @@ type InferSentencesFixParams = {
   word: string;
 };
 
-const INFER_SENTENCES_FIX_INSTRUCTION = `
+const INFER_VALIDATE_SENTENCES_INSTRUCTION = `
   You are assisting at language learning.
   As an input you will receieve several sentences in the target language.
   The input is in JSON format and has the following properties:
   - language: the target language (the one the user is learning)
   - sentences: array of sentences in the target language
-  - word: key word that must be present in all of the sentences
+  - word: key word
 
-  Given this input, fix all the sentences to be gramatically and stylistically correct. Try to make sure that the fixed version of the sentence
-  remains similar to the original one. Additional key requirement is that each sentence has to contain the key word provided in the input
-  or some form of that word (e.g., conjugated, in specific tense, grammatical number, etc.) as required by the grammar rules.
+  Given this input, validate all the sentences to be gramatically and stylistically correct. If a sentence is incorrect, provide a corrected version.
   If a sentence is already correct, simply return it without any changes.
-  Return an array of fixed sentences of the same length as the length of the input array (fixed sentence on the same position as its original sentence)
+  Additional mandatory requirement is that each sentence has to contain the key word provided in the input
+  or some form of that word (e.g., conjugated, in specific tense, grammatical number, etc.) as required by the grammar rules.
+  If the sentence does not contain some grammatic form of the key word (has to be a form of the same word, not a synonym), correct that as well.
+  Return an array of results of the same length as the length of the input 'sentences' array, where each result is an object consisting of:
+  - sentence - fixed sentence corresponding to the input sentence (same as input if it was already correct)
+  - wordForm - form of the input key word that the fixed sentence contains
 `;
-
-export const DEFAULT_USER_LANGUAGE = 'English';
 
 const AI_DAILY_RATE_LIMIT_KEY = 'ai_daily_limit';
 const AI_DAILY_RATE_LIMIT_LIMIT = 200;
@@ -80,22 +82,19 @@ export class AiService implements OnApplicationBootstrap {
   async getWordOverview(
     ctx: Context,
     wordId: WordId,
-  ): Promise<AiWordOverview | null> {
+  ): Promise<WordOverview | null> {
     const type = AiOutputType.WordOverview;
-    const key = `${type}:${wordId}`;
+    const userSettings = await this.userService.getSettings(ctx.user.id);
+    const userLocale = userSettings.selectedLocale as string;
+    const key = `${type}:${userLocale}:${wordId}`;
 
     return await this.getAiOutput(ctx, key, type, async () => {
-      const [userSettings, word] = await Promise.all([
-        this.userService.getSettings(ctx.user.id),
-        this.wordService.getById(ctx, wordId),
-      ]);
+      const word = await this.wordService.getById(ctx, wordId);
       const wordLanguage = await this.languageService.getById(
         ctx,
         word.languageId,
       );
-      const userLanguage =
-        localeToName[userSettings.selectedLocale as string] ??
-        DEFAULT_USER_LANGUAGE;
+      const userLanguage = localeToName[userLocale];
 
       const overview = await this.aiClient.infer({
         instruction: INFER_WORD_OVERVIEW_INSTRUCTION,
@@ -109,28 +108,37 @@ export class AiService implements OnApplicationBootstrap {
       });
 
       if (!overview) {
+        Logger.warn('Failed to generate overview', `word:"${word.original}"`);
         return null;
       }
 
-      const fixedSentences = await this.aiClient.infer({
-        instruction: INFER_SENTENCES_FIX_INSTRUCTION,
+      const validatedSentences = await this.aiClient.infer({
+        instruction: INFER_VALIDATE_SENTENCES_INSTRUCTION,
         input: {
           language: wordLanguage.name,
           sentences: overview.interpretations.map(({ example }) => example),
           word: word.original,
         } as InferSentencesFixParams,
-        outputSchema: AIExampleSentences,
+        outputSchema: AIValidatedExamples,
       });
 
-      if (fixedSentences?.length !== overview.interpretations.length) {
-        return overview;
+      if (validatedSentences?.length !== overview.interpretations.length) {
+        Logger.warn(
+          'Validated sentences have different length',
+          `word:"${word.original}"`,
+        );
+        return null;
       }
 
-      fixedSentences.forEach((fixedSentence, idx) => {
-        overview.interpretations[idx].example = fixedSentence;
-      });
-
-      return overview;
+      return {
+        ...overview,
+        interpretations: overview.interpretations.map(
+          (interpretation, idx) => ({
+            ...interpretation,
+            ...validatedSentences[idx],
+          }),
+        ),
+      };
     });
   }
 

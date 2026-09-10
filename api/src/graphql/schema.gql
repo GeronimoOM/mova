@@ -428,6 +428,7 @@ type WordOverview {
 type WordOverviewInterpretation {
   interpretation: String!
   example: String!
+  wordForm: String!
   translation: String!
 }
 

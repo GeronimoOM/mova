@@ -308,6 +308,7 @@ fragment WordOverviewFields on WordOverview {
   interpretations {
     interpretation
     example
+    wordForm
     translation
   }
   extra

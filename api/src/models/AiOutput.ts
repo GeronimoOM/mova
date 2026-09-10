@@ -23,5 +23,20 @@ export const AiWordOverview = Type.Object({
 });
 export type AiWordOverview = Static<typeof AiWordOverview>;
 
-export const AIExampleSentences = Type.Array(Type.String({ maxLength: 300 }));
-export type AIExampleSentences = Static<typeof AIExampleSentences>;
+export const AIValidatedExamples = Type.Array(
+  Type.Object({
+    sentence: Type.String({ maxLength: 300 }),
+    wordForm: Type.String({ maxLength: 50 }),
+  }),
+);
+export type AIValidatedExamples = Static<typeof AIValidatedExamples>;
+
+export type WordOverview = {
+  interpretations: Array<{
+    interpretation: string;
+    example: string;
+    wordForm: string;
+    translation: string;
+  }>;
+  extra?: string;
+};
