@@ -1,10 +1,10 @@
 import { NetworkStatus } from '@apollo/client';
 import { useLazyQuery, useQuery } from '@apollo/client/react';
 import { useMemo, useRef, useState } from 'react';
-import { FaInfo } from 'react-icons/fa';
 import { HiMiniXMark } from 'react-icons/hi2';
 
 import { useTranslation } from 'react-i18next';
+import { FaBook } from 'react-icons/fa6';
 import { ImArrowUpRight2 } from 'react-icons/im';
 import { IoPlay } from 'react-icons/io5';
 import { useAttemptMastery } from '../../api/mutations';
@@ -14,7 +14,7 @@ import {
   GetPropertiesDocument,
   PropertyFieldsFragment,
 } from '../../api/types/graphql';
-import { AppRoute } from '../../routes';
+import { wordRoute } from '../../routes';
 import { toGroupedRecord } from '../../utils/arrays';
 import { useLanguageContext } from '../LanguageContext';
 import { LayoutProvider } from '../LayoutContext';
@@ -33,7 +33,7 @@ export const ExerciseCard = () => {
   const [isStarted, setIsStarted] = useState(false);
   const [wordIndex, setWordIndex] = useState(-1);
   const [isResolved, setResolved] = useState(false);
-  const [isInfoOpen, setInfoOpen] = useState(false);
+  const [isDetailsOpen, setDetailsOpen] = useState(false);
 
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -96,7 +96,7 @@ export const ExerciseCard = () => {
       });
     }
     setWordIndex(0);
-    setInfoOpen(false);
+    setDetailsOpen(false);
   };
 
   const handleNext = () => {
@@ -106,7 +106,7 @@ export const ExerciseCard = () => {
       handleStart();
     }
     setResolved(false);
-    setInfoOpen(false);
+    setDetailsOpen(false);
   };
 
   const handleSuccess = () => {
@@ -124,8 +124,8 @@ export const ExerciseCard = () => {
   };
 
   const handleClose = () => {
-    if (isInfoOpen) {
-      setInfoOpen(false);
+    if (isDetailsOpen) {
+      setDetailsOpen(false);
     } else {
       setIsStarted(false);
       refetchExerciseCount();
@@ -133,11 +133,11 @@ export const ExerciseCard = () => {
   };
 
   const handleOpenInNewTab = () => {
-    window.open(AppRoute.Word.replace(':id', currentWord!.id), '_blank');
+    window.open(wordRoute(currentWord!.id), '_blank');
   };
 
   return (
-    <div className={styles.card} ref={cardRef}>
+    <div className={styles.wrapper} ref={cardRef}>
       {loading ? (
         <Loader />
       ) : !isStarted ? (
@@ -148,12 +148,12 @@ export const ExerciseCard = () => {
           properties={propertiesByPartOfSpeech![currentWord!.partOfSpeech]}
           cardRef={cardRef}
           isResolved={isResolved}
-          isInfoOpen={isInfoOpen}
+          isDetailsOpen={isDetailsOpen}
           handleNext={handleNext}
           handleSuccess={handleSuccess}
           handleFailure={handleFailure}
           handleClose={handleClose}
-          handleInfoOpen={setInfoOpen}
+          handleDetailsOpen={setDetailsOpen}
           handleOpenInNewTab={handleOpenInNewTab}
         />
       ) : (
@@ -168,12 +168,12 @@ type ExerciseContentProps = {
   properties: PropertyFieldsFragment[];
   cardRef: React.RefObject<HTMLDivElement | null>;
   isResolved: boolean;
-  isInfoOpen: boolean;
+  isDetailsOpen: boolean;
   handleNext: () => void;
   handleSuccess: () => void;
   handleFailure: () => void;
   handleClose: () => void;
-  handleInfoOpen: (isOpen: boolean) => void;
+  handleDetailsOpen: (isOpen: boolean) => void;
   handleOpenInNewTab: () => void;
 };
 
@@ -182,12 +182,12 @@ const ExerciseContent = ({
   properties,
   cardRef,
   isResolved,
-  isInfoOpen,
+  isDetailsOpen,
   handleNext,
   handleSuccess,
   handleFailure,
   handleClose,
-  handleInfoOpen,
+  handleDetailsOpen,
   handleOpenInNewTab,
 }: ExerciseContentProps) => {
   return (
@@ -201,21 +201,14 @@ const ExerciseContent = ({
           onFailure={handleFailure}
           onNext={handleNext}
         />
-
-        {isInfoOpen && currentWord && (
-          <WordDetailsOverlay
-            wordId={currentWord.id}
-            onClose={() => handleInfoOpen(false)}
-          />
-        )}
       </div>
 
-      <div className={styles.bottom}>
+      <div className={styles.buttons}>
         <ButtonIcon
-          icon={FaInfo}
-          onClick={() => handleInfoOpen(!isInfoOpen)}
+          icon={FaBook}
+          onClick={() => handleDetailsOpen(!isDetailsOpen)}
           disabled={!isResolved}
-          toggled={isInfoOpen}
+          toggled={isDetailsOpen}
         />
 
         <ButtonIcon
@@ -226,6 +219,13 @@ const ExerciseContent = ({
 
         <ButtonIcon icon={HiMiniXMark} color="negative" onClick={handleClose} />
       </div>
+
+      {isDetailsOpen && currentWord && (
+        <WordDetailsOverlay
+          wordId={currentWord.id}
+          onClose={() => handleDetailsOpen(false)}
+        />
+      )}
     </LayoutProvider>
   );
 };

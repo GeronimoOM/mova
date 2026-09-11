@@ -3,12 +3,13 @@ import { fontThemeVars, themeVars } from '../../../index.css';
 
 export const modal = style({
   height: '90%',
-  maxHeight: 600,
+  maxHeight: 700,
   width: '90%',
   maxWidth: 500,
 });
 
 export const wrapper = style({
+  position: 'relative',
   width: '100%',
   height: '100%',
   display: 'flex',
@@ -17,8 +18,18 @@ export const wrapper = style({
   justifyContent: 'center',
 });
 
+export const titleRow = style({
+  position: 'sticky',
+  top: 0,
+  padding: 10,
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  backgroundColor: themeVars.color.background,
+});
+
 export const title = style({
-  margin: '0 auto',
   fontFamily: fontThemeVars.monoFont,
   fontWeight: 500,
   letterSpacing: '0.025em',
@@ -30,6 +41,7 @@ export const title = style({
 export const list = style({
   width: '100%',
   height: '100%',
+  boxSizing: 'border-box',
   display: 'flex',
   flexDirection: 'column',
   overflowY: 'auto',
@@ -51,16 +63,12 @@ export const listItemContent = style({
   gap: 5,
 });
 
-export const interpretation = style({
-  paddingBottom: 5,
-});
-
 export const sentences = style({
   backgroundColor: themeVars.color.backgroundLight,
   display: 'flex',
   flexDirection: 'column',
-  padding: 10,
-  gap: 20,
+  padding: 5,
+  gap: 15,
 });
 
 export const example = style({

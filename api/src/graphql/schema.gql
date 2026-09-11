@@ -456,6 +456,7 @@ type Mutation {
   deleteWord(input: DeleteWordInput!): Word!
   createLink(input: CreateWordLinkInput!): WordLink!
   deleteLink(input: DeleteWordLinkInput!): WordLink!
+  resetWordOverview(input: ResetWordOverviewInput!): WordOverview
   attemptMastery(wordId: ID!, success: Boolean!): Word!
   resetConfidence(wordId: ID!): Word!
   setGoals(input: SetGoalsInput!): [Goal!]!
@@ -578,6 +579,10 @@ input DeleteWordLinkInput {
   word1Id: ID!
   word2Id: ID!
   type: WordLinkType!
+}
+
+input ResetWordOverviewInput {
+  id: ID!
 }
 
 input SetGoalsInput {

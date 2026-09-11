@@ -4,7 +4,7 @@ import { fontThemeVars, themeVars } from '../../index.css';
 export const wrapper = style({
   display: 'flex',
   flexDirection: 'column',
-  gap: 15,
+  gap: 10,
   padding: '0 1px',
 });
 
@@ -32,7 +32,6 @@ export const propertyLabel = style({
 });
 
 export const result = style({
-  marginTop: 10,
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'center',

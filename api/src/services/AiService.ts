@@ -83,10 +83,10 @@ export class AiService implements OnApplicationBootstrap {
     ctx: Context,
     wordId: WordId,
   ): Promise<WordOverview | null> {
-    const type = AiOutputType.WordOverview;
-    const userSettings = await this.userService.getSettings(ctx.user.id);
-    const userLocale = userSettings.selectedLocale as string;
-    const key = `${type}:${userLocale}:${wordId}`;
+    const { key, type, userLocale } = await this.getWorldOverviewKey(
+      ctx,
+      wordId,
+    );
 
     return await this.getAiOutput(ctx, key, type, async () => {
       const word = await this.wordService.getById(ctx, wordId);
@@ -140,6 +140,28 @@ export class AiService implements OnApplicationBootstrap {
         ),
       };
     });
+  }
+
+  async clearWordOverview(ctx: Context, wordId: WordId): Promise<void> {
+    const { key } = await this.getWorldOverviewKey(ctx, wordId);
+
+    await this.aiOutputsRepository.delete(key);
+  }
+
+  private async getWorldOverviewKey(
+    ctx: Context,
+    wordId: WordId,
+  ): Promise<{
+    key: string;
+    type: AiOutputType;
+    userLocale: string;
+  }> {
+    const type = AiOutputType.WordOverview;
+    const userSettings = await this.userService.getSettings(ctx.user.id);
+    const userLocale = userSettings.selectedLocale as string;
+    const key = `${type}:${userLocale}:${wordId}`;
+
+    return { key, type, userLocale };
   }
 
   onApplicationBootstrap() {

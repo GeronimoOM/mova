@@ -1,4 +1,5 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, ID, InputType, ObjectType } from '@nestjs/graphql';
+import { WordId } from 'models/Word';
 
 @ObjectType('WordOverview')
 export class WordOverviewType {
@@ -22,4 +23,10 @@ export class WordOverviewInterpretationType {
 
   @Field()
   translation: string;
+}
+
+@InputType()
+export class ResetWordOverviewInput {
+  @Field(() => ID)
+  id: WordId;
 }

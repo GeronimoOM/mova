@@ -15,7 +15,6 @@ export const title = style({
   flexDirection: 'column',
   alignItems: 'center',
   gap: 10,
-  fontWeight: 'bold',
 });
 
 export const property = style({

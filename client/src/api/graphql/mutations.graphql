@@ -112,3 +112,9 @@ mutation UpdateSettings($input: UpdateUserSettingsInput!) {
     selectedFont
   }
 }
+
+mutation ResetWordOverview($id: ID!) {
+  resetWordOverview(input: { id: $id }) {
+    ...WordOverviewFields
+  }
+}

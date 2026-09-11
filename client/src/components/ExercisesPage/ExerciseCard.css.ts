@@ -1,22 +1,38 @@
 import { globalStyle, style } from '@vanilla-extract/css';
 import { themeVars } from '../../index.css';
 
-export const card = style({
-  padding: 10,
+export const wrapper = style({
   backgroundColor: themeVars.color.background,
   flex: 1,
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   position: 'relative',
-  height: '100%',
-  overflowY: 'auto',
+  minHeight: 0,
 });
 
 export const exercise = style({
   boxSizing: 'border-box',
   width: '100%',
   maxWidth: 500,
+  flex: 1,
+  overflowY: 'auto',
+  minHeight: 0,
+  padding: 10,
+});
+
+export const buttons = style({
+  display: 'flex',
+  flexDirection: 'row',
+  padding: 10,
+  gap: 20,
+  boxSizing: 'border-box',
+  width: '100%',
+  flex: 0,
+});
+
+globalStyle(`${buttons} > *:last-child`, {
+  marginLeft: 'auto',
 });
 
 export const details = style({
@@ -47,23 +63,6 @@ export const noWordsTitle = style({
 export const noWordsDescription = style({
   color: themeVars.color.muted,
   textAlign: 'center',
-});
-
-export const bottom = style({
-  position: 'absolute',
-  left: 0,
-  bottom: 0,
-  right: 0,
-  display: 'flex',
-  flexDirection: 'row',
-  padding: 20,
-  gap: 20,
-  boxSizing: 'border-box',
-  width: '100%',
-});
-
-globalStyle(`${bottom} > *:last-child`, {
-  marginLeft: 'auto',
 });
 
 export const exercisesReady = style({

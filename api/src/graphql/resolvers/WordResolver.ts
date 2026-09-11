@@ -12,7 +12,10 @@ import {
   DeleteWordLinkInput,
   WordLinkObjectType,
 } from 'graphql/types/WordLinkType';
-import { WordOverviewType } from 'graphql/types/WordOverviewType';
+import {
+  ResetWordOverviewInput,
+  WordOverviewType,
+} from 'graphql/types/WordOverviewType';
 import { ContextDec } from 'middleware/ContextMiddleware';
 import { AiWordOverview } from 'models/AiOutput';
 import { Context } from 'models/Context';
@@ -109,5 +112,14 @@ export class WordResolver {
     @Args('input') input: DeleteWordLinkInput,
   ): Promise<WordLinkObjectType> {
     return await this.wordService.deleteLink(ctx, input);
+  }
+
+  @Mutation(() => WordOverviewType, { nullable: true })
+  async resetWordOverview(
+    @ContextDec() ctx: Context,
+    @Args('input') input: ResetWordOverviewInput,
+  ): Promise<AiWordOverview | null> {
+    await this.aiService.clearWordOverview(ctx, input.id);
+    return await this.aiService.getWordOverview(ctx, input.id);
   }
 }

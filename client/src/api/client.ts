@@ -5,6 +5,7 @@ import {
   ServerError,
 } from '@apollo/client';
 import { ErrorLink } from '@apollo/client/link/error';
+import { AppRoute } from '../routes';
 import { LOCAL_STORAGE_TOKEN_KEY } from '../utils/constants';
 import { cache } from './cache';
 
@@ -23,7 +24,7 @@ const httpLink = new HttpLink({
 const errorLink = new ErrorLink(({ error }) => {
   if (ServerError.is(error) && error.statusCode === 401) {
     localStorage.removeItem(LOCAL_STORAGE_TOKEN_KEY);
-    window.location.replace('/');
+    window.location.replace(AppRoute.Default);
   }
 });
 

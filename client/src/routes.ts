@@ -12,4 +12,5 @@ export enum AppRoute {
 
 export const allowedNoLanguageRoutes = [AppRoute.Languages, AppRoute.User];
 
-export const wordRoute = (wordId: string) => `/words/${wordId}`;
+export const wordRoute = (wordId: string) =>
+  AppRoute.Word.replace(':id', wordId);

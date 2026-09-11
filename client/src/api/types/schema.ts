@@ -293,6 +293,7 @@ export type Mutation = {
   login?: Maybe<Scalars['String']['output']>;
   reorderProperties: Array<Property>;
   resetConfidence: Word;
+  resetWordOverview?: Maybe<WordOverview>;
   setGoals: Array<Goal>;
   updateLanguage: Language;
   updateProperty: Property;
@@ -364,6 +365,11 @@ export type MutationReorderPropertiesArgs = {
 
 export type MutationResetConfidenceArgs = {
   wordId: Scalars['ID']['input'];
+};
+
+
+export type MutationResetWordOverviewArgs = {
+  input: ResetWordOverviewInput;
 };
 
 
@@ -573,6 +579,10 @@ export type ReorderPropertiesInput = {
   languageId: Scalars['ID']['input'];
   partOfSpeech: PartOfSpeech;
   propertyIds: Array<Scalars['ID']['input']>;
+};
+
+export type ResetWordOverviewInput = {
+  id: Scalars['ID']['input'];
 };
 
 export type SavePropertyValueInput = {

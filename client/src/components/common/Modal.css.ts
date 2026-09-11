@@ -26,6 +26,5 @@ export const modalWrapper = style({
 export const modal = style({
   border: `2px solid ${themeVars.color.text}`,
   borderRadius: 4,
-  padding: 10,
   backgroundColor: `${themeVars.color.background}`,
 });

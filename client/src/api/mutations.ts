@@ -36,6 +36,7 @@ import {
   PropertyFieldsFragmentDoc,
   ReorderPropertiesDocument,
   ResetConfidenceDocument,
+  ResetWordOverviewDocument,
   SetGoalsDocument,
   UpdateLanguageDocument,
   UpdatePropertyDocument,
@@ -46,6 +47,7 @@ import {
   WordFieldsFullFragmentDoc,
   WordFieldsLinksFragmentDoc,
   WordLinkType,
+  WordOverviewFieldsFragmentDoc,
 } from './types/graphql';
 
 type UseMutationResult<MDocument> =
@@ -370,6 +372,27 @@ export function useSetGoals(): UseMutationResult<typeof SetGoalsDocument> {
         __typename: 'Goal',
       })),
     }),
+  });
+}
+
+export function useResetWordOverview(): UseMutationResult<
+  typeof ResetWordOverviewDocument
+> {
+  return useMutation(ResetWordOverviewDocument, {
+    update: (cache, { data }, { variables }) => {
+      cache.updateFragment(
+        {
+          id: `WordOverview:${variables!.id}`,
+          fragment: WordOverviewFieldsFragmentDoc,
+          fragmentName: 'WordOverviewFields',
+          overwrite: true,
+        },
+        () => ({
+          ...data?.resetWordOverview,
+          __typename: 'WordOverview' as const,
+        }),
+      );
+    },
   });
 }
 
