@@ -16,29 +16,34 @@ export const NavBar = () => {
       <div className={styles.title}>
         <p>Mova</p>
       </div>
-      <NavBarItem href={AppRoute.Default} icon={FaBook} text={t('nav.words')} />
       <NavBarItem
-        href={AppRoute.Exercises}
+        route={AppRoute.Default}
+        icon={FaBook}
+        text={t('nav.words')}
+        activeRoutes={[AppRoute.Default, AppRoute.Words, AppRoute.WordNew]}
+      />
+      <NavBarItem
+        route={AppRoute.Exercises}
         icon={FaBrain}
         text={t('nav.exercises')}
       />
       <NavBarItem
-        href={AppRoute.Progress}
+        route={AppRoute.Progress}
         icon={BsFillBarChartFill}
         text={t('nav.progress')}
       />
       <NavBarItem
-        href={AppRoute.Properties}
+        route={AppRoute.Properties}
         icon={PiGraphBold}
         text={t('nav.properties')}
       />
       <NavBarItem
-        href={AppRoute.Languages}
+        route={AppRoute.Languages}
         icon={FaEarthEurope}
         text={t('nav.language')}
       />
 
-      <NavBarItem href={AppRoute.User} icon={FaUser} text={t('nav.user')} />
+      <NavBarItem route={AppRoute.User} icon={FaUser} text={t('nav.user')} />
     </nav>
   );
 };

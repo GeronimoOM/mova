@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { client, setClientId } from './api/client';
 import { App } from './components/App';
+import { RouterProvider } from './context/RouterContext';
 import { UserProvider } from './context/UserContext';
 import './index.css';
 import { registerServiceWorker } from './sw/client/register';
@@ -24,9 +25,11 @@ initTranslator();
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <ApolloProvider client={client}>
     <BrowserRouter>
-      <UserProvider>
-        <App />
-      </UserProvider>
+      <RouterProvider>
+        <UserProvider>
+          <App />
+        </UserProvider>
+      </RouterProvider>
     </BrowserRouter>
   </ApolloProvider>,
 );
