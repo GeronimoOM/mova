@@ -1,13 +1,13 @@
 import React, { RefObject, useRef } from 'react';
 
-import { useClickOutsideHandler } from '../../utils/useClickOutsideHandler';
+import { useLayoutContext } from '../../context/LayoutContext';
+import { useClickOutsideHandler } from '../../hooks/useClickOutsideHandler';
 import {
   DropdownAlignment,
   DropdownPosition,
   isCustomAlignment,
   useDropdownPosition,
-} from '../../utils/useDropdownPosition';
-import { useLayoutContext } from '../LayoutContext';
+} from '../../hooks/useDropdownPosition';
 import * as styles from './Dropdown.css';
 
 export type DropdownProps = {

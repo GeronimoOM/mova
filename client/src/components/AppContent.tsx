@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { LanguageProvider } from '../context/LanguageContext';
 import {
   initServiceWorker,
   isServiceWorkerRegistered,
@@ -7,7 +8,6 @@ import {
 import { SwWorkerMessageType } from '../sw/worker/messages';
 import * as styles from './AppContent.css';
 import { Loader } from './common/Loader';
-import { LanguageProvider } from './LanguageContext';
 import { Main } from './Main';
 import { NavBar } from './NavBar/NavBar';
 

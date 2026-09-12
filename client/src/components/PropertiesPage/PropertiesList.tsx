@@ -4,7 +4,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { TbHexagonPlusFilled } from 'react-icons/tb';
 import { v1 as uuid } from 'uuid';
 import { PartOfSpeech } from '../../api/types/graphql';
-import { useLanguageContext } from '../LanguageContext';
+import { useLanguageContext } from '../../context/LanguageContext';
 import { ButtonIcon } from '../common/ButtonIcon';
 import * as styles from './PropertiesList.css';
 import { PropertyListItem, PropertyListItemOverlay } from './PropertyListItem';

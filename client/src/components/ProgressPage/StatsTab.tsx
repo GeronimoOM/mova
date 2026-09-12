@@ -6,6 +6,7 @@ import { GiMuscleUp } from 'react-icons/gi';
 import { PiGraphBold } from 'react-icons/pi';
 import { PieChart } from 'react-minimal-pie-chart';
 import { GetStatsDocument } from '../../api/types/graphql';
+import { useLanguageContext } from '../../context/LanguageContext';
 import {
   confidences,
   confidenceToColor,
@@ -17,7 +18,6 @@ import {
   partOfSpeechToFullLabel,
   partsOfSpeech,
 } from '../../utils/partsOfSpeech';
-import { useLanguageContext } from '../LanguageContext';
 import { Icon } from '../common/Icon';
 import * as styles from './StatsTab.css';
 

@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useUserContext } from '../../../context/UserContext';
 import { DISPLAY_DATE_TIME_FORMAT } from '../../../utils/constants';
 import { fromTimestamp } from '../../../utils/datetime';
 import { Locale } from '../../../utils/translator';
 import { Dropdown } from '../../common/Dropdown';
-import { useUserContext } from '../../UserContext';
 import * as styles from './WordMastery.css';
 
 import { DateTime } from 'luxon';

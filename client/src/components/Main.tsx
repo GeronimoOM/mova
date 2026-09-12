@@ -1,9 +1,9 @@
 import { useRef } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { AppRoute } from '../routes';
+import { LayoutProvider } from './../context/LayoutContext';
 import { ExercisesPage } from './ExercisesPage/ExercisesPage';
 import { LanguagesPage } from './LanguagesPage/LanguagesPage';
-import { LayoutProvider } from './LayoutContext';
 import * as styles from './Main.css';
 import { ProgressPage } from './ProgressPage/ProgressPage';
 import { PropertiesPage } from './PropertiesPage/PropertiesPage';

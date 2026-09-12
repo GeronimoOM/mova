@@ -2,10 +2,10 @@ import { useState } from 'react';
 
 import { useTranslation } from 'react-i18next';
 import { FaCheck } from 'react-icons/fa';
+import { useUserContext } from '../context/UserContext';
 import { ButtonIcon } from './common/ButtonIcon';
 import { Input } from './common/Input';
 import * as styles from './LoginForm.css';
-import { useUserContext } from './UserContext';
 
 export const LoginForm = () => {
   const [name, setName] = useState('');

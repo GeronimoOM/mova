@@ -7,8 +7,8 @@ import {
   useUpdateLanguage,
 } from '../../api/mutations';
 import { LanguageFieldsFragment } from '../../api/types/graphql';
+import { useLanguageContext } from '../../context/LanguageContext';
 import { toTimestamp } from '../../utils/datetime';
-import { useLanguageContext } from '../LanguageContext';
 
 const MIN_LANGUAGE_NAME_LENGTH = 3;
 

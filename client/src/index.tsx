@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { client, setClientId } from './api/client';
 import { App } from './components/App';
-import { UserProvider } from './components/UserContext';
+import { UserProvider } from './context/UserContext';
 import './index.css';
 import { registerServiceWorker } from './sw/client/register';
 import { SwWorkerMessageType } from './sw/worker/messages';

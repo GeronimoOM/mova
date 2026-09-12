@@ -20,9 +20,9 @@ import {
   PropertyType,
   UpdateOptionInput,
 } from '../../api/types/graphql';
+import { useLanguageContext } from '../../context/LanguageContext';
 import { toRecord } from '../../utils/arrays';
 import { toTimestamp } from '../../utils/datetime';
-import { useLanguageContext } from '../LanguageContext';
 
 const MIN_PROPERTY_NAME_LENGTH = 3;
 

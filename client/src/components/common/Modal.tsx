@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import React, { useRef } from 'react';
 
-import { useClickOutsideHandler } from '../../utils/useClickOutsideHandler';
+import { useClickOutsideHandler } from '../../hooks/useClickOutsideHandler';
 import * as styles from './Modal.css';
 
 export type ModalProps = {

@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { TbHexagonPlusFilled } from 'react-icons/tb';
 import { WordFieldsFragment } from '../../../api/types/graphql';
+import { useInfiniteScroll } from '../../../hooks/useInfiniteScroll';
 import { MIN_QUERY_LENGTH } from '../../../utils/constants';
-import { useInfiniteScroll } from '../../../utils/useInfiniteScroll';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { Loader } from '../../common/Loader';
 import * as styles from './WordsList.css';

@@ -32,9 +32,9 @@ import {
   WordFieldsFullFragment,
   WordLinkType,
 } from '../../../api/types/graphql';
+import { useLanguageContext } from '../../../context/LanguageContext';
 import { toRecord } from '../../../utils/arrays';
 import { toTimestamp } from '../../../utils/datetime';
-import { useLanguageContext } from '../../LanguageContext';
 
 export type Word = Omit<
   Partial<WordFieldsFullFragment>,

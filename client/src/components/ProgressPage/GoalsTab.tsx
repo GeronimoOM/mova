@@ -12,8 +12,8 @@ import {
   ProgressCadence,
   ProgressType,
 } from '../../api/types/graphql';
+import { useLanguageContext } from '../../context/LanguageContext';
 import { toRecord } from '../../utils/arrays';
-import { useLanguageContext } from '../LanguageContext';
 import { ButtonIcon } from '../common/ButtonIcon';
 import { Icon } from '../common/Icon';
 import { Input } from '../common/Input';

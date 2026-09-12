@@ -10,6 +10,9 @@ import {
   ProgressCadence,
   ProgressType,
 } from '../../api/types/graphql';
+import { useLanguageContext } from '../../context/LanguageContext';
+import { useUserContext } from '../../context/UserContext';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { breakpoints, hover } from '../../index.css';
 import { sequence } from '../../utils/arrays';
 import {
@@ -20,9 +23,6 @@ import {
   N_WEEKDAYS,
 } from '../../utils/constants';
 import { Locale } from '../../utils/translator';
-import { useMediaQuery } from '../../utils/useMediaQuery';
-import { useLanguageContext } from '../LanguageContext';
-import { useUserContext } from '../UserContext';
 import { ButtonIcon } from '../common/ButtonIcon';
 import { Dropdown } from '../common/Dropdown';
 import { Icon } from '../common/Icon';

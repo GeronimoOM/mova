@@ -1,9 +1,9 @@
 import classNames from 'classnames';
 import { IconType } from 'react-icons';
 import { NavLink } from 'react-router-dom';
+import { useLanguageContext } from '../../context/LanguageContext';
 import { allowedNoLanguageRoutes, AppRoute } from '../../routes';
 import { Icon } from '../common/Icon';
-import { useLanguageContext } from '../LanguageContext';
 import * as styles from './NavBarItem.css';
 
 type NavBarItemProps = {

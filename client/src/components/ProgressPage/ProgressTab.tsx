@@ -5,7 +5,7 @@ import {
   ProgressFieldsFragment,
   ProgressType,
 } from '../../api/types/graphql';
-import { useLanguageContext } from '../LanguageContext';
+import { useLanguageContext } from '../../context/LanguageContext';
 import { ProgressCalendar } from './ProgressCalendar';
 import * as styles from './ProgressTab.css';
 import { ProgressTypeBar } from './ProgressTypeBar';

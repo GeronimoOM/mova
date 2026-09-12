@@ -1,9 +1,9 @@
 import classNames from 'classnames';
+import { useUserContext } from '../context/UserContext';
 import { classicFontTheme, defaultFontTheme, theme } from '../index.css';
 import * as styles from './App.css';
 import { AppContent } from './AppContent';
 import { LoginForm } from './LoginForm';
-import { useUserContext } from './UserContext';
 
 export const App = () => {
   const { authToken, settings } = useUserContext();

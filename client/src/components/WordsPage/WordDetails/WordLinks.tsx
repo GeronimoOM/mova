@@ -17,13 +17,13 @@ import {
   TbLinkOff,
   TbLinkPlus,
 } from 'react-icons/tb';
+import { useLanguageContext } from '../../../context/LanguageContext';
+import { useDebouncedValue } from '../../../hooks/useDebouncedValue';
 import { MIN_QUERY_LENGTH } from '../../../utils/constants';
-import { useDebouncedValue } from '../../../utils/useDebouncedValue';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { Dropdown } from '../../common/Dropdown';
 import { Icon } from '../../common/Icon';
 import { Input } from '../../common/Input';
-import { useLanguageContext } from '../../LanguageContext';
 import { LinkedWordChange, Word } from './useWordDetails';
 import * as styles from './WordLinks.css';
 

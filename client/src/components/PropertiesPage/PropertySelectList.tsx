@@ -5,8 +5,8 @@ import {
   GetPropertiesDocument,
   PropertyFieldsFragment,
 } from '../../api/types/graphql';
-import { useDebouncedValue } from '../../utils/useDebouncedValue.ts';
-import { useLanguageContext } from '../LanguageContext.tsx';
+import { useLanguageContext } from '../../context/LanguageContext.tsx';
+import { useDebouncedValue } from '../../hooks/useDebouncedValue.ts';
 import { Icon } from '../common/Icon.tsx';
 import { Input } from '../common/Input.tsx';
 import { PartOfSpeechPill } from '../common/PartOfSpeechPill.tsx';

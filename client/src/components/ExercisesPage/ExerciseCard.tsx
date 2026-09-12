@@ -14,10 +14,10 @@ import {
   GetPropertiesDocument,
   PropertyFieldsFragment,
 } from '../../api/types/graphql';
+import { useLanguageContext } from '../../context/LanguageContext';
+import { LayoutProvider } from '../../context/LayoutContext';
 import { wordRoute } from '../../routes';
 import { toGroupedRecord } from '../../utils/arrays';
-import { useLanguageContext } from '../LanguageContext';
-import { LayoutProvider } from '../LayoutContext';
 import { WordDetails } from '../WordsPage/WordDetails/WordDetails';
 import { ButtonIcon } from '../common/ButtonIcon';
 import { Loader } from '../common/Loader';

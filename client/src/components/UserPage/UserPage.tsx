@@ -4,10 +4,10 @@ import { MdLogout } from 'react-icons/md';
 import classNames from 'classnames';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useUserContext } from '../../context/UserContext';
 import { Font } from '../../utils/fonts';
 import { Locale } from '../../utils/translator';
 import { ButtonIcon } from '../common/ButtonIcon';
-import { useUserContext } from '../UserContext';
 import * as styles from './UserPage.css';
 
 const translationLanguageToFlag: Record<Locale, FlagComponent> = {

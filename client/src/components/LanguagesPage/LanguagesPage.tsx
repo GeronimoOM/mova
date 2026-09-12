@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/client/react';
 import { GetLanguagesDocument } from '../../api/types/graphql';
-import { useLanguageContext } from '../LanguageContext';
+import { useLanguageContext } from '../../context/LanguageContext';
 
 import { useCallback, useEffect, useState } from 'react';
 import { TbHexagonPlusFilled } from 'react-icons/tb';

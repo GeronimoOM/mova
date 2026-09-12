@@ -10,8 +10,8 @@ import { ProgressTab } from './ProgressTab';
 import { StatsTab } from './StatsTab';
 
 import { useTranslation } from 'react-i18next';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { breakpoints } from '../../index.css';
-import { useMediaQuery } from '../../utils/useMediaQuery';
 import * as styles from './ProgressPage.css';
 
 export enum ProgressPageTab {
